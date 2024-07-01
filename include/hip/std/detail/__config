@@ -1,0 +1,272 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of libhip++ (derived from libcu++),
+// the C++ Standard Library for your entire system,
+// under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#ifndef __cuda_std__
+#define __cuda_std__
+
+#ifdef __CUDACC__
+    #if defined(__clang__)
+        #include <hip_fp16.h>
+        #define __fp16 __half
+    #endif
+    #if defined(__FLT16_MANT_DIG__)
+        #include <hip_fp16.h>
+        #define _Float16 __half
+    #endif
+    #define _LIBCUDACXX_CUDACC_VER_MAJOR __CUDACC_VER_MAJOR__
+    #define _LIBCUDACXX_CUDACC_VER_MINOR __CUDACC_VER_MINOR__
+    #define _LIBCUDACXX_CUDACC_VER_BUILD __CUDACC_VER_BUILD__
+    #define _LIBCUDACXX_CUDACC_VER                                                  \
+        _LIBCUDACXX_CUDACC_VER_MAJOR * 100000 + _LIBCUDACXX_CUDACC_VER_MINOR * 1000 + \
+        _LIBCUDACXX_CUDACC_VER_BUILD
+
+    #define _LIBCUDACXX_HAS_NO_LONG_DOUBLE
+#else
+    #ifndef __host__
+        #define __host__
+    #endif
+    #ifndef __device__
+        #define __device__
+    #endif
+    #ifndef __forceinline__
+        #define __forceinline__
+    #endif
+#endif
+
+#ifdef _MSC_VER
+    #undef __cpp_lib_transparent_operators
+#endif
+
+// request these outcomes
+#define _LIBCUDACXX_NO_AUTO_LINK
+#ifndef _LIBCUDACXX_NO_EXCEPTIONS
+    #define _LIBCUDACXX_NO_EXCEPTIONS
+#endif
+#ifndef _LIBCUDACXX_NO_RTTI
+    #define _LIBCUDACXX_NO_RTTI
+#endif
+// Disable the nodebug type
+#ifndef _LIBCUDACXX_NODEBUG_TYPE
+    #define _LIBCUDACXX_NODEBUG_TYPE
+#endif
+
+#if defined(__HIPCC_RTC__)
+#  if defined(__CUDACC_RTC_INT128__)
+#    define __SIZEOF_INT128__ 16 // This macro is required in order to use int128 within the library
+#  else
+#    define _LIBCUDACXX_HAS_NO_INT128
+#  endif
+#endif
+
+#if defined(_LIBCUDACXX_COMPILER_MSVC) || (defined(_LIBCUDACXX_CUDACC_VER) && (_LIBCUDACXX_CUDACC_VER < 1105000))
+#  define _LIBCUDACXX_HAS_NO_INT128
+#endif
+
+#if defined(_LIBCUDACXX_COMPILER_MSVC) || (defined(_LIBCUDACXX_CUDACC_VER) && (_LIBCUDACXX_CUDACC_VER < 1100000))
+#  define _LIBCUDACXX_HAS_NO_ATTRIBUTE_NO_UNIQUE_ADDRESS
+#endif
+
+#ifndef _LIBCUDACXX_ASSERT
+#   define _LIBCUDACXX_ASSERT(x, m) ((void)0)
+#endif
+#define _LIBCUDACXX_FREESTANDING
+#define _LIBCUDACXX_HAS_NO_WCHAR_H
+#define _LIBCUDACXX_HAS_NO_THREAD_CONTENTION_TABLE
+#define _LIBCUDACXX_HAS_NO_PLATFORM_WAIT
+#define _LIBCUDACXX_HAS_NO_MONOTONIC_CLOCK
+#define _LIBCUDACXX_HAS_NO_TREE_BARRIER
+#ifdef __HIPCC_RTC__
+    #define __ELF__
+    #define _LIBCUDACXX_DISABLE_PRAGMA_GCC_SYSTEM_HEADER
+    #define _LIBCUDACXX_HAS_THREAD_API_EXTERNAL
+    #define __alignof(x) alignof(x)
+    #define _LIBCUDACXX_LITTLE_ENDIAN
+    #define _LIBCUDACXX_DISABLE_VISIBILITY_ANNOTATIONS
+    #define _LIBCUDACXX_HAS_NO_PRAGMA_PUSH_POP_MACRO
+#endif
+#define _LIBCUDACXX_HAS_EXTERNAL_ATOMIC_IMP
+#define _LIBCUDACXX_ATOMIC_ALWAYS_LOCK_FREE(size, ptr) (size <= 8)
+#define _LIBCUDACXX_HAS_NO_CXX20_CHRONO_LITERALS
+
+#if defined(__HIP_DEVICE_COMPILE__) || defined(__HIPCC_RTC__)
+// FIXME(hip): Other devices (e.g., from NVIDIA) may have a different clock rate for wall_clock64 and are currently not supported with HIP.
+// We may need to hardcode their clock rate at compile time or find a way to query it at runtime.
+// gfx90a and gfx908: 25 MHz TSC for wall_clock64 -> 1*1e9/25*1e6 ns/cycle = 40 ns/cycle
+#if defined(__gfx908__) || defined(__gfx90a__)
+#define _LIBCUDACXX_HIP_TSC_CLOCKRATE 25000000
+#define _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE 40 // (1/_LIBCUDACXX_HIP_TSC_CLOCKRATE)  
+// gfx940 gfx941 and gfx942: 100 MHz TSC for wall_clock64 -> 1*1e9/100*1e6 ns/cycle = 10 ns/cycle
+#elif defined(__gfx940__) || defined(__gfx941__) || defined(__gfx942__)
+#define _LIBCUDACXX_HIP_TSC_CLOCKRATE 100000000
+#define _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE 10 // (1/_LIBCUDACXX_HIP_TSC_CLOCKRATE)  
+#endif
+
+#define _LIBCUDACXX_SYS_CLOCK_DURATION duration<long long, std::ratio<1,_LIBCUDACXX_HIP_TSC_CLOCKRATE>>
+
+#else
+#define _LIBCUDACXX_SYS_CLOCK_DURATION nanoseconds
+#endif // defined(__HIP_DEVICE_COMPILE__) || defined(__HIPCC_RTC__)
+
+#if defined(__PGIC__) && defined(__linux__)
+    #define __ELF__
+#endif
+
+#define _LIBCUDACXX_ENABLE_BIT_BACKPORT
+
+#define _LIBCUDACXX_HAS_CUDA_ATOMIC_EXT
+
+#include "libcxx/include/__config"
+
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__) || defined(__HIPCC_RTC__)
+    #define _LIBCUDACXX_HAS_THREAD_API_CUDA
+#elif defined(_LIBCUDACXX_COMPILER_MSVC)
+    #define _LIBCUDACXX_HAS_THREAD_API_WIN32
+#endif
+
+#if _GNUC_VER <= 409
+    #define _LIBCUDACXX_CUDA_HAS_NO_HOST_STD_ATOMIC_INIT
+#endif
+
+// force this outcome
+#undef _LIBCUDACXX_EXECUTION_SPACE_SPECIFIER
+#define _LIBCUDACXX_EXECUTION_SPACE_SPECIFIER __host__ __device__
+#undef _LIBCUDACXX_ATOMIC_FLAG_TYPE
+#define _LIBCUDACXX_ATOMIC_FLAG_TYPE int
+#undef _LIBCUDACXX_INLINE_VISIBILITY
+#define _LIBCUDACXX_INLINE_VISIBILITY _LIBCUDACXX_EXECUTION_SPACE_SPECIFIER
+#undef _LIBCUDACXX_FUNC_VIS
+#define _LIBCUDACXX_FUNC_VIS _LIBCUDACXX_INLINE_VISIBILITY
+#undef _LIBCUDACXX_TYPE_VIS
+#define _LIBCUDACXX_TYPE_VIS
+
+#ifndef _LIBCUDACXX_ABI_UNSTABLE
+#  define _LIBCUDACXX_ABI_UNSTABLE
+#endif
+
+#define _LIBHIPCXX_HIP_API_VERSION 1009000
+
+#define _LIBHIPCXX_HIP_API_VERSION_MAJOR \
+  (_LIBHIPCXX_HIP_API_VERSION / 1000000)
+
+#define _LIBHIPCXX_HIP_API_VERSION_MINOR \
+  (_LIBHIPCXX_HIP_API_VERSION / 1000 % 1000)
+
+#define _LIBHIPCXX_HIP_API_VERSION_PATCH \
+  (_LIBHIPCXX_HIP_API_VERSION % 1000)
+
+#ifndef _LIBHIPCXX_HIP_ABI_VERSION_LATEST
+#  define _LIBHIPCXX_HIP_ABI_VERSION_LATEST 4
+#endif
+
+#ifdef _LIBHIPCXX_HIP_ABI_VERSION
+#  if _LIBHIPCXX_HIP_ABI_VERSION != 2 && _LIBHIPCXX_HIP_ABI_VERSION != 3 && _LIBHIPCXX_HIP_ABI_VERSION != 4
+#    error Unsupported libcu++ ABI version requested. Please define _LIBHIPCXX_HIP_ABI_VERSION to either 2 or 3.
+#  endif
+#else
+#  define _LIBHIPCXX_HIP_ABI_VERSION _LIBHIPCXX_HIP_ABI_VERSION_LATEST
+#endif
+
+#ifdef _LIBCUDACXX_PIPELINE_ASSUMED_ABI_VERSION
+#  if _LIBCUDACXX_PIPELINE_ASSUMED_ABI_VERSION != _LIBHIPCXX_HIP_ABI_VERSION
+#    error cuda_pipeline.h has assumed a different libcu++ ABI version than provided by this library. To fix this, please include a libcu++ header before including cuda_pipeline.h, or upgrade to a version of the toolkit this version of libcu++ shipped in.
+#  endif
+#endif
+
+#ifndef _LIBCUDACXX_CUDA_ABI_NAMESPACE
+#  define _LIBCUDACXX_CUDA_ABI_NAMESPACE _LIBCUDACXX_CONCAT(__,_LIBHIPCXX_HIP_ABI_VERSION)
+#endif
+
+#ifndef _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
+#  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA \
+    namespace hip { inline namespace _LIBCUDACXX_CUDA_ABI_NAMESPACE {
+#endif
+#ifndef _LIBCUDACXX_END_NAMESPACE_CUDA
+#  define _LIBCUDACXX_END_NAMESPACE_CUDA } } \
+    namespace cuda = hip;
+#endif
+
+#ifndef _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE
+#  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE \
+    namespace hip { namespace device { inline namespace _LIBCUDACXX_CUDA_ABI_NAMESPACE {
+#endif
+#ifndef _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE
+#  define _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE } } }  \
+    namespace cuda = hip;
+#endif
+
+// redefine namespace std::
+#undef _LIBCUDACXX_BEGIN_NAMESPACE_STD
+#define _LIBCUDACXX_BEGIN_NAMESPACE_STD \
+   namespace hip { namespace std { inline namespace _LIBCUDACXX_CUDA_ABI_NAMESPACE {
+
+#undef _LIBCUDACXX_END_NAMESPACE_STD
+#define _LIBCUDACXX_END_NAMESPACE_STD } } } \
+   namespace cuda = hip;
+
+#undef _CUDA_VSTD
+#define _CUDA_VSTD hip::std::_LIBCUDACXX_CUDA_ABI_NAMESPACE
+
+#undef _LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION
+#define _LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION namespace hip { namespace std {
+#undef _LIBCUDACXX_END_NAMESPACE_STD_NOVERSION
+#define _LIBCUDACXX_END_NAMESPACE_STD_NOVERSION } }
+
+// redefine namespace std::ranges
+#undef _LIBCUDACXX_BEGIN_NAMESPACE_RANGES
+#define _LIBCUDACXX_BEGIN_NAMESPACE_RANGES \
+   namespace hip { namespace std { namespace ranges { inline namespace _LIBCUDACXX_CUDA_ABI_NAMESPACE {
+
+#undef _LIBCUDACXX_END_NAMESPACE_RANGES
+#define _LIBCUDACXX_END_NAMESPACE_RANGES } } } } \
+   namespace cuda = hip;
+
+#undef _CUDA_VRANGES
+#define _CUDA_VRANGES hip::std::ranges::_LIBCUDACXX_CUDA_ABI_NAMESPACE
+
+#undef _LIBCUDACXX_BEGIN_NAMESPACE_RANGES_ABI
+#if _LIBCUDACXX_STD_VER > 17
+#define _LIBCUDACXX_BEGIN_NAMESPACE_RANGES_ABI inline namespace __cxx20 {
+#else
+#define _LIBCUDACXX_BEGIN_NAMESPACE_RANGES_ABI inline namespace __cxx17 {
+#endif
+
+#undef _LIBCUDACXX_END_NAMESPACE_RANGES_ABI
+#define _LIBCUDACXX_END_NAMESPACE_RANGES_ABI }
+
+#undef _LIBCUDACXX_BEGIN_NAMESPACE_CPO
+#define _LIBCUDACXX_BEGIN_NAMESPACE_CPO(_CPO) namespace _CPO { _LIBCUDACXX_BEGIN_NAMESPACE_RANGES_ABI
+
+#undef _LIBCUDACXX_END_NAMESPACE_CPO
+#define _LIBCUDACXX_END_NAMESPACE_CPO } }
+
+#if defined(__CUDA_ARCH__)
+#  define _LIBCUDACXX_CPO_ACCESSIBILITY static __device__
+#else
+#  define _LIBCUDACXX_CPO_ACCESSIBILITY
+#endif
+
+#endif //__cuda_std__
