@@ -2107,12 +2107,6 @@ extern "C" _LIBCUDACXX_FUNC_VIS void __sanitizer_annotate_contiguous_container(
 #  define _LIBCUDACXX_SYS_CLOCK_DURATION microseconds
 #endif
 
-#if defined(__CUDA_ARCH__)
-#  define _LIBCUDACXX_CPO_ACCESSIBILITY static __device__
-#else
-#  define _LIBCUDACXX_CPO_ACCESSIBILITY
-#endif
-
 #if !defined(_LIBCUDACXX_DISABLE_EXEC_CHECK)
 #if defined(__HIPCC__)                       \
 && !defined(_LIBCUDACXX_COMPILER_NVRTC)      \
