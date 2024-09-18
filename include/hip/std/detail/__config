@@ -263,7 +263,7 @@
 #undef _LIBCUDACXX_END_NAMESPACE_CPO
 #define _LIBCUDACXX_END_NAMESPACE_CPO } }
 
-#if defined(__CUDA_ARCH__)
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
 #  define _LIBCUDACXX_CPO_ACCESSIBILITY static __device__
 #else
 #  define _LIBCUDACXX_CPO_ACCESSIBILITY

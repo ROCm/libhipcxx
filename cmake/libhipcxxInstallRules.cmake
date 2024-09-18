@@ -55,7 +55,7 @@ install(DIRECTORY "${libhipcxx_SOURCE_DIR}/lib/cmake/libhipcxx"
 set(install_location "${CMAKE_INSTALL_LIBDIR}/cmake/libhipcxx")
 # Transform to a list of directories, replace each directory with "../"
 # and convert back to a string
-string(REGEX REPLACE "/" "\;" from_install_prefix "${install_location}")
+string(REGEX REPLACE "/" ";" from_install_prefix "${install_location}")
 list(TRANSFORM from_install_prefix REPLACE ".+" "../")
 list(JOIN from_install_prefix "" from_install_prefix)
 

@@ -1,0 +1,145 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+
+
+// <cuda/std/tuple>
+
+// template <class... Types> class tuple;
+
+// template <class... UTypes> tuple(tuple<UTypes...>&& u);
+
+// UNSUPPORTED: c++98, c++03
+// UNSUPPORTED: nvrtc
+// Internal compiler error in 14.24
+// XFAIL: msvc-19.20, msvc-19.21, msvc-19.22, msvc-19.23, msvc-19.24, msvc-19.25
+
+#include <hip/std/tuple>
+#include <hip/std/cassert>
+#include <hip/std/type_traits>
+
+#include "test_macros.h"
+
+struct Explicit {
+  int value;
+  __host__ __device__ explicit Explicit(int x) : value(x) {}
+};
+
+struct Implicit {
+  int value;
+  __host__ __device__ Implicit(int x) : value(x) {}
+};
+
+struct B
+{
+ int id_;
+
+ __host__ __device__ explicit B(int i) : id_(i) {}
+
+ __host__ __device__ virtual ~B() {}
+};
+
+struct D
+    : B
+{
+    __host__ __device__ explicit D(int i) : B(i) {}
+};
+
+struct BonkersBananas {
+  template <class T>
+  operator T() &&;
+  template <class T, class = void>
+  explicit operator T() && = delete;
+};
+
+void test_bonkers_bananas_conversion() {
+  using ReturnType = hip::std::tuple<int, int>;
+  static_assert(hip::std::is_convertible<BonkersBananas, ReturnType>(), "");
+  //TODO: possibly a compiler bug that allows NVCC to think that it can construct a tuple from this type
+  // static_assert(!hip::std::is_constructible<ReturnType, BonkersBananas>(), "");
+}
+
+int main(int, char**)
+{
+    {
+        typedef hip::std::tuple<long> T0;
+        typedef hip::std::tuple<long long> T1;
+        T0 t0(2);
+        T1 t1 = hip::std::move(t0);
+        assert(hip::std::get<0>(t1) == 2);
+    }
+    {
+        typedef hip::std::tuple<long, char> T0;
+        typedef hip::std::tuple<long long, int> T1;
+        T0 t0(2, 'a');
+        T1 t1 = hip::std::move(t0);
+        assert(hip::std::get<0>(t1) == 2);
+        assert(hip::std::get<1>(t1) == int('a'));
+    }
+    {
+        typedef hip::std::tuple<long, char, D> T0;
+        typedef hip::std::tuple<long long, int, B> T1;
+        T0 t0(2, 'a', D(3));
+        T1 t1 = hip::std::move(t0);
+        assert(hip::std::get<0>(t1) == 2);
+        assert(hip::std::get<1>(t1) == int('a'));
+        assert(hip::std::get<2>(t1).id_ == 3);
+    }
+    {
+        D d(3);
+        typedef hip::std::tuple<long, char, D&> T0;
+        typedef hip::std::tuple<long long, int, B&> T1;
+        T0 t0(2, 'a', d);
+        T1 t1 = hip::std::move(t0);
+        d.id_ = 2;
+        assert(hip::std::get<0>(t1) == 2);
+        assert(hip::std::get<1>(t1) == int('a'));
+        assert(hip::std::get<2>(t1).id_ == 2);
+    }
+    // hip::std::unique_ptr not supported
+    /*
+    {
+        typedef hip::std::tuple<long, char, hip::std::unique_ptr<D>> T0;
+        typedef hip::std::tuple<long long, int, hip::std::unique_ptr<B>> T1;
+        T0 t0(2, 'a', hip::std::unique_ptr<D>(new D(3)));
+        T1 t1 = hip::std::move(t0);
+        assert(hip::std::get<0>(t1) == 2);
+        assert(hip::std::get<1>(t1) == int('a'));
+        assert(hip::std::get<2>(t1)->id_ == 3);
+    }
+    */
+    {
+        hip::std::tuple<int> t1(42);
+        hip::std::tuple<Explicit> t2(hip::std::move(t1));
+        assert(hip::std::get<0>(t2).value == 42);
+    }
+    {
+        hip::std::tuple<int> t1(42);
+        hip::std::tuple<Implicit> t2 = hip::std::move(t1);
+        assert(hip::std::get<0>(t2).value == 42);
+    }
+
+  return 0;
+}
