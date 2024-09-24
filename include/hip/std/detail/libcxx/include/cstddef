@@ -1,0 +1,165 @@
+// -*- C++ -*-
+//===--------------------------- cstddef ----------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// Modifications Copyright (c) 2024 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#ifndef _LIBCUDACXX_CSTDDEF
+#define _LIBCUDACXX_CSTDDEF
+
+/*
+    cstddef synopsis
+
+Macros:
+
+    offsetof(type,member-designator)
+    NULL
+
+namespace std
+{
+
+Types:
+
+    ptrdiff_t
+    size_t
+    max_align_t
+    nullptr_t
+    byte // C++17
+
+}  // std
+
+*/
+
+#ifndef __cuda_std__
+#include <__config>
+#include <version>
+#include <__pragma_push>
+#endif //__cuda_std__
+
+#if defined(_LIBCUDACXX_USE_PRAGMA_GCC_SYSTEM_HEADER)
+#pragma GCC system_header
+#endif
+
+#ifndef __cuda_std__
+// Don't include our own <stddef.h>; we don't want to declare ::nullptr_t.
+#ifdef _MSC_VER
+    #include <../ucrt/stddef.h>
+#else
+    #include_next <stddef.h>
+#endif
+#include <__nullptr>
+#endif //__cuda_std__
+
+_LIBCUDACXX_BEGIN_NAMESPACE_STD
+
+//TODO(HIP): WAR for missing typedefs, see SWDEV-421819
+#ifdef __HIPCC_RTC__
+typedef long ptrdiff_t;
+#else
+using ::ptrdiff_t;
+#endif
+using ::size_t;
+
+#if defined(__CLANG_MAX_ALIGN_T_DEFINED) || defined(_GCC_MAX_ALIGN_T) || \
+    defined(__DEFINED_max_align_t) || defined(__NetBSD__)
+// Re-use the compiler's <stddef.h> max_align_t where possible.
+using ::max_align_t;
+#else
+typedef long double max_align_t;
+#endif
+
+_LIBCUDACXX_END_NAMESPACE_STD
+
+#if _LIBCUDACXX_STD_VER > 11
+#ifdef _LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION
+_LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION
+#else
+namespace std  // purposefully not versioned
+{
+#endif //_LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION
+enum class byte : unsigned char {};
+
+_LIBCUDACXX_INLINE_VISIBILITY
+constexpr byte  operator| (byte  __lhs, byte __rhs) noexcept
+{
+    return static_cast<byte>(
+      static_cast<unsigned char>(
+         static_cast<unsigned int>(__lhs) | static_cast<unsigned int>(__rhs)
+    ));
+}
+
+_LIBCUDACXX_INLINE_VISIBILITY
+constexpr byte& operator|=(byte& __lhs, byte __rhs) noexcept
+{ return __lhs = __lhs | __rhs; }
+
+_LIBCUDACXX_INLINE_VISIBILITY
+constexpr byte  operator& (byte  __lhs, byte __rhs) noexcept
+{
+    return static_cast<byte>(
+      static_cast<unsigned char>(
+         static_cast<unsigned int>(__lhs) & static_cast<unsigned int>(__rhs)
+    ));
+}
+
+_LIBCUDACXX_INLINE_VISIBILITY
+constexpr byte& operator&=(byte& __lhs, byte __rhs) noexcept
+{ return __lhs = __lhs & __rhs; }
+
+_LIBCUDACXX_INLINE_VISIBILITY
+constexpr byte  operator^ (byte  __lhs, byte __rhs) noexcept
+{
+    return static_cast<byte>(
+      static_cast<unsigned char>(
+         static_cast<unsigned int>(__lhs) ^ static_cast<unsigned int>(__rhs)
+    ));
+}
+
+_LIBCUDACXX_INLINE_VISIBILITY
+constexpr byte& operator^=(byte& __lhs, byte __rhs) noexcept
+{ return __lhs = __lhs ^ __rhs; }
+
+_LIBCUDACXX_INLINE_VISIBILITY
+constexpr byte  operator~ (byte __b) noexcept
+{
+    return static_cast<byte>(
+      static_cast<unsigned char>(
+        ~static_cast<unsigned int>(__b)
+    ));
+}
+
+#ifdef _LIBCUDACXX_END_NAMESPACE_STD_NOVERSION
+_LIBCUDACXX_END_NAMESPACE_STD_NOVERSION
+#else
+}
+#endif //_LIBCUDACXX_END_NAMESPACE_STD_NOVERSION
+
+#ifndef __cuda_std__
+#include <type_traits>  // rest of byte
+#endif
+#endif
+
+#ifndef __cuda_std__
+#include <__pragma_pop>
+#endif //__cuda_std__
+
+#endif  // _LIBCUDACXX_CSTDDEF
