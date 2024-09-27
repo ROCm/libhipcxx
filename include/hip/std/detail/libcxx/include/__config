@@ -2107,6 +2107,18 @@ extern "C" _LIBCUDACXX_FUNC_VIS void __sanitizer_annotate_contiguous_container(
 #  define _LIBCUDACXX_SYS_CLOCK_DURATION microseconds
 #endif
 
+#  if (defined(__CUDACC_VER_MAJOR__) && __CUDACC_VER_MAJOR__ <= 11) \
+    && (defined(__CUDACC_VER_MINOR__) && __CUDACC_VER_MINOR__ <= 2)
+#    define _LIBCUDACXX_CONSTEXPR_GLOBAL const
+#  else
+#    define _LIBCUDACXX_CONSTEXPR_GLOBAL constexpr
+#  endif
+#  if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+#    define _LIBCUDACXX_CPO_ACCESSIBILITY __device__ _LIBCUDACXX_CONSTEXPR_GLOBAL
+#  else
+#    define _LIBCUDACXX_CPO_ACCESSIBILITY _LIBCUDACXX_INLINE_VAR constexpr
+#  endif
+
 #if !defined(_LIBCUDACXX_DISABLE_EXEC_CHECK)
 #if defined(__HIPCC__)                       \
 && !defined(_LIBCUDACXX_COMPILER_NVRTC)      \
