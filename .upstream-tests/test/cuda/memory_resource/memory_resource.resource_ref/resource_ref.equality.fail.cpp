@@ -15,10 +15,10 @@
 
 #define LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE
 
-#include <cuda/memory_resource>
+#include <hip/memory_resource>
 
-#include <cuda/std/cassert>
-#include <cuda/std/cstdint>
+#include <hip/std/cassert>
+#include <hip/std/cstdint>
 
 template <class T>
 struct property_with_value {

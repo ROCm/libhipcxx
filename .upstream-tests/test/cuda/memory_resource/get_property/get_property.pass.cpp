@@ -15,8 +15,8 @@
 
 #define LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE
 
-#include <cuda/std/cassert>
-#include <cuda/memory_resource>
+#include <hip/std/cassert>
+#include <hip/memory_resource>
 
 struct prop_with_value {
   using value_type = int;
