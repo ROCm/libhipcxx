@@ -93,9 +93,14 @@ __host__ __device__ void test_aligned()
 #if !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPCC) && !defined(TEST_COMPILER_HIPRTC)
     DoNotOptimize(ap);
 #else
-    const auto meow = reinterpret_cast<uintptr_t>(ap) + 2;
-    (void) meow;
-#endif // !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPCC) && !defined(TEST_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from db57088edc (c90beab8ec) - COMMENTED OUT
+//     const auto meow = reinterpret_cast<uintptr_t>(ap) + 2;
+//     (void) meow;
+// #endif // !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPCC) && !defined(TEST_COMPILER_HIPRTC)
+// =======
+    [[maybe_unused]] const auto meow = reinterpret_cast<uintptr_t>(ap) + 2;
+#endif // !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (c90beab8ec)
     // assert(globalMemCounter.checkOutstandingNewEq(1));
     assert(globalMemCounter.checkNewCalledEq(1));
     assert(globalMemCounter.checkAlignedNewCalledEq(ExpectAligned));
