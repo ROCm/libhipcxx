@@ -48,7 +48,7 @@ struct __is_extended_floating_point : false_type
 
 #if !defined(_CCCL_NO_VARIABLE_TEMPLATES)
 template <class _Tp>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v
+inline constexpr bool __is_extended_floating_point_v
 #  if defined(_CCCL_NO_INLINE_VARIABLES)
   = __is_extended_floating_point<_Tp>::value;
 #  else // ^^^ _CCCL_NO_INLINE_VARIABLES ^^^ / vvv !_CCCL_NO_INLINE_VARIABLES vvv
@@ -63,7 +63,7 @@ struct __is_extended_floating_point<__half> : true_type
 
 #  ifndef _CCCL_NO_INLINE_VARIABLES
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__half> = true;
+inline constexpr bool __is_extended_floating_point_v<__half> = true;
 #  endif // !_CCCL_NO_INLINE_VARIABLES
 #endif // _CCCL_HAS_NVFP16
 
@@ -74,7 +74,7 @@ struct __is_extended_floating_point<__nv_bfloat16> : true_type
 
 #  ifndef _CCCL_NO_INLINE_VARIABLES
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_bfloat16> = true;
+inline constexpr bool __is_extended_floating_point_v<__nv_bfloat16> = true;
 #  endif // !_CCCL_NO_INLINE_VARIABLES
 #endif // _CCCL_HAS_NVBF16
 
@@ -97,15 +97,15 @@ struct __is_extended_floating_point<__nv_fp8_e8m0> : true_type
 #ifndef _CCCL_NO_INLINE_VARIABLES
 #  if _CCCL_HAS_NVFP8_E4M3()
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_fp8_e4m3> = true;
+inline constexpr bool __is_extended_floating_point_v<__nv_fp8_e4m3> = true;
 #  endif // _CCCL_HAS_NVFP8_E4M3()
 #  if _CCCL_HAS_NVFP8_E5M2()
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_fp8_e5m2> = true;
+inline constexpr bool __is_extended_floating_point_v<__nv_fp8_e5m2> = true;
 #  endif // _CCCL_HAS_NVFP8_E5M2()
 #  if _CCCL_HAS_NVFP8_E8M0()
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_fp8_e8m0> = true;
+inline constexpr bool __is_extended_floating_point_v<__nv_fp8_e8m0> = true;
 #  endif // _CCCL_HAS_NVFP8_E8M0()
 #endif // !_CCCL_NO_INLINE_VARIABLES
 
@@ -122,11 +122,11 @@ struct __is_extended_floating_point<__nv_fp6_e3m2> : true_type
 #ifndef _CCCL_NO_INLINE_VARIABLES
 #  if _CCCL_HAS_NVFP6_E2M3()
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_fp6_e2m3> = true;
+inline constexpr bool __is_extended_floating_point_v<__nv_fp6_e2m3> = true;
 #  endif // _CCCL_HAS_NVFP6_E2M3()
 #  if _CCCL_HAS_NVFP6_E3M2()
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_fp6_e3m2> = true;
+inline constexpr bool __is_extended_floating_point_v<__nv_fp6_e3m2> = true;
 #  endif // _CCCL_HAS_NVFP6_E3M2()
 #endif // !_CCCL_NO_INLINE_VARIABLES
 
@@ -138,7 +138,7 @@ struct __is_extended_floating_point<__nv_fp4_e2m1> : true_type
 #ifndef _CCCL_NO_INLINE_VARIABLES
 #  if _CCCL_HAS_NVFP4_E2M1()
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_fp4_e2m1> = true;
+inline constexpr bool __is_extended_floating_point_v<__nv_fp4_e2m1> = true;
 #  endif // _CCCL_HAS_NVFP4_E2M1()
 #endif // !_CCCL_NO_INLINE_VARIABLES
 
@@ -150,7 +150,7 @@ struct __is_extended_floating_point<__float128> : true_type
 #ifndef _CCCL_NO_INLINE_VARIABLES
 #  if _CCCL_HAS_FLOAT128()
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__float128> = true;
+inline constexpr bool __is_extended_floating_point_v<__float128> = true;
 #  endif // _CCCL_HAS_FLOAT128()
 #endif // !_CCCL_NO_INLINE_VARIABLES
 
