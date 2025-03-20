@@ -1612,10 +1612,10 @@ template <class T>
 struct Proxy;
 
 template <class T>
-_CCCL_INLINE_VAR constexpr bool IsProxy = false;
+inline constexpr bool IsProxy = false;
 
 template <class T>
-_CCCL_INLINE_VAR constexpr bool IsProxy<Proxy<T>> = true;
+inline constexpr bool IsProxy<Proxy<T>> = true;
 
 #if TEST_COMPILER(MSVC)
 _CCCL_BEGIN_NV_DIAG_SUPPRESS(1805) // MSVC complains that if we pass a pointer type, adding const is useless
