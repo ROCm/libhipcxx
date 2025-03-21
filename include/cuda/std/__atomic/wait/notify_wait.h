@@ -75,7 +75,11 @@ _LIBCUDACXX_HIDE_FROM_ABI void __atomic_notify_all(_Tp const volatile*, _Sco)
 template <typename _Tp>
 _LIBCUDACXX_HIDE_FROM_ABI bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp const& __rhs)
 {
-#if _CCCL_HAS_CUDA_COMPILER() || defined(__HIP_PLATFORM_AMD__) || defined(__HIPCC_RTC__)
+// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// #if _CCCL_HAS_CUDA_COMPILER() || defined(__HIP_PLATFORM_AMD__) || defined(__HIPCC_RTC__)
+// =======
+#if _CCCL_HAS_CUDA_COMPILER()
+// >>>>>>> END NEW CODE (702d3c08ed)
   return __lhs == __rhs;
 #else
   return _CUDA_VSTD::memcmp(&__lhs, &__rhs, sizeof(_Tp)) == 0;
