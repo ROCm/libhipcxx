@@ -84,15 +84,8 @@
 #  define _LIBCUDACXX_END_NAMESPACE_VIEWS } } } } } \
     namespace hip = cuda;
 
-#  if _CCCL_STD_VER >= 2020
-#    define _LIBCUDACXX_BEGIN_NAMESPACE_RANGES_ABI inline namespace __cxx20 {
-#  else
-#    define _LIBCUDACXX_BEGIN_NAMESPACE_RANGES_ABI inline namespace __cxx17 {
-#  endif
-#  define _LIBCUDACXX_END_NAMESPACE_RANGES_ABI }
-
-#  define _LIBCUDACXX_BEGIN_NAMESPACE_CPO(_CPO) namespace _CPO { _LIBCUDACXX_BEGIN_NAMESPACE_RANGES_ABI
-#  define _LIBCUDACXX_END_NAMESPACE_CPO } _LIBCUDACXX_END_NAMESPACE_RANGES_ABI
+#  define _LIBCUDACXX_BEGIN_NAMESPACE_CPO(_CPO) namespace _CPO {
+#  define _LIBCUDACXX_END_NAMESPACE_CPO }
 
 // Namespaces related to chrono / filesystem
 #  define _LIBCUDACXX_BEGIN_NAMESPACE_FILESYSTEM namespace cuda { namespace std { inline namespace __fs { namespace filesystem { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
