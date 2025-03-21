@@ -37,7 +37,11 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// #if _CCCL_HAS_CTK()
+// =======
+#if _CCCL_HAS_CUDA_COMPILER()
+// >>>>>>> END NEW CODE (702d3c08ed)
 
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")

@@ -167,7 +167,11 @@ _CCCL_HOST_DEVICE
 #    define _CCCL_ASSERT(expression, message) ((void) 0)
 #  endif
 #elif _CCCL_HAS_CUDA_COMPILER()
-#  if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// #  if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+// =======
+#  ifdef __CUDA_ARCH__
+// >>>>>>> END NEW CODE (702d3c08ed)
 #    define _CCCL_VERIFY(expression, message) _CCCL_ASSERT_IMPL_DEVICE(expression, message)
 #    define _CCCL_ASSERT(expression, message) _CCCL_ASSERT_DEVICE(expression, message)
 #  else // ^^^ __CUDA_ARCH__ ^^^ / vvv !__CUDA_ARCH__ vvv
