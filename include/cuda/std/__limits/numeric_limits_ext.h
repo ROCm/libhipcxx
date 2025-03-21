@@ -80,7 +80,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__half>(0x1400u);
@@ -157,7 +157,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x3c00u);
@@ -234,7 +234,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__nv_fp8_e4m3>(0x20u);
@@ -311,7 +311,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__nv_fp8_e5m2>(0x34u);
@@ -388,7 +388,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__nv_fp8_e8m0>(0x7fu);
@@ -465,7 +465,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__nv_fp6_e2m3>(0x01u);
@@ -542,7 +542,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__nv_fp6_e3m2>(0x04u);
@@ -619,7 +619,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return _CUDA_VSTD::__fp_from_storage<__nv_fp4_e2m1>(0x1u);
@@ -718,7 +718,7 @@ public:
 
   static constexpr bool is_integer = false;
   static constexpr bool is_exact   = false;
-  static constexpr int radix       = __FLT_RADIX__;
+  static constexpr int radix       = FLT_RADIX;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
     return type(1.92592994438723585305597794258492732e-34);

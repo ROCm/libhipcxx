@@ -69,7 +69,11 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/nvidia/nvrtc/nvrtcc")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "True")
-  set(LIBCUDACXX_FORCE_INCLUDE "-include '${libhipcxx_SOURCE_DIR}/test/support/nvrtc_limit_macros.h'")
+# <<<<<<< OLD CODE from 24e350cd01 (7da4068d41) - COMMENTED OUT
+#   set(LIBCUDACXX_FORCE_INCLUDE "-include '${libhipcxx_SOURCE_DIR}/test/support/nvrtc_limit_macros.h'")
+# =======
+  set(LIBCUDACXX_FORCE_INCLUDE "")
+# >>>>>>> END NEW CODE (7da4068d41)
   set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${CUDA_INCLUDE_DIR}'")
   # Use the NVRTCC utility to run the built test outputs
   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
