@@ -141,7 +141,41 @@
 #else // unknown compiler
 #  define _CCCL_SUPPRESS_DEPRECATED_PUSH
 #  define _CCCL_SUPPRESS_DEPRECATED_POP
-#endif // unknown compiler
+// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// #endif // unknown compiler
+// =======
+#endif // !_CCCL_COMPILER(CLANG) && !_CCCL_COMPILER(GCC) && !_CCCL_COMPILER(NVHPC) && !_CCCL_COMPILER(MSVC)
+
+// Enable us to selectively silence cuda compiler warnings
+#if _CCCL_HAS_CUDA_COMPILER()
+#  if _CCCL_CUDA_COMPILER(CLANG)
+#    define _CCCL_NV_DIAG_SUPPRESS(_WARNING)
+#    define _CCCL_NV_DIAG_DEFAULT(_WARNING)
+#  elif defined(__NVCC_DIAG_PRAGMA_SUPPORT__)
+#    if _CCCL_COMPILER(MSVC)
+#      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(nv_diag_suppress _WARNING)
+#      define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(nv_diag_default _WARNING)
+#    else // ^^^ _CCCL_COMPILER_{MSVC}^^^ / vvv !_CCCL_COMPILER_{MSVC} vvv
+#      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(nv_diagnostic push) _CCCL_PRAGMA(nv_diag_suppress _WARNING)
+#      define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(nv_diagnostic pop)
+#    endif // !_CCCL_COMPILER(MSVC)
+#  elif _CCCL_COMPILER(NVHPC)
+#    define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(diagnostic push) _CCCL_PRAGMA(diag_suppress _WARNING)
+#    define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(diagnostic pop)
+#  else // ^^^ __NVCC_DIAG_PRAGMA_SUPPORT__ ^^^ / vvv !__NVCC_DIAG_PRAGMA_SUPPORT__ vvv
+#    if _CCCL_COMPILER(GCC) // these compilers have issues with restoring the warning
+#      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(diag_suppress _WARNING)
+#      define _CCCL_NV_DIAG_DEFAULT(_WARNING)
+#    else // ^^^ _CCCL_COMPILER(GCC) ^^^ / vvv !_CCCL_COMPILER(GCC) vvv
+#      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(diag_suppress _WARNING)
+#      define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(diag_default _WARNING)
+#    endif // !_CCCL_COMPILER(GCC)
+#  endif // !__NVCC_DIAG_PRAGMA_SUPPORT__
+#else // ^^^ _CCCL_HAS_CUDA_COMPILER() ^^^ / vvv !_CCCL_HAS_CUDA_COMPILER() vvv
+#  define _CCCL_NV_DIAG_SUPPRESS(_WARNING)
+#  define _CCCL_NV_DIAG_DEFAULT(_WARNING)
+#endif // other compilers
+// >>>>>>> END NEW CODE (702d3c08ed)
 
 #if _CCCL_COMPILER(MSVC)
 #  define _CCCL_HAS_PRAGMA_MSVC_WARNING

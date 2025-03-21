@@ -79,8 +79,13 @@
 #  define _CCCL_HAS_LONG_DOUBLE() 1
 #endif // !_CCCL_HAS_CUDA_COMPILER()
 
-#if _CCCL_HAS_INCLUDE(<cuda_fp16.h>) && (_CCCL_HAS_CTK() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16)) \
-                      && !defined(CCCL_DISABLE_FP16_SUPPORT) || defined (__HIP_PLATFORM_AMD__)
+// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// #if _CCCL_HAS_INCLUDE(<cuda_fp16.h>) && (_CCCL_HAS_CTK() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16)) \
+//                       && !defined(CCCL_DISABLE_FP16_SUPPORT) || defined (__HIP_PLATFORM_AMD__)
+// =======
+#if _CCCL_HAS_INCLUDE(<cuda_fp16.h>) && (_CCCL_HAS_CUDA_COMPILER() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16)) \
+                      && !defined(CCCL_DISABLE_FP16_SUPPORT)
+// >>>>>>> END NEW CODE (702d3c08ed)
 #  undef _CCCL_HAS_NVFP16
 #  define _CCCL_HAS_NVFP16() 1
 #endif
