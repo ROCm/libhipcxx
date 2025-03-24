@@ -50,24 +50,29 @@
 
 #include <nv/target>
 
-#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
-#  pragma GCC system_header
-#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
-#  pragma clang system_header
-#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
-#  pragma system_header
-#endif // no system header
-
-#ifdef _CCCL_DOXYGEN_INVOKED // Only parse this during doxygen passes:
-//! When this macro is defined, Programmatic Dependent Launch (PDL) is disabled across CCCL
-#  define CCCL_DISABLE_PDL
-#endif // _CCCL_DOXYGEN_INVOKED
-
-#ifdef CCCL_DISABLE_PDL
-#  define _CCCL_HAS_PDL() 0
-#else // CCCL_DISABLE_PDL
-#  define _CCCL_HAS_PDL() _CCCL_CTK_AT_LEAST(12, 0)
-#endif // CCCL_DISABLE_PDL
+// <<<<<<< OLD CODE from 2e495c965e (3aeb8c29e5) - COMMENTED OUT
+// #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+// #  pragma GCC system_header
+// #elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+// #  pragma clang system_header
+// #elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+// #  pragma system_header
+// #endif // no system header
+//
+// #ifdef _CCCL_DOXYGEN_INVOKED // Only parse this during doxygen passes:
+// //! When this macro is defined, Programmatic Dependent Launch (PDL) is disabled across CCCL
+// #  define CCCL_DISABLE_PDL
+// #endif // _CCCL_DOXYGEN_INVOKED
+//
+// #ifdef CCCL_DISABLE_PDL
+// #  define _CCCL_HAS_PDL() 0
+// #else // CCCL_DISABLE_PDL
+// #  define _CCCL_HAS_PDL() _CCCL_CTK_AT_LEAST(12, 0)
+// #endif // CCCL_DISABLE_PDL
+// =======
+// True, when programmatic dependent launch is available, otherwise false.
+#define _CCCL_HAS_PDL _CCCL_CUDACC_AT_LEAST(12, 0)
+// >>>>>>> END NEW CODE (3aeb8c29e5)
 
 #if _CCCL_HAS_PDL()
 // Waits for the previous kernel to complete (when it reaches its final membar). Should be put before the first global
