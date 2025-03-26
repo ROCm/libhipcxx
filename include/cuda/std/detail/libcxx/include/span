@@ -450,7 +450,7 @@ public:
   {
     return _Extent * sizeof(element_type);
   }
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool empty() const noexcept
+  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool empty() const noexcept
   {
     return _Extent == 0;
   }
@@ -667,7 +667,7 @@ public:
   {
     return __size_ * sizeof(element_type);
   }
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool empty() const noexcept
+  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool empty() const noexcept
   {
     return __size_ == 0;
   }

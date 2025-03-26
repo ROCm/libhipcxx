@@ -62,8 +62,12 @@ using ::malloc;
 // #if _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA) || defined(__HIPCC__))
 // =======
 #if _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA))
-// >>>>>>> END NEW CODE (702d3c08ed)
-_CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
+// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // >>>>>>> END NEW CODE (702d3c08ed)
+// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
+// =======
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
+// >>>>>>> END NEW CODE (3eee69cda4)
 {
   void* __ptr{};
 
@@ -82,7 +86,7 @@ _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __
 }
 #endif // _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA))
 
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI void* calloc(size_t __n, size_t __size) noexcept
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI void* calloc(size_t __n, size_t __size) noexcept
 {
   NV_IF_ELSE_TARGET(NV_IS_HOST, (return ::calloc(__n, __size);), (return _CUDA_VSTD::__calloc_device(__n, __size);))
 }

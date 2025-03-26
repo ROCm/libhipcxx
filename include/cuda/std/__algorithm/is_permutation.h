@@ -30,7 +30,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _ForwardIterator1, class _ForwardIterator2, class _BinaryPredicate>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
   _ForwardIterator1 __first1, _ForwardIterator1 __last1, _ForwardIterator2 __first2, _BinaryPredicate __pred)
 {
   //  shorten sequences as much as possible by lopping of any equal prefix
@@ -101,7 +101,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
 }
 
 template <class _ForwardIterator1, class _ForwardIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool
 is_permutation(_ForwardIterator1 __first1, _ForwardIterator1 __last1, _ForwardIterator2 __first2)
 {
   return _CUDA_VSTD::is_permutation(__first1, __last1, __first2, __equal_to{});
@@ -109,7 +109,7 @@ is_permutation(_ForwardIterator1 __first1, _ForwardIterator1 __last1, _ForwardIt
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _BinaryPredicate, class _ForwardIterator1, class _ForwardIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __is_permutation(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __is_permutation(
   _ForwardIterator1 __first1,
   _ForwardIterator1 __last1,
   _ForwardIterator2 __first2,
@@ -193,7 +193,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __is_permutation(
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _BinaryPredicate, class _RandomAccessIterator1, class _RandomAccessIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __is_permutation(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __is_permutation(
   _RandomAccessIterator1 __first1,
   _RandomAccessIterator2 __last1,
   _RandomAccessIterator1 __first2,
@@ -212,7 +212,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __is_permutation(
 }
 
 template <class _ForwardIterator1, class _ForwardIterator2, class _BinaryPredicate>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
   _ForwardIterator1 __first1,
   _ForwardIterator1 __last1,
   _ForwardIterator2 __first2,
@@ -230,7 +230,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
 }
 
 template <class _ForwardIterator1, class _ForwardIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool is_permutation(
   _ForwardIterator1 __first1, _ForwardIterator1 __last1, _ForwardIterator2 __first2, _ForwardIterator2 __last2)
 {
   return _CUDA_VSTD::__is_permutation(
