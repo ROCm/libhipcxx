@@ -54,7 +54,7 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __includes(
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _InputIterator1, class _InputIterator2, class _Compare>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool includes(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool includes(
   _InputIterator1 __first1, _InputIterator1 __last1, _InputIterator2 __first2, _InputIterator2 __last2, _Compare __comp)
 {
   static_assert(__is_callable<_Compare, decltype(*__first1), decltype(*__first2)>::value,
@@ -72,7 +72,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool includes(
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _InputIterator1, class _InputIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr bool
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr bool
 includes(_InputIterator1 __first1, _InputIterator1 __last1, _InputIterator2 __first2, _InputIterator2 __last2)
 {
   return _CUDA_VSTD::includes(

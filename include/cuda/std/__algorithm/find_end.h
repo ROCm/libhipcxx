@@ -28,7 +28,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _BinaryPredicate, class _ForwardIterator1, class _ForwardIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1 __find_end(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1 __find_end(
   _ForwardIterator1 __first1,
   _ForwardIterator1 __last1,
   _ForwardIterator2 __first2,
@@ -83,7 +83,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1 __find_end
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _BinaryPredicate, class _BidirectionalIterator1, class _BidirectionalIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _BidirectionalIterator1 __find_end(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr _BidirectionalIterator1 __find_end(
   _BidirectionalIterator1 __first1,
   _BidirectionalIterator1 __last1,
   _BidirectionalIterator2 __first2,
@@ -137,7 +137,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _BidirectionalIterator1 __fi
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _BinaryPredicate, class _RandomAccessIterator1, class _RandomAccessIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _RandomAccessIterator1 __find_end(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr _RandomAccessIterator1 __find_end(
   _RandomAccessIterator1 __first1,
   _RandomAccessIterator1 __last1,
   _RandomAccessIterator2 __first2,
@@ -192,7 +192,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _RandomAccessIterator1 __fin
 }
 
 template <class _ForwardIterator1, class _ForwardIterator2, class _BinaryPredicate>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1 find_end(
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1 find_end(
   _ForwardIterator1 __first1,
   _ForwardIterator1 __last1,
   _ForwardIterator2 __first2,
@@ -210,7 +210,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1 find_end(
 }
 
 template <class _ForwardIterator1, class _ForwardIterator2>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr _ForwardIterator1
 find_end(_ForwardIterator1 __first1, _ForwardIterator1 __last1, _ForwardIterator2 __first2, _ForwardIterator2 __last2)
 {
   return _CUDA_VSTD::find_end(__first1, __last1, __first2, __last2, __equal_to{});

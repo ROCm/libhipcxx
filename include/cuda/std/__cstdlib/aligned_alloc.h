@@ -66,7 +66,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_HOST void* __aligned_alloc_host(size_t __nbytes, size_t __align) noexcept
 // =======
 #if !_CCCL_COMPILER(NVRTC)
-_CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_HOST void*
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST void*
 __aligned_alloc_host([[maybe_unused]] size_t __nbytes, [[maybe_unused]] size_t __align) noexcept
 // >>>>>>> END NEW CODE (c90beab8ec)
 {
@@ -79,9 +79,13 @@ __aligned_alloc_host([[maybe_unused]] size_t __nbytes, [[maybe_unused]] size_t _
 }
 #endif // !_CCCL_COMPILER(NVRTC)
 
-// Note(HIP/AMD): there is no device implementation for aligned alloc on AMD hardware yet (Dec 25)
-#if !defined(__HIP_DEVICE_COMPILE__)
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
+// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // Note(HIP/AMD): there is no device implementation for aligned alloc on AMD hardware yet (Dec 25)
+// #if !defined(__HIP_DEVICE_COMPILE__)
+// _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
+// =======
+[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
+// >>>>>>> END NEW CODE (3eee69cda4)
 {
   NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return _CUDA_VSTD::__aligned_alloc_host(__nbytes, __align);),
