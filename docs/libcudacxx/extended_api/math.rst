@@ -40,6 +40,7 @@ This page covers the math extended API, providing integer arithmetic utilities i
    math/round_up
    math/round_down
    math/ilog
+   math/uabs
 
 .. list-table::
    :widths: 25 45 30
@@ -67,4 +68,10 @@ This page covers the math extended API, providing integer arithmetic utilities i
 
    * - :ref:`ilog10 <libcudacxx-extended-api-math-ilog>`
      - Integer logarithm to the base 10
-     - libhipcxx 3.0
+     - CCCL 3.0.0
+     - CUDA 13.0
+
+   * - :ref:`uabs <libcudacxx-extended-api-math-uabs>`
+     - Unsigned absolute value
+     - CCCL 3.1.0
+     - CUDA 13.1
