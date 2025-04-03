@@ -48,11 +48,15 @@ __global__ void test_clusterlaunchcontrol(void** fn_ptr)
                (
                    // clusterlaunchcontrol.query_cancel.is_canceled.pred.b128 pred_is_canceled, try_cancel_response;
                    * fn_ptr++ = reinterpret_cast<void*>(
-// <<<<<<< OLD CODE from f057d49ff7 (6c3a480fb1) - COMMENTED OUT
-//                      static_cast<bool (*)(longlong2)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
-// #endif // __cccl_ptx_isa >= 860
+// <<<<<<< OLD CODE from 9ca5ab7c57 (930a8c5834) - COMMENTED OUT
+// // <<<<<<< OLD CODE from f057d49ff7 (6c3a480fb1) - COMMENTED OUT
+// //                      static_cast<bool (*)(longlong2)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
+// // #endif // __cccl_ptx_isa >= 860
+// // =======
+//                      static_cast<bool (*)(__int128)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
 // =======
-                     static_cast<bool (*)(__int128)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
+                     static_cast<bool (*)(longlong2)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
+// >>>>>>> END NEW CODE (930a8c5834)
 #  endif // __cccl_ptx_isa >= 860
 // >>>>>>> END NEW CODE (6c3a480fb1)
 
