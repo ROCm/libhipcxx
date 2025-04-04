@@ -75,11 +75,15 @@ struct warp_shuffle_result
 };
 
 template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_idx(
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_idx(
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up> warp_shuffle_idx(
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up> warp_shuffle_idx(
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_idx(
+// >>>>>>> END NEW CODE (68365cae16)
   const _Tp& __data, int __src_lane, uint32_t __lane_mask = 0xFFFFFFFF, _CUDA_VSTD::integral_constant<int, _Width> = {})
 {
   constexpr auto __warp_size   = 32u;
@@ -115,22 +119,30 @@ template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<
 }
 
 template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up>
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up>
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_idx(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
   return ::cuda::device::warp_shuffle_idx(__data, __src_lane, 0xFFFFFFFF, __width);
 }
 
 template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Tp> warp_shuffle_up(
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Tp> warp_shuffle_up(
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Tp> warp_shuffle_up(
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Tp> warp_shuffle_up(
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Tp> warp_shuffle_up(
+// >>>>>>> END NEW CODE (68365cae16)
   const _Tp& __data, int __delta, uint32_t __lane_mask = 0xFFFFFFFF, _CUDA_VSTD::integral_constant<int, _Width> = {})
 {
   constexpr auto __warp_size   = 32u;
@@ -172,22 +184,30 @@ template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<
 }
 
 template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up>
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up>
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_up(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
   return ::cuda::device::warp_shuffle_up(__data, __src_lane, 0xFFFFFFFF, __width);
 }
 
 template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_down(
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_down(
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up> warp_shuffle_down(
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up> warp_shuffle_down(
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_down(
+// >>>>>>> END NEW CODE (68365cae16)
   const _Tp& __data, int __delta, uint32_t __lane_mask = 0xFFFFFFFF, _CUDA_VSTD::integral_constant<int, _Width> = {})
 {
   constexpr auto __warp_size   = 32u;
@@ -229,22 +249,30 @@ template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<
 }
 
 template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Tp>
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Tp>
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Tp>
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Tp>
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Tp>
+// >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_down(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
   return ::cuda::device::warp_shuffle_down(__data, __src_lane, 0xFFFFFFFF, __width);
 }
 
 template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_xor(
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_xor(
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up> warp_shuffle_xor(
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up> warp_shuffle_xor(
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up> warp_shuffle_xor(
+// >>>>>>> END NEW CODE (68365cae16)
   const _Tp& __data, int __xor_mask, uint32_t __lane_mask = 0xFFFFFFFF, _CUDA_VSTD::integral_constant<int, _Width> = {})
 {
   constexpr auto __warp_size   = 32u;
@@ -286,11 +314,15 @@ template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<
 }
 
 template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// <<<<<<< OLD CODE from deca6f88c8 (68365cae16) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// // =======
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up>
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE WarpShuffleResult<_Up>
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE warp_shuffle_result<_Up>
+// >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_xor(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
   return ::cuda::device::warp_shuffle_xor(__data, __src_lane, 0xFFFFFFFF, __width);
