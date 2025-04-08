@@ -44,13 +44,25 @@
 #  pragma system_header
 #endif // no system header
 
-#ifndef _CCCL_NO_EXCEPTIONS
-#  if defined(CCCL_DISABLE_EXCEPTIONS) // Escape hatch for users to manually disable exceptions
-#    define _CCCL_NO_EXCEPTIONS
-#  elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) || (_CCCL_COMPILER(MSVC) && _CPPUNWIND == 0) \
-    || (!_CCCL_COMPILER(MSVC) && !__EXCEPTIONS && !defined(__HIP_PLATFORM_AMD__)) // Catches all non msvc based compilers
-#    define _CCCL_NO_EXCEPTIONS
-#  endif
-#endif // !_CCCL_NO_EXCEPTIONS
+// <<<<<<< OLD CODE from 47809d752f (bbc676aed3) - COMMENTED OUT
+// #ifndef _CCCL_NO_EXCEPTIONS
+// #  if defined(CCCL_DISABLE_EXCEPTIONS) // Escape hatch for users to manually disable exceptions
+// #    define _CCCL_NO_EXCEPTIONS
+// #  elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) || (_CCCL_COMPILER(MSVC) && _CPPUNWIND == 0) \
+//     || (!_CCCL_COMPILER(MSVC) && !__EXCEPTIONS && !defined(__HIP_PLATFORM_AMD__)) // Catches all non msvc based compilers
+// #    define _CCCL_NO_EXCEPTIONS
+// #  endif
+// #endif // !_CCCL_NO_EXCEPTIONS
+// =======
+#if defined(CCCL_DISABLE_EXCEPTIONS) // Escape hatch for users to manually disable exceptions
+#  define _CCCL_HAS_EXCEPTIONS() 0
+#elif _CCCL_COMPILER(NVRTC) // NVRTC has no exceptions
+#  define _CCCL_HAS_EXCEPTIONS() 0
+#elif _CCCL_COMPILER(MSVC) // MSVC needs special checks for `_HAS_EXCEPTIONS` and `_CPPUNWIND`
+#  define _CCCL_HAS_EXCEPTIONS() (_HAS_EXCEPTIONS != 0) && (_CPPUNWIND != 0)
+#else // other compilers use `__EXCEPTIONS`
+#  define _CCCL_HAS_EXCEPTIONS() __EXCEPTIONS
+#endif // has exceptions
+// >>>>>>> END NEW CODE (bbc676aed3)
 
 #endif // __CCCL_EXCEPTIONS_H

@@ -42,6 +42,9 @@
 #include <cuda/std/expected>
 #include <cuda/std/utility>
 
+#include "test_macros.h"
+
+#if TEST_HAS_EXCEPTIONS()
 template <class T, class = void>
 constexpr bool ErrorNoexcept = false;
 
@@ -89,9 +92,12 @@ void test()
     assert(i == 5);
   }
 }
+#endif // TEST_HAS_EXCEPTIONS()
 
 int main(int, char**)
 {
+#if TEST_HAS_EXCEPTIONS()
   NV_IF_TARGET(NV_IS_HOST, (test();))
+#endif // TEST_HAS_EXCEPTIONS()
   return 0;
 }
