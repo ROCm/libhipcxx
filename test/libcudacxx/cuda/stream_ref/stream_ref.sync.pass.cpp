@@ -8,24 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
-// UNSUPPORTED: nvrtc, hiprtc
+// UNSUPPORTED: nvrtc
 
 #include <cuda/std/cassert>
 #include <cuda/stream_ref>
@@ -36,9 +19,6 @@
 
 #include "test_macros.h"
 
-TEST_DIAG_SUPPRESS_CLANG("-Wdeprecated-declarations")
-TEST_DIAG_SUPPRESS_NVHPC(deprecated_entity_with_custom_message)
-
 void CUDART_CB callback(cudaStream_t, cudaError_t, void* flag)
 {
   std::chrono::milliseconds sleep_duration{1000};
@@ -46,19 +26,19 @@ void CUDART_CB callback(cudaStream_t, cudaError_t, void* flag)
   assert(!reinterpret_cast<std::atomic_flag*>(flag)->test_and_set());
 }
 
-void test_wait(cuda::stream_ref& ref)
+void test_sync(cuda::stream_ref& ref)
 {
 #if TEST_HAS_EXCEPTIONS()
   try
   {
-    ref.wait();
+    ref.sync();
   }
   catch (...)
   {
     assert(false && "Should not have thrown");
   }
 #else
-  ref.wait();
+  ref.sync();
 #endif // TEST_HAS_EXCEPTIONS()
 }
 
@@ -70,7 +50,7 @@ int main(int argc, char** argv)
       cudaStream_t stream; cudaStreamCreate(&stream); std::atomic_flag flag = ATOMIC_FLAG_INIT;
       cudaStreamAddCallback(stream, callback, &flag, 0);
       cuda::stream_ref ref{stream};
-      test_wait(ref);
+      test_sync(ref);
       assert(flag.test_and_set());
       cudaStreamDestroy(stream);))
 
