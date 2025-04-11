@@ -69,46 +69,50 @@ _LIBCUDACXX_HIDE_FROM_ABI system_clock::time_point system_clock::now() noexcept
     (return time_point(duration_cast<duration>(nanoseconds(
       ::std::chrono::duration_cast<::std::chrono::nanoseconds>(::std::chrono::system_clock::now().time_since_epoch())
         .count())));));
-#elif defined(__HIP_DEVICE_COMPILE__) || defined(__HIPCC_RTC__)
-#if _CCCL_STD_VER>2017
-#if defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
-    if(!(hip_gpu_ext::__unix_sysclock0_host_ticks>=0)) {
-        // FIXME(HIP): As this function needs to be NOEXCEPT, we can't throw an exception at this point.
-        printf("ERROR: Using sysclock on AMD GPUs requires a prior initialization call on the host side (cuda::std::chrono::hip_gpu_ext::initialize_amdgpu_sysclock_on_current_device())."
-             "The returned time point will not be a UNIX timestamp.\n");
-    }
-    // FIXME(HIP): This compilation path uses a workaround to make a UNIX timestamp counter available on the device.
-    // see header "detail/libcxx/include/support/hip/chrono_hip_extension.h" for more details.
-    assert(hip_gpu_ext::__unix_sysclock0_host_ticks>=0);
-
-    // convert host ticks to device ticks
-    long long __unix_sysclock0_device_ticks = hip_gpu_ext::__unix_sysclock0_host_ticks / _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE;
-
-    long long __time = __unix_sysclock0_device_ticks
-                    + (wall_clock64()-hip_gpu_ext::__offset_devclock0);
-    return time_point(duration_cast<duration>(chrono::duration<long long, ratio<1,_LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__time)));
-#else
-    printf("WARNING: A C++20 standard-conform system_clock is currently only supported with an experimental workaround that can be "
-           "activated with -D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP compile flag (see detail/libcxx/include/support/hip/chrono_hip_extension.h)."
-           "The returned time point will not be a UNIX timestamp.\n");
-    // default HIP implementation C++20 without UNIX timestamp workaround
-    // FIXME(HIP): Enable UNIX timestamps on the device without any workaround.
-    long long __time = wall_clock64();
-    return time_point(duration_cast<duration>(chrono::duration<long long, ratio<1,_LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__time)));
-#endif /*_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP*/
-#else
-    // FIXME(HIP): The timestamp on AMD devices will not be a UNIX timestamp. It is therefore different from the one on the host.
-    // default HIP implementation
-    long long __time = wall_clock64();
-    return time_point(duration_cast<duration>(chrono::duration<long long, ratio<1,_LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__time)));
-#endif /*_CCCL_STD_VER>2017*/
-#else
-    return time_point(duration_cast<duration>(nanoseconds(
-            ::std::chrono::duration_cast<::std::chrono::nanoseconds>(
-                ::std::chrono::system_clock::now().time_since_epoch()
-            ).count()
-           )));
-#endif
+// <<<<<<< OLD CODE from 4984d6106b (9e9d577f6b) - COMMENTED OUT
+// #elif defined(__HIP_DEVICE_COMPILE__) || defined(__HIPCC_RTC__)
+// #if _CCCL_STD_VER>2017
+// #if defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
+//     if(!(hip_gpu_ext::__unix_sysclock0_host_ticks>=0)) {
+//         // FIXME(HIP): As this function needs to be NOEXCEPT, we can't throw an exception at this point.
+//         printf("ERROR: Using sysclock on AMD GPUs requires a prior initialization call on the host side (cuda::std::chrono::hip_gpu_ext::initialize_amdgpu_sysclock_on_current_device())."
+//              "The returned time point will not be a UNIX timestamp.\n");
+//     }
+//     // FIXME(HIP): This compilation path uses a workaround to make a UNIX timestamp counter available on the device.
+//     // see header "detail/libcxx/include/support/hip/chrono_hip_extension.h" for more details.
+//     assert(hip_gpu_ext::__unix_sysclock0_host_ticks>=0);
+//
+//     // convert host ticks to device ticks
+//     long long __unix_sysclock0_device_ticks = hip_gpu_ext::__unix_sysclock0_host_ticks / _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE;
+//
+//     long long __time = __unix_sysclock0_device_ticks
+//                     + (wall_clock64()-hip_gpu_ext::__offset_devclock0);
+//     return time_point(duration_cast<duration>(chrono::duration<long long, ratio<1,_LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__time)));
+// #else
+//     printf("WARNING: A C++20 standard-conform system_clock is currently only supported with an experimental workaround that can be "
+//            "activated with -D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP compile flag (see detail/libcxx/include/support/hip/chrono_hip_extension.h)."
+//            "The returned time point will not be a UNIX timestamp.\n");
+//     // default HIP implementation C++20 without UNIX timestamp workaround
+//     // FIXME(HIP): Enable UNIX timestamps on the device without any workaround.
+//     long long __time = wall_clock64();
+//     return time_point(duration_cast<duration>(chrono::duration<long long, ratio<1,_LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__time)));
+// #endif /*_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP*/
+// #else
+//     // FIXME(HIP): The timestamp on AMD devices will not be a UNIX timestamp. It is therefore different from the one on the host.
+//     // default HIP implementation
+//     long long __time = wall_clock64();
+//     return time_point(duration_cast<duration>(chrono::duration<long long, ratio<1,_LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__time)));
+// #endif /*_CCCL_STD_VER>2017*/
+// #else
+//     return time_point(duration_cast<duration>(nanoseconds(
+//             ::std::chrono::duration_cast<::std::chrono::nanoseconds>(
+//                 ::std::chrono::system_clock::now().time_since_epoch()
+//             ).count()
+//            )));
+// #endif
+// =======
+  _CCCL_UNREACHABLE();
+// >>>>>>> END NEW CODE (9e9d577f6b)
 }
 
 _LIBCUDACXX_HIDE_FROM_ABI time_t system_clock::to_time_t(const system_clock::time_point& __t) noexcept
