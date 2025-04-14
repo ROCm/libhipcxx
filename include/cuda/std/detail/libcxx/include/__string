@@ -282,13 +282,20 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT char_traits<char>
     {
     }
 #endif
-#if defined(_CCCL_BUILTIN_STRLEN) || defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
-    NV_IF_ELSE_TARGET(NV_IS_DEVICE,
-                      (size_t __len = 0; for (; !eq(*__s, char(0)); ++__s)++ __len; return __len;),
-                      (return _CCCL_BUILTIN_STRLEN(__s);))
+# <<<<<<< OLD CODE from dd23b98eda (99eee75ab3) - COMMENTED OUT
+# #if defined(_CCCL_BUILTIN_STRLEN) || defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
+#     NV_IF_ELSE_TARGET(NV_IS_DEVICE,
+#                       (size_t __len = 0; for (; !eq(*__s, char(0)); ++__s)++ __len; return __len;),
+#                       (return _CCCL_BUILTIN_STRLEN(__s);))
+# =======
+    // nvcc and clang-cuda do not support __builtin_strlen in device code. nvhpc does
+    // though. this check relies on the fact that nvhpc does not define __CUDA_ARCH__.
+#if defined(_CCCL_BUILTIN_STRLEN) && !defined(__CUDA_ARCH__)
+    return _CCCL_BUILTIN_STRLEN(__s);
+# >>>>>>> END NEW CODE (99eee75ab3)
 #else
     size_t __len = 0;
-    for (; !eq(*__s, char(0)); ++__s)
+    while (*__s++)
     {
       ++__len;
     }
