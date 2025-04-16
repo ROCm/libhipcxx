@@ -60,7 +60,7 @@ using universal_vector = thrust::device_vector<T, universal_allocator<T>>;
 template <typename Key,
           typename Value,
           typename Hash           = cuda::std::identity,
-          typename KeyEqual       = thrust::equal_to<Key>,
+          typename KeyEqual       = cuda::std::equal_to<Key>,
           typename MemoryResource = thrust::universal_memory_resource>
 struct concurrent_hash_table
 {
