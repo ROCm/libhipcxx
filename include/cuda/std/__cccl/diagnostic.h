@@ -204,22 +204,26 @@
 #  define _CCCL_MSVC_WARNINGS_POP
 #endif // !_CCCL_COMPILER(MSVC)
 
-#ifndef _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
-#  if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-#    define _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
-#  endif
-#endif // _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
-
-#if defined(_CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO)
+// <<<<<<< OLD CODE from ae7327d30e (d47d2b9c79) - COMMENTED OUT
+// #ifndef _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
+// #  if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// #    define _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
+// #  endif
+// #endif // _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
+//
+// #if defined(_CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO)
+// =======
+#if _CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (d47d2b9c79)
 #  define _CCCL_PUSH_MACROS _CCCL_MSVC_WARNINGS_PUSH
 #  define _CCCL_POP_MACROS  _CCCL_MSVC_WARNINGS_POP
-#else // ^^^ _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO ^^^ / vvv !_CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO vvv
+#else // ^^^ _CCCL_COMPILER(NVRTC) ^^^ / vvv !_CCCL_COMPILER(NVRTC) vvv
 #  define _CCCL_PUSH_MACROS         \
     _CCCL_PRAGMA(push_macro("min")) \
     _CCCL_PRAGMA(push_macro("max")) _CCCL_PRAGMA(push_macro("interface")) _CCCL_MSVC_WARNINGS_PUSH
 #  define _CCCL_POP_MACROS         \
     _CCCL_PRAGMA(pop_macro("min")) \
     _CCCL_PRAGMA(pop_macro("max")) _CCCL_PRAGMA(pop_macro("interface")) _CCCL_MSVC_WARNINGS_POP
-#endif // !_CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
+#endif // !_CCCL_COMPILER(NVRTC)
 
 #endif // __CCCL_DIAGNOSTIC_H
