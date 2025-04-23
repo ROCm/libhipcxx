@@ -40,6 +40,7 @@ This page covers the math extended API, providing integer arithmetic utilities i
    math/round_up
    math/round_down
    math/ilog
+   math/isqrt
    math/uabs
 
 .. list-table::
@@ -70,6 +71,11 @@ This page covers the math extended API, providing integer arithmetic utilities i
      - Integer logarithm to the base 10
      - CCCL 3.0.0
      - CUDA 13.0
+
+   * - :ref:`isqrt <libcudacxx-extended-api-math-isqrt>`
+     - Integer square root
+     - CCCL 3.1.0
+     - CUDA 13.1
 
    * - :ref:`uabs <libcudacxx-extended-api-math-uabs>`
      - Unsigned absolute value
