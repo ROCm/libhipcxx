@@ -8,31 +8,34 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
-// UNSUPPORTED: pre-sm-70
-// UNSUPPORTED: !nvcc
-// UNSUPPORTED: nvrtc, hiprtc
-
+// <<<<<<< OLD CODE from 81de6371bc (49d285b60b) - COMMENTED OUT
+// // Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// // Permission is hereby granted, free of charge, to any person obtaining a copy
+// // of this software and associated documentation files (the "Software"), to deal
+// // in the Software without restriction, including without limitation the rights
+// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// // copies of the Software, and to permit persons to whom the Software is
+// // furnished to do so, subject to the following conditions:
+// // The above copyright notice and this permission notice shall be included in
+// // all copies or substantial portions of the Software.
+// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// // THE SOFTWARE.
+//
+// // UNSUPPORTED: pre-sm-70
+// // UNSUPPORTED: !nvcc
+// // UNSUPPORTED: nvrtc, hiprtc
+//
+// =======
+// >>>>>>> END NEW CODE (49d285b60b)
 #include "utils.h"
 
 template <typename T, typename P>
-__host__ __device__ __noinline__ void test_ctor()
+__host__ __device__ __noinline__ void test_ctor(T* ptr)
 {
   // default ctor, cpy and cpy assignment
   cuda::annotated_ptr<T, P> def;
@@ -43,11 +46,9 @@ __host__ __device__ __noinline__ void test_ctor()
   }
   cuda::annotated_ptr<T, P> other(def);
   unused(other);
-
   // from ptr
-  T* rp = nullptr;
-  cuda::annotated_ptr<T, P> a(rp);
-  assert(!a);
+  cuda::annotated_ptr<T, P> a(ptr);
+  assert(a);
 
   // cpy ctor & assign to cv
   cuda::annotated_ptr<const T, P> c(def);
@@ -76,10 +77,10 @@ __host__ __device__ __noinline__ void test_ctor()
 template <typename T, typename P>
 __host__ __device__ __noinline__ void test_global_ctor()
 {
-  test_ctor<T, P>();
-
-  // from ptr + prop
   T* rp = nullptr;
+  rp++;
+  test_ctor<T, P>(rp);
+  // from ptr + prop
   P p;
   cuda::annotated_ptr<T, cuda::access_property> a(rp, p);
   cuda::annotated_ptr<const T, cuda::access_property> b(rp, p);
@@ -94,7 +95,7 @@ __host__ __device__ __noinline__ void test_global_ctors()
   test_global_ctor<int, cuda::access_property::persisting>();
   test_global_ctor<int, cuda::access_property::global>();
   test_global_ctor<int, cuda::access_property>();
-  test_ctor<int, cuda::access_property::shared>();
+  NV_IF_TARGET(NV_IS_DEVICE, (__shared__ int smem_value; test_ctor<int, cuda::access_property::shared>(&smem_value);))
 }
 
 int main(int argc, char** argv)
