@@ -32,30 +32,15 @@
 
 This page documents ``cuda::associate_access_property``, which associates a cache access property with a raw pointer for use in subsequent memory operations.
 
-.. code:: cuda
+Defined in header ``<cuda/annotated_ptr>``.
 
-   template <class T, class Property>
-   __host__ __device__
-   T* associate_access_property(T* ptr, Property prop);
+.. code:: cpp
 
-**Preconditions**:
+   template <typename T, typename Property>
+   [[nodiscard]] __host__ __device__
+   T* associate_access_property(T* ptr, Property prop) noexcept;
 
-- if ``Property`` is :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-shared>`
-  then it must be valid to cast the generic pointer ``ptr`` to a pointer to the shared memory address space.
-- if ``Property`` is one of :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-global>`,
-  :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-persisting>`,
-  :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-normal>`, or
-  :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-streaming>`
-  then it must be valid to cast the generic pointer ``ptr`` to a pointer to the global memory address space.
-- if ``Property`` is a :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>`
-  of "range" kind, then ``ptr`` must be in the valid range.
-
-**Mandates**: ``Property`` is convertible to :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>`.
-
-**Effects**: no effects.
-
-**Hint**: to associate an access property with the returned pointer, such that subsequent memory operations with the
-returned pointer *or* pointers derived from it *may* apply the access property.
+Associate an :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>` to the input pointer, such that subsequent memory operations with the returned pointer *or* pointers derived from it *may* apply the access property.
 
 -  The "association" is *not* part of the value representation of the pointer.
 -  The compiler is allowed to drop the association; it does not have a functional consequence.
@@ -65,21 +50,30 @@ returned pointer *or* pointers derived from it *may* apply the access property.
 -  The association is *not* expected to hold through the ABI of an unknown function call, e.g., when the pointer is
    passed through a separately-compiled function interface, unless link-time optimizations are used.
 
+**Constraints**
+
+- ``Property`` is convertible to :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>`.
+
+**Preconditions**:
+
+- If ``Property`` is :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-shared>`, then it must be valid to cast the generic pointer ``ptr`` to a pointer to the *shared memory* address space.
+
+- If ``Property`` is one of :ref:`cuda::access_property::global <libcudacxx-extended-api-memory-access-properties-access-property-global>`, :ref:`cuda::access_property::persisting <libcudacxx-extended-api-memory-access-properties-access-property-persisting>`, :ref:`cuda::access_property::normal <libcudacxx-extended-api-memory-access-properties-access-property-normal>`, or     :ref:`cuda::access_property::streaming <libcudacxx-extended-api-memory-access-properties-access-property-streaming>`, then it must be valid to cast the generic pointer ``ptr`` to a pointer to the *global memory* address space.
+
 ..
-   **Note**: currently ``associate_access_property`` is ignored by nvcc and nvc++ on the host; but this might change any time.
+   *Note*: currently ``associate_access_property`` is ignored by nvcc and nvc++ on the host.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
-   #include <cuda/cooperative_groups.h>
-   __global__ void memcpy(int const* in_, int* out) {
-       int const* in = cuda::associate_access_property(in_, cuda::access_property::streaming{});
-       auto idx = cooperative_groups::this_grid().thread_rank();
+    #include <cuda/cooperative_groups.h>
 
-       __shared__ int shmem[N];
-       shmem[threadIdx.x] = in[idx]; // streaming access
-
-       // compute...
-   }
+    __global__ void memcpy_kernel(const int* in, int* out) {
+        __shared__ int smem[N];
+        auto in1          = cuda::associate_access_property(in, cuda::access_property::streaming{});
+        auto idx          = cooperative_groups::this_grid().thread_rank();
+        smem[threadIdx.x] = in1[idx]; // streaming access
+        // compute...
+    }
