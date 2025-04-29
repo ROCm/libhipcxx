@@ -44,28 +44,49 @@
 
 #include <cuda/std/__exception/cuda_error.h>
 
-#if _CCCL_HAS_CUDA_COMPILER()
-#  define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)           \
-    {                                                    \
-      const ::cudaError_t __status = _NAME(__VA_ARGS__); \
-      switch (__status)                                  \
-      {                                                  \
-        case ::cudaSuccess:                              \
-          break;                                         \
-        default:                                         \
-          ::cudaGetLastError();                          \
-          ::hip::__throw_cuda_error(__status, _MSG);    \
-      }                                                  \
-    }
+// <<<<<<< OLD CODE from 6a706b2d84 (178551348f) - COMMENTED OUT
+// #if _CCCL_HAS_CUDA_COMPILER()
+// #  define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)           \
+//     {                                                    \
+//       const ::cudaError_t __status = _NAME(__VA_ARGS__); \
+//       switch (__status)                                  \
+//       {                                                  \
+//         case ::cudaSuccess:                              \
+//           break;                                         \
+//         default:                                         \
+//           ::cudaGetLastError();                          \
+//           ::hip::__throw_cuda_error(__status, _MSG);    \
+//       }                                                  \
+//     }
+//
+// #  define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)                         \
+//     {                                                                     \
+//       [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__); \
+//       _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
+//     }
+// #else // ^^^ _CCCL_HAS_CUDA_COMPILER() ^^^ / vvv !_CCCL_HAS_CUDA_COMPILER() vvv
+// #  define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)
+// #  define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)
+// #endif // !_CCCL_HAS_CUDA_COMPILER()
+// =======
+#define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)           \
+  {                                                    \
+    const ::cudaError_t __status = _NAME(__VA_ARGS__); \
+    switch (__status)                                  \
+    {                                                  \
+      case ::cudaSuccess:                              \
+        break;                                         \
+      default:                                         \
+        ::cudaGetLastError();                          \
+        ::cuda::__throw_cuda_error(__status, _MSG);    \
+    }                                                  \
+  }
 
-#  define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)                         \
-    {                                                                     \
-      [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__); \
-      _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
-    }
-#else // ^^^ _CCCL_HAS_CUDA_COMPILER() ^^^ / vvv !_CCCL_HAS_CUDA_COMPILER() vvv
-#  define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)
-#  define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)
-#endif // !_CCCL_HAS_CUDA_COMPILER()
+#define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)                         \
+  {                                                                     \
+    [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__); \
+    _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
+  }
+// >>>>>>> END NEW CODE (178551348f)
 
 #endif //_CUDA__STD__CUDA_API_WRAPPER_H
