@@ -213,37 +213,67 @@
 #elif _CCCL_COMPILER(NVRTC)
 #  undef _CCCL_CUDA_COMPILER_NVRTC
 #  define _CCCL_CUDA_COMPILER_NVRTC() _CCCL_COMPILER_NVRTC()
-// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// #endif // ^^^ _CCCL_COMPILER(NVRTC) ^^^
-//
-// #if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_CUDA_COMPILER(CLANG) || _CCCL_CUDA_COMPILER(NVHPC) || _CCCL_CUDA_COMPILER(NVRTC)  || defined(_CCCL_COMPILER_HIPCC) || defined(_CCCL_COMPILER_HIPRTC)
-// #  define _CCCL_HAS_CUDA_COMPILER() 1
-// #else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
-// #  define _CCCL_HAS_CUDA_COMPILER() 0
-// #endif // ^^^ no cuda compiler ^^^
-//
-// #if defined(__CUDACC__) || _CCCL_CUDA_COMPILER(NVHPC) || defined(_CCCL_COMPILER_HIPCC) || defined(_CCCL_COMPILER_HIPRTC)
-// #  define _CCCL_CUDA_COMPILATION() 1
-// #else // ^^^ compiling .cu file ^^^ / vvv not compiling .cu file vvv
-// #  define _CCCL_CUDA_COMPILATION() 0
-// #endif // ^^^ not compiling .cu file ^^^
-//
-// // Determine if we are compiling host code, this includes both CUDA and C++ compilation
-// // nvc++ does not define __CUDA_ARCH__, but it compiles both host and device code at the same time
-// #if !defined(__CUDA_ARCH__)
-// #  define _CCCL_HOST_COMPILATION() 1
-// #else // ^^^ compiling host code ^^^ / vvv not compiling host code vvv
-// #  define _CCCL_HOST_COMPILATION() 0
-// #endif // ^^^ not compiling host code ^^^
-//
-// #if (_CCCL_CUDA_COMPILATION() && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))) || _CCCL_CUDA_COMPILER(NVHPC)
-// #  define _CCCL_DEVICE_COMPILATION() 1
-// #else // ^^^ compiling device code ^^^ / vvv not compiling device code vvv
-// #  define _CCCL_DEVICE_COMPILATION() 0
-// #endif // ^^^ not compiling device code ^^^
+// <<<<<<< OLD CODE from 1bdef2f937 (9c2d7ed65d) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// // #endif // ^^^ _CCCL_COMPILER(NVRTC) ^^^
+// //
+// // #if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_CUDA_COMPILER(CLANG) || _CCCL_CUDA_COMPILER(NVHPC) || _CCCL_CUDA_COMPILER(NVRTC)  || defined(_CCCL_COMPILER_HIPCC) || defined(_CCCL_COMPILER_HIPRTC)
+// // #  define _CCCL_HAS_CUDA_COMPILER() 1
+// // #else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
+// // #  define _CCCL_HAS_CUDA_COMPILER() 0
+// // #endif // ^^^ no cuda compiler ^^^
+// //
+// // #if defined(__CUDACC__) || _CCCL_CUDA_COMPILER(NVHPC) || defined(_CCCL_COMPILER_HIPCC) || defined(_CCCL_COMPILER_HIPRTC)
+// // #  define _CCCL_CUDA_COMPILATION() 1
+// // #else // ^^^ compiling .cu file ^^^ / vvv not compiling .cu file vvv
+// // #  define _CCCL_CUDA_COMPILATION() 0
+// // #endif // ^^^ not compiling .cu file ^^^
+// //
+// // // Determine if we are compiling host code, this includes both CUDA and C++ compilation
+// // // nvc++ does not define __CUDA_ARCH__, but it compiles both host and device code at the same time
+// // #if !defined(__CUDA_ARCH__)
+// // #  define _CCCL_HOST_COMPILATION() 1
+// // #else // ^^^ compiling host code ^^^ / vvv not compiling host code vvv
+// // #  define _CCCL_HOST_COMPILATION() 0
+// // #endif // ^^^ not compiling host code ^^^
+// //
+// // #if (_CCCL_CUDA_COMPILATION() && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))) || _CCCL_CUDA_COMPILER(NVHPC)
+// // #  define _CCCL_DEVICE_COMPILATION() 1
+// // #else // ^^^ compiling device code ^^^ / vvv not compiling device code vvv
+// // #  define _CCCL_DEVICE_COMPILATION() 0
+// // #endif // ^^^ not compiling device code ^^^
+// // =======
+// #endif
+// // >>>>>>> END NEW CODE (702d3c08ed)
 // =======
-#endif
-// >>>>>>> END NEW CODE (702d3c08ed)
+#endif // ^^^ _CCCL_COMPILER(NVRTC) ^^^
+
+#if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_CUDA_COMPILER(CLANG) || _CCCL_CUDA_COMPILER(NVHPC) || _CCCL_CUDA_COMPILER(NVRTC)
+#  define _CCCL_HAS_CUDA_COMPILER() 1
+#else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
+#  define _CCCL_HAS_CUDA_COMPILER() 0
+#endif // ^^^ no cuda compiler ^^^
+
+#if defined(__CUDACC__) || _CCCL_CUDA_COMPILER(NVHPC)
+#  define _CCCL_CUDA_COMPILATION() 1
+#else // ^^^ compiling .cu file ^^^ / vvv not compiling .cu file vvv
+#  define _CCCL_CUDA_COMPILATION() 0
+#endif // ^^^ not compiling .cu file ^^^
+
+// Determine if we are compiling host code, this includes both CUDA and C++ compilation
+// nvc++ does not define __CUDA_ARCH__, but it compiles both host and device code at the same time
+#if !defined(__CUDA_ARCH__)
+#  define _CCCL_HOST_COMPILATION() 1
+#else // ^^^ compiling host code ^^^ / vvv not compiling host code vvv
+#  define _CCCL_HOST_COMPILATION() 0
+#endif // ^^^ not compiling host code ^^^
+
+#if (_CCCL_CUDA_COMPILATION() && defined(__CUDA_ARCH__)) || _CCCL_CUDA_COMPILER(NVHPC)
+#  define _CCCL_DEVICE_COMPILATION() 1
+#else // ^^^ compiling device code ^^^ / vvv not compiling device code vvv
+#  define _CCCL_DEVICE_COMPILATION() 0
+#endif // ^^^ not compiling device code ^^^
+// >>>>>>> END NEW CODE (9c2d7ed65d)
 
 #define _CCCL_CUDACC_MAKE_VERSION(_MAJOR, _MINOR) ((_MAJOR) * 1000 + (_MINOR) * 10)
 
@@ -272,32 +302,43 @@
 // >>>>>>> END NEW CODE (d96b2a979a)
 #elif _CCCL_CUDA_COMPILER(CLANG)
 #  define _CCCL_CUDACC() (CUDA_VERSION / 1000, (CUDA_VERSION % 1000) / 10)
-#else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
+#endif // ^^^ has cuda compiler ^^^
+
+#if !defined(_CCCL_CUDACC) || !_CCCL_CUDA_COMPILATION()
+#  undef _CCCL_CUDACC
 #  define _CCCL_CUDACC() _CCCL_VERSION_INVALID()
-#endif // ^^^ no cuda compiler ^^^
-// >>>>>>> END NEW CODE (702d3c08ed)
+// <<<<<<< OLD CODE from 1bdef2f937 (9c2d7ed65d) - COMMENTED OUT
+// #endif // ^^^ no cuda compiler ^^^
+// // >>>>>>> END NEW CODE (702d3c08ed)
+// =======
+#endif // !_CCCL_CUDACC || !_CCCL_CUDA_COMPILATION()
+// >>>>>>> END NEW CODE (9c2d7ed65d)
 
 #define _CCCL_CUDACC_EQUAL(...)    _CCCL_VERSION_COMPARE(_CCCL_CUDACC_, _CCCL_CUDACC, ==, __VA_ARGS__)
 #define _CCCL_CUDACC_BELOW(...)    _CCCL_VERSION_COMPARE(_CCCL_CUDACC_, _CCCL_CUDACC, <, __VA_ARGS__)
 #define _CCCL_CUDACC_AT_LEAST(...) _CCCL_VERSION_COMPARE(_CCCL_CUDACC_, _CCCL_CUDACC, >=, __VA_ARGS__)
 
-// <<<<<<< OLD CODE from 9cce1a228d (d96b2a979a) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #if _CCCL_CUDA_COMPILATION() && _CCCL_CUDACC_BELOW(12) && !defined(CCCL_IGNORE_DEPRECATED_CUDA_BELOW_12)
+// <<<<<<< OLD CODE from 1bdef2f937 (9c2d7ed65d) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 9cce1a228d (d96b2a979a) - COMMENTED OUT
+// // // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// // // #if _CCCL_CUDA_COMPILATION() && _CCCL_CUDACC_BELOW(12) && !defined(CCCL_IGNORE_DEPRECATED_CUDA_BELOW_12)
+// // // =======
+// // #if _CCCL_CUDACC() != _CCCL_VERSION_INVALID()
+// // #  define _CCCL_HAS_CUDA_COMPILER() 1
+// // #else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
 // // =======
-// #if _CCCL_CUDACC() != _CCCL_VERSION_INVALID()
-// #  define _CCCL_HAS_CUDA_COMPILER() 1
+// #if _CCCL_VERSION_IS_INVALID(_CCCL_CUDACC())
+// // >>>>>>> END NEW CODE (d96b2a979a)
+// #  define _CCCL_HAS_CUDA_COMPILER() 0
 // #else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
+// #  define _CCCL_HAS_CUDA_COMPILER() 1
+// #endif // ^^^ no cuda compiler ^^^
+//
+// #if _CCCL_HAS_CUDA_COMPILER() && _CCCL_CUDACC_BELOW(12) && !defined(CCCL_IGNORE_DEPRECATED_CUDA_BELOW_12)
+// // >>>>>>> END NEW CODE (702d3c08ed)
 // =======
-#if _CCCL_VERSION_IS_INVALID(_CCCL_CUDACC())
-// >>>>>>> END NEW CODE (d96b2a979a)
-#  define _CCCL_HAS_CUDA_COMPILER() 0
-#else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
-#  define _CCCL_HAS_CUDA_COMPILER() 1
-#endif // ^^^ no cuda compiler ^^^
-
-#if _CCCL_HAS_CUDA_COMPILER() && _CCCL_CUDACC_BELOW(12) && !defined(CCCL_IGNORE_DEPRECATED_CUDA_BELOW_12)
-// >>>>>>> END NEW CODE (702d3c08ed)
+#if _CCCL_CUDA_COMPILATION() && _CCCL_CUDACC_BELOW(12) && !defined(CCCL_IGNORE_DEPRECATED_CUDA_BELOW_12)
+// >>>>>>> END NEW CODE (9c2d7ed65d)
 #  error "CUDA versions below 12 are not supported." \
 "Define CCCL_IGNORE_DEPRECATED_CUDA_BELOW_12 to suppress this message."
 #endif
@@ -316,15 +357,22 @@
 #  endif // !__ELF__
 #endif // _CCCL_COMPILER(NVHPC) || _CCCL_COMPILER(NVRTC)
 
-// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// #if _CCCL_DEVICE_COMPILATION()
-// #  define _CCCL_PRAGMA_UNROLL(_N)    _CCCL_PRAGMA(unroll _N)
-// #  define _CCCL_PRAGMA_UNROLL_FULL() _CCCL_PRAGMA(unroll)
-// #elif _CCCL_COMPILER(NVHPC) || _CCCL_COMPILER(NVRTC) || _CCCL_COMPILER(CLANG)
+// <<<<<<< OLD CODE from 1bdef2f937 (9c2d7ed65d) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// // #if _CCCL_DEVICE_COMPILATION()
+// // #  define _CCCL_PRAGMA_UNROLL(_N)    _CCCL_PRAGMA(unroll _N)
+// // #  define _CCCL_PRAGMA_UNROLL_FULL() _CCCL_PRAGMA(unroll)
+// // #elif _CCCL_COMPILER(NVHPC) || _CCCL_COMPILER(NVRTC) || _CCCL_COMPILER(CLANG)
+// // =======
+// #if (_CCCL_CUDA_COMPILER(NVCC) && defined(__CUDA_ARCH__)) || _CCCL_COMPILER(NVHPC) || _CCCL_COMPILER(NVRTC) \
+//   || _CCCL_COMPILER(CLANG)
+// // >>>>>>> END NEW CODE (702d3c08ed)
 // =======
-#if (_CCCL_CUDA_COMPILER(NVCC) && defined(__CUDA_ARCH__)) || _CCCL_COMPILER(NVHPC) || _CCCL_COMPILER(NVRTC) \
-  || _CCCL_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (702d3c08ed)
+#if _CCCL_DEVICE_COMPILATION()
+#  define _CCCL_PRAGMA_UNROLL(_N)    _CCCL_PRAGMA(unroll _N)
+#  define _CCCL_PRAGMA_UNROLL_FULL() _CCCL_PRAGMA(unroll)
+#elif _CCCL_COMPILER(NVHPC) || _CCCL_COMPILER(NVRTC) || _CCCL_COMPILER(CLANG)
+// >>>>>>> END NEW CODE (9c2d7ed65d)
 #  define _CCCL_PRAGMA_UNROLL(_N)    _CCCL_PRAGMA(unroll _N)
 #  define _CCCL_PRAGMA_UNROLL_FULL() _CCCL_PRAGMA(unroll)
 #elif _CCCL_COMPILER(GCC, >=, 8)

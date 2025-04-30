@@ -24,11 +24,15 @@
 namespace __cccl_internal
 {
 
-// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILATION()
+// <<<<<<< OLD CODE from 1bdef2f937 (9c2d7ed65d) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// // #if _CCCL_CUDA_COMPILATION()
+// // =======
+// #if _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA) || _CCCL_COMPILER(NVRTC))
+// // >>>>>>> END NEW CODE (702d3c08ed)
 // =======
-#if _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA) || _CCCL_COMPILER(NVRTC))
-// >>>>>>> END NEW CODE (702d3c08ed)
+#if _CCCL_CUDA_COMPILATION()
+// >>>>>>> END NEW CODE (9c2d7ed65d)
 template <class _Tp>
 __host__ __device__ _Tp&& __cccl_declval(int);
 template <class _Tp>
