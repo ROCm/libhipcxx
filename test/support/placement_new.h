@@ -26,10 +26,15 @@
 #ifndef PLACEMENT_NEW_HPP
 #define PLACEMENT_NEW_HPP
 
-// CUDA always defines placement new/delete for device code.
-#if !(defined(__CUDACC__) || defined(__HIPCC__))
+#include "test_macros.h"
 
-#  include "test_macros.h"
+// CUDA always defines placement new/delete for device code.
+// <<<<<<< OLD CODE from 51e5a1601d (61c56ec958) - COMMENTED OUT
+// #if !(defined(__CUDACC__) || defined(__HIPCC__))
+// =======
+#if !_CCCL_CUDA_COMPILATION()
+// >>>>>>> END NEW CODE (61c56ec958)
+
 #  include <stddef.h> // Avoid depending on the C++ standard library.
 
 void* operator new(size_t, void* p)
@@ -43,6 +48,6 @@ void* operator new[](size_t, void* p)
 void operator delete(void*, void*) {}
 void operator delete[](void*, void*) {}
 
-#endif // !defined(__CUDACC__)
+#endif // !_CCCL_CUDA_COMPILATION()
 
 #endif // PLACEMENT_NEW_HPP
