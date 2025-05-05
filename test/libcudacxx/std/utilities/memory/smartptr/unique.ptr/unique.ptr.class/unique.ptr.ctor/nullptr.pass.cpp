@@ -93,7 +93,7 @@ __host__ __device__ TEST_CONSTEXPR_CXX23 void test_sfinae()
   }
 }
 
-#ifndef __CUDACC__
+#if !_CCCL_CUDA_COMPILATION()
 DEFINE_AND_RUN_IS_INCOMPLETE_TEST({
   {
     doIncompleteTypeTest(0, nullptr);
@@ -112,7 +112,7 @@ DEFINE_AND_RUN_IS_INCOMPLETE_TEST({
   }
   checkNumIncompleteTypeAlive(0);
 })
-#endif // __CUDACC__
+#endif // !_CCCL_CUDA_COMPILATION()
 
 __host__ __device__ TEST_CONSTEXPR_CXX23 bool test()
 {
