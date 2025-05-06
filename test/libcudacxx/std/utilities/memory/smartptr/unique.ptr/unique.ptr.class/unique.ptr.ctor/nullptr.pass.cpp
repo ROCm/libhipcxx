@@ -37,9 +37,15 @@
 #include "test_macros.h"
 #include "unique_ptr_test_helper.h"
 
-#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)  // no dynamic initialization
-_LIBCUDACXX_SAFE_STATIC cuda::std::unique_ptr<int> global_static_unique_ptr_single(nullptr);
-_LIBCUDACXX_SAFE_STATIC cuda::std::unique_ptr<int[]> global_static_unique_ptr_runtime(nullptr);
+// <<<<<<< OLD CODE from 19af4bcc8f (87fc615d5a) - COMMENTED OUT
+// #if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)  // no dynamic initialization
+// _LIBCUDACXX_SAFE_STATIC cuda::std::unique_ptr<int> global_static_unique_ptr_single(nullptr);
+// _LIBCUDACXX_SAFE_STATIC cuda::std::unique_ptr<int[]> global_static_unique_ptr_runtime(nullptr);
+// =======
+#if !TEST_COMPILER(NVRTC) // no dynamic initialization
+_CCCL_CONSTINIT cuda::std::unique_ptr<int> global_static_unique_ptr_single(nullptr);
+_CCCL_CONSTINIT cuda::std::unique_ptr<int[]> global_static_unique_ptr_runtime(nullptr);
+// >>>>>>> END NEW CODE (87fc615d5a)
 #endif // TEST_COMPILER(NVRTC)
 
 struct NonDefaultDeleter

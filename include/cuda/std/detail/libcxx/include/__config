@@ -61,79 +61,82 @@ extern "C++" {
 #    define __has_extension(__x) 0
 #  endif
 
-# <<<<<<< OLD CODE from e9423c3d7a (2ffa90b52a) - COMMENTED OUT
-# #  ifdef __LITTLE_ENDIAN__
-# #    if __LITTLE_ENDIAN__
-# #      define _LIBCUDACXX_LITTLE_ENDIAN
-# #    endif // __LITTLE_ENDIAN__
-# #  endif // __LITTLE_ENDIAN__
-#
-# #  ifdef __BIG_ENDIAN__
-# #    if __BIG_ENDIAN__
-# #      define _LIBCUDACXX_BIG_ENDIAN
-# #    endif // __BIG_ENDIAN__
-# #  endif // __BIG_ENDIAN__
-#
-# #  ifdef __BYTE_ORDER__
-# #    if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-# #      define _LIBCUDACXX_LITTLE_ENDIAN
-# #    elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-# #      define _LIBCUDACXX_BIG_ENDIAN
-# #    endif // __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-# #  endif // __BYTE_ORDER__
-#
-# #  if defined(_WIN32)
-# #    define _LIBCUDACXX_LITTLE_ENDIAN
-# #    if (defined(_M_AMD64) || defined(__x86_64__)) || (defined(_M_ARM) || defined(__arm__))
-# #      define _LIBCUDACXX_HAS_BITSCAN64
-# #    endif
-#
-# // Some CRT APIs are unavailable to store apps
-# #    if defined(WINAPI_FAMILY)
-# #      include <winapifamily.h>
-# #      if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) \
-#         && (!defined(WINAPI_PARTITION_SYSTEM) || !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_SYSTEM))
-# #        define _LIBCUDACXX_WINDOWS_STORE_APP
-# #      endif
-# #    endif
-# #  endif // defined(_WIN32)
-#
-# #  ifndef _LIBCUDACXX_LITTLE_ENDIAN
-# #    if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# #      define _LIBCUDACXX_LITTLE_ENDIAN
-# #    endif
-# #  endif // _LIBCUDACXX_LITTLE_ENDIAN
-#
-# #  if !defined(_LIBCUDACXX_LITTLE_ENDIAN) && !defined(_LIBCUDACXX_BIG_ENDIAN)
-# #    include <endian.h>
-# #    if __BYTE_ORDER == __LITTLE_ENDIAN
-# #      define _LIBCUDACXX_LITTLE_ENDIAN
-# #    elif __BYTE_ORDER == __BIG_ENDIAN
-# #      define _LIBCUDACXX_BIG_ENDIAN
-# #    else // __BYTE_ORDER == __BIG_ENDIAN
-# #      error unable to determine endian
-# #    endif
-# #  endif // !defined(_LIBCUDACXX_LITTLE_ENDIAN) && !defined(_LIBCUDACXX_BIG_ENDIAN)
-#
-# =======
-# >>>>>>> END NEW CODE (2ffa90b52a)
-#  if _CCCL_HAS_ATTRIBUTE(__no_sanitize__) && !_CCCL_COMPILER(GCC)
-#    define _LIBCUDACXX_NO_CFI __attribute__((__no_sanitize__("cfi")))
-#  else
-#    define _LIBCUDACXX_NO_CFI
-#  endif
-
-# <<<<<<< OLD CODE from 65131f6703 (8f7544a101) - COMMENTED OUT
-# #  if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# #    define __alignof(x) alignof(x)
-# #  endif // _CCCL_COMPILER(NVRTC)
-#
-# #  if _CCCL_COMPILER(MSVC)
-# #    define __alignof__ __alignof
+# <<<<<<< OLD CODE from 19af4bcc8f (87fc615d5a) - COMMENTED OUT
+# # <<<<<<< OLD CODE from e9423c3d7a (2ffa90b52a) - COMMENTED OUT
+# # #  ifdef __LITTLE_ENDIAN__
+# # #    if __LITTLE_ENDIAN__
+# # #      define _LIBCUDACXX_LITTLE_ENDIAN
+# # #    endif // __LITTLE_ENDIAN__
+# # #  endif // __LITTLE_ENDIAN__
+# #
+# # #  ifdef __BIG_ENDIAN__
+# # #    if __BIG_ENDIAN__
+# # #      define _LIBCUDACXX_BIG_ENDIAN
+# # #    endif // __BIG_ENDIAN__
+# # #  endif // __BIG_ENDIAN__
+# #
+# # #  ifdef __BYTE_ORDER__
+# # #    if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+# # #      define _LIBCUDACXX_LITTLE_ENDIAN
+# # #    elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+# # #      define _LIBCUDACXX_BIG_ENDIAN
+# # #    endif // __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+# # #  endif // __BYTE_ORDER__
+# #
+# # #  if defined(_WIN32)
+# # #    define _LIBCUDACXX_LITTLE_ENDIAN
+# # #    if (defined(_M_AMD64) || defined(__x86_64__)) || (defined(_M_ARM) || defined(__arm__))
+# # #      define _LIBCUDACXX_HAS_BITSCAN64
+# # #    endif
+# #
+# # // Some CRT APIs are unavailable to store apps
+# # #    if defined(WINAPI_FAMILY)
+# # #      include <winapifamily.h>
+# # #      if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) \
+# #         && (!defined(WINAPI_PARTITION_SYSTEM) || !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_SYSTEM))
+# # #        define _LIBCUDACXX_WINDOWS_STORE_APP
+# # #      endif
+# # #    endif
+# # #  endif // defined(_WIN32)
+# #
+# # #  ifndef _LIBCUDACXX_LITTLE_ENDIAN
+# # #    if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+# # #      define _LIBCUDACXX_LITTLE_ENDIAN
+# # #    endif
+# # #  endif // _LIBCUDACXX_LITTLE_ENDIAN
+# #
+# # #  if !defined(_LIBCUDACXX_LITTLE_ENDIAN) && !defined(_LIBCUDACXX_BIG_ENDIAN)
+# # #    include <endian.h>
+# # #    if __BYTE_ORDER == __LITTLE_ENDIAN
+# # #      define _LIBCUDACXX_LITTLE_ENDIAN
+# # #    elif __BYTE_ORDER == __BIG_ENDIAN
+# # #      define _LIBCUDACXX_BIG_ENDIAN
+# # #    else // __BYTE_ORDER == __BIG_ENDIAN
+# # #      error unable to determine endian
+# # #    endif
+# # #  endif // !defined(_LIBCUDACXX_LITTLE_ENDIAN) && !defined(_LIBCUDACXX_BIG_ENDIAN)
+# #
+# # =======
+# # >>>>>>> END NEW CODE (2ffa90b52a)
+# #  if _CCCL_HAS_ATTRIBUTE(__no_sanitize__) && !_CCCL_COMPILER(GCC)
+# #    define _LIBCUDACXX_NO_CFI __attribute__((__no_sanitize__("cfi")))
+# #  else
+# #    define _LIBCUDACXX_NO_CFI
 # #  endif
 #
-# #  define _LIBCUDACXX_PREFERRED_ALIGNOF(_Tp) __alignof(_Tp)
+# # <<<<<<< OLD CODE from 65131f6703 (8f7544a101) - COMMENTED OUT
+# # #  if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+# # #    define __alignof(x) alignof(x)
+# # #  endif // _CCCL_COMPILER(NVRTC)
+# #
+# # #  if _CCCL_COMPILER(MSVC)
+# # #    define __alignof__ __alignof
+# # #  endif
+# #
+# # #  define _LIBCUDACXX_PREFERRED_ALIGNOF(_Tp) __alignof(_Tp)
+# # =======
 # =======
+# >>>>>>> END NEW CODE (87fc615d5a)
 #  if !_CCCL_COMPILER(NVRTC)
 #    define _LIBCUDACXX_PREFERRED_ALIGNOF(_T) __alignof(_T)
 #  else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
@@ -161,16 +164,6 @@ extern "C++" {
 #  elif _CCCL_COMPILER(CLANG) || _CCCL_COMPILER(GCC)
 #    define _LIBCUDACXX_ATOMIC_ALWAYS_LOCK_FREE(...) __atomic_always_lock_free(__VA_ARGS__)
 #  endif // _CCCL_CUDA_COMPILER
-
-#  if _CCCL_COMPILER(CLANG)
-
-// Allow for build-time disabling of unsigned integer sanitization
-#    if !defined(_LIBCUDACXX_DISABLE_UBSAN_UNSIGNED_INTEGER_CHECK) && _CCCL_HAS_ATTRIBUTE(no_sanitize)
-#      define _LIBCUDACXX_DISABLE_UBSAN_UNSIGNED_INTEGER_CHECK \
-        __attribute__((__no_sanitize__("unsigned-integer-overflow")))
-#    endif
-
-#  endif //  _CCCL_COMPILER(CLANG)
 
 #  ifdef _LIBCUDACXX_DEBUG
 #    if _LIBCUDACXX_DEBUG == 0
@@ -296,28 +289,12 @@ extern "C++" {
 #    endif
 #  endif
 
-#  ifndef _LIBCUDACXX_DISABLE_UBSAN_UNSIGNED_INTEGER_CHECK
-#    define _LIBCUDACXX_DISABLE_UBSAN_UNSIGNED_INTEGER_CHECK
-#  endif
-
-#  if _CCCL_HAS_ATTRIBUTE(require_constant_initialization)
-#    define _LIBCUDACXX_SAFE_STATIC __attribute__((__require_constant_initialization__))
+#  if !defined(_LIBCUDACXX_DISABLE_ADDITIONAL_DIAGNOSTICS)
+#    define _LIBCUDACXX_DIAGNOSE_WARNING(_COND, _MSG) _CCCL_DIAGNOSE_IF(_COND, _MSG, "warning")
+#    define _LIBCUDACXX_DIAGNOSE_ERROR(_COND, _MSG)   _CCCL_DIAGNOSE_IF(_COND, _MSG, "error")
 #  else
-#    define _LIBCUDACXX_SAFE_STATIC
-#  endif
-
-#  if _CCCL_HAS_ATTRIBUTE(diagnose_if) && !defined(_LIBCUDACXX_DISABLE_ADDITIONAL_DIAGNOSTICS)
-#    define _LIBCUDACXX_DIAGNOSE_WARNING(...) __attribute__((diagnose_if(__VA_ARGS__, "warning")))
-#    define _LIBCUDACXX_DIAGNOSE_ERROR(...)   __attribute__((diagnose_if(__VA_ARGS__, "error")))
-#  else
-#    define _LIBCUDACXX_DIAGNOSE_WARNING(...)
-#    define _LIBCUDACXX_DIAGNOSE_ERROR(...)
-#  endif
-
-#  if _CCCL_HAS_ATTRIBUTE(__preferred_name__)
-#    define _LIBCUDACXX_PREFERRED_NAME(x) __attribute__((__preferred_name__(x)))
-#  else
-#    define _LIBCUDACXX_PREFERRED_NAME(x)
+#    define _LIBCUDACXX_DIAGNOSE_WARNING(_COND, _MSG)
+#    define _LIBCUDACXX_DIAGNOSE_ERROR(_COND, _MSG)
 #  endif
 
 #  if defined(_LIBCUDACXX_ENABLE_CXX17_REMOVED_FEATURES)
