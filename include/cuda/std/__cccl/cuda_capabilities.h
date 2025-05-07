@@ -71,8 +71,12 @@
 // #endif // CCCL_DISABLE_PDL
 // =======
 // True, when programmatic dependent launch is available, otherwise false.
-#define _CCCL_HAS_PDL _CCCL_CUDACC_AT_LEAST(12, 0)
-// >>>>>>> END NEW CODE (3aeb8c29e5)
+// <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
+// #define _CCCL_HAS_PDL _CCCL_CUDACC_AT_LEAST(12, 0)
+// // >>>>>>> END NEW CODE (3aeb8c29e5)
+// =======
+#define _CCCL_HAS_PDL _CCCL_CTK_AT_LEAST(12, 0)
+// >>>>>>> END NEW CODE (22b068b84b)
 
 #if _CCCL_HAS_PDL()
 // Waits for the previous kernel to complete (when it reaches its final membar). Should be put before the first global

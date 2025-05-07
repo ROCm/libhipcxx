@@ -37,11 +37,15 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// #if _CCCL_HAS_CTK()
+// <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
+// // #if _CCCL_HAS_CTK()
+// // =======
+// #if _CCCL_HAS_CUDA_COMPILER()
+// // >>>>>>> END NEW CODE (702d3c08ed)
 // =======
-#if _CCCL_HAS_CUDA_COMPILER()
-// >>>>>>> END NEW CODE (702d3c08ed)
+#if _CCCL_HAS_CTK()
+// >>>>>>> END NEW CODE (22b068b84b)
 
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
@@ -59,16 +63,29 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 #    include <cuda_runtime_api.h>
 #  endif // !_CCCL_CUDA_COMPILATION()
 
-#  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size, ...)                      \
-    template <>                                                                                    \
-    struct tuple_size<__name##__size##__VA_ARGS__> : _CUDA_VSTD::integral_constant<size_t, __size> \
-    {};                                                                                            \
-                                                                                                   \
-    template <size_t _Ip>                                                                          \
-    struct tuple_element<_Ip, __name##__size##__VA_ARGS__>                                         \
-    {                                                                                              \
-      static_assert(_Ip < __size, "tuple_element index out of range");                             \
-      using type = __type;                                                                         \
+// <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
+// #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size, ...)                      \
+//     template <>                                                                                    \
+//     struct tuple_size<__name##__size##__VA_ARGS__> : _CUDA_VSTD::integral_constant<size_t, __size> \
+//     {};                                                                                            \
+//                                                                                                    \
+//     template <size_t _Ip>                                                                          \
+//     struct tuple_element<_Ip, __name##__size##__VA_ARGS__>                                         \
+//     {                                                                                              \
+//       static_assert(_Ip < __size, "tuple_element index out of range");                             \
+//       using type = __type;                                                                         \
+// =======
+#  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size)              \
+    template <>                                                                       \
+    struct tuple_size<__name##__size> : _CUDA_VSTD::integral_constant<size_t, __size> \
+    {};                                                                               \
+                                                                                      \
+    template <size_t _Ip>                                                             \
+    struct tuple_element<_Ip, __name##__size>                                         \
+    {                                                                                 \
+      static_assert(_Ip < __size, "tuple_element index out of range");                \
+      using type = __type;                                                            \
+// >>>>>>> END NEW CODE (22b068b84b)
     };
 
 #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE_VECTOR(__name, __type) \
