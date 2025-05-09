@@ -221,7 +221,11 @@ extern "C++" {
 #  endif // _LIBCUDACXX_HAS_THREAD_API_EXTERNAL
 
 #  ifndef _LIBCUDACXX_HAS_THREAD_API_CUDA
-#    if (defined(__CUDA_ARCH__) || defined(__EMSCRIPTEN__)) || defined(__HIP_DEVICE_COMPILE__) || defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from 079adf5db1 (cdb17a5a84) - COMMENTED OUT
+# #    if (defined(__CUDA_ARCH__) || defined(__EMSCRIPTEN__)) || defined(__HIP_DEVICE_COMPILE__) || defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#    if ((_CCCL_DEVICE_COMPILATION() && !_CCCL_CUDA_COMPILER(NVHPC)) || defined(__EMSCRIPTEN__))
+# >>>>>>> END NEW CODE (cdb17a5a84)
 #      define _LIBCUDACXX_HAS_THREAD_API_CUDA
 #    endif // __cuda_std__
 #  endif // _LIBCUDACXX_HAS_THREAD_API_CUDA
