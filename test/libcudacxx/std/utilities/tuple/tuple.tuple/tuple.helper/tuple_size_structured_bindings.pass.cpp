@@ -169,8 +169,12 @@ __host__ __device__ void test_after_tuple_size_specialization()
 {
   Test const t{99};
   auto& [p] = t;
-  // NOTE(HIP/AMD): Windows fails here as it seems that it doesn't use custom get() with structured bindings.
-#if !(_CCCL_COMPILER(NVRTC) && defined(__CUDA_ARCH__)) && !defined(_CCCL_COMPILER_HIPRTC) && !_CCCL_OS(WINDOWS) // nvbug4053842
+// <<<<<<< OLD CODE from 079adf5db1 (cdb17a5a84) - COMMENTED OUT
+//   // NOTE(HIP/AMD): Windows fails here as it seems that it doesn't use custom get() with structured bindings.
+// #if !(_CCCL_COMPILER(NVRTC) && defined(__CUDA_ARCH__)) && !defined(_CCCL_COMPILER_HIPRTC) && !_CCCL_OS(WINDOWS) // nvbug4053842
+// =======
+#if !_CCCL_COMPILER(NVRTC) // nvbug4053842
+// >>>>>>> END NEW CODE (cdb17a5a84)
   assert(p == -1);
 #endif
 }

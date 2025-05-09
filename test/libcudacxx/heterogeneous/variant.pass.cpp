@@ -74,9 +74,13 @@ void kernel_invoker()
 
 int main(int arg, char** argv)
 {
-#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
-  kernel_invoker();
-#endif
+// <<<<<<< OLD CODE from 079adf5db1 (cdb17a5a84) - COMMENTED OUT
+// #if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
+//   kernel_invoker();
+// #endif
+// =======
+  NV_IF_TARGET(NV_IS_HOST, (kernel_invoker();))
+// >>>>>>> END NEW CODE (cdb17a5a84)
 
   return 0;
 }
