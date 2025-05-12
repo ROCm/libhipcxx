@@ -43,6 +43,8 @@
 #include <cuda/std/__atomic/wait/polling.h>
 #include <cuda/std/cstring>
 
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 _CCCL_DEVICE inline void __atomic_try_wait_unsupported_before_SM_70__(){};
@@ -112,5 +114,7 @@ _LIBCUDACXX_HIDE_FROM_ABI void __atomic_wait(
 }
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___ATOMIC_WAIT_NOTIFY_WAIT_H

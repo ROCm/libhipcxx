@@ -39,7 +39,7 @@
 #include <cuda/std/cstring>
 #include <cuda/std/limits>
 
-_CCCL_PUSH_MACROS
+#include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NV_DIAG_SUPPRESS(1215)
 
@@ -552,6 +552,6 @@ _LIBCUDACXX_END_NAMESPACE_STD
 
 _CCCL_END_NV_DIAG_SUPPRESS()
 
-_CCCL_POP_MACROS
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___MEMORY_ALLOCATOR_TRAITS_H

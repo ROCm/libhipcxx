@@ -62,7 +62,7 @@
 #  error "Unknown Thread API"
 #endif // Unknown Thread API
 
-_CCCL_PUSH_MACROS
+#include <cuda/std/__cccl/prologue.h>
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
@@ -126,6 +126,6 @@ _LIBCUDACXX_HIDE_FROM_ABI bool __cccl_thread_poll_with_backoff(
 
 _LIBCUDACXX_END_NAMESPACE_STD
 
-_CCCL_POP_MACROS
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___THREAD_THREADING_SUPPORT_H

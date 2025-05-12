@@ -56,7 +56,13 @@
 #  include <math.h>
 #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
 
-#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
+// #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#include <cuda/std/__cccl/prologue.h>
+
+#if _CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (24bb5db96f)
 #  ifndef FP_NAN
 #    define FP_NAN 0
 #  endif // ! FP_NAN
@@ -221,5 +227,7 @@ _CCCL_REQUIRES(_CCCL_TRAIT(is_integral, _Tp))
 }
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___CMATH_FPCLASSIFY_H

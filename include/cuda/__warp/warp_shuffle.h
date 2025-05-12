@@ -58,6 +58,8 @@
 #include <cuda/__ptx/instructions/get_sreg.h>
 #include <cuda/__ptx/instructions/shfl_sync.h>
 
+#  include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE
 
 template <typename _Tp>
@@ -328,6 +330,8 @@ warp_shuffle_xor(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constan
 }
 
 _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE
+
+#  include <cuda/std/__cccl/epilogue.h>
 
 #endif // __cccl_ptx_isa >= 600
 #endif // _CUDA___WARP_WARP_SHUFFLE_H
