@@ -30,12 +30,16 @@
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/cstring>
 
-#if defined(_CCCL_COMPILER_HIPRTC)
-// NOTE(AMD/HIP): We need to define these types here because 
-// they are not defined in hiprtc. libhipcxx issue #104.
-typedef __hip_internal::uint32_t uint32_t;
-typedef __hip_internal::int32_t int32_t;
-#endif
+// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
+// #if defined(_CCCL_COMPILER_HIPRTC)
+// // NOTE(AMD/HIP): We need to define these types here because 
+// // they are not defined in hiprtc. libhipcxx issue #104.
+// typedef __hip_internal::uint32_t uint32_t;
+// typedef __hip_internal::int32_t int32_t;
+// #endif
+// =======
+#include <cuda/std/__cccl/prologue.h>
+// >>>>>>> END NEW CODE (24bb5db96f)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
@@ -227,5 +231,7 @@ _CCCL_HOST_DEVICE inline auto __atomic_fetch_min_dispatch(_Sto* __a, _Up __val, 
 }
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___ATOMIC_TYPES_SMALL_H

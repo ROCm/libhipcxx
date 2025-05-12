@@ -51,6 +51,8 @@
 #include <cuda/std/__type_traits/is_unsigned_integer.h>
 #include <cuda/std/limits>
 
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 
 template <typename _Tp>
@@ -111,5 +113,7 @@ template <typename _Tp = uint32_t>
 }
 
 _LIBCUDACXX_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___BIT_BITMASK_H

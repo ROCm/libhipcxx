@@ -58,6 +58,8 @@
 #  include <math.h>
 #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
 
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float copysign(float __x, float __y) noexcept
@@ -201,5 +203,7 @@ _CCCL_REQUIRES(_CCCL_TRAIT(is_integral, _Tp))
 }
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___CMATH_COPYSIGN_H

@@ -37,8 +37,9 @@
 // =======
 // >>>>>>> END NEW CODE (49d285b60b)
 
-#include "utils.h"
 #include <cooperative_groups.h>
+
+#include "utils.h"
 
 // TODO: global-shared
 // TODO: read  const

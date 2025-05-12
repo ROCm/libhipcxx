@@ -51,6 +51,8 @@
 #include <cuda/std/cstdint>
 #include <cuda/std/limits>
 
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 
 #if __cccl_ptx_isa >= 200
@@ -144,5 +146,7 @@ bitfield_extract(const _Tp __value, int __start, int __width) noexcept
 }
 
 _LIBCUDACXX_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___BIT_BITFILED_INSERT_EXTRACT_H

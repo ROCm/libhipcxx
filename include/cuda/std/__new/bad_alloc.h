@@ -45,6 +45,8 @@
 #  include <new>
 #endif // !_CCCL_HAS_EXCEPTIONS()
 
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 [[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_alloc()
@@ -66,5 +68,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 }
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___NEW_BAD_ALLOC_H

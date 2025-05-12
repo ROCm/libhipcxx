@@ -51,6 +51,8 @@
 
 #  include <nv/target>
 
+#  include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 // floating point helper
@@ -70,6 +72,8 @@ _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 __constexpr_fmax(__nv_bfloat16 __x, __nv
 }
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#  include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
