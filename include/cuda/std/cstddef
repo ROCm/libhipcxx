@@ -43,16 +43,17 @@
 #  pragma system_header
 #endif // no system header
 
-_CCCL_PUSH_MACROS
-
 #include <cuda/std/__cstddef/byte.h>
 #include <cuda/std/__cstddef/types.h>
 #include <cuda/std/version>
 
-#if defined(_CCCL_COMPILER_HIPRTC)
-#define NULL __null
-#endif // _CCCL_COMPILER_HIPRTC
-
-_CCCL_POP_MACROS
-
+# <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
+# #if defined(_CCCL_COMPILER_HIPRTC)
+# #define NULL __null
+# #endif // _CCCL_COMPILER_HIPRTC
+#
+# _CCCL_POP_MACROS
+#
+# =======
+# >>>>>>> END NEW CODE (24bb5db96f)
 #endif // _CUDA_STD_CSTDDEF

@@ -25,7 +25,13 @@
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/cstdint>
 
-_CCCL_BEGIN_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
+// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
+// _CCCL_BEGIN_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
+// =======
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
+// >>>>>>> END NEW CODE (24bb5db96f)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE
 
@@ -34,5 +40,7 @@ _CCCL_DEVICE inline _CUDA_VSTD::uint64_t* barrier_native_handle(barrier<thread_s
 _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE
 
 _CCCL_END_NV_DIAG_SUPPRESS()
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___FWD_BARRIER_NATIVE_HANDLE_H

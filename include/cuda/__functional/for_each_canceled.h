@@ -52,6 +52,8 @@
 
 #if _CCCL_HAS_CUDA_COMPILER()
 
+#  include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 
 #  if _CCCL_HAS_INT128() && __cccl_ptx_isa >= 870
@@ -288,6 +290,8 @@ _CCCL_DEVICE _CCCL_HIDE_FROM_ABI void for_each_canceled_block(__UnaryFunction __
 }
 
 _LIBCUDACXX_END_NAMESPACE_CUDA
+
+#  include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CCCL_HAS_CUDA_COMPILER()
 

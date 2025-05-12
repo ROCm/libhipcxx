@@ -43,9 +43,13 @@
 #  pragma system_header
 #endif // no system header
 
-_CCCL_PUSH_MACROS
-
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
+# _CCCL_PUSH_MACROS
+#
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if !_CCCL_COMPILER(NVRTC)
+# >>>>>>> END NEW CODE (24bb5db96f)
 #  include <climits>
 #else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
 #  define _CCCL_CHAR_IS_UNSIGNED() ('\xff' > 0) // CURSED
@@ -81,7 +85,5 @@ _CCCL_PUSH_MACROS
 #  define LLONG_MAX  0x7fffffffffffffffLL
 #  define ULLONG_MAX 0xffffffffffffffffUL
 #endif // _CCCL_COMPILER(NVRTC)
-
-_CCCL_POP_MACROS
 
 #endif // _CUDA_STD_CLIMITS

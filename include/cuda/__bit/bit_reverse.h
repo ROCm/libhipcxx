@@ -47,6 +47,8 @@
 #include <cuda/std/__type_traits/is_unsigned_integer.h>
 #include <cuda/std/cstdint>
 
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 
 #if defined(_CCCL_BUILTIN_BITREVERSE32)
@@ -185,5 +187,7 @@ template <typename _Tp>
 }
 
 _LIBCUDACXX_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___BIT_BIT_REVERSE_H

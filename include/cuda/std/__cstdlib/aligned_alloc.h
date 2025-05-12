@@ -55,6 +55,8 @@
 
 #include <nv/target>
 
+#include <cuda/std/__cccl/prologue.h>
+
 #if _CCCL_HAS_CUDA_COMPILER()
 extern "C" _CCCL_DEVICE void* __cuda_syscall_aligned_malloc(size_t, size_t);
 #endif // _CCCL_HAS_CUDA_COMPILER()
@@ -95,6 +97,10 @@ __aligned_alloc_host([[maybe_unused]] size_t __nbytes, [[maybe_unused]] size_t _
 
 _LIBCUDACXX_END_NAMESPACE_STD
 
-#endif // !defined(__HIP_PLATFORM_AMD__)
+// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
+// #endif // !defined(__HIP_PLATFORM_AMD__)
+// =======
+#include <cuda/std/__cccl/epilogue.h>
+// >>>>>>> END NEW CODE (24bb5db96f)
 
 #endif // _LIBCUDACXX___CSTDLIB_ALIGNED_ALLOC_H

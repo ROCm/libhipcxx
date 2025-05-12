@@ -30,9 +30,9 @@
 // UNSUPPORTED: pre-sm-70
 
 // Remove after bump to version 4
-#include <cuda_pipeline.h>
-
 #include <cuda/barrier>
+
+#include <cuda_pipeline.h>
 
 #include "cuda_space_selector.h"
 #include "test_macros.h"

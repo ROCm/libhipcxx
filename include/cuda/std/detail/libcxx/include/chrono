@@ -871,7 +871,7 @@ constexpr chrono::year                                  operator ""y(unsigned lo
 // #include <cuda/std/concepts>
 #include <cuda/std/version>
 
-_CCCL_PUSH_MACROS
+#include <cuda/std/__cccl/prologue.h>
 
 // Silence NVCC warnings `long double` arising from chrono floating pointer
 // user-defined literals which are defined in terms of `long double`.
@@ -3701,6 +3701,6 @@ _LIBCUDACXX_END_NAMESPACE_FILESYSTEM
 
 _CCCL_END_NV_DIAG_SUPPRESS()
 
-_CCCL_POP_MACROS
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX_CHRONO

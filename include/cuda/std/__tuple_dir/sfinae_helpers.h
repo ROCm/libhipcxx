@@ -38,6 +38,8 @@
 #include <cuda/std/__type_traits/remove_reference.h>
 #include <cuda/std/cstddef>
 
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 template <bool... _Preds>
@@ -260,5 +262,7 @@ struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, false, false
 };
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___TUPLE_SFINAE_HELPERS_H
