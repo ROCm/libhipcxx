@@ -3567,7 +3567,11 @@ _CCCL_DIAG_SUPPRESS_GCC("-Wliteral-suffix")
 _CCCL_DIAG_SUPPRESS_CLANG("-Wuser-defined-literals")
 _CCCL_DIAG_SUPPRESS_NVHPC(lit_suffix_no_underscore)
 _CCCL_DIAG_SUPPRESS_MSVC(4455) // literal suffix identifiers that do not start with an underscore are reserved
-_CCCL_BEGIN_NV_DIAG_SUPPRESS(2506) // a user-provided literal suffix must begin with "_"
+# <<<<<<< OLD CODE from 41fd3bc237 (0981b7fc23) - COMMENTED OUT
+# _CCCL_BEGIN_NV_DIAG_SUPPRESS(2506) // a user-provided literal suffix must begin with "_"
+# =======
+_CCCL_NV_DIAG_SUPPRESS(2506) // a user-provided literal suffix must begin with "_"
+# >>>>>>> END NEW CODE (0981b7fc23)
 
 // Suffixes for duration literals [time.duration.literals]
 inline namespace literals
@@ -3640,7 +3644,7 @@ operator""ns(long double __ns)
   return chrono::duration<_LIBCUDACXX_CHRONO_LITERAL_INTERNAL_T, nano>(__ns);
 }
 
-#if _CCCL_STD_VER > 2017 && _LIBCUDACXX_HAS_CXX20_CHRONO_LITERALS()
+#if _LIBCUDACXX_HAS_CXX20_CHRONO_LITERALS()
 _LIBCUDACXX_HIDE_FROM_ABI constexpr chrono::day operator""d(unsigned long long __d) noexcept
 {
   return chrono::day(static_cast<unsigned>(__d));
@@ -3650,11 +3654,15 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr chrono::year operator""y(unsigned long long 
 {
   return chrono::year(static_cast<int>(__y));
 }
-#endif //_CCCL_STD_VER > 2017 && _LIBCUDACXX_HAS_CXX20_CHRONO_LITERALS()
+#endif // _LIBCUDACXX_HAS_CXX20_CHRONO_LITERALS()
 } // namespace chrono_literals
 } // namespace literals
 
-_CCCL_END_NV_DIAG_SUPPRESS()
+# <<<<<<< OLD CODE from 41fd3bc237 (0981b7fc23) - COMMENTED OUT
+# _CCCL_END_NV_DIAG_SUPPRESS()
+# =======
+_CCCL_NV_DIAG_DEFAULT(2506)
+# >>>>>>> END NEW CODE (0981b7fc23)
 _CCCL_DIAG_POP
 
 namespace chrono
