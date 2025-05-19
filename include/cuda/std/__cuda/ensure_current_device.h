@@ -38,17 +38,21 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_CUDA_COMPILER(CLANG) && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
-#  include <cuda_runtime_api.h>
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+// <<<<<<< OLD CODE from 40c5b56c00 (f69d5ba4be) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILER(CLANG) && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
+// #  include <cuda_runtime_api.h>
+// #endif // _CCCL_CUDA_COMPILER(CLANG)
+// =======
+#if _CCCL_HAS_CTK()
+// >>>>>>> END NEW CODE (f69d5ba4be)
 
-#include <cuda/std/__cuda/api_wrapper.h>
+#  include <cuda/std/__cuda/api_wrapper.h>
 
-#include <cuda/std/__cccl/prologue.h>
+#  include <cuda/std/__cccl/prologue.h>
 
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 
-#if !_CCCL_COMPILER(NVRTC)
+#  if !_CCCL_COMPILER(NVRTC)
 
 //! @brief `__ensure_current_device` is a simple helper that the current device is set to the right one.
 //! Only changes the current device if the target device is not the current one
@@ -80,10 +84,12 @@ struct __ensure_current_device
   }
 };
 
-#endif // !_CCCL_COMPILER(NVRTC)
+#  endif // !_CCCL_COMPILER(NVRTC)
 
 _LIBCUDACXX_END_NAMESPACE_CUDA
 
-#include <cuda/std/__cccl/epilogue.h>
+#  include <cuda/std/__cccl/epilogue.h>
+
+#endif // _CCCL_HAS_CTK()
 
 #endif //_CUDA__STD__CUDA_ENSURE_CURRENT_DEVICE_H

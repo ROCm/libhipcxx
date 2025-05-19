@@ -43,10 +43,14 @@
 #  pragma system_header
 #endif // no system header
 
-// CUDA headers might not be present when using NVRTC, see NVIDIA/cccl#2095 for detail
-#if !_CCCL_COMPILER(NVRTC) && not defined(__HIP_PLATFORM_AMD__)
-#  include <cuda_runtime_api.h>
-#endif // !_CCCL_COMPILER(NVRTC)
+// <<<<<<< OLD CODE from 40c5b56c00 (f69d5ba4be) - COMMENTED OUT
+// // CUDA headers might not be present when using NVRTC, see NVIDIA/cccl#2095 for detail
+// #if !_CCCL_COMPILER(NVRTC) && not defined(__HIP_PLATFORM_AMD__)
+// #  include <cuda_runtime_api.h>
+// #endif // !_CCCL_COMPILER(NVRTC)
+// =======
+#include <cuda/std/__cccl/cuda_toolkit.h>
+// >>>>>>> END NEW CODE (f69d5ba4be)
 
 #include <nv/target>
 
