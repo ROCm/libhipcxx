@@ -38,10 +38,13 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_CUDA_COMPILER(CLANG) && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
-#  include <cuda_runtime_api.h>
-#endif // _CCCL_CUDA_COMPILER(CLANG)
-
+// <<<<<<< OLD CODE from 40c5b56c00 (f69d5ba4be) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILER(CLANG) && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
+// #  include <cuda_runtime_api.h>
+// #endif // _CCCL_CUDA_COMPILER(CLANG)
+//
+// =======
+// >>>>>>> END NEW CODE (f69d5ba4be)
 #include <cuda/std/__exception/cuda_error.h>
 
 // <<<<<<< OLD CODE from 9de450753d (ecc4210681) - COMMENTED OUT
