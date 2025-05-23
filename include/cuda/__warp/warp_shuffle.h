@@ -132,7 +132,7 @@ template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
 // >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_idx(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
-  return ::cuda::device::warp_shuffle_idx(__data, __src_lane, 0xFFFFFFFF, __width);
+  return _CUDA_DEVICE::warp_shuffle_idx(__data, __src_lane, 0xFFFFFFFF, __width);
 }
 
 template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
@@ -153,10 +153,9 @@ template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<
                 "non-void pointers are not allowed to prevent bug-prone code");
   static_assert(_CUDA_VSTD::has_single_bit(uint32_t{_Width}) && _Width >= 1 && _Width <= __warp_size,
                 "_Width must be a power of 2 and less or equal to the warp size");
-  NV_IF_TARGET(
-    NV_PROVIDES_SM_70,
-    ([[maybe_unused]] int __pred1;
-     _CCCL_ASSERT(__match_all_sync(__activemask(), __delta, &__pred1), "all active lanes must have the same delta");))
+  NV_IF_TARGET(NV_PROVIDES_SM_70,
+               ([[maybe_unused]] int __pred1; _CCCL_ASSERT(::__match_all_sync(::__activemask(), __delta, &__pred1),
+                                                           "all active lanes must have the same delta");))
   if constexpr (_Width == 1)
   {
     _CCCL_ASSERT(__delta == 0, "delta must be 0 when Width == 1");
@@ -197,7 +196,7 @@ template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
 // >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_up(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
-  return ::cuda::device::warp_shuffle_up(__data, __src_lane, 0xFFFFFFFF, __width);
+  return _CUDA_DEVICE::warp_shuffle_up(__data, __src_lane, 0xFFFFFFFF, __width);
 }
 
 template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
@@ -218,10 +217,9 @@ template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<
                 "non-void pointers are not allowed to prevent bug-prone code");
   static_assert(_CUDA_VSTD::has_single_bit(uint32_t{_Width}) && _Width >= 1 && _Width <= __warp_size,
                 "_Width must be a power of 2 and less or equal to the warp size");
-  NV_IF_TARGET(
-    NV_PROVIDES_SM_70,
-    ([[maybe_unused]] int __pred1;
-     _CCCL_ASSERT(__match_all_sync(__activemask(), __delta, &__pred1), "all active lanes must have the same delta");))
+  NV_IF_TARGET(NV_PROVIDES_SM_70,
+               ([[maybe_unused]] int __pred1; _CCCL_ASSERT(::__match_all_sync(::__activemask(), __delta, &__pred1),
+                                                           "all active lanes must have the same delta");))
   if constexpr (_Width == 1)
   {
     _CCCL_ASSERT(__delta == 0, "delta must be 0 when Width == 1");
@@ -262,7 +260,7 @@ template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
 // >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_down(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
-  return ::cuda::device::warp_shuffle_down(__data, __src_lane, 0xFFFFFFFF, __width);
+  return _CUDA_DEVICE::warp_shuffle_down(__data, __src_lane, 0xFFFFFFFF, __width);
 }
 
 template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
@@ -284,7 +282,7 @@ template <int _Width = 32, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<
   static_assert(_CUDA_VSTD::has_single_bit(uint32_t{_Width}) && _Width >= 1 && _Width <= __warp_size,
                 "_Width must be a power of 2 and less or equal to the warp size");
   NV_IF_TARGET(NV_PROVIDES_SM_70,
-               ([[maybe_unused]] int __pred1; _CCCL_ASSERT(__match_all_sync(__activemask(), __xor_mask, &__pred1),
+               ([[maybe_unused]] int __pred1; _CCCL_ASSERT(::__match_all_sync(::__activemask(), __xor_mask, &__pred1),
                                                            "all active lanes must have the same delta");))
   if constexpr (_Width == 1)
   {
@@ -326,7 +324,7 @@ template <int _Width, typename _Tp, typename _Up = _CUDA_VSTD::remove_cv_t<_Tp>>
 // >>>>>>> END NEW CODE (68365cae16)
 warp_shuffle_xor(const _Tp& __data, int __src_lane, _CUDA_VSTD::integral_constant<int, _Width> __width)
 {
-  return ::cuda::device::warp_shuffle_xor(__data, __src_lane, 0xFFFFFFFF, __width);
+  return _CUDA_DEVICE::warp_shuffle_xor(__data, __src_lane, 0xFFFFFFFF, __width);
 }
 
 _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE
