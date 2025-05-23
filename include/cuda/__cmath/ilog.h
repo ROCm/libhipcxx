@@ -174,37 +174,50 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr int ilog10(_Tp __t) noexcept
   auto __log10_approx                 = static_cast<int>(__log2);
   if constexpr (sizeof(_Tp) <= sizeof(uint32_t))
   {
-    _CCCL_ASSERT(__log10_approx < static_cast<int>(::cuda::__power_of_10_32bit().size()), "out of bounds");
-    // NOTE(HIP/AMD): on Windows unsigned long is 32 bits, but on other platforms it's 64 bits,
-    // so we need to check for both types here
-    if constexpr (_CUDA_VSTD::is_same_v<_Tp, uint32_t> or _CUDA_VSTD::is_same_v<_Tp, unsigned long>)
+// <<<<<<< OLD CODE from f0f43bb63e (2c133809b3) - COMMENTED OUT
+//     _CCCL_ASSERT(__log10_approx < static_cast<int>(::cuda::__power_of_10_32bit().size()), "out of bounds");
+//     // NOTE(HIP/AMD): on Windows unsigned long is 32 bits, but on other platforms it's 64 bits,
+//     // so we need to check for both types here
+//     if constexpr (_CUDA_VSTD::is_same_v<_Tp, uint32_t> or _CUDA_VSTD::is_same_v<_Tp, unsigned long>)
+// =======
+    _CCCL_ASSERT(__log10_approx < int{_CUDA_VSTD::size(::cuda::__power_of_10_32bit())}, "out of bounds");
+    if constexpr (_CUDA_VSTD::is_same_v<_Tp, uint32_t>)
+// >>>>>>> END NEW CODE (2c133809b3)
     {
       // don't replace +1 with >= because wraparound behavior is needed here
-      __log10_approx += static_cast<uint32_t>(__t) + 1 > __power_of_10_32bit()[__log10_approx];
+      __log10_approx += static_cast<uint32_t>(__t) + 1 > ::cuda::__power_of_10_32bit()[__log10_approx];
     }
     else
     {
-      __log10_approx += static_cast<uint32_t>(__t) >= __power_of_10_32bit()[__log10_approx];
+      __log10_approx += static_cast<uint32_t>(__t) >= ::cuda::__power_of_10_32bit()[__log10_approx];
     }
   }
   else if constexpr (sizeof(_Tp) == sizeof(uint64_t))
   {
-    _CCCL_ASSERT(__log10_approx < static_cast<int>(::cuda::__power_of_10_64bit().size()), "out of bounds");
+// <<<<<<< OLD CODE from f0f43bb63e (2c133809b3) - COMMENTED OUT
+//     _CCCL_ASSERT(__log10_approx < static_cast<int>(::cuda::__power_of_10_64bit().size()), "out of bounds");
+// =======
+    _CCCL_ASSERT(__log10_approx < int{_CUDA_VSTD::size(::cuda::__power_of_10_64bit())}, "out of bounds");
+// >>>>>>> END NEW CODE (2c133809b3)
     // +1 is not needed here
-    __log10_approx += static_cast<uint64_t>(__t) >= __power_of_10_64bit()[__log10_approx];
+    __log10_approx += static_cast<uint64_t>(__t) >= ::cuda::__power_of_10_64bit()[__log10_approx];
   }
 #if _CCCL_HAS_INT128()
   else
   {
-    _CCCL_ASSERT(__log10_approx < static_cast<int>(::cuda::__power_of_10_128bit().size()), "out of bounds");
+// <<<<<<< OLD CODE from f0f43bb63e (2c133809b3) - COMMENTED OUT
+//     _CCCL_ASSERT(__log10_approx < static_cast<int>(::cuda::__power_of_10_128bit().size()), "out of bounds");
+// =======
+    _CCCL_ASSERT(__log10_approx < int{_CUDA_VSTD::size(::cuda::__power_of_10_128bit())}, "out of bounds");
+// >>>>>>> END NEW CODE (2c133809b3)
     if constexpr (_CUDA_VSTD::is_same_v<_Tp, __uint128_t>)
     {
       // don't replace +1 with >= because wraparound behavior is needed here
-      __log10_approx += static_cast<__uint128_t>(__t) + 1 > __power_of_10_128bit()[__log10_approx];
+      __log10_approx += static_cast<__uint128_t>(__t) + 1 > ::cuda::__power_of_10_128bit()[__log10_approx];
     }
     else
     {
-      __log10_approx += static_cast<__uint128_t>(__t) >= __power_of_10_128bit()[__log10_approx];
+      __log10_approx += static_cast<__uint128_t>(__t) >= ::cuda::__power_of_10_128bit()[__log10_approx];
     }
   }
 #endif // _CCCL_HAS_INT128()
