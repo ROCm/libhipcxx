@@ -174,8 +174,12 @@
 #else // ^^^ _CCCL_HAS_CUDA_COMPILER() ^^^ / vvv !_CCCL_HAS_CUDA_COMPILER() vvv
 #  define _CCCL_NV_DIAG_SUPPRESS(_WARNING)
 #  define _CCCL_NV_DIAG_DEFAULT(_WARNING)
-#endif // other compilers
-// >>>>>>> END NEW CODE (702d3c08ed)
+// <<<<<<< OLD CODE from 732986f474 (1252e35dda) - COMMENTED OUT
+// #endif // other compilers
+// // >>>>>>> END NEW CODE (702d3c08ed)
+// =======
+#endif // ^^^ !_CCCL_HAS_CUDA_COMPILER() ^^^
+// >>>>>>> END NEW CODE (1252e35dda)
 
 #if _CCCL_COMPILER(MSVC)
 #  define _CCCL_HAS_PRAGMA_MSVC_WARNING
