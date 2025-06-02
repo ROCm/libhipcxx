@@ -30,11 +30,13 @@
 Warp Shuffle
 ============
 
-The warp shuffle functions allow threads within a warp to exchange data of arbitrary size, including raw arrays, pointers, and structs.
+Defined in ``<cuda/warp>`` header.
 
 ``warp_shuffle_idx``:
 
 .. code:: cuda
+
+    namespace cuda::device {
 
     template <int Width = 32, typename T>
     [[nodiscard]] __device__ warp_shuffle_result<T>
@@ -49,9 +51,13 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
                      int      src_lane,
                      cuda::std::integral_constant<int, Width>) // lane_mask is 0xFFFFFFFF
 
+    } // namespace cuda::device
+
 ``warp_shuffle_up``:
 
 .. code:: cuda
+
+    namespace cuda::device {
 
     template <int Width = 32, typename T>
     [[nodiscard]] __device__ warp_shuffle_result<T>
@@ -66,9 +72,13 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
                     int      delta,
                     cuda::std::integral_constant<int, Width>) // lane_mask is 0xFFFFFFFF
 
+    } // namespace cuda::device
+
 ``warp_shuffle_down``:
 
 .. code:: cuda
+
+    namespace cuda::device {
 
     template <int Width = 32, typename T>
     [[nodiscard]] __device__ warp_shuffle_result<T>
@@ -83,9 +93,13 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
                       int      delta,
                       cuda::std::integral_constant<int, Width>) // lane_mask is 0xFFFFFFFF
 
+    } // namespace cuda::device
+
 ``warp_shuffle_xor``:
 
 .. code:: cuda
+
+    namespace cuda::device {
 
     template <int Width = 32, typename T>
     [[nodiscard]] __device__ warp_shuffle_result<T>
@@ -100,9 +114,13 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
                      int      xor_mask,
                      cuda::std::integral_constant<int, Width>) // lane_mask is 0xFFFFFFFF
 
+    } // namespace cuda::device
+
 Result type:
 
 .. code:: cuda
+
+    namespace cuda::device {
 
     template <typename T>
     struct warp_shuffle_result {
@@ -112,8 +130,10 @@ Result type:
         __device__ operator T() const { return data; }
     };
 
-The functionality provides a generalized, safe alternative to CUDA warp shuffle intrinsics.
-The functions allow threads to exchange data of any size, including raw arrays, pointers, and structs.
+    } // namespace cuda::device
+
+The functionality provides a generalized and safe alternative to CUDA warp shuffle intrinsics.
+The functions allow to exchange data of any data size, including raw arrays, pointers, and structs.
 
 **Parameters**
 
