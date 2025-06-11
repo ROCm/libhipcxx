@@ -28,9 +28,7 @@
 .. _libcudacxx-extended-api-asynchronous-operations-memcpy-async:
 
 ``cuda::memcpy_async``
-==========================
-
-This page documents ``cuda::memcpy_async``, which asynchronously copies a memory range and synchronizes completion via a barrier or pipeline.
+======================
 
 Defined in header ``<cuda/barrier>``:
 

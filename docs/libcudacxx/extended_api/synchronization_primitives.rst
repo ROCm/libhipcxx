@@ -59,13 +59,14 @@ This page covers the synchronization primitives extended API, providing thread-s
    :widths: 25 45 30
    :header-rows: 1
 
-   * - API
-     - Description
-     - Since
+   * - **Header**
+     - **Content**
+     - **Since**
 
    * - :ref:`cuda::atomic <libcudacxx-extended-api-synchronization-atomic>`
      - System-wide `std::atomic <https://en.cppreference.com/w/cpp/atomic/atomic>`_ objects and operations
      - libhipcxx 2.7
+
    * - :ref:`cuda::atomic_ref <libcudacxx-extended-api-synchronization-atomic-ref>`
      - System-wide `std::atomic_ref <https://en.cppreference.com/w/cpp/atomic/atomic_ref>`_ objects and operations
      - libhipcxx 2.7
@@ -77,7 +78,11 @@ This page covers the synchronization primitives extended API, providing thread-s
 
    .. list-table::
       :widths: 25 45 30
-      :header-rows: 0
+      :header-rows: 1
+
+      * - **Header**
+        - **Content**
+        - **Since**
 
       * - :ref:`cuda::latch <libcudacxx-extended-api-synchronization-latch>`
         - System-wide `std::latch <https://en.cppreference.com/w/cpp/thread/latch>`_ single-phase asynchronous
@@ -88,7 +93,11 @@ This page covers the synchronization primitives extended API, providing thread-s
 
    .. list-table::
       :widths: 25 45 30
-      :header-rows: 0
+      :header-rows: 1
+
+      * - **Header**
+        - **Content**
+        - **Since**
 
       * - :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`
         - System wide `std::barrier <https://en.cppreference.com/w/cpp/thread/barrier>`_ multi-phase asynchronous
@@ -99,12 +108,17 @@ This page covers the synchronization primitives extended API, providing thread-s
 
    .. list-table::
       :widths: 25 45 30
-      :header-rows: 0
+      :header-rows: 1
+
+      * - **Header**
+        - **Content**
+        - **Since**
 
       * - :ref:`cuda::counting_semaphore <libcudacxx-extended-api-synchronization-counting-semaphore>`
         - System wide `std::counting_semaphore <https://en.cppreference.com/w/cpp/thread/counting_semaphore>`_
           primitive for constraining concurrent access
         - libhipcxx 2.7
+
       * - :ref:`cuda::binary_semaphore <libcudacxx-extended-api-synchronization-counting-semaphore>`
         - System wide `std::binary_semaphore <https://en.cppreference.com/w/cpp/thread/counting_semaphore>`_
           primitive for mutual exclusion
@@ -116,23 +130,32 @@ This page covers the synchronization primitives extended API, providing thread-s
 
    .. list-table::
       :widths: 25 45 30
-      :header-rows: 0
+      :header-rows: 1
+
+      * - **Header**
+        - **Content**
+        - **Since**
 
       * - :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>`
         - Coordination mechanism for sequencing asynchronous operations
         - libhipcxx 2.7
+
       * - :ref:`cuda::pipeline_shared_state <libcudacxx-extended-api-synchronization-pipeline-pipeline-shared-state>`
         - :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>` shared state object
         - libhipcxx 2.7
+
       * - :ref:`cuda::pipeline_role <libcudacxx-extended-api-synchronization-pipeline-pipeline-role>`
         - Defines producer/consumer role for a thread participating in a *pipeline*
         - libhipcxx 2.7
+
       * - :ref:`cuda::make_pipeline <libcudacxx-extended-api-synchronization-pipeline-pipeline-role>`
         - Creates a :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>`
         - libhipcxx 2.7
+
       * - :ref:`cuda::pipeline_consumer_wait_prior <libcudacxx-extended-api-synchronization-pipeline-pipeline-consumer-wait-prior>`
         - Blocks the current thread until all operations committed up to a prior *pipeline stage* complete
         - libhipcxx 2.7
+
       * - :ref:`cuda::pipeline_producer_commit <libcudacxx-extended-api-synchronization-pipeline-pipeline-producer-commit>`
         - Binds operations previously issued by the current thread to a :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`
         - libhipcxx 2.7

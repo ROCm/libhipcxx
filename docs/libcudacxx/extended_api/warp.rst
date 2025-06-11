@@ -36,9 +36,9 @@ This page covers the warp extended API, providing generalized warp shuffle opera
    :hidden:
    :maxdepth: 1
 
-   cuda::device::warp_shuffle <warp/warp_shuffle>
-   cuda::device::warp_match_all <warp/warp_match_all>
-   cuda::device::lane_mask <warp/lane_mask>
+   warp/warp_shuffle
+   warp/warp_match_all
+   warp/lane_mask
 
 .. list-table::
    :widths: 25 45 30

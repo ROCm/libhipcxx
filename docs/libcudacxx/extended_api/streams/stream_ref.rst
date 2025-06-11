@@ -27,8 +27,8 @@
 
 .. _libcudacxx-extended-api-streams-stream-ref:
 
-``cuda::stream_ref``: a wrapper around a ``hipStream_t``
-==========================================================
+``cuda::stream_ref``
+====================
 
 This page documents ``cuda::stream_ref``, a type-safe wrapper around ``hipStream_t`` that prevents implicit conversions and provides wait and ready member functions.
 
