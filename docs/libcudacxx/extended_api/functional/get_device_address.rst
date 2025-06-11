@@ -28,9 +28,7 @@
 .. _libcudacxx-extended-api-functional-get-device-address:
 
 ``cuda::get_device_address``
-==================================
-
-This page documents ``cuda::get_device_address``, which returns a valid device pointer to a device object.
+============================
 
 Defined in the header ``<cuda/functional>``:
 

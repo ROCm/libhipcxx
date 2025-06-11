@@ -42,11 +42,16 @@ This page covers the asynchronous operations extended API, providing non-blockin
 
 .. list-table::
    :widths: 25 45 30
-   :header-rows: 0
+   :header-rows: 1
+
+   * - **Header**
+     - **Content**
+     - **Since**
 
    * - :ref:`cuda::memcpy_async <libcudacxx-extended-api-asynchronous-operations-memcpy-async>`
      - Asynchronously copies one range to another
      - libhipcxx 2.7
+
    * - :ref:`cuda::memcpy_async_tx <libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx>`
      - Asynchronously copies one range to another with manual transaction accounting
      - libhipcxx 2.7

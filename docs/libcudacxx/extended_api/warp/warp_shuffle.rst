@@ -27,8 +27,8 @@
 
 .. _libcudacxx-extended-api-warp-warp-shuffle:
 
-Warp Shuffle
-============
+``cuda::device::warp_shuffle_idx/up/down/xor``
+==============================================
 
 Defined in ``<cuda/warp>`` header.
 

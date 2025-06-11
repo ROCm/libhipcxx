@@ -28,9 +28,7 @@
 .. _libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx:
 
 ``cuda::device::memcpy_async_tx``
-=====================================
-
-This page documents ``cuda::device::memcpy_async_tx``, which asynchronously copies global memory to shared memory while decrementing a barrier's transaction count.
+=================================
 
 Defined in header ``<cuda/barrier>``:
 

@@ -42,12 +42,13 @@ This page covers the functional extended API, including utilities for maximum an
    functional/maximum_minimum
 
 .. list-table::
-   :widths: 25 45 30
+   :widths: 25 45 30 30
    :header-rows: 1
 
-   * - API
-     - Description
-     - Since
+   * - **Header**
+     - **Content**
+     - **CCCL Availability**
+     - **CUDA Toolkit Availability**
 
    * - :ref:`cuda::maximum <libcudacxx-extended-api-functional-maximum-minimum>`
      - Returns the maximum of two values

@@ -36,16 +36,18 @@ This page covers the streams extended API, providing ``cuda::stream_ref`` as a t
    :hidden:
    :maxdepth: 1
 
-   cuda::stream_ref <streams/stream_ref>
+   streams/stream_ref
 
 .. list-table::
-   :widths: 25 45 30
+   :widths: 25 45 30 30
    :header-rows: 1
 
-   * - API
-     - Description
-     - Since
+   * - **Header**
+     - **Content**
+     - **CCCL Availability**
+     - **CUDA Toolkit Availability**
 
    * - :ref:`stream_ref <libcudacxx-extended-api-streams-stream-ref>`
-     - A wrapper around a ``hipStream_t``
-     - libhipcxx 2.7
+     - A wrapper around a ``cudaStream_t``
+     - CCCL 2.2.0
+     - CUDA 12.3

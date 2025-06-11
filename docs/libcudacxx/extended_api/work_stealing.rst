@@ -38,8 +38,8 @@ Defined in header ``<cuda/work_stealing>``:
 
    namespace cuda {
 
-       template <int ThreadBlockRank = 3, typename UnaryFunction = ..unspecified..>
-       __device__ void for_each_canceled_block(UnaryFunction uf);
+    template <int ThreadBlockRank = 3, typename UnaryFunction = ..unspecified..>
+    __device__ void for_each_canceled_block(UnaryFunction uf);
 
    } // namespace cuda
 
