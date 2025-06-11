@@ -18,7 +18,7 @@
 
 .. _libcudacxx-extended-api-functional-proclaim-return-type:
 
-cuda::proclaim_return_type
+``cuda::proclaim_return_type``
 ==============================
 
 Defined in the header ``<cuda/functional>``:
