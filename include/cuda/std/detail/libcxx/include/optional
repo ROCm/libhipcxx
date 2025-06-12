@@ -266,7 +266,7 @@ _LIBCUDACXX_END_NAMESPACE_STD_NOVERSION
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_optional_access()
+[[noreturn]] _CCCL_API inline void __throw_bad_optional_access()
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(
@@ -282,7 +282,7 @@ struct nullopt_t
   {
     _CCCL_HIDE_FROM_ABI explicit __secret_tag() = default;
   };
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit nullopt_t(__secret_tag, __secret_tag) noexcept {}
+  _CCCL_API constexpr explicit nullopt_t(__secret_tag, __secret_tag) noexcept {}
 };
 
 _CCCL_GLOBAL_CONSTANT nullopt_t nullopt{nullopt_t::__secret_tag{}, nullopt_t::__secret_tag{}};
@@ -324,7 +324,7 @@ struct __optional_destruct_base<_Tp, false>
   bool __engaged_;
 
   _CCCL_EXEC_CHECK_DISABLE
-  _LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX20 ~__optional_destruct_base()
+  _CCCL_API inline _CCCL_CONSTEXPR_CXX20 ~__optional_destruct_base()
   {
     if (__engaged_)
     {
@@ -332,28 +332,43 @@ struct __optional_destruct_base<_Tp, false>
     }
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base() noexcept
-      : __storage_()
+# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+#   _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base() noexcept
+#       : __storage_()
+# =======
+  _CCCL_API constexpr __optional_destruct_base() noexcept
+      : __null_state_()
+# >>>>>>> END NEW CODE (d2673f2d96)
       , __engaged_(false)
   {}
 
   template <class... _Args>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
-    is_nothrow_constructible_v<value_type, _Args...>)
-      : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+#   _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
+#     is_nothrow_constructible_v<value_type, _Args...>)
+#       : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# =======
+  _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args)
+      : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
+# >>>>>>> END NEW CODE (d2673f2d96)
       , __engaged_(true)
   {}
 
   template <class _Fp, class... _Args>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base(
-    __optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
-      : __storage_(
-          __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
+# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+#   _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base(
+#     __optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+#       : __storage_(
+#           __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
+# =======
+  _CCCL_API constexpr __optional_destruct_base(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+      : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
+# >>>>>>> END NEW CODE (d2673f2d96)
       , __engaged_(true)
   {}
 
   _CCCL_EXEC_CHECK_DISABLE
-  _LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX20 void reset() noexcept
+  _CCCL_API inline _CCCL_CONSTEXPR_CXX20 void reset() noexcept
   {
     if (__engaged_)
     {
@@ -392,27 +407,42 @@ struct __optional_destruct_base<_Tp, true>
   __storage __storage_;
   bool __engaged_;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base() noexcept
-      : __storage_()
+# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+#   _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base() noexcept
+#       : __storage_()
+# =======
+  _CCCL_API constexpr __optional_destruct_base() noexcept
+      : __null_state_()
+# >>>>>>> END NEW CODE (d2673f2d96)
       , __engaged_(false)
   {}
 
   template <class... _Args>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
-    is_nothrow_constructible_v<value_type, _Args...>)
-      : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+#   _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
+#     is_nothrow_constructible_v<value_type, _Args...>)
+#       : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# =======
+  _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args)
+      : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
+# >>>>>>> END NEW CODE (d2673f2d96)
       , __engaged_(true)
   {}
 
   template <class _Fp, class... _Args>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base(
-    __optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
-      : __storage_(
-          __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
+# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+#   _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_destruct_base(
+#     __optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+#       : __storage_(
+#           __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
+# =======
+  _CCCL_API constexpr __optional_destruct_base(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+      : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
+# >>>>>>> END NEW CODE (d2673f2d96)
       , __engaged_(true)
   {}
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr void reset() noexcept
+  _CCCL_API constexpr void reset() noexcept
   {
     if (__engaged_)
     {
@@ -428,31 +458,31 @@ struct __optional_storage_base : __optional_destruct_base<_Tp>
 
   using value_type = _Tp;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr bool has_value() const noexcept
+  _CCCL_API constexpr bool has_value() const noexcept
   {
     return this->__engaged_;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type& __get() & noexcept
+  _CCCL_API constexpr value_type& __get() & noexcept
   {
     return this->__storage_.__val_;
   }
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr const value_type& __get() const& noexcept
+  _CCCL_API constexpr const value_type& __get() const& noexcept
   {
     return this->__storage_.__val_;
   }
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type&& __get() && noexcept
+  _CCCL_API constexpr value_type&& __get() && noexcept
   {
     return _CUDA_VSTD::move(this->__storage_.__val_);
   }
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr const value_type&& __get() const&& noexcept
+  _CCCL_API constexpr const value_type&& __get() const&& noexcept
   {
     return _CUDA_VSTD::move(this->__storage_.__val_);
   }
 
   _CCCL_EXEC_CHECK_DISABLE
   template <class... _Args>
-  _LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX20 void __construct(_Args&&... __args)
+  _CCCL_API inline _CCCL_CONSTEXPR_CXX20 void __construct(_Args&&... __args)
   {
     _CCCL_ASSERT(!has_value(), "__construct called for engaged __optional_storage");
 #if _CCCL_STD_VER > 2017
@@ -464,7 +494,7 @@ struct __optional_storage_base : __optional_destruct_base<_Tp>
   }
 
   template <class _That>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr void __construct_from(_That&& __opt)
+  _CCCL_API constexpr void __construct_from(_That&& __opt)
   {
     if (__opt.has_value())
     {
@@ -474,7 +504,7 @@ struct __optional_storage_base : __optional_destruct_base<_Tp>
 
   _CCCL_EXEC_CHECK_DISABLE
   template <class _That>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr void __assign_from(_That&& __opt)
+  _CCCL_API constexpr void __assign_from(_That&& __opt)
   {
     if (this->__engaged_ == __opt.has_value())
     {
@@ -518,7 +548,7 @@ struct __optional_copy_base<_Tp, __smf_availability::__available> : __optional_s
   // This ctor shouldn't need to initialize the base explicitly, but g++ 9 considers it to be uninitialized
   // during constexpr evaluation if it isn't initialized explicitly. This can be replaced with the pattern
   // below, in __optional_move_base, once g++ 9 falls off our support matrix.
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_copy_base(const __optional_copy_base& __opt)
+  _CCCL_API constexpr __optional_copy_base(const __optional_copy_base& __opt)
       : __base()
   {
     this->__construct_from(__opt);
@@ -559,7 +589,7 @@ struct __optional_move_base<_Tp, __smf_availability::__available> : __optional_c
 
   _CCCL_HIDE_FROM_ABI __optional_move_base(const __optional_move_base&) = default;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_move_base(__optional_move_base&& __opt) noexcept(
+  _CCCL_API constexpr __optional_move_base(__optional_move_base&& __opt) noexcept(
     _CCCL_TRAIT(is_nothrow_move_constructible, _Tp))
   {
     this->__construct_from(_CUDA_VSTD::move(__opt));
@@ -603,7 +633,7 @@ struct __optional_copy_assign_base<_Tp, __smf_availability::__available> : __opt
   _CCCL_HIDE_FROM_ABI __optional_copy_assign_base(const __optional_copy_assign_base&) = default;
   _CCCL_HIDE_FROM_ABI __optional_copy_assign_base(__optional_copy_assign_base&&)      = default;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_copy_assign_base& operator=(const __optional_copy_assign_base& __opt)
+  _CCCL_API constexpr __optional_copy_assign_base& operator=(const __optional_copy_assign_base& __opt)
   {
     this->__assign_from(__opt);
     return *this;
@@ -647,8 +677,7 @@ struct __optional_move_assign_base<_Tp, __smf_availability::__available> : __opt
   _CCCL_HIDE_FROM_ABI __optional_move_assign_base(__optional_move_assign_base&&)                 = default;
   _CCCL_HIDE_FROM_ABI __optional_move_assign_base& operator=(const __optional_move_assign_base&) = default;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr __optional_move_assign_base&
-  operator=(__optional_move_assign_base&& __opt) noexcept(
+  _CCCL_API constexpr __optional_move_assign_base& operator=(__optional_move_assign_base&& __opt) noexcept(
     _CCCL_TRAIT(is_nothrow_move_assignable, _Tp) && _CCCL_TRAIT(is_nothrow_move_constructible, _Tp))
   {
     this->__assign_from(_CUDA_VSTD::move(__opt));
@@ -750,46 +779,46 @@ private:
   static_assert(!_CCCL_TRAIT(is_array, value_type), "instantiation of optional with an array type is ill-formed");
 
 public:
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional() noexcept {}
+  _CCCL_API constexpr optional() noexcept {}
   _CCCL_HIDE_FROM_ABI constexpr optional(const optional&) = default;
   _CCCL_HIDE_FROM_ABI constexpr optional(optional&&)      = default;
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(nullopt_t) noexcept {}
+  _CCCL_API constexpr optional(nullopt_t) noexcept {}
 
   _CCCL_TEMPLATE(class _In_place_t, class... _Args)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_same, _In_place_t, in_place_t)
                    _CCCL_AND _CCCL_TRAIT(is_constructible, value_type, _Args...))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(_In_place_t, _Args&&... __args)
+  _CCCL_API constexpr explicit optional(_In_place_t, _Args&&... __args)
       : __base(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
   {}
 
   _CCCL_TEMPLATE(class _Up, class... _Args)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, value_type, initializer_list<_Up>&, _Args...))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(in_place_t, initializer_list<_Up> __il, _Args&&... __args)
+  _CCCL_API constexpr explicit optional(in_place_t, initializer_list<_Up> __il, _Args&&... __args)
       : __base(in_place, __il, _CUDA_VSTD::forward<_Args>(__args)...)
   {}
 
   _CCCL_TEMPLATE(class _Up = value_type)
   _CCCL_REQUIRES(__opt_is_constructible_from_U<_Tp, _Up> _CCCL_AND __opt_is_implictly_constructible<_Tp, _Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(_Up&& __v)
+  _CCCL_API constexpr optional(_Up&& __v)
       : __base(in_place, _CUDA_VSTD::forward<_Up>(__v))
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_constructible_from_U<_Tp, _Up> _CCCL_AND __opt_is_explictly_constructible<_Tp, _Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(_Up&& __v)
+  _CCCL_API constexpr explicit optional(_Up&& __v)
       : __base(in_place, _CUDA_VSTD::forward<_Up>(__v))
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_constructible_from_opt<_Tp, _Up> _CCCL_AND __opt_is_implictly_constructible<_Tp, const _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(const optional<_Up>& __v)
+  _CCCL_API constexpr optional(const optional<_Up>& __v)
   {
     this->__construct_from(__v);
   }
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_constructible_from_opt<_Tp, _Up> _CCCL_AND __opt_is_explictly_constructible<_Tp, const _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(const optional<_Up>& __v)
+  _CCCL_API constexpr explicit optional(const optional<_Up>& __v)
   {
     this->__construct_from(__v);
   }
@@ -798,7 +827,7 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((_CCCL_TRAIT(is_same, remove_cv_t<_Tp>, bool) || __opt_is_constructible_from_opt<_Tp, _Up>)
                    _CCCL_AND __opt_is_implictly_constructible<_Tp, const _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(const optional<_Up&>& __v)
+  _CCCL_API constexpr optional(const optional<_Up&>& __v)
   {
     this->__construct_from(__v);
   }
@@ -806,7 +835,7 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((_CCCL_TRAIT(is_same, remove_cv_t<_Tp>, bool) || __opt_is_constructible_from_opt<_Tp, _Up>)
                    _CCCL_AND __opt_is_explictly_constructible<_Tp, const _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(const optional<_Up&>& __v)
+  _CCCL_API constexpr explicit optional(const optional<_Up&>& __v)
   {
     this->__construct_from(__v);
   }
@@ -814,7 +843,7 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_constructible_from_opt<_Tp, _Up> _CCCL_AND
                    __opt_is_implictly_constructible<_Tp, _Up> _CCCL_AND(!_CCCL_TRAIT(is_reference, _Up)))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(optional<_Up>&& __v)
+  _CCCL_API constexpr optional(optional<_Up>&& __v)
   {
     this->__construct_from(_CUDA_VSTD::move(__v));
   }
@@ -822,21 +851,21 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_constructible_from_opt<_Tp, _Up> _CCCL_AND
                    __opt_is_explictly_constructible<_Tp, _Up> _CCCL_AND(!_CCCL_TRAIT(is_reference, _Up)))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(optional<_Up>&& __v)
+  _CCCL_API constexpr explicit optional(optional<_Up>&& __v)
   {
     this->__construct_from(_CUDA_VSTD::move(__v));
   }
 #else // ^^^ CCCL_ENABLE_OPTIONAL_REF ^^^ / vvv !CCCL_ENABLE_OPTIONAL_REF vvv
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_constructible_from_opt<_Tp, _Up> _CCCL_AND __opt_is_implictly_constructible<_Tp, _Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(optional<_Up>&& __v)
+  _CCCL_API constexpr optional(optional<_Up>&& __v)
   {
     this->__construct_from(_CUDA_VSTD::move(__v));
   }
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_constructible_from_opt<_Tp, _Up> _CCCL_AND __opt_is_explictly_constructible<_Tp, _Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(optional<_Up>&& __v)
+  _CCCL_API constexpr explicit optional(optional<_Up>&& __v)
   {
     this->__construct_from(_CUDA_VSTD::move(__v));
   }
@@ -844,14 +873,13 @@ public:
 
 private:
   template <class _Fp, class... _Args>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit optional(
-    __optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+  _CCCL_API constexpr explicit optional(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
       : __base(
           __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
   {}
 
 public:
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional& operator=(nullopt_t) noexcept
+  _CCCL_API constexpr optional& operator=(nullopt_t) noexcept
   {
     reset();
     return *this;
@@ -863,7 +891,7 @@ public:
   _CCCL_EXEC_CHECK_DISABLE
   _CCCL_TEMPLATE(class _Up = value_type)
   _CCCL_REQUIRES(__opt_is_assignable_from_U<_Tp, _Up> _CCCL_AND __opt_is_assignable<_Tp, _Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional& operator=(_Up&& __v)
+  _CCCL_API constexpr optional& operator=(_Up&& __v)
   {
     if (this->has_value())
     {
@@ -880,7 +908,7 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!_CCCL_TRAIT(is_reference, _Up))
                    _CCCL_AND __opt_is_assignable_from_opt<_Tp, _Up> _CCCL_AND __opt_is_assignable<_Tp, const _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional& operator=(const optional<_Up>& __v)
+  _CCCL_API constexpr optional& operator=(const optional<_Up>& __v)
   {
     this->__assign_from(__v);
     return *this;
@@ -889,7 +917,7 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_reference, _Up)
                    _CCCL_AND __opt_is_assignable_from_opt<_Tp, _Up&> _CCCL_AND __opt_is_assignable<_Tp, _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional& operator=(const optional<_Up>& __v)
+  _CCCL_API constexpr optional& operator=(const optional<_Up>& __v)
   {
     this->__assign_from(__v);
     return *this;
@@ -897,7 +925,7 @@ public:
 #else // ^^^ CCCL_ENABLE_OPTIONAL_REF ^^^ / vvv !CCCL_ENABLE_OPTIONAL_REF vvv
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_assignable_from_opt<_Tp, _Up> _CCCL_AND __opt_is_assignable<_Tp, const _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional& operator=(const optional<_Up>& __v)
+  _CCCL_API constexpr optional& operator=(const optional<_Up>& __v)
   {
     this->__assign_from(__v);
     return *this;
@@ -906,14 +934,14 @@ public:
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__opt_is_assignable_from_opt<_Tp, _Up> _CCCL_AND __opt_is_assignable<_Tp, _Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional& operator=(optional<_Up>&& __v)
+  _CCCL_API constexpr optional& operator=(optional<_Up>&& __v)
   {
     this->__assign_from(_CUDA_VSTD::move(__v));
     return *this;
   }
 
   template <class... _Args, enable_if_t<_CCCL_TRAIT(is_constructible, value_type, _Args...), int> = 0>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp& emplace(_Args&&... __args)
+  _CCCL_API constexpr _Tp& emplace(_Args&&... __args)
   {
     reset();
     this->__construct(_CUDA_VSTD::forward<_Args>(__args)...);
@@ -923,7 +951,7 @@ public:
   template <class _Up,
             class... _Args,
             enable_if_t<_CCCL_TRAIT(is_constructible, value_type, initializer_list<_Up>&, _Args...), int> = 0>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp& emplace(initializer_list<_Up> __il, _Args&&... __args)
+  _CCCL_API constexpr _Tp& emplace(initializer_list<_Up> __il, _Args&&... __args)
   {
     reset();
     this->__construct(__il, _CUDA_VSTD::forward<_Args>(__args)...);
@@ -931,7 +959,7 @@ public:
   }
 
   _CCCL_EXEC_CHECK_DISABLE
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr void swap(optional& __opt) noexcept(
+  _CCCL_API constexpr void swap(optional& __opt) noexcept(
     _CCCL_TRAIT(is_nothrow_move_constructible, value_type) && _CCCL_TRAIT(is_nothrow_swappable, value_type))
   {
     if (this->has_value() == __opt.has_value())
@@ -957,43 +985,43 @@ public:
     }
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr add_pointer_t<value_type const> operator->() const
+  _CCCL_API constexpr add_pointer_t<value_type const> operator->() const
   {
     _CCCL_ASSERT(this->has_value(), "optional operator-> called on a disengaged value");
     return _CUDA_VSTD::addressof(this->__get());
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr add_pointer_t<value_type> operator->()
+  _CCCL_API constexpr add_pointer_t<value_type> operator->()
   {
     _CCCL_ASSERT(this->has_value(), "optional operator-> called on a disengaged value");
     return _CUDA_VSTD::addressof(this->__get());
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr const value_type& operator*() const& noexcept
+  _CCCL_API constexpr const value_type& operator*() const& noexcept
   {
     _CCCL_ASSERT(this->has_value(), "optional operator* called on a disengaged value");
     return this->__get();
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type& operator*() & noexcept
+  _CCCL_API constexpr value_type& operator*() & noexcept
   {
     _CCCL_ASSERT(this->has_value(), "optional operator* called on a disengaged value");
     return this->__get();
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type&& operator*() && noexcept
+  _CCCL_API constexpr value_type&& operator*() && noexcept
   {
     _CCCL_ASSERT(this->has_value(), "optional operator* called on a disengaged value");
     return _CUDA_VSTD::move(this->__get());
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr const value_type&& operator*() const&& noexcept
+  _CCCL_API constexpr const value_type&& operator*() const&& noexcept
   {
     _CCCL_ASSERT(this->has_value(), "optional operator* called on a disengaged value");
     return _CUDA_VSTD::move(this->__get());
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit operator bool() const noexcept
+  _CCCL_API constexpr explicit operator bool() const noexcept
   {
     return has_value();
   }
@@ -1001,7 +1029,7 @@ public:
   using __base::__get;
   using __base::has_value;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type const& value() const&
+  _CCCL_API constexpr value_type const& value() const&
   {
     if (!this->has_value())
     {
@@ -1010,7 +1038,7 @@ public:
     return this->__get();
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type& value() &
+  _CCCL_API constexpr value_type& value() &
   {
     if (!this->has_value())
     {
@@ -1019,7 +1047,7 @@ public:
     return this->__get();
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type&& value() &&
+  _CCCL_API constexpr value_type&& value() &&
   {
     if (!this->has_value())
     {
@@ -1028,7 +1056,7 @@ public:
     return _CUDA_VSTD::move(this->__get());
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type const&& value() const&&
+  _CCCL_API constexpr value_type const&& value() const&&
   {
     if (!this->has_value())
     {
@@ -1038,7 +1066,7 @@ public:
   }
 
   template <class _Up>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type value_or(_Up&& __v) const&
+  _CCCL_API constexpr value_type value_or(_Up&& __v) const&
   {
     static_assert(_CCCL_TRAIT(is_copy_constructible, value_type),
                   "optional<T>::value_or: T must be copy constructible");
@@ -1047,7 +1075,7 @@ public:
   }
 
   template <class _Up>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr value_type value_or(_Up&& __v) &&
+  _CCCL_API constexpr value_type value_or(_Up&& __v) &&
   {
     static_assert(_CCCL_TRAIT(is_move_constructible, value_type),
                   "optional<T>::value_or: T must be move constructible");
@@ -1056,7 +1084,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto and_then(_Func&& __f) &
+  _CCCL_API constexpr auto and_then(_Func&& __f) &
   {
     using _Up = invoke_result_t<_Func, value_type&>;
     static_assert(__is_std_optional<remove_cvref_t<_Up>>::value,
@@ -1069,7 +1097,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto and_then(_Func&& __f) const&
+  _CCCL_API constexpr auto and_then(_Func&& __f) const&
   {
     using _Up = invoke_result_t<_Func, const value_type&>;
     static_assert(__is_std_optional<remove_cvref_t<_Up>>::value,
@@ -1082,7 +1110,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto and_then(_Func&& __f) &&
+  _CCCL_API constexpr auto and_then(_Func&& __f) &&
   {
     using _Up = invoke_result_t<_Func, value_type&&>;
     static_assert(__is_std_optional<remove_cvref_t<_Up>>::value,
@@ -1095,7 +1123,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto and_then(_Func&& __f) const&&
+  _CCCL_API constexpr auto and_then(_Func&& __f) const&&
   {
     using _Up = invoke_result_t<_Func, const value_type&&>;
     static_assert(__is_std_optional<remove_cvref_t<_Up>>::value,
@@ -1108,7 +1136,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto transform(_Func&& __f) &
+  _CCCL_API constexpr auto transform(_Func&& __f) &
   {
     using _Up = remove_cv_t<invoke_result_t<_Func, value_type&>>;
     static_assert(!_CCCL_TRAIT(is_array, _Up), "Result of f(value()) should not be an Array");
@@ -1123,7 +1151,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto transform(_Func&& __f) const&
+  _CCCL_API constexpr auto transform(_Func&& __f) const&
   {
     using _Up = remove_cv_t<invoke_result_t<_Func, const value_type&>>;
     static_assert(!_CCCL_TRAIT(is_array, _Up), "Result of f(value()) should not be an Array");
@@ -1138,7 +1166,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto transform(_Func&& __f) &&
+  _CCCL_API constexpr auto transform(_Func&& __f) &&
   {
     using _Up = remove_cv_t<invoke_result_t<_Func, value_type&&>>;
     static_assert(!_CCCL_TRAIT(is_array, _Up), "Result of f(std::move(value())) should not be an Array");
@@ -1156,7 +1184,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto transform(_Func&& __f) const&&
+  _CCCL_API constexpr auto transform(_Func&& __f) const&&
   {
     using _Up = remove_cvref_t<invoke_result_t<_Func, const value_type&&>>;
     static_assert(!_CCCL_TRAIT(is_array, _Up), "Result of f(std::move(value())) should not be an Array");
@@ -1175,7 +1203,7 @@ public:
 
   _CCCL_TEMPLATE(class _Func, class _Tp2 = _Tp)
   _CCCL_REQUIRES(invocable<_Func> _CCCL_AND _CCCL_TRAIT(is_copy_constructible, _Tp2))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional or_else(_Func&& __f) const&
+  _CCCL_API constexpr optional or_else(_Func&& __f) const&
   {
     static_assert(_CCCL_TRAIT(is_same, remove_cvref_t<invoke_result_t<_Func>>, optional),
                   "Result of f() should be the same type as this optional");
@@ -1188,7 +1216,7 @@ public:
 
   _CCCL_TEMPLATE(class _Func, class _Tp2 = _Tp)
   _CCCL_REQUIRES(invocable<_Func> _CCCL_AND _CCCL_TRAIT(is_move_constructible, _Tp2))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional or_else(_Func&& __f) &&
+  _CCCL_API constexpr optional or_else(_Func&& __f) &&
   {
     static_assert(_CCCL_TRAIT(is_same, remove_cvref_t<invoke_result_t<_Func>>, optional),
                   "Result of f() should be the same type as this optional");
@@ -1208,7 +1236,7 @@ _CCCL_HOST_DEVICE optional(_Tp) -> optional<_Tp>;
 // Comparisons between optionals
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() == declval<const _Up&>()), bool),
   bool>
 operator==(const optional<_Tp>& __x, const optional<_Up>& __y)
@@ -1226,7 +1254,7 @@ operator==(const optional<_Tp>& __x, const optional<_Up>& __y)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() != declval<const _Up&>()), bool),
   bool>
 operator!=(const optional<_Tp>& __x, const optional<_Up>& __y)
@@ -1244,7 +1272,7 @@ operator!=(const optional<_Tp>& __x, const optional<_Up>& __y)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() < declval<const _Up&>()), bool),
   bool>
 operator<(const optional<_Tp>& __x, const optional<_Up>& __y)
@@ -1262,7 +1290,7 @@ operator<(const optional<_Tp>& __x, const optional<_Up>& __y)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() > declval<const _Up&>()), bool),
   bool>
 operator>(const optional<_Tp>& __x, const optional<_Up>& __y)
@@ -1280,7 +1308,7 @@ operator>(const optional<_Tp>& __x, const optional<_Up>& __y)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() <= declval<const _Up&>()), bool),
   bool>
 operator<=(const optional<_Tp>& __x, const optional<_Up>& __y)
@@ -1298,7 +1326,7 @@ operator<=(const optional<_Tp>& __x, const optional<_Up>& __y)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() >= declval<const _Up&>()), bool),
   bool>
 operator>=(const optional<_Tp>& __x, const optional<_Up>& __y)
@@ -1316,73 +1344,73 @@ operator>=(const optional<_Tp>& __x, const optional<_Up>& __y)
 
 // Comparisons with nullopt
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator==(const optional<_Tp>& __x, nullopt_t) noexcept
+_CCCL_API constexpr bool operator==(const optional<_Tp>& __x, nullopt_t) noexcept
 {
   return !static_cast<bool>(__x);
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator==(nullopt_t, const optional<_Tp>& __x) noexcept
+_CCCL_API constexpr bool operator==(nullopt_t, const optional<_Tp>& __x) noexcept
 {
   return !static_cast<bool>(__x);
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator!=(const optional<_Tp>& __x, nullopt_t) noexcept
+_CCCL_API constexpr bool operator!=(const optional<_Tp>& __x, nullopt_t) noexcept
 {
   return static_cast<bool>(__x);
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator!=(nullopt_t, const optional<_Tp>& __x) noexcept
+_CCCL_API constexpr bool operator!=(nullopt_t, const optional<_Tp>& __x) noexcept
 {
   return static_cast<bool>(__x);
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator<(const optional<_Tp>&, nullopt_t) noexcept
+_CCCL_API constexpr bool operator<(const optional<_Tp>&, nullopt_t) noexcept
 {
   return false;
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator<(nullopt_t, const optional<_Tp>& __x) noexcept
+_CCCL_API constexpr bool operator<(nullopt_t, const optional<_Tp>& __x) noexcept
 {
   return static_cast<bool>(__x);
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator<=(const optional<_Tp>& __x, nullopt_t) noexcept
+_CCCL_API constexpr bool operator<=(const optional<_Tp>& __x, nullopt_t) noexcept
 {
   return !static_cast<bool>(__x);
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator<=(nullopt_t, const optional<_Tp>&) noexcept
+_CCCL_API constexpr bool operator<=(nullopt_t, const optional<_Tp>&) noexcept
 {
   return true;
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator>(const optional<_Tp>& __x, nullopt_t) noexcept
+_CCCL_API constexpr bool operator>(const optional<_Tp>& __x, nullopt_t) noexcept
 {
   return static_cast<bool>(__x);
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator>(nullopt_t, const optional<_Tp>&) noexcept
+_CCCL_API constexpr bool operator>(nullopt_t, const optional<_Tp>&) noexcept
 {
   return false;
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator>=(const optional<_Tp>&, nullopt_t) noexcept
+_CCCL_API constexpr bool operator>=(const optional<_Tp>&, nullopt_t) noexcept
 {
   return true;
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator>=(nullopt_t, const optional<_Tp>& __x) noexcept
+_CCCL_API constexpr bool operator>=(nullopt_t, const optional<_Tp>& __x) noexcept
 {
   return !static_cast<bool>(__x);
 }
@@ -1390,7 +1418,7 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr bool operator>=(nullopt_t, const optional<_T
 // Comparisons with T
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() == declval<const _Up&>()), bool),
   bool>
 operator==(const optional<_Tp>& __x, const _Up& __v)
@@ -1400,7 +1428,7 @@ operator==(const optional<_Tp>& __x, const _Up& __v)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() == declval<const _Up&>()), bool),
   bool>
 operator==(const _Tp& __v, const optional<_Up>& __x)
@@ -1410,7 +1438,7 @@ operator==(const _Tp& __v, const optional<_Up>& __x)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() != declval<const _Up&>()), bool),
   bool>
 operator!=(const optional<_Tp>& __x, const _Up& __v)
@@ -1420,7 +1448,7 @@ operator!=(const optional<_Tp>& __x, const _Up& __v)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() != declval<const _Up&>()), bool),
   bool>
 operator!=(const _Tp& __v, const optional<_Up>& __x)
@@ -1430,7 +1458,7 @@ operator!=(const _Tp& __v, const optional<_Up>& __x)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() < declval<const _Up&>()), bool),
   bool>
 operator<(const optional<_Tp>& __x, const _Up& __v)
@@ -1440,7 +1468,7 @@ operator<(const optional<_Tp>& __x, const _Up& __v)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() < declval<const _Up&>()), bool),
   bool>
 operator<(const _Tp& __v, const optional<_Up>& __x)
@@ -1450,7 +1478,7 @@ operator<(const _Tp& __v, const optional<_Up>& __x)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() <= declval<const _Up&>()), bool),
   bool>
 operator<=(const optional<_Tp>& __x, const _Up& __v)
@@ -1460,7 +1488,7 @@ operator<=(const optional<_Tp>& __x, const _Up& __v)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() <= declval<const _Up&>()), bool),
   bool>
 operator<=(const _Tp& __v, const optional<_Up>& __x)
@@ -1470,7 +1498,7 @@ operator<=(const _Tp& __v, const optional<_Up>& __x)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() > declval<const _Up&>()), bool),
   bool>
 operator>(const optional<_Tp>& __x, const _Up& __v)
@@ -1480,7 +1508,7 @@ operator>(const optional<_Tp>& __x, const _Up& __v)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() > declval<const _Up&>()), bool),
   bool>
 operator>(const _Tp& __v, const optional<_Up>& __x)
@@ -1490,7 +1518,7 @@ operator>(const _Tp& __v, const optional<_Up>& __x)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() >= declval<const _Up&>()), bool),
   bool>
 operator>=(const optional<_Tp>& __x, const _Up& __v)
@@ -1500,7 +1528,7 @@ operator>=(const optional<_Tp>& __x, const _Up& __v)
 
 _CCCL_EXEC_CHECK_DISABLE
 template <class _Tp, class _Up>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
   _CCCL_TRAIT(is_convertible, decltype(declval<const _Tp&>() >= declval<const _Up&>()), bool),
   bool>
 operator>=(const _Tp& __v, const optional<_Up>& __x)
@@ -1509,7 +1537,7 @@ operator>=(const _Tp& __v, const optional<_Up>& __x)
 }
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI constexpr enable_if_t<
+_CCCL_API constexpr enable_if_t<
 #ifdef CCCL_ENABLE_OPTIONAL_REF
   _CCCL_TRAIT(is_reference, _Tp) ||
 #endif // CCCL_ENABLE_OPTIONAL_REF
@@ -1530,7 +1558,7 @@ private:
 
   _CCCL_TEMPLATE(class _Ref, class _Arg)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, _Ref, _Arg))
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI static constexpr _Ref __make_reference(_Arg&& __arg) noexcept
+  [[nodiscard]] _CCCL_API static constexpr _Ref __make_reference(_Arg&& __arg) noexcept
   {
     static_assert(_CCCL_TRAIT(is_reference, _Ref), "optional<T&>: make-reference requires a reference as argument");
     return _Ref(_CUDA_VSTD::forward<_Arg>(__arg));
@@ -1540,11 +1568,11 @@ private:
   template <class>
   friend struct __optional_storage_base;
 
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp& __get() noexcept
+  [[nodiscard]] _CCCL_API constexpr _Tp& __get() noexcept
   {
     return *__value_;
   }
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr const _Tp& __get() const noexcept
+  [[nodiscard]] _CCCL_API constexpr const _Tp& __get() const noexcept
   {
     return *__value_;
   }
@@ -1560,59 +1588,56 @@ private:
 public:
   using value_type = __raw_type&;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional() noexcept {}
+  _CCCL_API constexpr optional() noexcept {}
   _CCCL_HIDE_FROM_ABI constexpr optional(const optional&) noexcept = default;
   _CCCL_HIDE_FROM_ABI constexpr optional(optional&&) noexcept      = default;
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(nullopt_t) noexcept {}
+  _CCCL_API constexpr optional(nullopt_t) noexcept {}
 
   _CCCL_TEMPLATE(class _Arg)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, _Tp&, _Arg) _CCCL_AND(!__from_temporary<_Arg>))
-  _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr optional(in_place_t, _Arg&& __arg) noexcept
+  _CCCL_API explicit constexpr optional(in_place_t, _Arg&& __arg) noexcept
       : __value_(_CUDA_VSTD::addressof(__make_reference<_Tp&>(_CUDA_VSTD::forward<_Arg>(__arg))))
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!__is_std_optional<decay_t<_Up>>::value) _CCCL_AND _CCCL_TRAIT(is_convertible, _Up, _Tp&)
                    _CCCL_AND(!__from_temporary<_Up>))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(_Up&& __u) noexcept(
-    noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up>())))
+  _CCCL_API constexpr optional(_Up&& __u) noexcept(noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up>())))
       : __value_(_CUDA_VSTD::addressof(static_cast<_Tp&>(_CUDA_VSTD::forward<_Up>(__u))))
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!__is_std_optional<decay_t<_Up>>::value) _CCCL_AND(!_CCCL_TRAIT(is_convertible, _Up, _Tp&))
                    _CCCL_AND _CCCL_TRAIT(is_constructible, _Tp&, _Up) _CCCL_AND(!__from_temporary<_Up>))
-  _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr optional(_Up&& __u) noexcept(
-    noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up>())))
+  _CCCL_API explicit constexpr optional(_Up&& __u) noexcept(noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up>())))
       : __value_(_CUDA_VSTD::addressof(static_cast<_Tp&>(_CUDA_VSTD::forward<_Up>(__u))))
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!__is_std_optional<decay_t<_Up>>::value) _CCCL_AND __from_temporary<_Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(_Up&&) = delete;
+  _CCCL_API constexpr optional(_Up&&) = delete;
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_convertible, _Up&, _Tp&) _CCCL_AND(!__from_temporary<_Up&>))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(optional<_Up>& __u) noexcept(
-    noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up&>())))
+  _CCCL_API constexpr optional(optional<_Up>& __u) noexcept(noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up&>())))
       : __value_(__u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(__u.value())) : nullptr)
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!_CCCL_TRAIT(is_convertible, _Up&, _Tp&)) _CCCL_AND _CCCL_TRAIT(is_constructible, _Tp&, _Up&)
                    _CCCL_AND(!__from_temporary<_Up&>))
-  _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr optional(optional<_Up>& __u) noexcept(
+  _CCCL_API explicit constexpr optional(optional<_Up>& __u) noexcept(
     noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up&>())))
       : __value_(__u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(__u.value())) : nullptr)
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__from_temporary<_Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(optional<_Up>&) = delete;
+  _CCCL_API constexpr optional(optional<_Up>&) = delete;
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_convertible, const _Up&, _Tp&) _CCCL_AND(!__from_temporary<const _Up&>))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(const optional<_Up>& __u) noexcept(
+  _CCCL_API constexpr optional(const optional<_Up>& __u) noexcept(
     noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<const _Up&>())))
       : __value_(__u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(__u.value())) : nullptr)
   {}
@@ -1620,19 +1645,18 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!_CCCL_TRAIT(is_convertible, const _Up&, _Tp&)) _CCCL_AND _CCCL_TRAIT(
     is_constructible, _Tp&, const _Up&) _CCCL_AND(!__from_temporary<const _Up&>))
-  _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr optional(const optional<_Up>& __u) noexcept(
+  _CCCL_API explicit constexpr optional(const optional<_Up>& __u) noexcept(
     noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<const _Up&>())))
       : __value_(__u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(__u.value())) : nullptr)
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__from_temporary<const _Up&>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(const optional<_Up>&) = delete;
+  _CCCL_API constexpr optional(const optional<_Up>&) = delete;
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_convertible, _Up, _Tp&) _CCCL_AND(!__from_temporary<_Up>))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(optional<_Up>&& __u) noexcept(
-    noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up>())))
+  _CCCL_API constexpr optional(optional<_Up>&& __u) noexcept(noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up>())))
       : __value_(
           __u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(_CUDA_VSTD::forward<_Up>(__u.value()))) : nullptr)
   {}
@@ -1640,7 +1664,7 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!_CCCL_TRAIT(is_convertible, _Up, _Tp&)) _CCCL_AND _CCCL_TRAIT(is_constructible, _Tp&, _Up)
                    _CCCL_AND(!__from_temporary<_Up>))
-  _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr optional(optional<_Up>&& __u) noexcept(
+  _CCCL_API explicit constexpr optional(optional<_Up>&& __u) noexcept(
     noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<_Up>())))
       : __value_(
           __u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(_CUDA_VSTD::forward<_Up>(__u.value()))) : nullptr)
@@ -1648,11 +1672,11 @@ public:
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__from_temporary<_Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(optional<_Up>&&) = delete;
+  _CCCL_API constexpr optional(optional<_Up>&&) = delete;
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_convertible, const _Up, _Tp&) _CCCL_AND(!__from_temporary<const _Up>))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(const optional<_Up>&& __u) noexcept(
+  _CCCL_API constexpr optional(const optional<_Up>&& __u) noexcept(
     noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<const _Up>())))
       : __value_(__u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(__u.value())) : nullptr)
   {}
@@ -1660,19 +1684,19 @@ public:
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES((!_CCCL_TRAIT(is_convertible, const _Up, _Tp&)) _CCCL_AND _CCCL_TRAIT(
     is_constructible, _Tp&, const _Up) _CCCL_AND(!__from_temporary<const _Up>))
-  _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr optional(const optional<_Up>&& __u) noexcept(
+  _CCCL_API explicit constexpr optional(const optional<_Up>&& __u) noexcept(
     noexcept(static_cast<_Tp&>(_CUDA_VSTD::declval<const _Up>())))
       : __value_(__u.has_value() ? _CUDA_VSTD::addressof(static_cast<_Tp&>(__u.value())) : nullptr)
   {}
 
   _CCCL_TEMPLATE(class _Up)
   _CCCL_REQUIRES(__from_temporary<const _Up>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional(const optional<_Up>&&) = delete;
+  _CCCL_API constexpr optional(const optional<_Up>&&) = delete;
 
   _CCCL_HIDE_FROM_ABI constexpr optional& operator=(const optional&) noexcept = default;
   _CCCL_HIDE_FROM_ABI constexpr optional& operator=(optional&&) noexcept      = default;
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional& operator=(nullopt_t) noexcept
+  _CCCL_API constexpr optional& operator=(nullopt_t) noexcept
   {
     __value_ = nullptr;
     return *this;
@@ -1680,41 +1704,40 @@ public:
 
   _CCCL_TEMPLATE(class _Up = _Tp)
   _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, _Tp&, _Up) _CCCL_AND(!__from_temporary<_Up>))
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp&
-  emplace(_Up&& __u) noexcept(noexcept(static_cast<_Tp&>(_CUDA_VSTD::forward<_Up>(__u))))
+  _CCCL_API constexpr _Tp& emplace(_Up&& __u) noexcept(noexcept(static_cast<_Tp&>(_CUDA_VSTD::forward<_Up>(__u))))
   {
     __value_ = _CUDA_VSTD::addressof(static_cast<_Tp&>(_CUDA_VSTD::forward<_Up>(__u)));
     return *__value_;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr void swap(optional& __rhs) noexcept
+  _CCCL_API constexpr void swap(optional& __rhs) noexcept
   {
     return _CUDA_VSTD::swap(__value_, __rhs.__value_);
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp* operator->() const noexcept
+  _CCCL_API constexpr _Tp* operator->() const noexcept
   {
     _CCCL_ASSERT(__value_ != nullptr, "optional operator-> called on a disengaged value");
     return __value_;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp& operator*() const noexcept
+  _CCCL_API constexpr _Tp& operator*() const noexcept
   {
     _CCCL_ASSERT(__value_ != nullptr, "optional operator* called on a disengaged value");
     return *__value_;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit operator bool() const noexcept
+  _CCCL_API constexpr explicit operator bool() const noexcept
   {
     return __value_ != nullptr;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr bool has_value() const noexcept
+  _CCCL_API constexpr bool has_value() const noexcept
   {
     return __value_ != nullptr;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp& value() const noexcept
+  _CCCL_API constexpr _Tp& value() const noexcept
   {
     if (__value_ != nullptr)
     {
@@ -1727,7 +1750,7 @@ public:
   }
 
   template <class _Up>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr remove_cvref_t<_Tp> value_or(_Up&& __v) const
+  _CCCL_API constexpr remove_cvref_t<_Tp> value_or(_Up&& __v) const
   {
     static_assert(_CCCL_TRAIT(is_copy_constructible, _Tp), "optional<T&>::value_or: T must be copy constructible");
     static_assert(_CCCL_TRAIT(is_convertible, _Up, _Tp), "optional<T&>::value_or: U must be convertible to T");
@@ -1735,7 +1758,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto and_then(_Func&& __f) const
+  _CCCL_API constexpr auto and_then(_Func&& __f) const
   {
     using _Up = invoke_result_t<_Func, _Tp&>;
     static_assert(__is_std_optional<remove_cvref_t<_Up>>::value,
@@ -1748,7 +1771,7 @@ public:
   }
 
   template <class _Func>
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr auto transform(_Func&& __f) const
+  _CCCL_API constexpr auto transform(_Func&& __f) const
   {
     using _Up = invoke_result_t<_Func, _Tp&>;
     static_assert(!_CCCL_TRAIT(is_array, _Up), "optional<T&>::transform: Result of f(value()) should not be an Array");
@@ -1772,7 +1795,7 @@ public:
 
   _CCCL_TEMPLATE(class _Func)
   _CCCL_REQUIRES(invocable<_Func>)
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr optional or_else(_Func&& __f) const
+  _CCCL_API constexpr optional or_else(_Func&& __f) const
   {
     using _Up = invoke_result_t<_Func>;
     static_assert(_CCCL_TRAIT(is_same, remove_cvref_t<_Up>, optional),
@@ -1784,7 +1807,7 @@ public:
     return _CUDA_VSTD::forward<_Func>(__f)();
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI constexpr void reset() noexcept
+  _CCCL_API constexpr void reset() noexcept
   {
     __value_ = nullptr;
   }
@@ -1794,21 +1817,21 @@ public:
 
 _CCCL_TEMPLATE(class _Tp = nullopt_t::__secret_tag, class _Up)
 _CCCL_REQUIRES(_CCCL_TRAIT(is_same, _Tp, nullopt_t::__secret_tag))
-_LIBCUDACXX_HIDE_FROM_ABI constexpr optional<decay_t<_Up>> make_optional(_Up&& __v)
+_CCCL_API constexpr optional<decay_t<_Up>> make_optional(_Up&& __v)
 {
   return optional<decay_t<_Up>>(_CUDA_VSTD::forward<_Up>(__v));
 }
 
 _CCCL_TEMPLATE(class _Tp, class... _Args)
 _CCCL_REQUIRES((!_CCCL_TRAIT(is_reference, _Tp)))
-_LIBCUDACXX_HIDE_FROM_ABI constexpr optional<_Tp> make_optional(_Args&&... __args)
+_CCCL_API constexpr optional<_Tp> make_optional(_Args&&... __args)
 {
   return optional<_Tp>(in_place, _CUDA_VSTD::forward<_Args>(__args)...);
 }
 
 _CCCL_TEMPLATE(class _Tp, class _Up, class... _Args)
 _CCCL_REQUIRES((!_CCCL_TRAIT(is_reference, _Tp)))
-_LIBCUDACXX_HIDE_FROM_ABI constexpr optional<_Tp> make_optional(initializer_list<_Up> __il, _Args&&... __args)
+_CCCL_API constexpr optional<_Tp> make_optional(initializer_list<_Up> __il, _Args&&... __args)
 {
   return optional<_Tp>(in_place, __il, _CUDA_VSTD::forward<_Args>(__args)...);
 }
@@ -1822,7 +1845,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT hash<__enable_hash_helper<optional<_Tp>, re
   using result_type _LIBCUDACXX_DEPRECATED   = size_t;
 #  endif
 
-  _LIBCUDACXX_HIDE_FROM_ABI size_t operator()(const optional<_Tp>& __opt) const
+  _CCCL_API inline size_t operator()(const optional<_Tp>& __opt) const
   {
     return static_cast<bool>(__opt) ? hash<remove_const_t<_Tp>>()(*__opt) : 0;
   }

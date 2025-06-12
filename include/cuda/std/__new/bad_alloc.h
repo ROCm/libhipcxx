@@ -49,7 +49,7 @@
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_alloc()
+[[noreturn]] _CCCL_API inline void __throw_bad_alloc()
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::bad_alloc();), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -58,7 +58,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_array_new_length()
+[[noreturn]] _CCCL_API inline void __throw_bad_array_new_length()
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::bad_array_new_length();), (_CUDA_VSTD_NOVERSION::terminate();))
