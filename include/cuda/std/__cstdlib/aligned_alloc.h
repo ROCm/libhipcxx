@@ -81,13 +81,17 @@ __aligned_alloc_host([[maybe_unused]] size_t __nbytes, [[maybe_unused]] size_t _
 }
 #endif // !_CCCL_COMPILER(NVRTC)
 
-// <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// // Note(HIP/AMD): there is no device implementation for aligned alloc on AMD hardware yet (Dec 25)
-// #if !defined(__HIP_DEVICE_COMPILE__)
-// _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
+// <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // // Note(HIP/AMD): there is no device implementation for aligned alloc on AMD hardware yet (Dec 25)
+// // #if !defined(__HIP_DEVICE_COMPILE__)
+// // _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
+// // =======
+// [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
-// >>>>>>> END NEW CODE (3eee69cda4)
+[[nodiscard]] _CCCL_API inline void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
+// >>>>>>> END NEW CODE (d2673f2d96)
 {
   NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return _CUDA_VSTD::__aligned_alloc_host(__nbytes, __align);),

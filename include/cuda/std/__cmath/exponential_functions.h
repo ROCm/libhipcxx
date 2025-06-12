@@ -62,7 +62,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 // exp
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float exp(float __x) noexcept
+[[nodiscard]] _CCCL_API inline float exp(float __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXPF)
   return _CCCL_BUILTIN_EXPF(__x);
@@ -71,7 +71,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_BUILTIN_EXPF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float expf(float __x) noexcept
+[[nodiscard]] _CCCL_API inline float expf(float __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXPF)
   return _CCCL_BUILTIN_EXPF(__x);
@@ -80,7 +80,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_BUILTIN_EXPF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double exp(double __x) noexcept
+[[nodiscard]] _CCCL_API inline double exp(double __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXP)
   return _CCCL_BUILTIN_EXP(__x);
@@ -90,7 +90,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double exp(long double __x) noexcept
+[[nodiscard]] _CCCL_API inline long double exp(long double __x) noexcept
 {
 #  if defined(_CCCL_BUILTIN_EXPL)
   return _CCCL_BUILTIN_EXPL(__x);
@@ -99,7 +99,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #  endif // !_CCCL_BUILTIN_EXPL
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double expl(long double __x) noexcept
+[[nodiscard]] _CCCL_API inline long double expl(long double __x) noexcept
 {
 #  if defined(_CCCL_BUILTIN_EXPL)
   return _CCCL_BUILTIN_EXPL(__x);
@@ -110,7 +110,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half exp(__half __x) noexcept
+[[nodiscard]] _CCCL_API inline __half exp(__half __x) noexcept
 {
   {
     NV_IF_ELSE_TARGET(NV_PROVIDES_SM_53, (return ::hexp(__x);), ({
@@ -136,7 +136,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 exp(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 exp(__nv_bfloat16 __x) noexcept
 {
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE, (return ::hexp(__x);), (return __float2bfloat16(_CUDA_VSTD::expf(__bfloat162float(__x)));))
@@ -144,14 +144,14 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double exp(_Integer __x) noexcept
+[[nodiscard]] _CCCL_API inline double exp(_Integer __x) noexcept
 {
   return _CUDA_VSTD::exp((double) __x);
 }
 
 // frexp
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float frexp(float __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline float frexp(float __x, int* __e) noexcept
 {
 #if defined(_CCCL_BUILTIN_FREXPF)
   return _CCCL_BUILTIN_FREXPF(__x, __e);
@@ -160,7 +160,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_FREXPF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float frexpf(float __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline float frexpf(float __x, int* __e) noexcept
 {
 #if defined(_CCCL_BUILTIN_FREXPF)
   return _CCCL_BUILTIN_FREXPF(__x, __e);
@@ -169,7 +169,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_FREXPF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double frexp(double __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline double frexp(double __x, int* __e) noexcept
 {
 #if defined(_CCCL_BUILTIN_FREXP)
   return _CCCL_BUILTIN_FREXP(__x, __e);
@@ -179,7 +179,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double frexp(long double __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline long double frexp(long double __x, int* __e) noexcept
 {
 #  if defined(_CCCL_BUILTIN_FREXPL)
   return _CCCL_BUILTIN_FREXPL(__x, __e);
@@ -188,7 +188,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  endif // !_CCCL_BUILTIN_FREXPL
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double frexpl(long double __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline long double frexpl(long double __x, int* __e) noexcept
 {
 #  if defined(_CCCL_BUILTIN_FREXPL)
   return _CCCL_BUILTIN_FREXPL(__x, __e);
@@ -199,28 +199,28 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half frexp(__half __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline __half frexp(__half __x, int* __e) noexcept
 {
   return __float2half(_CUDA_VSTD::frexpf(__half2float(__x), __e));
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 frexp(__nv_bfloat16 __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 frexp(__nv_bfloat16 __x, int* __e) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::frexpf(__bfloat162float(__x), __e));
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double frexp(_Integer __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline double frexp(_Integer __x, int* __e) noexcept
 {
   return _CUDA_VSTD::frexp((double) __x, __e);
 }
 
 // ldexp
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float ldexp(float __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline float ldexp(float __x, int __e) noexcept
 {
 #if defined(_CCCL_BUILTIN_LDEXPF)
   return _CCCL_BUILTIN_LDEXPF(__x, __e);
@@ -229,7 +229,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_LDEXPF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float ldexpf(float __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline float ldexpf(float __x, int __e) noexcept
 {
 #if defined(_CCCL_BUILTIN_LDEXPF)
   return _CCCL_BUILTIN_LDEXPF(__x, __e);
@@ -238,7 +238,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_LDEXPF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double ldexp(double __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline double ldexp(double __x, int __e) noexcept
 {
 #if defined(_CCCL_BUILTIN_LDEXP)
   return _CCCL_BUILTIN_LDEXP(__x, __e);
@@ -248,7 +248,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double ldexp(long double __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline long double ldexp(long double __x, int __e) noexcept
 {
 #  if defined(_CCCL_BUILTIN_LDEXPL)
   return _CCCL_BUILTIN_LDEXPL(__x, __e);
@@ -257,7 +257,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  endif // !_CCCL_BUILTIN_LDEXPL
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double ldexpl(long double __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline long double ldexpl(long double __x, int __e) noexcept
 {
 #  if defined(_CCCL_BUILTIN_LDEXPL)
   return _CCCL_BUILTIN_LDEXPL(__x, __e);
@@ -268,28 +268,28 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half ldexp(__half __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline __half ldexp(__half __x, int __e) noexcept
 {
   return __float2half(_CUDA_VSTD::ldexpf(__half2float(__x), __e));
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 ldexp(__nv_bfloat16 __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 ldexp(__nv_bfloat16 __x, int __e) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::ldexpf(__bfloat162float(__x), __e));
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double ldexp(_Integer __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline double ldexp(_Integer __x, int __e) noexcept
 {
   return _CUDA_VSTD::ldexp((double) __x, __e);
 }
 
 // exp2
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float exp2(float __x) noexcept
+[[nodiscard]] _CCCL_API inline float exp2(float __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXP2F)
   return _CCCL_BUILTIN_EXP2F(__x);
@@ -298,7 +298,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_EXP2F
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float exp2f(float __x) noexcept
+[[nodiscard]] _CCCL_API inline float exp2f(float __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXP2F)
   return _CCCL_BUILTIN_EXP2F(__x);
@@ -307,7 +307,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_EXP2F
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double exp2(double __x) noexcept
+[[nodiscard]] _CCCL_API inline double exp2(double __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXP2)
   return _CCCL_BUILTIN_EXP2(__x);
@@ -317,7 +317,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double exp2(long double __x) noexcept
+[[nodiscard]] _CCCL_API inline long double exp2(long double __x) noexcept
 {
 #  if defined(_CCCL_BUILTIN_EXP2L)
   return _CCCL_BUILTIN_EXP2L(__x);
@@ -326,7 +326,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  endif // !_CCCL_BUILTIN_EXP2L
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double exp2l(long double __x) noexcept
+[[nodiscard]] _CCCL_API inline long double exp2l(long double __x) noexcept
 {
 #  if defined(_CCCL_BUILTIN_EXP2L)
   return _CCCL_BUILTIN_EXP2L(__x);
@@ -337,14 +337,14 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half exp2(__half __x) noexcept
+[[nodiscard]] _CCCL_API inline __half exp2(__half __x) noexcept
 {
   NV_IF_ELSE_TARGET(NV_IS_DEVICE, (return ::hexp2(__x);), (return __float2half(_CUDA_VSTD::exp2f(__half2float(__x)));))
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 exp2(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 exp2(__nv_bfloat16 __x) noexcept
 {
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE, (return ::hexp2(__x);), (return __float2bfloat16(_CUDA_VSTD::exp2f(__bfloat162float(__x)));))
@@ -352,14 +352,14 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double exp2(_Integer __x) noexcept
+[[nodiscard]] _CCCL_API inline double exp2(_Integer __x) noexcept
 {
   return _CUDA_VSTD::exp2((double) __x);
 }
 
 // expm1
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float expm1(float __x) noexcept
+[[nodiscard]] _CCCL_API inline float expm1(float __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXPM1F)
   return _CCCL_BUILTIN_EXPM1F(__x);
@@ -368,7 +368,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_EXPM1F
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float expm1f(float __x) noexcept
+[[nodiscard]] _CCCL_API inline float expm1f(float __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXPM1F)
   return _CCCL_BUILTIN_EXPM1F(__x);
@@ -377,7 +377,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_EXPM1F
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double expm1(double __x) noexcept
+[[nodiscard]] _CCCL_API inline double expm1(double __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_EXPM1)
   return _CCCL_BUILTIN_EXPM1(__x);
@@ -387,7 +387,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double expm1(long double __x) noexcept
+[[nodiscard]] _CCCL_API inline long double expm1(long double __x) noexcept
 {
 #  if defined(_CCCL_BUILTIN_EXPM1L)
   return _CCCL_BUILTIN_EXPM1L(__x);
@@ -396,7 +396,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  endif // !_CCCL_BUILTIN_EXPM1L
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double expm1l(long double __x) noexcept
+[[nodiscard]] _CCCL_API inline long double expm1l(long double __x) noexcept
 {
 #  if defined(_CCCL_BUILTIN_EXPM1L)
   return _CCCL_BUILTIN_EXPM1L(__x);
@@ -407,28 +407,28 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half expm1(__half __x) noexcept
+[[nodiscard]] _CCCL_API inline __half expm1(__half __x) noexcept
 {
   return __float2half(_CUDA_VSTD::expm1f(__half2float(__x)));
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 expm1(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 expm1(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::expm1f(__bfloat162float(__x)));
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double expm1(_Integer __x) noexcept
+[[nodiscard]] _CCCL_API inline double expm1(_Integer __x) noexcept
 {
   return _CUDA_VSTD::expm1((double) __x);
 }
 
 // scalbln
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float scalbln(float __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline float scalbln(float __x, long __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_SCALBLNF)
   return _CCCL_BUILTIN_SCALBLNF(__x, __y);
@@ -437,7 +437,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_SCALBLNF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float scalblnf(float __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline float scalblnf(float __x, long __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_SCALBLNF)
   return _CCCL_BUILTIN_SCALBLNF(__x, __y);
@@ -446,7 +446,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_SCALBLNF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double scalbln(double __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline double scalbln(double __x, long __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_SCALBLN)
   return _CCCL_BUILTIN_SCALBLN(__x, __y);
@@ -456,7 +456,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double scalbln(long double __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline long double scalbln(long double __x, long __y) noexcept
 {
 #  if defined(_CCCL_BUILTIN_SCALBLNL)
   return _CCCL_BUILTIN_SCALBLNL(__x, __y);
@@ -465,7 +465,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  endif // !_CCCL_BUILTIN_SCALBLNL
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double scalblnl(long double __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline long double scalblnl(long double __x, long __y) noexcept
 {
 #  if defined(_CCCL_BUILTIN_SCALBLNL)
   return _CCCL_BUILTIN_SCALBLNL(__x, __y);
@@ -476,28 +476,28 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half scalbln(__half __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline __half scalbln(__half __x, long __y) noexcept
 {
   return __float2half(_CUDA_VSTD::scalblnf(__half2float(__x), __y));
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 scalbln(__nv_bfloat16 __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 scalbln(__nv_bfloat16 __x, long __y) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::scalblnf(__bfloat162float(__x), __y));
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double scalbln(_Integer __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline double scalbln(_Integer __x, long __y) noexcept
 {
   return _CUDA_VSTD::scalbln((double) __x, __y);
 }
 
 // scalbn
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float scalbn(float __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline float scalbn(float __x, int __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_SCALBNF)
   return _CCCL_BUILTIN_SCALBNF(__x, __y);
@@ -506,7 +506,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_SCALBNF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float scalbnf(float __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline float scalbnf(float __x, int __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_SCALBNF)
   return _CCCL_BUILTIN_SCALBNF(__x, __y);
@@ -515,7 +515,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_SCALBNF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double scalbn(double __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline double scalbn(double __x, int __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_SCALBN)
   return _CCCL_BUILTIN_SCALBN(__x, __y);
@@ -525,7 +525,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double scalbn(long double __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline long double scalbn(long double __x, int __y) noexcept
 {
 #  if defined(_CCCL_BUILTIN_SCALBNL)
   return _CCCL_BUILTIN_SCALBNL(__x, __y);
@@ -534,7 +534,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  endif // !_CCCL_BUILTIN_SCALBNL
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double scalbnl(long double __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline long double scalbnl(long double __x, int __y) noexcept
 {
 #  if defined(_CCCL_BUILTIN_SCALBNL)
   return _CCCL_BUILTIN_SCALBNL(__x, __y);
@@ -545,28 +545,28 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half scalbn(__half __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline __half scalbn(__half __x, int __y) noexcept
 {
   return __float2half(_CUDA_VSTD::scalbnf(__half2float(__x), __y));
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 scalbn(__nv_bfloat16 __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 scalbn(__nv_bfloat16 __x, int __y) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::scalbnf(__bfloat162float(__x), __y));
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double scalbn(_Integer __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline double scalbn(_Integer __x, int __y) noexcept
 {
   return _CUDA_VSTD::scalbn((double) __x, __y);
 }
 
 // pow
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float pow(float __x, float __y) noexcept
+[[nodiscard]] _CCCL_API inline float pow(float __x, float __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_POWF)
   return _CCCL_BUILTIN_POWF(__x, __y);
@@ -575,7 +575,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_POWF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI float powf(float __x, float __y) noexcept
+[[nodiscard]] _CCCL_API inline float powf(float __x, float __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_POWF)
   return _CCCL_BUILTIN_POWF(__x, __y);
@@ -584,7 +584,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // !_CCCL_BUILTIN_POWF
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI double pow(double __x, double __y) noexcept
+[[nodiscard]] _CCCL_API inline double pow(double __x, double __y) noexcept
 {
 #if defined(_CCCL_BUILTIN_POW)
   return _CCCL_BUILTIN_POW(__x, __y);
@@ -594,7 +594,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 
 #if _CCCL_HAS_LONG_DOUBLE()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double pow(long double __x, long double __y) noexcept
+[[nodiscard]] _CCCL_API inline long double pow(long double __x, long double __y) noexcept
 {
 #  if defined(_CCCL_BUILTIN_POWL)
   return _CCCL_BUILTIN_POWL(__x, __y);
@@ -603,7 +603,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  endif // !_CCCL_BUILTIN_POWL
 }
 
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI long double powl(long double __x, long double __y) noexcept
+[[nodiscard]] _CCCL_API inline long double powl(long double __x, long double __y) noexcept
 {
 #  if defined(_CCCL_BUILTIN_POWL)
   return _CCCL_BUILTIN_POWL(__x, __y);
@@ -614,21 +614,21 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_HAS_LONG_DOUBLE()
 
 #if _LIBCUDACXX_HAS_NVFP16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __half pow(__half __x, __half __y) noexcept
+[[nodiscard]] _CCCL_API inline __half pow(__half __x, __half __y) noexcept
 {
   return __float2half(_CUDA_VSTD::powf(__half2float(__x), __half2float(__y)));
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 pow(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
+[[nodiscard]] _CCCL_API inline __nv_bfloat16 pow(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::powf(__bfloat162float(__x), __bfloat162float(__y)));
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 template <class _A1, class _A2, enable_if_t<_CCCL_TRAIT(is_arithmetic, _A1) && _CCCL_TRAIT(is_arithmetic, _A2), int> = 0>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __promote_t<_A1, _A2> pow(_A1 __x, _A2 __y) noexcept
+[[nodiscard]] _CCCL_API inline __promote_t<_A1, _A2> pow(_A1 __x, _A2 __y) noexcept
 {
   using __result_type = __promote_t<_A1, _A2>;
   static_assert(!(_CCCL_TRAIT(is_same, _A1, __result_type) && _CCCL_TRAIT(is_same, _A2, __result_type)), "");

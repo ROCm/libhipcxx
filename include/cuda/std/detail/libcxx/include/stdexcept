@@ -49,7 +49,7 @@
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_runtime_error([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_runtime_error([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::runtime_error(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -58,7 +58,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_logic_error([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_logic_error([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::logic_error(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -67,7 +67,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_domain_error([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_domain_error([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::domain_error(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -76,7 +76,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_invalid_argument([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_invalid_argument([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::invalid_argument(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -85,7 +85,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_length_error([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_length_error([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::length_error(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -94,7 +94,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_out_of_range([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_out_of_range([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::out_of_range(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -103,7 +103,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_range_error([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_range_error([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::range_error(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -112,7 +112,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_overflow_error([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_overflow_error([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::overflow_error(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))
@@ -121,7 +121,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __throw_underflow_error([[maybe_unused]] const char* __msg)
+[[noreturn]] _CCCL_API inline void __throw_underflow_error([[maybe_unused]] const char* __msg)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::underflow_error(__msg);), (_CUDA_VSTD_NOVERSION::terminate();))

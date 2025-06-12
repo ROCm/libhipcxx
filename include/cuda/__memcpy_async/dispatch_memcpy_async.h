@@ -134,7 +134,7 @@ template <_CUDA_VSTD::size_t _Align, typename _Group>
 
 // __dispatch_memcpy_async is the internal entry point for dispatching to the correct memcpy_async implementation.
 template <_CUDA_VSTD::size_t _Align, typename _Group>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __completion_mechanism __dispatch_memcpy_async(
+[[nodiscard]] _CCCL_API inline __completion_mechanism __dispatch_memcpy_async(
   _Group const& __group,
   char* __dest_char,
   char const* __src_char,
@@ -169,7 +169,7 @@ template <_CUDA_VSTD::size_t _Align, typename _Group>
 }
 
 template <_CUDA_VSTD::size_t _Align, typename _Group>
-[[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI __completion_mechanism __dispatch_memcpy_async(
+[[nodiscard]] _CCCL_API inline __completion_mechanism __dispatch_memcpy_async(
   _Group const& __group,
   char* __dest_char,
   char const* __src_char,

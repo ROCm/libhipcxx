@@ -49,7 +49,7 @@ _CCCL_DIAG_SUPPRESS_MSVC(4702) // unreachable code
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION // purposefully not using versioning namespace
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void __cccl_terminate() noexcept
+[[noreturn]] _CCCL_API inline void __cccl_terminate() noexcept
 {
   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
   _CCCL_UNREACHABLE();
@@ -65,18 +65,18 @@ __device__
   static _CCCL_CONSTINIT _CUDA_VSTD::atomic<terminate_handler>
     __cccl_terminate_handler{&__cccl_terminate};
 
-_LIBCUDACXX_HIDE_FROM_ABI  terminate_handler set_terminate(terminate_handler __func) noexcept
+_CCCL_API inline  terminate_handler set_terminate(terminate_handler __func) noexcept
 {
   return __cccl_terminate_handler.exchange(__func);
 }
-_LIBCUDACXX_HIDE_FROM_ABI  terminate_handler get_terminate() noexcept
+_CCCL_API inline  terminate_handler get_terminate() noexcept
 {
   return __cccl_terminate_handler.load(__func);
 }
 
 #endif
 
-[[noreturn]] _LIBCUDACXX_HIDE_FROM_ABI void terminate() noexcept
+[[noreturn]] _CCCL_API inline void terminate() noexcept
 {
   __cccl_terminate();
   _CCCL_UNREACHABLE();
