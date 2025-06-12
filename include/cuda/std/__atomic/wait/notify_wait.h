@@ -50,7 +50,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 _CCCL_DEVICE inline void __atomic_try_wait_unsupported_before_SM_70__(){};
 
 template <typename _Tp, typename _Sco>
-_LIBCUDACXX_HIDE_FROM_ABI void
+_CCCL_API inline void
 __atomic_try_wait_slow(_Tp const volatile* __a, __atomic_underlying_remove_cv_t<_Tp> __val, memory_order __order, _Sco)
 {
   #ifdef __HIP_PLATFORM_AMD__
@@ -63,19 +63,19 @@ __atomic_try_wait_slow(_Tp const volatile* __a, __atomic_underlying_remove_cv_t<
 }
 
 template <typename _Tp, typename _Sco>
-_LIBCUDACXX_HIDE_FROM_ABI void __atomic_notify_one(_Tp const volatile*, _Sco)
+_CCCL_API inline void __atomic_notify_one(_Tp const volatile*, _Sco)
 {
   NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST, , NV_ANY_TARGET, __atomic_try_wait_unsupported_before_SM_70__(););
 }
 
 template <typename _Tp, typename _Sco>
-_LIBCUDACXX_HIDE_FROM_ABI void __atomic_notify_all(_Tp const volatile*, _Sco)
+_CCCL_API inline void __atomic_notify_all(_Tp const volatile*, _Sco)
 {
   NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST, , NV_ANY_TARGET, __atomic_try_wait_unsupported_before_SM_70__(););
 }
 
 template <typename _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp const& __rhs)
+_CCCL_API inline bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp const& __rhs)
 {
 // <<<<<<< OLD CODE from 732986f474 (1252e35dda) - COMMENTED OUT
 // // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
@@ -93,7 +93,7 @@ _LIBCUDACXX_HIDE_FROM_ABI bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp c
 }
 
 template <typename _Tp, typename _Sco>
-_LIBCUDACXX_HIDE_FROM_ABI void __atomic_wait(
+_CCCL_API inline void __atomic_wait(
   _Tp const volatile* __a, __atomic_underlying_remove_cv_t<_Tp> const __val, memory_order __order, _Sco = {})
 {
   for (int __i = 0; __i < _LIBCUDACXX_POLLING_COUNT; ++__i)

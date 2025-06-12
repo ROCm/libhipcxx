@@ -95,15 +95,15 @@ public:
   barrier(const barrier&)            = delete;
   barrier& operator=(const barrier&) = delete;
 
-  _LIBCUDACXX_HIDE_FROM_ABI barrier(_CUDA_VSTD::ptrdiff_t __expected,
-                                    _CUDA_VSTD::__empty_completion __completion = _CUDA_VSTD::__empty_completion())
+  _CCCL_API inline barrier(_CUDA_VSTD::ptrdiff_t __expected,
+                           _CUDA_VSTD::__empty_completion __completion = _CUDA_VSTD::__empty_completion())
   {
     static_assert(_LIBCUDACXX_OFFSET_IS_ZERO(barrier<thread_scope_block>, __barrier),
                   "fatal error: bad barrier layout");
     init(this, __expected, __completion);
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI ~barrier()
+  _CCCL_API inline ~barrier()
   {
     NV_DISPATCH_TARGET(
       NV_PROVIDES_SM_90,
@@ -121,7 +121,7 @@ public:
       }))
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI friend void init(
+  _CCCL_API inline friend void init(
     barrier* __b, _CUDA_VSTD::ptrdiff_t __expected, _CUDA_VSTD::__empty_completion = _CUDA_VSTD::__empty_completion())
   {
     NV_DISPATCH_TARGET(
@@ -147,7 +147,7 @@ public:
       (new (&__b->__barrier) __barrier_base(__expected);))
   }
 
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI arrival_token arrive(_CUDA_VSTD::ptrdiff_t __update = 1)
+  [[nodiscard]] _CCCL_API inline arrival_token arrive(_CUDA_VSTD::ptrdiff_t __update = 1)
   {
     _CCCL_ASSERT(__update >= 0, "Arrival count update must be non-negative.");
     arrival_token __token = {};
@@ -192,7 +192,7 @@ public:
   }
 
 private:
-  _LIBCUDACXX_HIDE_FROM_ABI bool __test_wait_sm_80([[maybe_unused]] arrival_token __token) const
+  _CCCL_API inline bool __test_wait_sm_80([[maybe_unused]] arrival_token __token) const
   {
     int32_t __ready = 0;
     NV_DISPATCH_TARGET(
@@ -208,7 +208,7 @@ private:
   }
 
   // Document de drop > uint32_t for __nanosec on public for APIs
-  _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait([[maybe_unused]] arrival_token __token) const
+  _CCCL_API inline bool __try_wait([[maybe_unused]] arrival_token __token) const
   {
     NV_DISPATCH_TARGET(
       NV_PROVIDES_SM_90,
@@ -234,7 +234,7 @@ private:
   }
 
   // Document de drop > uint32_t for __nanosec on public for APIs
-  _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait(arrival_token __token, _CUDA_VSTD::chrono::nanoseconds __nanosec) const
+  _CCCL_API inline bool __try_wait(arrival_token __token, _CUDA_VSTD::chrono::nanoseconds __nanosec) const
   {
     if (__nanosec.count() < 1)
     {
@@ -289,7 +289,7 @@ private:
                 _CUDA_VSTD::chrono::nanoseconds(__nanosec));))
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI bool __test_wait_parity_sm_80([[maybe_unused]] bool __phase_parity) const
+  _CCCL_API inline bool __test_wait_parity_sm_80([[maybe_unused]] bool __phase_parity) const
   {
     uint16_t __ready = 0;
     NV_DISPATCH_TARGET(
@@ -303,7 +303,7 @@ private:
     return __ready;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait_parity(bool __phase_parity) const
+  _CCCL_API inline bool __try_wait_parity(bool __phase_parity) const
   {
     NV_DISPATCH_TARGET(
       NV_PROVIDES_SM_90,
@@ -329,7 +329,7 @@ private:
       (return _CUDA_VSTD::__call_try_wait_parity(__barrier, __phase_parity);))
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait_parity(bool __phase_parity, _CUDA_VSTD::chrono::nanoseconds __nanosec) const
+  _CCCL_API inline bool __try_wait_parity(bool __phase_parity, _CUDA_VSTD::chrono::nanoseconds __nanosec) const
   {
     if (__nanosec.count() < 1)
     {
@@ -387,24 +387,24 @@ private:
   }
 
 public:
-  _LIBCUDACXX_HIDE_FROM_ABI void wait(arrival_token&& __phase) const
+  _CCCL_API inline void wait(arrival_token&& __phase) const
   {
     _CUDA_VSTD::__cccl_thread_poll_with_backoff(
       _CUDA_VSTD::__barrier_poll_tester_phase<barrier>(this, _CUDA_VSTD::move(__phase)));
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI void wait_parity(bool __phase_parity) const
+  _CCCL_API inline void wait_parity(bool __phase_parity) const
   {
     _CUDA_VSTD::__cccl_thread_poll_with_backoff(
       _CUDA_VSTD::__barrier_poll_tester_parity<barrier>(this, __phase_parity));
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI void arrive_and_wait()
+  _CCCL_API inline void arrive_and_wait()
   {
     wait(arrive());
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI void arrive_and_drop()
+  _CCCL_API inline void arrive_and_drop()
   {
     NV_DISPATCH_TARGET(
       NV_PROVIDES_SM_90,
@@ -431,13 +431,13 @@ public:
         __barrier.arrive_and_drop();))
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI static constexpr ptrdiff_t max() noexcept
+  _CCCL_API static constexpr ptrdiff_t max() noexcept
   {
     return (1 << 20) - 1;
   }
 
   template <class _Rep, class _Period>
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI bool
+  [[nodiscard]] _CCCL_API inline bool
   try_wait_for(arrival_token&& __token, const _CUDA_VSTD::chrono::duration<_Rep, _Period>& __dur)
   {
     auto __nanosec = _CUDA_VSTD::chrono::duration_cast<_CUDA_VSTD::chrono::nanoseconds>(__dur);
@@ -446,14 +446,14 @@ public:
   }
 
   template <class _Clock, class _Duration>
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI bool
+  [[nodiscard]] _CCCL_API inline bool
   try_wait_until(arrival_token&& __token, const _CUDA_VSTD::chrono::time_point<_Clock, _Duration>& __time)
   {
     return try_wait_for(_CUDA_VSTD::move(__token), (__time - _Clock::now()));
   }
 
   template <class _Rep, class _Period>
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI bool
+  [[nodiscard]] _CCCL_API inline bool
   try_wait_parity_for(bool __phase_parity, const _CUDA_VSTD::chrono::duration<_Rep, _Period>& __dur)
   {
     auto __nanosec = _CUDA_VSTD::chrono::duration_cast<_CUDA_VSTD::chrono::nanoseconds>(__dur);
@@ -462,7 +462,7 @@ public:
   }
 
   template <class _Clock, class _Duration>
-  [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI bool
+  [[nodiscard]] _CCCL_API inline bool
   try_wait_parity_until(bool __phase_parity, const _CUDA_VSTD::chrono::time_point<_Clock, _Duration>& __time)
   {
     return try_wait_parity_for(__phase_parity, (__time - _Clock::now()));
