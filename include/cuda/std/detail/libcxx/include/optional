@@ -304,21 +304,37 @@ struct __optional_destruct_base<_Tp, false>
     char __null_state_;
     remove_cv_t<value_type> __val_;
 
-    _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage() noexcept
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#     _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage() noexcept
+# =======
+    _CCCL_API constexpr __storage() noexcept
+# >>>>>>> END NEW CODE (c15e21957b)
         : __null_state_()
     {}
     _CCCL_EXEC_CHECK_DISABLE
     template <class... _Args>
-    _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(in_place_t, _Args&&... __args) noexcept(
-      is_nothrow_constructible_v<value_type, _Args...>)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#     _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(in_place_t, _Args&&... __args) noexcept(
+#       is_nothrow_constructible_v<value_type, _Args...>)
+# =======
+    _CCCL_API constexpr __storage(in_place_t,
+                                  _Args&&... __args) noexcept(is_nothrow_constructible_v<value_type, _Args...>)
+# >>>>>>> END NEW CODE (c15e21957b)
         : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
     {}
     _CCCL_EXEC_CHECK_DISABLE
     template <class _Fp, class... _Args>
-    _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#     _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+#         : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
+#     {}
+#     _LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX20 ~__storage() noexcept {}
+# =======
+    _CCCL_API constexpr __storage(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
         : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
     {}
-    _LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX20 ~__storage() noexcept {}
+    _CCCL_API _CCCL_CONSTEXPR_CXX20 ~__storage() noexcept {}
+# >>>>>>> END NEW CODE (c15e21957b)
   };
   __storage __storage_;
   bool __engaged_;
@@ -337,20 +353,30 @@ struct __optional_destruct_base<_Tp, false>
 #       : __storage_()
 # =======
   _CCCL_API constexpr __optional_destruct_base() noexcept
-      : __null_state_()
-# >>>>>>> END NEW CODE (d2673f2d96)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#       : __null_state_()
+# # >>>>>>> END NEW CODE (d2673f2d96)
+# =======
+      : __storage_()
+# >>>>>>> END NEW CODE (c15e21957b)
       , __engaged_(false)
   {}
 
   template <class... _Args>
-# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-#   _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
-#     is_nothrow_constructible_v<value_type, _Args...>)
-#       : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+# # <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+# #   _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
+# #     is_nothrow_constructible_v<value_type, _Args...>)
+# #       : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# # =======
+#   _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args)
+#       : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
+# # >>>>>>> END NEW CODE (d2673f2d96)
 # =======
-  _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args)
-      : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
-# >>>>>>> END NEW CODE (d2673f2d96)
+  _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
+    is_nothrow_constructible_v<value_type, _Args...>)
+      : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# >>>>>>> END NEW CODE (c15e21957b)
       , __engaged_(true)
   {}
 
@@ -362,8 +388,13 @@ struct __optional_destruct_base<_Tp, false>
 #           __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
 # =======
   _CCCL_API constexpr __optional_destruct_base(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
-      : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
-# >>>>>>> END NEW CODE (d2673f2d96)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#       : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
+# # >>>>>>> END NEW CODE (d2673f2d96)
+# =======
+      : __storage_(
+          __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
+# >>>>>>> END NEW CODE (c15e21957b)
       , __engaged_(true)
   {}
 
@@ -389,18 +420,31 @@ struct __optional_destruct_base<_Tp, true>
     char __null_state_;
     remove_cv_t<value_type> __val_;
 
-    _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage() noexcept
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#     _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage() noexcept
+# =======
+    _CCCL_API constexpr __storage() noexcept
+# >>>>>>> END NEW CODE (c15e21957b)
         : __null_state_()
     {}
     _CCCL_EXEC_CHECK_DISABLE
     template <class... _Args>
-    _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(in_place_t, _Args&&... __args) noexcept(
-      is_nothrow_constructible_v<value_type, _Args...>)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#     _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(in_place_t, _Args&&... __args) noexcept(
+#       is_nothrow_constructible_v<value_type, _Args...>)
+# =======
+    _CCCL_API constexpr __storage(in_place_t,
+                                  _Args&&... __args) noexcept(is_nothrow_constructible_v<value_type, _Args...>)
+# >>>>>>> END NEW CODE (c15e21957b)
         : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
     {}
     _CCCL_EXEC_CHECK_DISABLE
     template <class _Fp, class... _Args>
-    _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#     _LIBCUDACXX_HIDE_FROM_ABI constexpr __storage(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+# =======
+    _CCCL_API constexpr __storage(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
+# >>>>>>> END NEW CODE (c15e21957b)
         : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
     {}
   };
@@ -412,20 +456,30 @@ struct __optional_destruct_base<_Tp, true>
 #       : __storage_()
 # =======
   _CCCL_API constexpr __optional_destruct_base() noexcept
-      : __null_state_()
-# >>>>>>> END NEW CODE (d2673f2d96)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#       : __null_state_()
+# # >>>>>>> END NEW CODE (d2673f2d96)
+# =======
+      : __storage_()
+# >>>>>>> END NEW CODE (c15e21957b)
       , __engaged_(false)
   {}
 
   template <class... _Args>
-# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-#   _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
-#     is_nothrow_constructible_v<value_type, _Args...>)
-#       : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+# # <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+# #   _LIBCUDACXX_HIDE_FROM_ABI constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
+# #     is_nothrow_constructible_v<value_type, _Args...>)
+# #       : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# # =======
+#   _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args)
+#       : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
+# # >>>>>>> END NEW CODE (d2673f2d96)
 # =======
-  _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args)
-      : __val_(_CUDA_VSTD::forward<_Args>(__args)...)
-# >>>>>>> END NEW CODE (d2673f2d96)
+  _CCCL_API constexpr explicit __optional_destruct_base(in_place_t, _Args&&... __args) noexcept(
+    is_nothrow_constructible_v<value_type, _Args...>)
+      : __storage_(in_place, _CUDA_VSTD::forward<_Args>(__args)...)
+# >>>>>>> END NEW CODE (c15e21957b)
       , __engaged_(true)
   {}
 
@@ -437,8 +491,13 @@ struct __optional_destruct_base<_Tp, true>
 #           __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
 # =======
   _CCCL_API constexpr __optional_destruct_base(__optional_construct_from_invoke_tag, _Fp&& __f, _Args&&... __args)
-      : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
-# >>>>>>> END NEW CODE (d2673f2d96)
+# <<<<<<< OLD CODE from 490e708f26 (c15e21957b) - COMMENTED OUT
+#       : __val_(_CUDA_VSTD::invoke(_CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...))
+# # >>>>>>> END NEW CODE (d2673f2d96)
+# =======
+      : __storage_(
+          __optional_construct_from_invoke_tag{}, _CUDA_VSTD::forward<_Fp>(__f), _CUDA_VSTD::forward<_Args>(__args)...)
+# >>>>>>> END NEW CODE (c15e21957b)
       , __engaged_(true)
   {}
 
