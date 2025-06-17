@@ -161,7 +161,11 @@ __device__ void test(int base_i, int base_j)
 }
 
 #if !TEST_COMPILER(NVRTC)
-#  if CUDART_VERSION < 12050
+// <<<<<<< OLD CODE from 2d933d5d06 (1fe0198a99) - COMMENTED OUT
+// #  if CUDART_VERSION < 12050
+// =======
+#  if _CCCL_CTK_BELOW(12, 5)
+// >>>>>>> END NEW CODE (1fe0198a99)
 PFN_cuTensorMapEncodeTiled get_cuTensorMapEncodeTiled()
 {
   void* driver_ptr = nullptr;
@@ -170,7 +174,11 @@ PFN_cuTensorMapEncodeTiled get_cuTensorMapEncodeTiled()
   assert(code == cudaSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled>(driver_ptr);
 }
-#  else // ^^^ CUDART_VERSION < 12050 ^^^ / vvv CUDART_VERSION >= 12050 vvv
+// <<<<<<< OLD CODE from 2d933d5d06 (1fe0198a99) - COMMENTED OUT
+// #  else // ^^^ CUDART_VERSION < 12050 ^^^ / vvv CUDART_VERSION >= 12050 vvv
+// =======
+#  else // ^^^ _CCCL_CTK_BELOW(12, 5) ^^^ / vvv _CCCL_CTK_AT_LEAST(12, 5) vvv
+// >>>>>>> END NEW CODE (1fe0198a99)
 PFN_cuTensorMapEncodeTiled_v12000 get_cuTensorMapEncodeTiled()
 {
   void* driver_ptr = nullptr;
@@ -180,7 +188,11 @@ PFN_cuTensorMapEncodeTiled_v12000 get_cuTensorMapEncodeTiled()
   assert(code == cudaSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled_v12000>(driver_ptr);
 }
-#  endif // CUDART_VERSION < 12050
+// <<<<<<< OLD CODE from 2d933d5d06 (1fe0198a99) - COMMENTED OUT
+// #  endif // CUDART_VERSION < 12050
+// =======
+#  endif // _CCCL_CTK_AT_LEAST(12, 5)
+// >>>>>>> END NEW CODE (1fe0198a99)
 #endif // !TEST_COMPILER(NVRTC)
 
 int main(int, char**)
