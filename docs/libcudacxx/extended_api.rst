@@ -63,5 +63,6 @@ This section documents the extended API provided by libhipcxx, covering bit mani
    extended_api/asynchronous_operations
    extended_api/memory_access_properties
    extended_api/warp
+   extended_api/utility
    extended_api/work_stealing
    extended_api/execution_model
