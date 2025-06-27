@@ -1,10 +1,10 @@
-// -*- C++ -*-
 //===----------------------------------------------------------------------===//
 //
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// Part of libcu++, the C++ Standard Library for your entire system,
+// under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-// SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES.
+// SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
 
@@ -41,14 +41,13 @@
 #if _LIBCUDACXX_HAS_NVFP16()
 
 #  include <cuda/std/__cmath/nvfp16.h>
+#  include <cuda/std/__complex/complex.h>
+#  include <cuda/std/__complex/tuple.h>
 #  include <cuda/std/__complex/vector_support.h>
 #  include <cuda/std/__floating_point/nvfp_types.h>
 #  include <cuda/std/__fwd/get.h>
 #  include <cuda/std/__type_traits/enable_if.h>
 #  include <cuda/std/__type_traits/is_constructible.h>
-#  include <cuda/std/__type_traits/is_extended_floating_point.h>
-#  include <cuda/std/cmath>
-#  include <cuda/std/complex>
 
 #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #    include <sstream> // for std::basic_ostringstream
@@ -102,25 +101,28 @@ struct __cccl_complex_overload_traits<__half, false, false>
   using _ComplexType = complex<__half>;
 };
 
-template <class _Tp>
-_CCCL_API inline __half __convert_to_half(const _Tp& __value) noexcept
-{
-  return __value;
-}
-
-_CCCL_API inline __half __convert_to_half(const float& __value) noexcept
-{
-  return __float2half(__value);
-}
-
-_CCCL_API inline __half __convert_to_half(const double& __value) noexcept
-{
-  // NOTE(HIP/AMD): fp16 currently does not provide a __double2half conversion
-  // (see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
-  // corresponding ticket SWDEV-529927
-  return __float2half(static_cast<float>(__value));
-}
-
+// <<<<<<< OLD CODE from e769a94eba (b7bcf1df63) - COMMENTED OUT
+// template <class _Tp>
+// _CCCL_API inline __half __convert_to_half(const _Tp& __value) noexcept
+// {
+//   return __value;
+// }
+//
+// _CCCL_API inline __half __convert_to_half(const float& __value) noexcept
+// {
+//   return __float2half(__value);
+// }
+//
+// _CCCL_API inline __half __convert_to_half(const double& __value) noexcept
+// {
+//   // NOTE(HIP/AMD): fp16 currently does not provide a __double2half conversion
+//   // (see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
+//   // corresponding ticket SWDEV-529927
+//   return __float2half(static_cast<float>(__value));
+// }
+//
+// =======
+// >>>>>>> END NEW CODE (b7bcf1df63)
 template <>
 class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__half2)) complex<__half>
 {
@@ -131,6 +133,22 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__half2)) complex<__ha
 
   template <class _Up>
   friend struct __get_complex_impl;
+
+  template <class _Tp>
+  [[nodiscard]] _CCCL_API inline static __half __convert_to_half(const _Tp& __value) noexcept
+  {
+    return __value;
+  }
+
+  [[nodiscard]] _CCCL_API inline static __half __convert_to_half(const float& __value) noexcept
+  {
+    return ::__float2half(__value);
+  }
+
+  [[nodiscard]] _CCCL_API inline static __half __convert_to_half(const double& __value) noexcept
+  {
+    return ::__double2half(__value);
+  }
 
 public:
   using value_type = __half;
@@ -216,66 +234,66 @@ public:
 
   _CCCL_API inline complex& operator+=(const value_type& __re)
   {
-    __repr_.x = __hadd(__repr_.x, __re);
+    __repr_.x = ::__hadd(__repr_.x, __re);
     return *this;
   }
   _CCCL_API inline complex& operator-=(const value_type& __re)
   {
-    __repr_.x = __hsub(__repr_.x, __re);
+    __repr_.x = ::__hsub(__repr_.x, __re);
     return *this;
   }
   _CCCL_API inline complex& operator*=(const value_type& __re)
   {
-    __repr_.x = __hmul(__repr_.x, __re);
-    __repr_.y = __hmul(__repr_.y, __re);
+    __repr_.x = ::__hmul(__repr_.x, __re);
+    __repr_.y = ::__hmul(__repr_.y, __re);
     return *this;
   }
   _CCCL_API inline complex& operator/=(const value_type& __re)
   {
-    __repr_.x = __hdiv(__repr_.x, __re);
-    __repr_.y = __hdiv(__repr_.y, __re);
+    __repr_.x = ::__hdiv(__repr_.x, __re);
+    __repr_.y = ::__hdiv(__repr_.y, __re);
     return *this;
   }
 
   // We can utilize vectorized operations for those operators
   _CCCL_API inline friend complex& operator+=(complex& __lhs, const complex& __rhs) noexcept
   {
-    __lhs.__repr_ = __hadd2(__lhs.__repr_, __rhs.__repr_);
+    __lhs.__repr_ = ::__hadd2(__lhs.__repr_, __rhs.__repr_);
     return __lhs;
   }
 
   _CCCL_API inline friend complex& operator-=(complex& __lhs, const complex& __rhs) noexcept
   {
-    __lhs.__repr_ = __hsub2(__lhs.__repr_, __rhs.__repr_);
+    __lhs.__repr_ = ::__hsub2(__lhs.__repr_, __rhs.__repr_);
     return __lhs;
   }
 
   [[nodiscard]] _CCCL_API inline friend bool operator==(const complex& __lhs, const complex& __rhs) noexcept
   {
-    return __hbeq2(__lhs.__repr_, __rhs.__repr_);
+    return ::__hbeq2(__lhs.__repr_, __rhs.__repr_);
   }
 };
 
 template <> // complex<float>
 template <> // complex<__half>
 _CCCL_API inline complex<float>::complex(const complex<__half>& __c)
-    : __re_(__half2float(__c.real()))
-    , __im_(__half2float(__c.imag()))
+    : __re_(::__half2float(__c.real()))
+    , __im_(::__half2float(__c.imag()))
 {}
 
 template <> // complex<double>
 template <> // complex<__half>
 _CCCL_API inline complex<double>::complex(const complex<__half>& __c)
-    : __re_(__half2float(__c.real()))
-    , __im_(__half2float(__c.imag()))
+    : __re_(::__half2float(__c.real()))
+    , __im_(::__half2float(__c.imag()))
 {}
 
 template <> // complex<float>
 template <> // complex<__half>
 _CCCL_API inline complex<float>& complex<float>::operator=(const complex<__half>& __c)
 {
-  __re_ = __half2float(__c.real());
-  __im_ = __half2float(__c.imag());
+  __re_ = ::__half2float(__c.real());
+  __im_ = ::__half2float(__c.imag());
   return *this;
 }
 
@@ -283,64 +301,67 @@ template <> // complex<double>
 template <> // complex<__half>
 _CCCL_API inline complex<double>& complex<double>::operator=(const complex<__half>& __c)
 {
-  __re_ = __half2float(__c.real());
-  __im_ = __half2float(__c.imag());
+  __re_ = ::__half2float(__c.real());
+  __im_ = ::__half2float(__c.imag());
   return *this;
 }
 
-[[nodiscard]] _CCCL_API inline __half arg(__half __re)
-{
-  // NOTE(HIP/AMD): fp16 currently does not provide __int2half_rn for host code; this is implementated for floating point alternatives
-  // (device only see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
-  // corresponding ticket SWDEV-529927
-  return _CUDA_VSTD::atan2(__float2half_rn(0.0f), __re);
-}
-
-// We have performance issues with some trigonometric functions with __half
-template <>
-_CCCL_API inline complex<__half> asinh(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::asinh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__half> acosh(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::acosh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__half> atanh(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::atanh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__half> acos(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::acos(complex<float>{__x})};
-}
-
+// <<<<<<< OLD CODE from e769a94eba (b7bcf1df63) - COMMENTED OUT
+// [[nodiscard]] _CCCL_API inline __half arg(__half __re)
+// {
+//   // NOTE(HIP/AMD): fp16 currently does not provide __int2half_rn for host code; this is implementated for floating point alternatives
+//   // (device only see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
+//   // corresponding ticket SWDEV-529927
+//   return _CUDA_VSTD::atan2(__float2half_rn(0.0f), __re);
+// }
+//
+// // We have performance issues with some trigonometric functions with __half
+// template <>
+// _CCCL_API inline complex<__half> asinh(const complex<__half>& __x)
+// {
+//   return complex<__half>{_CUDA_VSTD::asinh(complex<float>{__x})};
+// }
+// template <>
+// _CCCL_API inline complex<__half> acosh(const complex<__half>& __x)
+// {
+//   return complex<__half>{_CUDA_VSTD::acosh(complex<float>{__x})};
+// }
+// template <>
+// _CCCL_API inline complex<__half> atanh(const complex<__half>& __x)
+// {
+//   return complex<__half>{_CUDA_VSTD::atanh(complex<float>{__x})};
+// }
+// template <>
+// _CCCL_API inline complex<__half> acos(const complex<__half>& __x)
+// {
+//   return complex<__half>{_CUDA_VSTD::acos(complex<float>{__x})};
+// }
+//
+// =======
+// >>>>>>> END NEW CODE (b7bcf1df63)
 template <>
 struct __get_complex_impl<__half>
 {
   template <size_t _Index>
-  static _CCCL_API constexpr __half& get(complex<__half>& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr __half& get(complex<__half>& __z) noexcept
   {
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
   }
 
   template <size_t _Index>
-  static _CCCL_API constexpr __half&& get(complex<__half>&& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr __half&& get(complex<__half>&& __z) noexcept
   {
     return _CUDA_VSTD::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
   }
 
   template <size_t _Index>
-  static _CCCL_API constexpr const __half& get(const complex<__half>& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr const __half& get(const complex<__half>& __z) noexcept
   {
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
   }
 
   template <size_t _Index>
-  static _CCCL_API constexpr const __half&& get(const complex<__half>&& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr const __half&& get(const complex<__half>&& __z) noexcept
   {
     return _CUDA_VSTD::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
   }
