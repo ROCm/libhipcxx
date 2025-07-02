@@ -42,6 +42,7 @@ This section documents the extended API provided by libhipcxx, covering bit mani
    extended_api/functional
    extended_api/type_traits
    extended_api/numeric
+   extended_api/memory
    extended_api/streams
    extended_api/memory_resource
    extended_api/math
