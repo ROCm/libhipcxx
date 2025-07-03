@@ -33,7 +33,13 @@
 
 #include "test_macros.h"
 
-_CCCL_SUPPRESS_DEPRECATED_PUSH
+// <<<<<<< OLD CODE from 71caa2af63 (6bcfd39214) - COMMENTED OUT
+// _CCCL_SUPPRESS_DEPRECATED_PUSH
+// =======
+#if _CCCL_CTK_AT_LEAST(13, 0)
+__NV_SILENCE_DEPRECATION_BEGIN
+#endif // _CCCL_CTK_AT_LEAST(13, 0)
+// >>>>>>> END NEW CODE (6bcfd39214)
 
 template <class VType, class BaseType, size_t VSize>
 struct get_val;
