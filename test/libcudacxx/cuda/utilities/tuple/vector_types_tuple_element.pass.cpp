@@ -30,13 +30,17 @@
 
 #include "test_macros.h"
 
-// <<<<<<< OLD CODE from 71caa2af63 (6bcfd39214) - COMMENTED OUT
-// _CCCL_SUPPRESS_DEPRECATED_PUSH
+// <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 71caa2af63 (6bcfd39214) - COMMENTED OUT
+// // _CCCL_SUPPRESS_DEPRECATED_PUSH
+// // =======
+// #if _CCCL_CTK_AT_LEAST(13, 0)
+// __NV_SILENCE_DEPRECATION_BEGIN
+// #endif // _CCCL_CTK_AT_LEAST(13, 0)
+// // >>>>>>> END NEW CODE (6bcfd39214)
 // =======
-#if _CCCL_CTK_AT_LEAST(13, 0)
-__NV_SILENCE_DEPRECATION_BEGIN
-#endif // _CCCL_CTK_AT_LEAST(13, 0)
-// >>>>>>> END NEW CODE (6bcfd39214)
+_CCCL_SUPPRESS_DEPRECATED_PUSH
+// >>>>>>> END NEW CODE (0de6f3b24e)
 
 template <class VType, class BaseType, size_t Index>
 using expected_type = cuda::std::is_same<typename cuda::std::tuple_element<Index, VType>::type, BaseType>;

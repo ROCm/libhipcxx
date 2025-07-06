@@ -42,8 +42,12 @@
 // =======
 #include <cuda/std/__cccl/prologue.h>
 
-_CCCL_NV_DIAG_SUPPRESS(1384) // warning: pointer converted to bool
-// >>>>>>> END NEW CODE (24bb5db96f)
+// <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
+// _CCCL_NV_DIAG_SUPPRESS(1384) // warning: pointer converted to bool
+// // >>>>>>> END NEW CODE (24bb5db96f)
+// =======
+_CCCL_BEGIN_NV_DIAG_SUPPRESS(1384) // warning: pointer converted to bool
+// >>>>>>> END NEW CODE (0de6f3b24e)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
