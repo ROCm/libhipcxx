@@ -30,8 +30,12 @@
 // =======
 #include <cuda/std/__cccl/prologue.h>
 
-_CCCL_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
-// >>>>>>> END NEW CODE (24bb5db96f)
+// <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
+// _CCCL_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
+// // >>>>>>> END NEW CODE (24bb5db96f)
+// =======
+_CCCL_BEGIN_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
+// >>>>>>> END NEW CODE (0de6f3b24e)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE
 
