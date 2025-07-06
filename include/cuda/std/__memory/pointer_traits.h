@@ -98,11 +98,13 @@ private:
 //   _LIBCUDACXX_HIDE_FROM_ABI static true_type __test(typename _Xp::template rebind<_Up>* = 0);
 // =======
   _CCCL_API inline static false_type __test(...);
-  _CCCL_SUPPRESS_DEPRECATED_PUSH
   template <class _Xp>
   _CCCL_API inline static true_type __test(typename _Xp::template rebind<_Up>* = 0);
-  _CCCL_SUPPRESS_DEPRECATED_POP
-// >>>>>>> END NEW CODE (d2673f2d96)
+// <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
+//   _CCCL_SUPPRESS_DEPRECATED_POP
+// // >>>>>>> END NEW CODE (d2673f2d96)
+// =======
+// >>>>>>> END NEW CODE (0de6f3b24e)
 
 public:
   static const bool value = decltype(__test<_Tp>(0))::value;
