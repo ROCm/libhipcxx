@@ -167,18 +167,22 @@ struct __static_partial_sums
 // ------------------------------------------------------------------
 
 template <class _TStatic, _TStatic _DynTag, _TStatic... _Values>
-// <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// // constexpr size_t __count_dynamic_v = (size_t{0} + ... + static_cast<size_t>(_Values == _DynTag));
+// <<<<<<< OLD CODE from b045d74359 (27357226f4) - COMMENTED OUT
+// // <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
+// // // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
+// // // constexpr size_t __count_dynamic_v = (size_t{0} + ... + static_cast<size_t>(_Values == _DynTag));
+// // // =======
+// // [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr size_t __count_dynamic()
 // // =======
-// [[nodiscard]] _LIBCUDACXX_HIDE_FROM_ABI constexpr size_t __count_dynamic()
+// [[nodiscard]] _CCCL_API constexpr size_t __count_dynamic()
+// // >>>>>>> END NEW CODE (d2673f2d96)
+// {
+//   return (size_t(0) + ... + static_cast<size_t>(_Values == _DynTag));
+// }
+// // >>>>>>> END NEW CODE (3eee69cda4)
 // =======
-[[nodiscard]] _CCCL_API constexpr size_t __count_dynamic()
-// >>>>>>> END NEW CODE (d2673f2d96)
-{
-  return (size_t(0) + ... + static_cast<size_t>(_Values == _DynTag));
-}
-// >>>>>>> END NEW CODE (3eee69cda4)
+constexpr size_t __count_dynamic_v = (size_t{0} + ... + static_cast<size_t>(_Values == _DynTag));
+// >>>>>>> END NEW CODE (27357226f4)
 
 // array like class which has a mix of static and runtime values but
 // only stores the runtime values.
