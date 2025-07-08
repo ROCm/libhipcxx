@@ -305,7 +305,7 @@ class Configuration(object):
                 # that the user wants it at the end, but we have no
                 # way of getting at that easily.
                 self.lit_config.fatal(
-                    "Cannot infer how to create a Valgrind " " executor."
+                    "Cannot infer how to create a Valgrind  executor."
                 )
         else:
             te = LocalExecutor()
@@ -451,7 +451,7 @@ class Configuration(object):
                     self.lit_config.note("inferred cxx_under_test as: %r" % cxx)
                 elif self.cxx_is_clang_cl:
                     self.lit_config.fatal(
-                        "Failed to find clang++ substitution for" " clang-cl"
+                        "Failed to find clang++ substitution for clang-cl"
                     )
             if not cxx:
                 self.lit_config.fatal(
@@ -1090,8 +1090,7 @@ class Configuration(object):
                 ["--target=" + self.config.target_triple]
             ):
                 self.lit_config.warning(
-                    "use_target is true but --target is "
-                    "not supported by the compiler"
+                    "use_target is true but --target is not supported by the compiler"
                 )
         if self.use_deployment:
             arch, name, version = self.config.deployment
@@ -1640,7 +1639,7 @@ class Configuration(object):
                 self.config.available_features.add("sanitizer-new-delete")
             else:
                 self.lit_config.fatal(
-                    "unsupported value for " "use_sanitizer: {0}".format(san)
+                    "unsupported value for use_sanitizer: {0}".format(san)
                 )
             san_lib = self.get_lit_conf("sanitizer_library")
             if san_lib:
@@ -1663,8 +1662,7 @@ class Configuration(object):
             macros = self._dump_macros_verbose(flags=["-fcoroutines-ts"])
             if "__cpp_coroutines" not in macros:
                 self.lit_config.warning(
-                    "-fcoroutines-ts is supported but "
-                    "__cpp_coroutines is not defined"
+                    "-fcoroutines-ts is supported but __cpp_coroutines is not defined"
                 )
             # Consider coroutines supported only when the feature test macro
             # reflects a recent value.
