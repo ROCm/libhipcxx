@@ -33,9 +33,9 @@
 #include <cuda/std/array>
 #include <cuda/std/tuple>
 #include <cuda/std/utility>
-#if defined(_LIBCUDACXX_HAS_STRING)
+#ifdef _LIBCUDACXX_HAS_STRING
 #  include <cuda/std/string>
-#endif
+#endif // _LIBCUDACXX_HAS_STRING
 #include <cuda/std/cassert>
 
 #include "test_macros.h"
