@@ -86,7 +86,11 @@
 //! _CCCL_ASSERT_IMPL_HOST should never be used directly
 #if _CCCL_OS(QNX)
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
-#elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) // There is no host standard library in nvrtc
+// <<<<<<< OLD CODE from 3de80f3e26 (c788cb9d47) - COMMENTED OUT
+// #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) // There is no host standard library in nvrtc
+// =======
+#elif _CCCL_COMPILER(NVRTC) // There is no host standard library in nvrtc
+// >>>>>>> END NEW CODE (c788cb9d47)
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
 #elif _CCCL_HAS_INCLUDE(<yvals.h>) && (_CCCL_COMPILER(MSVC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32))) // MSVC uses _STL_VERIFY from <yvals.h>
 #  include <yvals.h>
@@ -112,9 +116,13 @@ _CCCL_HOST_DEVICE
 //! _CCCL_ASSERT_IMPL_DEVICE should never be used directly
 #if _CCCL_OS(QNX)
 #  define _CCCL_ASSERT_IMPL_DEVICE(expression, message) ((void) 0)
-#elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// NOTE(HIP/AMD): Use _wassert on Windows, __assertfail on Linux
-#  if defined(_WIN32)
+// <<<<<<< OLD CODE from 3de80f3e26 (c788cb9d47) - COMMENTED OUT
+// #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// // NOTE(HIP/AMD): Use _wassert on Windows, __assertfail on Linux
+// #  if defined(_WIN32)
+// =======
+#elif _CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (c788cb9d47)
 #  define _CCCL_ASSERT_IMPL_DEVICE(expression, message)    \
     _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
     ? (void) 0 : _wassert(_CRT_WIDE(message), __FILEW__, __LINE__)
