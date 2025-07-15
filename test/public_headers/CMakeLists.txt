@@ -75,10 +75,18 @@ function(libcudacxx_add_public_header_test header)
                          PRIVATE
                          ${headertest_warning_levels_device}
                          -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE)
-  target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_ASSERTIONS)
-  target_compile_definitions(headertest_${header_name} PRIVATE CCCL_IGNORE_DEPRECATED_CPP_DIALECT)
-  target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_OPTIONAL_REF)
-  target_link_libraries(headertest_${header_name} hip::device)
+# <<<<<<< OLD CODE from 7f5c1a3afe (b950d40ef0) - COMMENTED OUT
+#   target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_ASSERTIONS)
+#   target_compile_definitions(headertest_${header_name} PRIVATE CCCL_IGNORE_DEPRECATED_CPP_DIALECT)
+#   target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_OPTIONAL_REF)
+#   target_link_libraries(headertest_${header_name} hip::device)
+# =======
+  target_compile_definitions(headertest_${header_name} PRIVATE
+    _CCCL_HEADER_TEST
+    CCCL_ENABLE_ASSERTIONS
+    CCCL_IGNORE_DEPRECATED_CPP_DIALECT
+    CCCL_ENABLE_OPTIONAL_REF)
+# >>>>>>> END NEW CODE (b950d40ef0)
 
   # Ensure that if this is an atomic header, we only include the right architectures
   string(REGEX MATCH "ptx|barrier|latch|semaphore|annotated_ptr|pipeline|memcpy_async" match "${header}")
