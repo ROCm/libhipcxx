@@ -70,15 +70,27 @@ function(libcudacxx_create_internal_header_test header_name, headertest_src, fal
     $<$<COMPILE_LANGUAGE:CUDA>:${headertest_warning_levels_device}>
     $<$<COMPILE_LANGUAGE:CXX>:${headertest_warning_levels_host}>
     -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE)
-  target_compile_definitions(headertest_${header_name} PRIVATE _CCCL_HEADER_TEST)
-  target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_ASSERTIONS)
-  target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_OPTIONAL_REF)
-  # if ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
-  #   target_link_libraries(headertest_${header_name} NVHPC::CUDART)
-  # else()
-  #   target_link_libraries(headertest_${header_name} CUDA::cudart)
-  # endif()
-  target_link_libraries(headertest_${header_name} hip::host)
+# <<<<<<< OLD CODE from 7f5c1a3afe (b950d40ef0) - COMMENTED OUT
+#   target_compile_definitions(headertest_${header_name} PRIVATE _CCCL_HEADER_TEST)
+#   target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_ASSERTIONS)
+#   target_compile_definitions(headertest_${header_name} PRIVATE CCCL_ENABLE_OPTIONAL_REF)
+#   # if ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
+#   #   target_link_libraries(headertest_${header_name} NVHPC::CUDART)
+#   # else()
+#   #   target_link_libraries(headertest_${header_name} CUDA::cudart)
+#   # endif()
+#   target_link_libraries(headertest_${header_name} hip::host)
+# =======
+  target_compile_definitions(headertest_${header_name} PRIVATE
+    _CCCL_HEADER_TEST
+    CCCL_ENABLE_ASSERTIONS
+    CCCL_ENABLE_OPTIONAL_REF)
+  if ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
+    target_link_libraries(headertest_${header_name} NVHPC::CUDART)
+  else()
+    target_link_libraries(headertest_${header_name} CUDA::cudart)
+  endif()
+# >>>>>>> END NEW CODE (b950d40ef0)
 
   if(fallback)
     target_compile_definitions(headertest_${header_name} PRIVATE "-D${fallback}")
