@@ -229,7 +229,42 @@ inline constexpr bool __must_synthesize_assignment_v =
 // We need to ensure that __tuple_impl_sfinae_helper is unique for every instantiation of __tuple_impl, so its templated
 // on the impl
 template <class _Impl, bool _AllCopyAssignable, bool _AllMoveAssignable>
-struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper{};
+// <<<<<<< OLD CODE from 91bb4ab8ba (3c33d4cea7) - COMMENTED OUT
+// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper{};
+//
+// template <class _Impl>
+// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, false, true>
+// {
+//   __tuple_impl_sfinae_helper()                                             = default;
+//   __tuple_impl_sfinae_helper(const __tuple_impl_sfinae_helper&)            = default;
+//   __tuple_impl_sfinae_helper(__tuple_impl_sfinae_helper&&)                 = default;
+//   __tuple_impl_sfinae_helper& operator=(const __tuple_impl_sfinae_helper&) = delete;
+//   __tuple_impl_sfinae_helper& operator=(__tuple_impl_sfinae_helper&&)      = default;
+// };
+//
+// template <class _Impl>
+// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, true, false>
+// {
+//   __tuple_impl_sfinae_helper()                                             = default;
+//   __tuple_impl_sfinae_helper(const __tuple_impl_sfinae_helper&)            = default;
+//   __tuple_impl_sfinae_helper(__tuple_impl_sfinae_helper&&)                 = default;
+//   __tuple_impl_sfinae_helper& operator=(const __tuple_impl_sfinae_helper&) = default;
+//   __tuple_impl_sfinae_helper& operator=(__tuple_impl_sfinae_helper&&)      = delete;
+// };
+//
+// template <class _Impl>
+// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, false, false>
+// {
+//   __tuple_impl_sfinae_helper()                                             = default;
+//   __tuple_impl_sfinae_helper(const __tuple_impl_sfinae_helper&)            = default;
+//   __tuple_impl_sfinae_helper(__tuple_impl_sfinae_helper&&)                 = default;
+//   __tuple_impl_sfinae_helper& operator=(const __tuple_impl_sfinae_helper&) = delete;
+//   __tuple_impl_sfinae_helper& operator=(__tuple_impl_sfinae_helper&&)      = delete;
+// };
+// =======
+struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper
+{};
+// >>>>>>> END NEW CODE (3c33d4cea7)
 
 template <class _Impl>
 struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, false, true>
