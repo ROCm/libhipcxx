@@ -45,6 +45,7 @@ This page covers the math extended API, providing integer arithmetic utilities i
    math/isqrt
    math/neg
    math/uabs
+   math/fast_mod_div
 
 .. list-table::
    :widths: 25 45 30
@@ -107,5 +108,10 @@ This page covers the math extended API, providing integer arithmetic utilities i
 
    * - :ref:`uabs <libcudacxx-extended-api-math-uabs>`
      - Unsigned absolute value
+     - CCCL 3.1.0
+     - CUDA 13.1
+
+   * - :ref:`fast_mod_div <libcudacxx-extended-api-math-fast-mod-div>`
+     - Fast Modulo/Division
      - CCCL 3.1.0
      - CUDA 13.1
