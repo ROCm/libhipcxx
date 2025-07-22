@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,51 +30,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef _CUDA___GET_DEVICE_ADDRESS_H
-#define _CUDA___GET_DEVICE_ADDRESS_H
+// NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
+// UNSUPPORTED: hipcc, hiprtc
 
-#include <cuda/std/detail/__config>
+// UNSUPPORTED: libcpp-has-no-threads
+// UNSUPPORTED: pre-sm-70
 
-#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
-#  pragma GCC system_header
-#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
-#  pragma clang system_header
-#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
-#  pragma system_header
-#endif // no system header
+// <cuda/memory>
 
-#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+#include <cuda/memory>
+#include <cuda/std/cassert>
+#include <cuda/std/type_traits>
 
-#  include <cuda/std/__cuda/api_wrapper.h>
-#  include <cuda/std/__memory/addressof.h>
+#include "test_macros.h"
 
-#  include <nv/target>
-
-#  include <cuda/std/__cccl/prologue.h>
-
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA
-
-//! @brief Returns the device address of the passed \c __device_object
-//! @param __device_object the object residing in device memory
-//! @return Valid pointer to the device object
-template <class _Tp>
-[[nodiscard]] _CCCL_API inline _Tp* get_device_address(_Tp& __device_object)
+__host__ __device__ constexpr bool test()
 {
-  NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE,
-    (return _CUDA_VSTD::addressof(__device_object);),
-    (void* __device_ptr = nullptr; _CCCL_TRY_CUDA_API(
-       ::hipGetSymbolAddress,
-       "failed to call cudaGetSymbolAddress in cuda::get_device_address",
-       &__device_ptr,
-       __device_object);
-     return static_cast<_Tp*>(__device_ptr);))
+  using aligned_t = cuda::aligned_size_t<1>;
+  static_assert(!cuda::std::is_default_constructible<aligned_t>::value);
+  static_assert(aligned_t::align == 1);
+  {
+    const aligned_t aligned{42};
+    assert(aligned.value == 42);
+    assert(static_cast<cuda::std::size_t>(aligned) == 42);
+  }
+  return true;
 }
 
-_LIBCUDACXX_END_NAMESPACE_CUDA
+// test C++11 differently
+static_assert(cuda::aligned_size_t<32>{1024}.value == 1024);
 
-#  include <cuda/std/__cccl/epilogue.h>
-
-#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-
-#endif // _CUDA___GET_DEVICE_ADDRESS_H
+int main(int, char**)
+{
+  test();
+  static_assert(test());
+  return 0;
+}

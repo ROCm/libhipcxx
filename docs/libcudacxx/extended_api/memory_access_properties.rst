@@ -40,7 +40,6 @@ This page covers the memory access properties extended API, providing types and 
    memory_access_properties/access_property
    memory_access_properties/apply_access_property
    memory_access_properties/associate_access_property
-   memory_access_properties/discard_memory
 
 ..
    memory_access_properties/annotated_ptr
@@ -70,10 +69,5 @@ This page covers the memory access properties extended API, providing types and 
 
    * - :ref:`cuda::associate_access_property <libcudacxx-extended-api-memory-access-properties-associate-access-property>`
      - Associates access property with raw pointer
-     - libcu++ 1.6.0 / CCCL 2.0.0
-     - CUDA 11.5
-
-   * - :ref:`cuda::discard_memory <libcudacxx-extended-api-memory-access-properties-discard-memory>`
-     - Writes indeterminate values to memory
      - libcu++ 1.6.0 / CCCL 2.0.0
      - CUDA 11.5

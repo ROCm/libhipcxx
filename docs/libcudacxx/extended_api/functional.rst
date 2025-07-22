@@ -38,8 +38,8 @@ This page covers the functional extended API, including utilities for maximum an
    :maxdepth: 1
 
    functional/proclaim_return_type
-   functional/get_device_address
    functional/maximum_minimum
+   memory/get_device_address
 
 .. list-table::
    :widths: 25 45 30 30
@@ -66,6 +66,6 @@ This page covers the functional extended API, including utilities for maximum an
      - Creates a forwarding call wrapper that proclaims that arguments can be freely copied before an invocation of the wrapped callable
      - libhipcxx 3.0
 
-   * - :ref:`cuda::get_device_address <libcudacxx-extended-api-functional-get-device-address>`
+   * - :ref:`cuda::get_device_address <libcudacxx-extended-api-memory-get-device-address>`
      - Returns a valid address to a device object
      - libhipcxx 3.0
