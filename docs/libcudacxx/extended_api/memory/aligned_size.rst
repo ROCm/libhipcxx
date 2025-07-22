@@ -25,14 +25,14 @@
   :description: API reference for cuda::aligned_size_t, a shape type representing a byte extent with a statically defined address and size alignment for memory operations in libhipcxx.
   :keywords: libhipcxx, ROCm, HIP, C++, aligned_size_t, alignment, byte extent, memcpy_async, shape
 
-.. _libcudacxx-extended-api-memory-access-shapes-aligned-size:
+.. _libcudacxx-extended-api-memory-aligned-size:
 
 ``cuda::aligned_size_t``
 ========================
 
 This page documents ``cuda::aligned_size_t``, a shape type representing a byte extent with a statically defined address and size alignment for memory operations.
 
-Defined in headers ``<cuda/barrier>`` and ``<cuda/pipeline>``:
+Defined in headers ``<cuda/memory>``, ``<cuda/barrier>`` and ``<cuda/pipeline>``:
 
 .. code:: cuda
 
@@ -101,7 +101,7 @@ Example
 
 .. code:: cuda
 
-   #include <cuda/barrier>
+   #include <cuda/memory>
 
    __global__ void example_kernel(void* dst, void* src, size_t size) {
      cuda::barrier<cuda::thread_scope_system> bar;

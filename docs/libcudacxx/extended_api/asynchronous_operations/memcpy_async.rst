@@ -111,21 +111,21 @@ Notes
 ``cuda::memcpy_async`` has similar constraints to `std::memcpy <https://en.cppreference.com/w/cpp/string/byte/memcpy>`_,
 namely:
 
-- If the objects overlap, the behavior is undefined.
-- If either ``destination`` or ``source`` is an invalid or null pointer, the behavior is undefined
-  (even if ``count`` is zero).
-- If the objects are `potentially-overlapping <https://en.cppreference.com/w/cpp/language/object#Subobjects>`_
-  the behavior is undefined.
-- If the objects are not of `TriviallyCopyable <https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable>`_
-  type the program is ill-formed, no diagnostic required.
-- If *Shape* is :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-access-shapes-aligned-size>`, ``source``
-  and ``destination`` are both required to be aligned on ``cuda::aligned_size_t::align``, else the behavior is
-  undefined.
-- If ``cuda::pipeline`` is in a *quitted state*
-  (see ``cuda::pipeline::quit``),
-  the behavior is undefined.
-- For cooperative variants, if the parameters are not the same across all threads in ``group``, the behavior is
-  undefined.
+   - If the objects overlap, the behavior is undefined.
+   - If either ``destination`` or ``source`` is an invalid or null pointer, the behavior is undefined
+     (even if ``count`` is zero).
+   - If the objects are `potentially-overlapping <https://en.cppreference.com/w/cpp/language/object#Subobjects>`_
+     the behavior is undefined.
+   - If the objects are not of `TriviallyCopyable <https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable>`_
+     type the program is ill-formed, no diagnostic required.
+   - If *Shape* is :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-aligned-size>`, ``source``
+     and ``destination`` are both required to be aligned on ``cuda::aligned_size_t::align``, else the behavior is
+     undefined.
+   - If ``cuda::pipeline`` is in a *quitted state*
+     (see :ref:`cuda::pipeline::quit <libcudacxx-extended-api-synchronization-pipeline-pipeline-quit>`),
+     the behavior is undefined.
+   - For cooperative variants, if the parameters are not the same across all threads in ``group``, the behavior is
+     undefined.
 
 Template Parameters
 -------------------
@@ -138,7 +138,7 @@ Template Parameters
      - A type satisfying the [*Group*] concept.
    * - ``Shape``
      - Either `cuda::std::size_t <https://en.cppreference.com/w/c/types/size_t>`_
-       or :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-access-shapes-aligned-size>`.
+       or :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-aligned-size>`.
 
 Parameters
 ----------
