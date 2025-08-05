@@ -62,11 +62,11 @@ void test_conversion_from_resource_ref()
     assert(fake_orig.static_vtable == fake_conv.static_vtable);
 
     // Ensure that we properly pass on the allocate function
-    assert(input.allocate(0, 0) == ref.allocate(0, 0));
+    assert(input.allocate_sync(0, 0) == ref.allocate_sync(0, 0));
 
     // Ensure we are deallocating properly
     int expected_after_deallocate = 1337;
-    ref.deallocate(static_cast<void*>(&expected_after_deallocate), 0, 0);
+    ref.deallocate_sync(static_cast<void*>(&expected_after_deallocate), 0, 0);
     assert(input._val == expected_after_deallocate);
   }
 
@@ -81,11 +81,11 @@ void test_conversion_from_resource_ref()
     assert(fake_orig.static_vtable == fake_conv.static_vtable);
 
     // Ensure that we properly pass on the allocate function
-    assert(input.allocate(0, 0) == ref.allocate(0, 0));
+    assert(input.allocate_sync(0, 0) == ref.allocate_sync(0, 0));
 
     // Ensure we are deallocating properly
     int expected_after_deallocate = 1337;
-    ref.deallocate(static_cast<void*>(&expected_after_deallocate), 0, 0);
+    ref.deallocate_sync(static_cast<void*>(&expected_after_deallocate), 0, 0);
     assert(input._val == expected_after_deallocate);
   }
 }
@@ -106,11 +106,11 @@ void test_conversion_from_async_resource_ref()
     assert(fake_orig->static_vtable == fake_conv->static_vtable);
 
     // Ensure that we properly pass on the allocate function
-    assert(input.allocate(0, 0) == ref.allocate(0, 0));
+    assert(input.allocate_sync(0, 0) == ref.allocate_sync(0, 0));
 
     // Ensure we are deallocating properly
     int expected_after_deallocate = 1337;
-    ref.deallocate(static_cast<void*>(&expected_after_deallocate), 0, 0);
+    ref.deallocate_sync(static_cast<void*>(&expected_after_deallocate), 0, 0);
     assert(input._val == expected_after_deallocate);
   }
 
@@ -125,11 +125,11 @@ void test_conversion_from_async_resource_ref()
     assert(fake_orig->static_vtable == fake_conv->static_vtable);
 
     // Ensure that we properly pass on the allocate function
-    assert(input.allocate(0, 0) == ref.allocate(0, 0));
+    assert(input.allocate_sync(0, 0) == ref.allocate_sync(0, 0));
 
     // Ensure we are deallocating properly
     int expected_after_deallocate = 1337;
-    ref.deallocate(static_cast<void*>(&expected_after_deallocate), 0, 0);
+    ref.deallocate_sync(static_cast<void*>(&expected_after_deallocate), 0, 0);
     assert(input._val == expected_after_deallocate);
   }
 }
