@@ -131,8 +131,25 @@ __host__ __device__ void constexpr test_fabs_abs(const T pos)
 }
 
 template <class T>
-__host__ __device__ constexpr void test_type()
+__host__ __device__ constexpr void test_type(float val)
 {
+  if (!cuda::std::__cccl_default_is_constant_evaluated())
+  {
+    if constexpr (cuda::std::is_integral_v<T>)
+    {
+#if TEST_CUDA_COMPILER(CLANG)
+      if constexpr (sizeof(T) < 16) // clang fails the conversion from float to 128 bit integers
+#endif // TEST_CUDA_COMPILER(CLANG)
+      {
+        test_fabs_abs(static_cast<T>(val));
+      }
+    }
+    else
+    {
+      test_fabs_abs(cuda::std::__fp_cast<T>(val));
+    }
+  }
+
   // __nv_fp8_e8m0 cannot represent 0
 #if _CCCL_HAS_NVFP8_E8M0()
   if constexpr (!cuda::std::is_same_v<T, __nv_fp8_e8m0>)
@@ -165,95 +182,106 @@ __host__ __device__ constexpr void test_type()
   }
 }
 
-__host__ __device__ constexpr bool test()
+__host__ __device__ constexpr bool test(float val)
 {
-  test_type<float>();
-  test_type<double>();
+  test_type<float>(val);
+  test_type<double>(val);
 #if _CCCL_HAS_LONG_DOUBLE()
-  test_type<long double>();
+  test_type<long double>(val);
 #endif // _CCCL_HAS_LONG_DOUBLE()
 #if _LIBCUDACXX_HAS_NVFP16()
-// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-#  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
-  test_type<__half>();
-#  endif
+// <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
+// // NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
+// #  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
+//   test_type<__half>();
+// #  endif
+// =======
+  test_type<__half>(val);
+// >>>>>>> END NEW CODE (e2c8bf22d1)
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test_type<__nv_bfloat16>();
+  test_type<__nv_bfloat16>(val);
 #endif // _LIBCUDACXX_HAS_NVBF16()
 #if _CCCL_HAS_NVFP8_E4M3()
-  test_type<__nv_fp8_e4m3>();
+  test_type<__nv_fp8_e4m3>(val);
 #endif // _CCCL_HAS_NVFP8_E4M3
 #if _CCCL_HAS_NVFP8_E5M2()
-  test_type<__nv_fp8_e5m2>();
+  test_type<__nv_fp8_e5m2>(val);
 #endif // _CCCL_HAS_NVFP8_E5M2
 #if _CCCL_HAS_NVFP8_E8M0()
-  test_type<__nv_fp8_e8m0>();
+  test_type<__nv_fp8_e8m0>(val);
 #endif // _CCCL_HAS_NVFP8_E8M0
 #if _CCCL_HAS_NVFP6_E2M3()
-  test_type<__nv_fp6_e2m3>();
+  test_type<__nv_fp6_e2m3>(val);
 #endif // _CCCL_HAS_NVFP6_E2M3
 #if _CCCL_HAS_NVFP6_E3M2()
-  test_type<__nv_fp6_e3m2>();
+  test_type<__nv_fp6_e3m2>(val);
 #endif // _CCCL_HAS_NVFP6_E3M2
 #if _CCCL_HAS_NVFP4_E2M1()
-  test_type<__nv_fp4_e2m1>();
+  test_type<__nv_fp4_e2m1>(val);
 #endif // _CCCL_HAS_NVFP4_E2M1
 
-  test_type<signed char>();
-  test_type<unsigned char>();
-  test_type<signed short>();
-  test_type<unsigned short>();
-  test_type<signed int>();
-  test_type<unsigned int>();
-  test_type<signed long>();
-  test_type<unsigned long>();
-  test_type<signed long long>();
-  test_type<unsigned long long>();
+  test_type<signed char>(val);
+  test_type<unsigned char>(val);
+  test_type<signed short>(val);
+  test_type<unsigned short>(val);
+  test_type<signed int>(val);
+  test_type<unsigned int>(val);
+  test_type<signed long>(val);
+  test_type<unsigned long>(val);
+  test_type<signed long long>(val);
+  test_type<unsigned long long>(val);
 #if _CCCL_HAS_INT128()
-  test_type<__int128_t>();
-  test_type<__uint128_t>();
+  test_type<__int128_t>(val);
+  test_type<__uint128_t>(val);
 #endif // _CCCL_HAS_INT128()
 
   return true;
 }
 
-__host__ __device__ constexpr bool test_constexpr()
-{
-#if _LIBCUDACXX_HAS_NVFP16()
-// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-#  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
-  test_type<__half>();
-#  endif
-#endif // _LIBCUDACXX_HAS_NVFP16()
-#if _LIBCUDACXX_HAS_NVBF16()
-  test_type<__nv_bfloat16>();
-#endif // _LIBCUDACXX_HAS_NVBF16()
-#if _CCCL_HAS_NVFP8_E4M3()
-  test_type<__nv_fp8_e4m3>();
-#endif // _CCCL_HAS_NVFP8_E4M3
-#if _CCCL_HAS_NVFP8_E5M2()
-  test_type<__nv_fp8_e5m2>();
-#endif // _CCCL_HAS_NVFP8_E5M2
-#if _CCCL_HAS_NVFP8_E8M0()
-  test_type<__nv_fp8_e8m0>();
-#endif // _CCCL_HAS_NVFP8_E8M0
-#if _CCCL_HAS_NVFP6_E2M3()
-  test_type<__nv_fp6_e2m3>();
-#endif // _CCCL_HAS_NVFP6_E2M3
-#if _CCCL_HAS_NVFP6_E3M2()
-  test_type<__nv_fp6_e3m2>();
-#endif // _CCCL_HAS_NVFP6_E3M2
-#if _CCCL_HAS_NVFP4_E2M1()
-  test_type<__nv_fp4_e2m1>();
-#endif // _CCCL_HAS_NVFP4_E2M1
-
-  return true;
-}
-
+// <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
+// __host__ __device__ constexpr bool test_constexpr()
+// {
+// #if _LIBCUDACXX_HAS_NVFP16()
+// // NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
+// #  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
+//   test_type<__half>();
+// #  endif
+// #endif // _LIBCUDACXX_HAS_NVFP16()
+// #if _LIBCUDACXX_HAS_NVBF16()
+//   test_type<__nv_bfloat16>();
+// #endif // _LIBCUDACXX_HAS_NVBF16()
+// #if _CCCL_HAS_NVFP8_E4M3()
+//   test_type<__nv_fp8_e4m3>();
+// #endif // _CCCL_HAS_NVFP8_E4M3
+// #if _CCCL_HAS_NVFP8_E5M2()
+//   test_type<__nv_fp8_e5m2>();
+// #endif // _CCCL_HAS_NVFP8_E5M2
+// #if _CCCL_HAS_NVFP8_E8M0()
+//   test_type<__nv_fp8_e8m0>();
+// #endif // _CCCL_HAS_NVFP8_E8M0
+// #if _CCCL_HAS_NVFP6_E2M3()
+//   test_type<__nv_fp6_e2m3>();
+// #endif // _CCCL_HAS_NVFP6_E2M3
+// #if _CCCL_HAS_NVFP6_E3M2()
+//   test_type<__nv_fp6_e3m2>();
+// #endif // _CCCL_HAS_NVFP6_E3M2
+// #if _CCCL_HAS_NVFP4_E2M1()
+//   test_type<__nv_fp4_e2m1>();
+// #endif // _CCCL_HAS_NVFP4_E2M1
+//
+//   return true;
+// }
+//
+// =======
+// >>>>>>> END NEW CODE (e2c8bf22d1)
 int main(int, char**)
 {
-  test();
-  static_assert(test_constexpr());
+  volatile float val = 1.0f;
+  test(val);
+#if _CCCL_HAS_CONSTEXPR_BIT_CAST()
+  static_assert(test(1.0f));
+#endif // _CCCL_HAS_CONSTEXPR_BIT_CAST()
+
   return 0;
 }
