@@ -61,7 +61,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 // isgreater
 
-template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int> = 0>
+template <class _A1, enable_if_t<__is_extended_arithmetic_v<_A1>, int> = 0>
 [[nodiscard]] _CCCL_DEVICE _CCCL_HIDE_FROM_ABI bool __device_isgreater(_A1 __x, _A1 __y) noexcept
 {
   if (_CUDA_VSTD::isnan(__x) || _CUDA_VSTD::isnan(__y))
@@ -71,9 +71,7 @@ template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int
   return __x > __y;
 }
 
-template <class _A1,
-          class _A2,
-          enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1) && _CCCL_TRAIT(__is_extended_arithmetic, _A2), int> = 0>
+template <class _A1, class _A2, enable_if_t<__is_extended_arithmetic_v<_A1> && __is_extended_arithmetic_v<_A2>, int> = 0>
 [[nodiscard]] _CCCL_API inline bool isgreater(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
@@ -84,7 +82,7 @@ template <class _A1,
 
 // isgreaterequal
 
-template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int> = 0>
+template <class _A1, enable_if_t<__is_extended_arithmetic_v<_A1>, int> = 0>
 [[nodiscard]] _CCCL_DEVICE _CCCL_HIDE_FROM_ABI bool __device_isgreaterequal(_A1 __x, _A1 __y) noexcept
 {
   if (_CUDA_VSTD::isnan(__x) || _CUDA_VSTD::isnan(__y))
@@ -94,9 +92,7 @@ template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int
   return __x >= __y;
 }
 
-template <class _A1,
-          class _A2,
-          enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1) && _CCCL_TRAIT(__is_extended_arithmetic, _A2), int> = 0>
+template <class _A1, class _A2, enable_if_t<__is_extended_arithmetic_v<_A1> && __is_extended_arithmetic_v<_A2>, int> = 0>
 [[nodiscard]] _CCCL_API inline bool isgreaterequal(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
@@ -107,7 +103,7 @@ template <class _A1,
 
 // isless
 
-template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int> = 0>
+template <class _A1, enable_if_t<__is_extended_arithmetic_v<_A1>, int> = 0>
 [[nodiscard]] _CCCL_DEVICE _CCCL_HIDE_FROM_ABI bool __device_isless(_A1 __x, _A1 __y) noexcept
 {
   if (_CUDA_VSTD::isnan(__x) || _CUDA_VSTD::isnan(__y))
@@ -117,9 +113,7 @@ template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int
   return __x < __y;
 }
 
-template <class _A1,
-          class _A2,
-          enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1) && _CCCL_TRAIT(__is_extended_arithmetic, _A2), int> = 0>
+template <class _A1, class _A2, enable_if_t<__is_extended_arithmetic_v<_A1> && __is_extended_arithmetic_v<_A2>, int> = 0>
 [[nodiscard]] _CCCL_API inline bool isless(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
@@ -130,7 +124,7 @@ template <class _A1,
 
 // islessequal
 
-template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int> = 0>
+template <class _A1, enable_if_t<__is_extended_arithmetic_v<_A1>, int> = 0>
 [[nodiscard]] _CCCL_DEVICE _CCCL_HIDE_FROM_ABI bool __device_islessequal(_A1 __x, _A1 __y) noexcept
 {
   if (_CUDA_VSTD::isnan(__x) || _CUDA_VSTD::isnan(__y))
@@ -140,9 +134,7 @@ template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int
   return __x <= __y;
 }
 
-template <class _A1,
-          class _A2,
-          enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1) && _CCCL_TRAIT(__is_extended_arithmetic, _A2), int> = 0>
+template <class _A1, class _A2, enable_if_t<__is_extended_arithmetic_v<_A1> && __is_extended_arithmetic_v<_A2>, int> = 0>
 [[nodiscard]] _CCCL_API inline bool islessequal(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
@@ -153,7 +145,7 @@ template <class _A1,
 
 // islessgreater
 
-template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int> = 0>
+template <class _A1, enable_if_t<__is_extended_arithmetic_v<_A1>, int> = 0>
 [[nodiscard]] _CCCL_DEVICE _CCCL_HIDE_FROM_ABI bool __device_islessgreater(_A1 __x, _A1 __y) noexcept
 {
   if (_CUDA_VSTD::isnan(__x) || _CUDA_VSTD::isnan(__y))
@@ -163,9 +155,7 @@ template <class _A1, enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1), int
   return __x < __y || __x > __y;
 }
 
-template <class _A1,
-          class _A2,
-          enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1) && _CCCL_TRAIT(__is_extended_arithmetic, _A2), int> = 0>
+template <class _A1, class _A2, enable_if_t<__is_extended_arithmetic_v<_A1> && __is_extended_arithmetic_v<_A2>, int> = 0>
 [[nodiscard]] _CCCL_API inline bool islessgreater(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
@@ -176,9 +166,7 @@ template <class _A1,
 
 // isunordered
 
-template <class _A1,
-          class _A2,
-          enable_if_t<_CCCL_TRAIT(__is_extended_arithmetic, _A1) && _CCCL_TRAIT(__is_extended_arithmetic, _A2), int> = 0>
+template <class _A1, class _A2, enable_if_t<__is_extended_arithmetic_v<_A1> && __is_extended_arithmetic_v<_A2>, int> = 0>
 [[nodiscard]] _CCCL_API inline bool isunordered(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
