@@ -152,7 +152,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
-template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
+template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 [[nodiscard]] _CCCL_API inline double log(_Integer __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_LOG)
@@ -240,7 +240,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
-template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
+template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 [[nodiscard]] _CCCL_API inline double log10(_Integer __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_LOG10)
@@ -327,7 +327,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
-template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
+template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 [[nodiscard]] _CCCL_API inline int ilogb(_Integer __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_ILOGB)
@@ -413,7 +413,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
-template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
+template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 [[nodiscard]] _CCCL_API inline double log1p(_Integer __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_LOG1P)
@@ -501,7 +501,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
-template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
+template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 [[nodiscard]] _CCCL_API inline double log2(_Integer __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_LOG2)
@@ -587,7 +587,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
-template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> = 0>
+template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 [[nodiscard]] _CCCL_API inline double logb(_Integer __x) noexcept
 {
 #if defined(_CCCL_BUILTIN_LOGB)

@@ -121,8 +121,7 @@ public:
   }
 
   _CCCL_TEMPLATE(class _OtherExtents)
-  _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, extents_type, _OtherExtents)
-                   _CCCL_AND _CCCL_TRAIT(is_convertible, _OtherExtents, extents_type))
+  _CCCL_REQUIRES(is_constructible_v<extents_type, _OtherExtents> _CCCL_AND is_convertible_v<_OtherExtents, extents_type>)
   _CCCL_API constexpr mapping(const mapping<_OtherExtents>& __other) noexcept
       : __base(__other.extents())
   {
@@ -134,8 +133,8 @@ public:
   }
 
   _CCCL_TEMPLATE(class _OtherExtents)
-  _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, extents_type, _OtherExtents)
-                   _CCCL_AND(!_CCCL_TRAIT(is_convertible, _OtherExtents, extents_type)))
+  _CCCL_REQUIRES(
+    is_constructible_v<extents_type, _OtherExtents> _CCCL_AND(!is_convertible_v<_OtherExtents, extents_type>))
   _CCCL_API explicit constexpr mapping(const mapping<_OtherExtents>& __other) noexcept
       : __base(__other.extents())
   {
@@ -147,8 +146,8 @@ public:
   }
 
   _CCCL_TEMPLATE(class _OtherExtents)
-  _CCCL_REQUIRES((_OtherExtents::rank() <= 1) _CCCL_AND _CCCL_TRAIT(is_constructible, extents_type, _OtherExtents)
-                   _CCCL_AND _CCCL_TRAIT(is_convertible, _OtherExtents, extents_type))
+  _CCCL_REQUIRES((_OtherExtents::rank() <= 1) _CCCL_AND is_constructible_v<extents_type, _OtherExtents> _CCCL_AND
+                   is_convertible_v<_OtherExtents, extents_type>)
   _CCCL_API constexpr mapping(const layout_right::mapping<_OtherExtents>& __other) noexcept
       : __base(__other.extents())
   {
@@ -164,8 +163,8 @@ public:
   }
 
   _CCCL_TEMPLATE(class _OtherExtents)
-  _CCCL_REQUIRES((_OtherExtents::rank() <= 1) _CCCL_AND _CCCL_TRAIT(is_constructible, extents_type, _OtherExtents)
-                   _CCCL_AND(!_CCCL_TRAIT(is_convertible, _OtherExtents, extents_type)))
+  _CCCL_REQUIRES((_OtherExtents::rank() <= 1) _CCCL_AND is_constructible_v<extents_type, _OtherExtents> _CCCL_AND(
+    !is_convertible_v<_OtherExtents, extents_type>))
   _CCCL_API explicit constexpr mapping(const layout_right::mapping<_OtherExtents>& __other) noexcept
       : __base(__other.extents())
   {
@@ -196,7 +195,7 @@ public:
   }
 
   _CCCL_TEMPLATE(class _OtherExtents)
-  _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, extents_type, _OtherExtents) _CCCL_AND(extents_type::rank() > 0))
+  _CCCL_REQUIRES(is_constructible_v<extents_type, _OtherExtents> _CCCL_AND(extents_type::rank() > 0))
   _CCCL_API explicit constexpr mapping(const layout_stride::mapping<_OtherExtents>& __other) noexcept
       : __base(__other.extents())
   {
@@ -208,7 +207,7 @@ public:
   }
 
   _CCCL_TEMPLATE(class _OtherExtents)
-  _CCCL_REQUIRES(_CCCL_TRAIT(is_constructible, extents_type, _OtherExtents) _CCCL_AND(extents_type::rank() == 0))
+  _CCCL_REQUIRES(is_constructible_v<extents_type, _OtherExtents> _CCCL_AND(extents_type::rank() == 0))
   _CCCL_API constexpr mapping(const layout_stride::mapping<_OtherExtents>& __other) noexcept
       : __base(__other.extents())
   {}
