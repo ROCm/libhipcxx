@@ -51,11 +51,14 @@
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 // floating point helper
-_CCCL_API inline __half __constexpr_fabs(__half __x) noexcept
-{
-  return __habs(__x);
-}
-
+// <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
+// _CCCL_API inline __half __constexpr_fabs(__half __x) noexcept
+// {
+//   return __habs(__x);
+// }
+//
+// =======
+// >>>>>>> END NEW CODE (e2c8bf22d1)
 _CCCL_API inline __half __constexpr_fmax(__half __x, __half __y) noexcept
 {
   return __hmax(__x, __y);
