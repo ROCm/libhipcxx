@@ -53,7 +53,7 @@ Defined in header ``<cuda/barrier>``:
 The class template ``cuda::barrier`` is an extended form of `cuda::std::barrier <https://en.cppreference.com/w/cpp/thread/barrier>`_
 that takes an additional :ref:`cuda::thread_scope <libcudacxx-extended-api-memory-model-thread-scopes>` argument.
 
-If ``!(scope == thread_block_scope && __isShared(this))``, then the semantics are the same as
+If ``!(scope == cuda::thread_block_scope && cuda::device::is_address_from(this, cuda::device::address_space::shared))``, then the semantics are the same as
 `cuda::std::barrier <https://en.cppreference.com/w/cpp/thread/barrier>`_, otherwise, see below.
 
 The ``cuda::barrier`` class template extends ``cuda::std::barrier`` with the following additional operations:
@@ -71,7 +71,7 @@ The ``cuda::barrier`` class template extends ``cuda::std::barrier`` with the fol
    * - :ref:`cuda::device::barrier_expect_tx <libcudacxx-extended-api-synchronization-barrier-barrier-expect-tx>`
      - Update transaction count of ``cuda::barrier<cuda::thread_scope_block>``.
 
-If ``scope == thread_scope_block && __isShared(this)``, then the semantics of `[thread.barrier.class] <http://eel.is/c++draft/thread.barrier.class>`_
+If ``scope == cuda::thread_scope_block && cuda::device::is_address_from(this, cuda::device::address_space::shared)``, then the semantics of `[thread.barrier.class] <http://eel.is/c++draft/thread.barrier.class>`_
 of ISO/IEC IS 14882 (the C++ Standard) are modified as follows:
 
 .. pull-quote::
