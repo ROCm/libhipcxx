@@ -33,7 +33,7 @@
 // UNSUPPORTED: nvrtc
 // UNSUPPORTED: hiprtc
 
-// cuda::mr::resource_ref equality
+// cuda::mr::synchronous_resource_ref equality
 
 #include <cuda/memory_resource>
 #include <cuda/std/cassert>
@@ -41,16 +41,16 @@
 
 #include "types.h"
 
-using ref = cuda::mr::resource_ref<cuda::mr::host_accessible,
-                                   property_with_value<int>,
-                                   property_with_value<double>,
-                                   property_without_value<std::size_t>>;
+using ref = cuda::mr::synchronous_resource_ref<cuda::mr::host_accessible,
+                                               property_with_value<int>,
+                                               property_with_value<double>,
+                                               property_without_value<std::size_t>>;
 
 using pertubed_properties =
-  cuda::mr::resource_ref<cuda::mr::host_accessible,
-                         property_with_value<double>,
-                         property_with_value<int>,
-                         property_without_value<std::size_t>>;
+  cuda::mr::synchronous_resource_ref<cuda::mr::host_accessible,
+                                     property_with_value<double>,
+                                     property_with_value<int>,
+                                     property_without_value<std::size_t>>;
 
 using res = resource<cuda::mr::host_accessible,
                      property_with_value<int>,
