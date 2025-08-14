@@ -59,7 +59,7 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA
+_CCCL_BEGIN_NAMESPACE_CUDA
 
 template <typename _Tp, typename _Property>
 class annotated_ptr : private ::cuda::__annotated_ptr_base<_Property>
@@ -240,7 +240,7 @@ _CCCL_API inline void memcpy_async(
 }
 #endif // !_CCCL_HIP_COMPILER
 
-_LIBCUDACXX_END_NAMESPACE_CUDA
+_CCCL_END_NAMESPACE_CUDA
 
 #include <cuda/std/__cccl/epilogue.h>
 
