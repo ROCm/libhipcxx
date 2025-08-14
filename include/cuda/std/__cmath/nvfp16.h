@@ -48,7 +48,7 @@
 
 #  include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // floating point helper
 // <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
@@ -64,7 +64,7 @@ _CCCL_API inline __half __constexpr_fmax(__half __x, __half __y) noexcept
   return __hmax(__x, __y);
 }
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #  include <cuda/std/__cccl/epilogue.h>
 

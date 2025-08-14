@@ -63,7 +63,7 @@
 
 _CCCL_BEGIN_NV_DIAG_SUPPRESS(1384) // warning: pointer converted to bool
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // common_reference
 
@@ -275,7 +275,7 @@ template <class...>
 struct common_reference
 {};
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 _CCCL_END_NV_DIAG_SUPPRESS()
 

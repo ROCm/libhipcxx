@@ -46,7 +46,7 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 enum class __atomic_tag
 {
@@ -115,7 +115,7 @@ _CCCL_HOST_DEVICE inline int __atomic_memcmp(void const* __lhs, void const* __rh
   _CCCL_UNREACHABLE();
 }
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #include <cuda/std/__cccl/epilogue.h>
 

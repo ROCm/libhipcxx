@@ -61,7 +61,7 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 template <class _Extents>
 class layout_right::mapping : private __mdspan_ebco<_Extents>
@@ -317,7 +317,7 @@ public:
 #endif // _CCCL_STD_VER <= 2017
 };
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #include <cuda/std/__cccl/epilogue.h>
 
