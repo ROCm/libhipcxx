@@ -384,7 +384,7 @@ long double    truncl(long double x);
 
 #include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 #if !_CCCL_COMPILER(NVRTC)  && !defined(_CCCL_COMPILER_HIPRTC)
 
@@ -712,23 +712,27 @@ _CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX _Tp __constexpr_scalbn(_Tp __x, i
 }
 #endif // !_CCCL_COMPILER(MSVC)
 
-#if defined(_CCCL_COMPILER_HIPCC) && defined(_LIBCUDACXX_HAS_NVFP16)
-template <>
-_LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX14_COMPLEX __half __constexpr_scalbn(__half __x, int __exp)
-{
-  return __float2half(scalbn(__half2float(__x), __exp));
-}
-#endif
-
-#if defined(_CCCL_COMPILER_HIPCC) && defined(_LIBCUDACXX_HAS_NVBF16)
-template <>
-_LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX14_COMPLEX __nv_bfloat16 __constexpr_scalbn(__nv_bfloat16 __x, int __exp)
-{
-  return __float2bfloat16(scalbn(__bfloat162float(__x), __exp));
-}
-#endif
-
-_LIBCUDACXX_END_NAMESPACE_STD
+# <<<<<<< OLD CODE from ba8f6d689a (ec71ee891a) - COMMENTED OUT
+# #if defined(_CCCL_COMPILER_HIPCC) && defined(_LIBCUDACXX_HAS_NVFP16)
+# template <>
+# _LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX14_COMPLEX __half __constexpr_scalbn(__half __x, int __exp)
+# {
+#   return __float2half(scalbn(__half2float(__x), __exp));
+# }
+# #endif
+#
+# #if defined(_CCCL_COMPILER_HIPCC) && defined(_LIBCUDACXX_HAS_NVBF16)
+# template <>
+# _LIBCUDACXX_HIDE_FROM_ABI _CCCL_CONSTEXPR_CXX14_COMPLEX __nv_bfloat16 __constexpr_scalbn(__nv_bfloat16 __x, int __exp)
+# {
+#   return __float2bfloat16(scalbn(__bfloat162float(__x), __exp));
+# }
+# #endif
+#
+# _LIBCUDACXX_END_NAMESPACE_STD
+# =======
+_CCCL_END_NAMESPACE_CUDA_STD
+# >>>>>>> END NEW CODE (ec71ee891a)
 
 #include <cuda/std/__cccl/epilogue.h>
 

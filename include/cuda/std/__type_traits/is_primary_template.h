@@ -57,7 +57,7 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 #if _CCCL_COMPILER(MSVC)
 
@@ -134,7 +134,7 @@ using __select_traits =
 
 #endif // !_CCCL_COMPILER(NVRTC)
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #include <cuda/std/__cccl/epilogue.h>
 

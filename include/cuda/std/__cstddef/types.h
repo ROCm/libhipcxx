@@ -60,7 +60,7 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 #if _CCCL_COMPILER(NVRTC)
 using max_align_t = long double;
@@ -73,7 +73,7 @@ using nullptr_t = decltype(nullptr);
 using ::ptrdiff_t;
 using ::size_t;
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #include <cuda/std/__cccl/epilogue.h>
 
