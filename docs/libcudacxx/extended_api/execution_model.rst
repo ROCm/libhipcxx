@@ -147,8 +147,8 @@ The implementation may assume that any device thread will eventually do one of t
     The following examples refer to the itemized sub-clauses of the implementation assumptions for host and device threads above
     using "host.threads.<id>" and "device.threads.<id>", respectively.
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.Device.0
         // Outcome: grid eventually terminates per device.threads.4 because the atomic object does not have automatic storage duration.
@@ -160,8 +160,8 @@ The implementation may assume that any device thread will eventually do one of t
             }
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.Device.1
         // Allowed outcome: No thread makes progress because device threads don't support host.threads.2.
@@ -169,8 +169,8 @@ The implementation may assume that any device thread will eventually do one of t
             while(true) cuda::std::this_thread::yield();
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.Device.2
         // Allowed outcome: No thread makes progress because device threads don't support host.threads.4
@@ -180,8 +180,8 @@ The implementation may assume that any device thread will eventually do one of t
             while(True);
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.Device.3
         // Allowed outcome: No thread makes progress because device threads don't support host.threads.5
@@ -191,8 +191,8 @@ The implementation may assume that any device thread will eventually do one of t
             while(True.load());
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.Device.4
         // Allowed outcome: No thread makes progress because device threads don't support host.thread.6.
@@ -230,8 +230,8 @@ return ``hipErrorNotReady`` without a device thread making progress.
    .. dropdown:: Examples of CUDA API forward progress guarantees.
 .. dropdown:: Examples of HIP API forward progress guarantees.
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.API.1
         // Outcome: if no other device threads (e.g., from other processes) are making progress,
@@ -248,8 +248,8 @@ return ``hipErrorNotReady`` without a device thread making progress.
             return (int)hipDeviceSynchronize();
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.API.2
         // Allowed outcome: eventually, no thread makes progress.
@@ -265,8 +265,8 @@ return ``hipErrorNotReady`` without a device thread making progress.
             return hipDeviceSynchronize();
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.API.3
         // Allowed outcome: eventually, no thread makes progress.
@@ -282,8 +282,8 @@ return ``hipErrorNotReady`` without a device thread making progress.
             return hipDeviceSynchronize();
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.API.4
         // Outcome: terminates.
@@ -317,8 +317,8 @@ A device thread shall not start until all its dependencies have completed.
    .. dropdown:: Examples of CUDA API forward progress guarantees due to dependencies
 .. dropdown:: Examples of HIP API forward progress guarantees due to dependencies
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.Stream.0
         // Allowed outcome: eventually, no thread makes progress.
@@ -340,8 +340,8 @@ A device thread shall not start until all its dependencies have completed.
             return hipDeviceSynchronize();
         }
 
-    .. code:: cuda
-       :number-lines:
+    .. code-block:: cuda
+        :linenos:
 
         // Example: Execution.Model.Stream.1
         // Outcome: terminates.
