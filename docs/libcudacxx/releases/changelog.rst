@@ -128,7 +128,7 @@ based on Docker to improve testing and coverage.
 
 Supported ABI Versions: 4 (default), 3, and 2.
 
-.. _new-features-1:
+.. _libcudacxx-new-features-1:
 
 New Features
 ~~~~~~~~~~~~
@@ -200,7 +200,7 @@ for both host and device code.
 
 Supported ABI Versions: 4 (default), 3, and 2.
 
-.. _new-features-2:
+.. _libcudacxx-new-features-2:
 
 New Features
 ~~~~~~~~~~~~
@@ -240,7 +240,7 @@ singular API for host and device code.
 
 Supported ABI Versions: 4 (default), 3, and 2.
 
-.. _new-features-3:
+.. _libcudacxx-new-features-3:
 
 New Features
 ~~~~~~~~~~~~
@@ -331,7 +331,7 @@ Supported ABI Versions: 3 (default) and 2.
 
 Included in: CUDA Toolkit 11.4.
 
-.. _new-features-4:
+.. _libcudacxx-new-features-4:
 
 New Features
 ~~~~~~~~~~~~
@@ -384,7 +384,7 @@ C++17 ``<cuda/std/type_traits>`` features to C++14.
 
 Supported ABI versions: 3 (default) and 2.
 
-.. _new-features-5:
+.. _libcudacxx-new-features-5:
 
 New Features
 ~~~~~~~~~~~~
@@ -403,7 +403,9 @@ New Features
 
 -  #76: C++20 ``cuda::std::is_constant_evaluated`` backported to C++11.
 
-.. _other-enhancements-1:
+   -  Thanks to Jake Hemstad and Paul Taylor for this contribution.
+
+.. _libcudacxx-other-enhancements-1:
 
 Other Enhancements
 ~~~~~~~~~~~~~~~~~~
@@ -439,7 +441,7 @@ Supported ABI versions: 3 (default) and 2.
 
 Included in: CUDA Toolkit 11.2.
 
-.. _new-features-6:
+.. _libcudacxx-new-features-6:
 
 New Features
 ~~~~~~~~~~~~
@@ -450,7 +452,7 @@ New Features
    heterogeneous values. The only ``<cuda/std/utility>`` facilities
    supported are ``cuda::std::pair``. Not supported with NVCC + MSVC.
 
-.. _other-enhancements-2:
+.. _libcudacxx-other-enhancements-2:
 
 Other Enhancements
 ~~~~~~~~~~~~~~~~~~
@@ -489,7 +491,7 @@ ABI Breaking Changes
    1.1.0 / CUDA 11.0 release. Both ABI version 3 and ABI version 2 will
    be supported until the next major CUDA release.
 
-.. _new-features-7:
+.. _libcudacxx-new-features-7:
 
 New Features
 ~~~~~~~~~~~~
@@ -506,7 +508,7 @@ New Features
    ABI version. ``_LIBCUDACXX_CUDA_ABI_VERSION_LATEST`` is set to the
    latest ABI version, which is always the default.
 
-.. _other-enhancements-3:
+.. _libcudacxx-other-enhancements-3:
 
 Other Enhancements
 ~~~~~~~~~~~~~~~~~~
@@ -551,7 +553,7 @@ API Breaking Changes
    not support them and on this platform the CUDA driver rejects
    binaries containing these operations.
 
-.. _new-features-8:
+.. _libcudacxx-new-features-8:
 
 New Features
 ~~~~~~~~~~~~
@@ -573,7 +575,7 @@ New Features
    ``cuda::std::function``, ``cuda::std::bind``, ``cuda::std::hash``,
    and ``cuda::std::reference_wrapper`` are omitted.
 
-.. _other-enhancements-4:
+.. _libcudacxx-other-enhancements-4:
 
 Other Enhancements
 ~~~~~~~~~~~~~~~~~~
@@ -606,7 +608,7 @@ Supported ABI versions: 1.
 
 Included in: CUDA Toolkit 10.2.
 
-.. _new-features-9:
+.. _libcudacxx-new-features-9:
 
 New Features
 ~~~~~~~~~~~~
