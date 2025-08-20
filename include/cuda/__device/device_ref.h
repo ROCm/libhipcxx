@@ -147,13 +147,17 @@ public:
 
 #ifndef _CCCL_HIP_COMPILER
     // For some reason there is no separate name query in CUDA runtime
-    _CUDA_DRIVER::__deviceGetName(__name.data(), __max_name_length, get());
-#else
-    // HIP uses runtime API to get device name
-    cudaDeviceProp __prop;
-    _CCCL_TRY_CUDA_API(::cudaGetDeviceProperties, "Failed to get device properties", &__prop, get());
-    __name = __prop.name;
-#endif
+// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
+//     _CUDA_DRIVER::__deviceGetName(__name.data(), __max_name_length, get());
+// #else
+//     // HIP uses runtime API to get device name
+//     cudaDeviceProp __prop;
+//     _CCCL_TRY_CUDA_API(::cudaGetDeviceProperties, "Failed to get device properties", &__prop, get());
+//     __name = __prop.name;
+// #endif
+// =======
+    ::cuda::__driver::__deviceGetName(__name.data(), __max_name_length, get());
+// >>>>>>> END NEW CODE (752febcc68)
     return __name;
   }
 
