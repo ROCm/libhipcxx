@@ -53,7 +53,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 _CCCL_API inline void __cccl_thread_yield() {}
 
-_CCCL_API inline void __cccl_thread_sleep_for(_CUDA_VSTD::chrono::nanoseconds __ns)
+_CCCL_API inline void __cccl_thread_sleep_for(::cuda::std::chrono::nanoseconds __ns)
 {
   #ifdef __HIP_DEVICE_COMPILE__
 // FIXME(HIP): Due to a lack of a clock rate-independent nanosleep ISA instruction on AMD GPUs,
