@@ -147,149 +147,153 @@ struct __numbers<__half>
 {
   static _CCCL_API constexpr __half __e() noexcept
   {
-# <<<<<<< OLD CODE from 8feaa3a149 (c75f819baf) - COMMENTED OUT
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x4170u};
-#   }
-#   static _CCCL_API constexpr __half __log2e() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x3dc5u};
-#   }
-#   static _CCCL_API constexpr __half __log10e() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x36f3u};
-#   }
-#   static _CCCL_API constexpr __half __pi() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x4248u};
-#   }
-#   static _CCCL_API constexpr __half __inv_pi() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x3518u};
-#   }
-#   static _CCCL_API constexpr __half __inv_sqrtpi() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x3883u};
-#   }
-#   static _CCCL_API constexpr __half __ln2() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x398cu};
-#   }
-#   static _CCCL_API constexpr __half __ln10() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x409bu};
-#   }
-#   static _CCCL_API constexpr __half __sqrt2() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x3da8u};
-#   }
-#   static _CCCL_API constexpr __half __sqrt3() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x3eeeu};
-#   }
-#   static _CCCL_API constexpr __half __inv_sqrt3() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x389eu};
-#   }
-#   static _CCCL_API constexpr __half __egamma() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x389eu};
-#   }
-#   static _CCCL_API constexpr __half __phi() noexcept
-#   {
-#     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
-#     // This WAR is necessary as otherwise the data member will be active and the
-#     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
-#     return __half_raw{.x = 0x3e79u};
-#   }
-# };
-# #  endif // LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
-# #endif // _LIBCUDACXX_HAS_NVFP16()
+# <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
+# # <<<<<<< OLD CODE from 8feaa3a149 (c75f819baf) - COMMENTED OUT
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x4170u};
+# #   }
+# #   static _CCCL_API constexpr __half __log2e() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x3dc5u};
+# #   }
+# #   static _CCCL_API constexpr __half __log10e() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x36f3u};
+# #   }
+# #   static _CCCL_API constexpr __half __pi() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x4248u};
+# #   }
+# #   static _CCCL_API constexpr __half __inv_pi() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x3518u};
+# #   }
+# #   static _CCCL_API constexpr __half __inv_sqrtpi() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x3883u};
+# #   }
+# #   static _CCCL_API constexpr __half __ln2() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x398cu};
+# #   }
+# #   static _CCCL_API constexpr __half __ln10() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x409bu};
+# #   }
+# #   static _CCCL_API constexpr __half __sqrt2() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x3da8u};
+# #   }
+# #   static _CCCL_API constexpr __half __sqrt3() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x3eeeu};
+# #   }
+# #   static _CCCL_API constexpr __half __inv_sqrt3() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x389eu};
+# #   }
+# #   static _CCCL_API constexpr __half __egamma() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x389eu};
+# #   }
+# #   static _CCCL_API constexpr __half __phi() noexcept
+# #   {
+# #     // TODO(HIP/AMD): remove this WAR once __half_raw has only the x member
+# #     // This WAR is necessary as otherwise the data member will be active and the
+# #     // passed value will be interpreted as a FLOAT16 instead of an unsigned int
+# #     return __half_raw{.x = 0x3e79u};
+# #   }
+# # };
+# # #  endif // LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
+# # #endif // _LIBCUDACXX_HAS_NVFP16()
+# # =======
+#     return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x4170u});
 # =======
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x4170u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x4170u});
+# >>>>>>> END NEW CODE (752febcc68)
   }
   static _CCCL_API constexpr __half __log2e() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3dc5u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3dc5u});
   }
   static _CCCL_API constexpr __half __log10e() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x36f3u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x36f3u});
   }
   static _CCCL_API constexpr __half __pi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x4248u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x4248u});
   }
   static _CCCL_API constexpr __half __inv_pi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3518u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3518u});
   }
   static _CCCL_API constexpr __half __inv_sqrtpi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3883u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3883u});
   }
   static _CCCL_API constexpr __half __ln2() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x398cu});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x398cu});
   }
   static _CCCL_API constexpr __half __ln10() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x409bu});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x409bu});
   }
   static _CCCL_API constexpr __half __sqrt2() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3da8u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3da8u});
   }
   static _CCCL_API constexpr __half __sqrt3() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3eeeu});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3eeeu});
   }
   static _CCCL_API constexpr __half __inv_sqrt3() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x389eu});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x389eu});
   }
   static _CCCL_API constexpr __half __egamma() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x389eu});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x389eu});
   }
   static _CCCL_API constexpr __half __phi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3e79u});
+    return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3e79u});
   }
 };
 #endif // _CCCL_HAS_NVFP16()
@@ -301,55 +305,55 @@ struct __numbers<__nv_bfloat16>
 {
   static _CCCL_API constexpr __nv_bfloat16 __e() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x402eu});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x402eu});
   }
   static _CCCL_API constexpr __nv_bfloat16 __log2e() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fb9u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fb9u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __log10e() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3edeu});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3edeu});
   }
   static _CCCL_API constexpr __nv_bfloat16 __pi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x4049u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x4049u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __inv_pi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3ea3u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3ea3u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __inv_sqrtpi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f10u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f10u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __ln2() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f31u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f31u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __ln10() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x4013u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x4013u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __sqrt2() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fb5u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fb5u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __sqrt3() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fdeu});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fdeu});
   }
   static _CCCL_API constexpr __nv_bfloat16 __inv_sqrt3() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f14u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f14u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __egamma() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f14u});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3f14u});
   }
   static _CCCL_API constexpr __nv_bfloat16 __phi() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fcfu});
+    return ::cuda::std::__fp_from_storage<__nv_bfloat16>(__fp_storage_of_t<__nv_bfloat16>{0x3fcfu});
   }
 };
 #endif // _CCCL_HAS_NVBF16()

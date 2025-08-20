@@ -66,7 +66,7 @@ template <class _Tp>
 [[nodiscard]] _CCCL_API constexpr bool __isnan_impl(_Tp __x) noexcept
 {
   static_assert(is_floating_point_v<_Tp>, "Only standard floating-point types are supported");
-  if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
+  if (!::cuda::std::__cccl_default_is_constant_evaluated())
   {
     return ::isnan(__x);
   }
@@ -78,7 +78,7 @@ template <class _Tp>
 #if defined(_CCCL_BUILTIN_ISNAN)
   return _CCCL_BUILTIN_ISNAN(__x);
 #else // ^^^ _CCCL_BUILTIN_ISNAN ^^^ / vvv !_CCCL_BUILTIN_ISNAN vvv
-  return _CUDA_VSTD::__isnan_impl(__x);
+  return ::cuda::std::__isnan_impl(__x);
 #endif // ^^^ !_CCCL_BUILTIN_ISNAN ^^^
 }
 
@@ -87,7 +87,7 @@ template <class _Tp>
 #if defined(_CCCL_BUILTIN_ISNAN)
   return _CCCL_BUILTIN_ISNAN(__x);
 #else // ^^^ _CCCL_BUILTIN_ISNAN ^^^ / vvv !_CCCL_BUILTIN_ISNAN vvv
-  return _CUDA_VSTD::__isnan_impl(__x);
+  return ::cuda::std::__isnan_impl(__x);
 #endif // ^^^ !_CCCL_BUILTIN_ISNAN ^^^
 }
 
@@ -97,7 +97,7 @@ template <class _Tp>
 #  if defined(_CCCL_BUILTIN_ISNAN)
   return _CCCL_BUILTIN_ISNAN(__x);
 #  else // ^^^ _CCCL_BUILTIN_ISNAN ^^^ / vvv !_CCCL_BUILTIN_ISNAN vvv
-  return _CUDA_VSTD::__isnan_impl(__x);
+  return ::cuda::std::__isnan_impl(__x);
 #  endif // ^^^ !_CCCL_BUILTIN_ISNAN ^^^
 }
 #endif // _CCCL_HAS_LONG_DOUBLE()
@@ -106,13 +106,13 @@ template <class _Tp>
 [[nodiscard]] _CCCL_API constexpr bool isnan(__half __x) noexcept
 {
 #  if _LIBCUDACXX_HAS_NVFP16()
-  if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
+  if (!::cuda::std::__cccl_default_is_constant_evaluated())
   {
     return ::__hisnan(__x);
   }
 #  endif // _LIBCUDACXX_HAS_NVFP16()
 
-  const auto __storage = _CUDA_VSTD::__fp_get_storage(__x);
+  const auto __storage = ::cuda::std::__fp_get_storage(__x);
   return ((__storage & __fp_exp_mask_of_v<__half>) == __fp_exp_mask_of_v<__half>)
       && (__storage & __fp_mant_mask_of_v<__half>);
 }
@@ -122,13 +122,13 @@ template <class _Tp>
 [[nodiscard]] _CCCL_API constexpr bool isnan(__nv_bfloat16 __x) noexcept
 {
 #  if _LIBCUDACXX_HAS_NVFP16()
-  if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
+  if (!::cuda::std::__cccl_default_is_constant_evaluated())
   {
     return ::__hisnan(__x);
   }
 #  endif // _LIBCUDACXX_HAS_NVFP16()
 
-  const auto __storage = _CUDA_VSTD::__fp_get_storage(__x);
+  const auto __storage = ::cuda::std::__fp_get_storage(__x);
   return ((__storage & __fp_exp_mask_of_v<__nv_bfloat16>) == __fp_exp_mask_of_v<__nv_bfloat16>)
       && (__storage & __fp_mant_mask_of_v<__nv_bfloat16>);
 }
@@ -183,7 +183,7 @@ template <class _Tp>
 #  if defined(_CCCL_BUILTIN_ISNAN)
   return _CCCL_BUILTIN_ISNAN(__x);
 #  else // ^^^ _CCCL_BUILTIN_ISNAN ^^^ / vvv !_CCCL_BUILTIN_ISNAN vvv
-  return _CUDA_VSTD::__isnan_impl(__x);
+  return ::cuda::std::__isnan_impl(__x);
 #  endif // ^^^ !_CCCL_BUILTIN_ISNAN ^^^
 }
 #endif // _CCCL_HAS_FLOAT128()
