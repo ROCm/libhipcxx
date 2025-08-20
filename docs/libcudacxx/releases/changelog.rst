@@ -26,10 +26,13 @@
 Changelog
 =========
 
-This page documents the release history of libhipcxx, including new features, API changes, and bug fixes for each version.
+.. warning::
+    This changelog is no longer maintained since Thrust was merged into the CCCL project.
+    For the latest changes, see the release notes for each CCCL release
+    on `GitHub <https://github.com/NVIDIA/cccl/releases>`_.
 
-libhipcxx 2.1.0
----------------
+libcu++ 2.1.0
+-------------
 
 Adds ``<cuda/std/span>``, ``<cuda/std/mdspan>``, and
 ``<cuda/std/concepts>`` to libhipcxx.
