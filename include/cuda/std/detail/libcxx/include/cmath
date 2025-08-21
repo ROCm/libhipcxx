@@ -369,19 +369,22 @@ long double    truncl(long double x);
 #include <cuda/std/type_traits>
 #include <cuda/std/version>
 
-#if _LIBCUDACXX_HAS_NVFP16()
-#  include <cuda/std/__cmath/nvfp16.h>
-#endif // _LIBCUDACXX_HAS_NVFP16()
-
-#if _LIBCUDACXX_HAS_NVBF16()
-#  include <cuda/std/__cmath/nvbf16.h>
-#endif // _LIBCUDACXX_HAS_NVBF16()
-
-# <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-# #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# #  define INFINITY _CUDA_VSTD::numeric_limits<float>::infinity()
-# #  define NAN      _CUDA_VSTD::numeric_limits<float>::quiet_NaN()
+# <<<<<<< OLD CODE from 3bedf395d7 (2e263a57a7) - COMMENTED OUT
+# #if _LIBCUDACXX_HAS_NVFP16()
+# #  include <cuda/std/__cmath/nvfp16.h>
+# #endif // _LIBCUDACXX_HAS_NVFP16()
+#
+# #if _LIBCUDACXX_HAS_NVBF16()
+# #  include <cuda/std/__cmath/nvbf16.h>
+# #endif // _LIBCUDACXX_HAS_NVBF16()
+#
+# # <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
+# # #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+# # #  define INFINITY _CUDA_VSTD::numeric_limits<float>::infinity()
+# # #  define NAN      _CUDA_VSTD::numeric_limits<float>::quiet_NaN()
+# # =======
 # =======
+# >>>>>>> END NEW CODE (2e263a57a7)
 #if _CCCL_COMPILER(NVRTC)
 #  define INFINITY ::cuda::std::numeric_limits<float>::infinity()
 #  define NAN      ::cuda::std::numeric_limits<float>::quiet_NaN()
@@ -420,152 +423,156 @@ using ::nanl;
 #  define _CCCL_CONSTEXPR_CXX14_COMPLEX
 #endif // !_LIBCUDACXX_HAS_CONSTEXPR_COMPLEX_OPERATIONS()
 
-#if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-template <class _A1>
-# <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
-# # <<<<<<< OLD CODE from d0ad88c268 (0dbc63ad98) - COMMENTED OUT
-# # _CCCL_API inline _A1 __constexpr_copysign(_A1 __x, _A1 __y) noexcept
+# <<<<<<< OLD CODE from 3bedf395d7 (2e263a57a7) - COMMENTED OUT
+# #if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+# template <class _A1>
+# # <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
+# # # <<<<<<< OLD CODE from d0ad88c268 (0dbc63ad98) - COMMENTED OUT
+# # # _CCCL_API inline _A1 __constexpr_copysign(_A1 __x, _A1 __y) noexcept
+# # # {
+# # #   return ::copysign(__x, __y);
+# # # }
+# # # #else
+# # # _CCCL_API constexpr float __constexpr_copysign(float __x, float __y) noexcept
+# # # {
+# # #   return __builtin_copysignf(__x, __y);
+# # # }
+# # #
+# # # _CCCL_API constexpr double __constexpr_copysign(double __x, double __y) noexcept
+# # # {
+# # #   return __builtin_copysign(__x, __y);
+# # # }
+# # #
+# # # #  if _CCCL_HAS_LONG_DOUBLE()
+# # # _CCCL_API constexpr long double __constexpr_copysign(long double __x, long double __y) noexcept
+# # # {
+# # #   return __builtin_copysignl(__x, __y);
+# # # }
+# # # #  endif // _CCCL_HAS_LONG_DOUBLE()
+# # #
+# # # template <class _A1, class _A2>
+# # # _CCCL_API constexpr enable_if_t<is_arithmetic<_A1>::value && is_arithmetic<_A2>::value, __promote_t<_A1, _A2>>
+# # # __constexpr_copysign(_A1 __x, _A2 __y) noexcept
+# # # {
+# # #   using __result_type = __promote_t<_A1, _A2>;
+# # #   static_assert((!(_IsSame<_A1, __result_type>::value && _IsSame<_A2, __result_type>::value)), "");
+# # #   return __builtin_copysign((__result_type) __x, (__result_type) __y);
+# # # }
+# # # #endif // !_CCCL_COMPILER(MSVC)
+# # #
+# # # #if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+# # # template <class _A1>
+# # # =======
+# # # >>>>>>> END NEW CODE (0dbc63ad98)
+# # _CCCL_API inline _A1 __constexpr_fabs(_A1 __x) noexcept
 # # {
-# #   return ::copysign(__x, __y);
+# #   return ::fabs(__x);
 # # }
 # # #else
-# # _CCCL_API constexpr float __constexpr_copysign(float __x, float __y) noexcept
+# # _CCCL_API constexpr float __constexpr_fabs(float __x) noexcept
 # # {
-# #   return __builtin_copysignf(__x, __y);
+# #   return __builtin_fabsf(__x);
 # # }
 # #
-# # _CCCL_API constexpr double __constexpr_copysign(double __x, double __y) noexcept
+# # _CCCL_API constexpr double __constexpr_fabs(double __x) noexcept
 # # {
-# #   return __builtin_copysign(__x, __y);
+# #   return __builtin_fabs(__x);
 # # }
 # #
 # # #  if _CCCL_HAS_LONG_DOUBLE()
-# # _CCCL_API constexpr long double __constexpr_copysign(long double __x, long double __y) noexcept
+# # _CCCL_API constexpr long double __constexpr_fabs(long double __x) noexcept
 # # {
-# #   return __builtin_copysignl(__x, __y);
+# #   return __builtin_fabsl(__x);
 # # }
 # # #  endif // _CCCL_HAS_LONG_DOUBLE()
 # #
-# # template <class _A1, class _A2>
-# # _CCCL_API constexpr enable_if_t<is_arithmetic<_A1>::value && is_arithmetic<_A2>::value, __promote_t<_A1, _A2>>
-# # __constexpr_copysign(_A1 __x, _A2 __y) noexcept
+# # template <class _Tp, enable_if_t<is_integral<_Tp>::value, int> = 0>
+# # _CCCL_API constexpr double __constexpr_fabs(_Tp __x) noexcept
 # # {
-# #   using __result_type = __promote_t<_A1, _A2>;
-# #   static_assert((!(_IsSame<_A1, __result_type>::value && _IsSame<_A2, __result_type>::value)), "");
-# #   return __builtin_copysign((__result_type) __x, (__result_type) __y);
+# #   return __builtin_fabs(static_cast<double>(__x));
 # # }
 # # #endif // !_CCCL_COMPILER(MSVC)
 # #
 # # #if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 # # template <class _A1>
 # # =======
-# # >>>>>>> END NEW CODE (0dbc63ad98)
-# _CCCL_API inline _A1 __constexpr_fabs(_A1 __x) noexcept
+# # >>>>>>> END NEW CODE (e2c8bf22d1)
+# _CCCL_API inline _A1 __constexpr_fmax(_A1 __x, _A1 __y) noexcept
 # {
-#   return ::fabs(__x);
+#   return ::fmax(__x, __y);
 # }
 # #else
-# _CCCL_API constexpr float __constexpr_fabs(float __x) noexcept
+# _CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX float __constexpr_fmax(float __x, float __y) noexcept
 # {
-#   return __builtin_fabsf(__x);
+# #  if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED) && _LIBCUDACXX_HAS_CONSTEXPR_COMPLEX_OPERATIONS()
+#   if (_CCCL_BUILTIN_IS_CONSTANT_EVALUATED())
+#   {
+#     if (::cuda::std::isnan(__x))
+#     {
+#       return __y;
+#     }
+#     if (::cuda::std::isnan(__y))
+#     {
+#       return __x;
+#     }
+#     return __x < __y ? __y : __x;
+#   }
+# #  endif // defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
+#   return __builtin_fmaxf(__x, __y);
 # }
 #
-# _CCCL_API constexpr double __constexpr_fabs(double __x) noexcept
+# _CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX double __constexpr_fmax(double __x, double __y) noexcept
 # {
-#   return __builtin_fabs(__x);
+# #  if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED) && _LIBCUDACXX_HAS_CONSTEXPR_COMPLEX_OPERATIONS()
+#   if (_CCCL_BUILTIN_IS_CONSTANT_EVALUATED())
+#   {
+#     if (::cuda::std::isnan(__x))
+#     {
+#       return __y;
+#     }
+#     if (::cuda::std::isnan(__y))
+#     {
+#       return __x;
+#     }
+#     return __x < __y ? __y : __x;
+#   }
+# #  endif // defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
+#   return __builtin_fmax(__x, __y);
 # }
 #
 # #  if _CCCL_HAS_LONG_DOUBLE()
-# _CCCL_API constexpr long double __constexpr_fabs(long double __x) noexcept
+# _CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX long double __constexpr_fmax(long double __x, long double __y) noexcept
 # {
-#   return __builtin_fabsl(__x);
+# #    if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED) && _LIBCUDACXX_HAS_CONSTEXPR_COMPLEX_OPERATIONS()
+#   if (_CCCL_BUILTIN_IS_CONSTANT_EVALUATED())
+#   {
+#     if (::cuda::std::isnan(__x))
+#     {
+#       return __y;
+#     }
+#     if (::cuda::std::isnan(__y))
+#     {
+#       return __x;
+#     }
+#     return __x < __y ? __y : __x;
+#   }
+# #    endif // defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
+#   return __builtin_fmax(__x, __y);
 # }
 # #  endif // _CCCL_HAS_LONG_DOUBLE()
 #
-# template <class _Tp, enable_if_t<is_integral<_Tp>::value, int> = 0>
-# _CCCL_API constexpr double __constexpr_fabs(_Tp __x) noexcept
+# template <class _Tp, class _Up, enable_if_t<is_arithmetic<_Tp>::value && is_arithmetic<_Up>::value, int> = 0>
+# _CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX __promote_t<_Tp, _Up> __constexpr_fmax(_Tp __x, _Up __y) noexcept
 # {
-#   return __builtin_fabs(static_cast<double>(__x));
+#   using __result_type = __promote_t<_Tp, _Up>;
+#   return ::cuda::std::__constexpr_fmax(static_cast<__result_type>(__x), static_cast<__result_type>(__y));
 # }
 # #endif // !_CCCL_COMPILER(MSVC)
 #
-# #if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# template <class _A1>
+# #if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_COMPILER_HIPRTC)
 # =======
-# >>>>>>> END NEW CODE (e2c8bf22d1)
-_CCCL_API inline _A1 __constexpr_fmax(_A1 __x, _A1 __y) noexcept
-{
-  return ::fmax(__x, __y);
-}
-#else
-_CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX float __constexpr_fmax(float __x, float __y) noexcept
-{
-#  if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED) && _LIBCUDACXX_HAS_CONSTEXPR_COMPLEX_OPERATIONS()
-  if (_CCCL_BUILTIN_IS_CONSTANT_EVALUATED())
-  {
-    if (::cuda::std::isnan(__x))
-    {
-      return __y;
-    }
-    if (::cuda::std::isnan(__y))
-    {
-      return __x;
-    }
-    return __x < __y ? __y : __x;
-  }
-#  endif // defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
-  return __builtin_fmaxf(__x, __y);
-}
-
-_CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX double __constexpr_fmax(double __x, double __y) noexcept
-{
-#  if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED) && _LIBCUDACXX_HAS_CONSTEXPR_COMPLEX_OPERATIONS()
-  if (_CCCL_BUILTIN_IS_CONSTANT_EVALUATED())
-  {
-    if (::cuda::std::isnan(__x))
-    {
-      return __y;
-    }
-    if (::cuda::std::isnan(__y))
-    {
-      return __x;
-    }
-    return __x < __y ? __y : __x;
-  }
-#  endif // defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
-  return __builtin_fmax(__x, __y);
-}
-
-#  if _CCCL_HAS_LONG_DOUBLE()
-_CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX long double __constexpr_fmax(long double __x, long double __y) noexcept
-{
-#    if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED) && _LIBCUDACXX_HAS_CONSTEXPR_COMPLEX_OPERATIONS()
-  if (_CCCL_BUILTIN_IS_CONSTANT_EVALUATED())
-  {
-    if (::cuda::std::isnan(__x))
-    {
-      return __y;
-    }
-    if (::cuda::std::isnan(__y))
-    {
-      return __x;
-    }
-    return __x < __y ? __y : __x;
-  }
-#    endif // defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
-  return __builtin_fmax(__x, __y);
-}
-#  endif // _CCCL_HAS_LONG_DOUBLE()
-
-template <class _Tp, class _Up, enable_if_t<is_arithmetic<_Tp>::value && is_arithmetic<_Up>::value, int> = 0>
-_CCCL_API inline _CCCL_CONSTEXPR_CXX14_COMPLEX __promote_t<_Tp, _Up> __constexpr_fmax(_Tp __x, _Up __y) noexcept
-{
-  using __result_type = __promote_t<_Tp, _Up>;
-  return ::cuda::std::__constexpr_fmax(static_cast<__result_type>(__x), static_cast<__result_type>(__y));
-}
-#endif // !_CCCL_COMPILER(MSVC)
-
-#if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_COMPILER(MSVC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG)
+# >>>>>>> END NEW CODE (2e263a57a7)
 template <class _A1>
 _CCCL_API inline _A1 __constexpr_logb(_A1 __x)
 {
