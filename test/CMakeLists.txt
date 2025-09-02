@@ -56,11 +56,20 @@ else()
   set(headertest_warning_levels_host -Wall -Werror)
 endif()
 
-# Libcudacxx auto-generated internal header tests
-add_subdirectory(internal_headers)
+# <<<<<<< OLD CODE from 90c10be92c (98b11f3297) - COMMENTED OUT
+# # Libcudacxx auto-generated internal header tests
+# add_subdirectory(internal_headers)
+#
+# # Libcudacxx auto-generated public header tests
+# add_subdirectory(public_headers)
+#
+# # Libcudacxx auto-generated public header as std tests
+# add_subdirectory(public_headers_host_only)
+# =======
+# Enable building the nvrtcc project if NVRTC is enabled
+if (LIBCUDACXX_TEST_WITH_NVRTC)
+  add_subdirectory(utils/nvidia/nvrtc)
+endif()
 
-# Libcudacxx auto-generated public header tests
-add_subdirectory(public_headers)
-
-# Libcudacxx auto-generated public header as std tests
-add_subdirectory(public_headers_host_only)
+add_subdirectory(atomic_codegen)
+# >>>>>>> END NEW CODE (98b11f3297)
