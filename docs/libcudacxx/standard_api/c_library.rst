@@ -30,6 +30,13 @@
 C Library
 =========
 
+.. toctree::
+   :hidden:
+   :maxdepth: 1
+
+   c_library/cstring
+
+
 Any Standard C++ header not listed below is omitted.
 
 .. list-table::
@@ -91,7 +98,7 @@ Any Standard C++ header not listed below is omitted.
      - libhipcxx 2.7
      - `\<cstdlib\> <https://en.cppreference.com/w/cpp/header/cstdlib>`_
 
-   * - ``<cuda/std/cstring>``
+   * - :ref:`\<cuda/std/cstring\> <libcudacxx-standard-api-cstring>`
      - Provides array manipulation functions such as ``memcpy``, ``memset`` and ``memcmp``
      - libhipcxx 3.0
      - `\<cstring\> <https://en.cppreference.com/w/cpp/header/cstring>`_
