@@ -40,6 +40,7 @@ This section documents the extended API provided by libhipcxx, covering bit mani
    extended_api/thread_groups
    extended_api/synchronization_primitives
    extended_api/functional
+   extended_api/iterators
    extended_api/type_traits
    extended_api/numeric
    extended_api/memory
