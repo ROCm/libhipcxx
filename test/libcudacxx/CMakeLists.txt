@@ -35,19 +35,26 @@ if (LIBCUDACXX_ENABLE_CUDA)
 
   set(LIBCUDACXX_HIGHEST_COMPUTE_ARCH 90)
 
-  foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
-    set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
-    set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
-  endforeach ()
-
-  message(STATUS "Enabled CUDA architectures:${_compute_message}")
-
-elseif(LIBCUDACXX_ENABLE_HIP)
-
-  # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
-  if (NOT LIBCUDACXX_COMPUTE_ARCHS)
-    set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
-  endif()
+# <<<<<<< OLD CODE from 6def8aee26 (1789a7554e) - COMMENTED OUT
+#   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
+#     set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
+#     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
+#   endforeach ()
+#
+#   message(STATUS "Enabled CUDA architectures:${_compute_message}")
+#
+# elseif(LIBCUDACXX_ENABLE_HIP)
+#
+#   # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
+#   if (NOT LIBCUDACXX_COMPUTE_ARCHS)
+#     set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
+#   endif()
+# =======
+foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
+  set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
+  set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
+endforeach ()
+# >>>>>>> END NEW CODE (1789a7554e)
 
   # Separate the architectures with a space
   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
