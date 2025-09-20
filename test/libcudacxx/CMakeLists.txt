@@ -81,14 +81,23 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "True")
   # Use the NVRTCC utility to run the built test outputs
   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
-elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
-  # TODO: Use project properties to get path to binary.
-  # Should also set up dependency on the project when NVRTC is enabled
-  set(CMAKE_CUDA_COMPILER_ID "HIPCC")
-  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
-  message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
-  set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
-  set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
+# <<<<<<< OLD CODE from f1c3a9dfff (6ea2021a22) - COMMENTED OUT
+# elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
+#   # TODO: Use project properties to get path to binary.
+#   # Should also set up dependency on the project when NVRTC is enabled
+#   set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+#   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
+#   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
+#   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
+#   set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
+# =======
+  # Enable 128-bit types for NVRTC
+  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-int128")
+  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-float128")
+else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
+  set(LIBCUDACXX_FORCE_INCLUDE "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include.h")
+  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CUDA_COMPILER}")
+# >>>>>>> END NEW CODE (6ea2021a22)
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
   set(LIBCUDACXX_FORCE_INCLUDE "")
   set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${HIP_INCLUDE_DIR}'")
