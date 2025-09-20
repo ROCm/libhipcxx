@@ -891,8 +891,13 @@ class Configuration(object):
         compute_archs = self.get_lit_conf("compute_archs")
         if self.cxx.type == "nvrtcc":
             self.config.available_features.add("nvrtc")
-        if self.cxx.type == 'hiprtcc':
-            self.config.available_features.add("hiprtc")
+# <<<<<<< OLD CODE from f1c3a9dfff (6ea2021a22) - COMMENTED OUT
+#         if self.cxx.type == 'hiprtcc':
+#             self.config.available_features.add("hiprtc")
+# =======
+            self.cxx.compile_flags += ["-device-int128"]
+            self.cxx.compile_flags += ["-device-float128"]
+# >>>>>>> END NEW CODE (6ea2021a22)
         if self.cxx.type == "nvcc":
             self.cxx.compile_flags += ["--extended-lambda"]
         real_arch_format = "-gencode=arch=compute_{0},code=sm_{0}"
