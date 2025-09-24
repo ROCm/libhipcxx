@@ -45,6 +45,7 @@
 
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
 #  include <cuda/__driver/driver_api.h>
+#  include <cuda/__runtime/types.h>
 #  include <cuda/std/__cuda/api_wrapper.h>
 
 #  include <string>
@@ -133,6 +134,14 @@ public:
   [[nodiscard]] auto attribute() const
   {
     return attribute(__detail::__dev_attr<_Attr>());
+  }
+
+  //! @brief Retrieve the memory location of this device
+  //!
+  //! @return The memory location of this device
+  [[nodiscard]] operator memory_location() const noexcept
+  {
+    return memory_location{::cudaMemLocationTypeDevice, get()};
   }
 
   //! @brief Retrieve string with the name of this device.
