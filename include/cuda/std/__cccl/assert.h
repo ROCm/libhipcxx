@@ -93,24 +93,42 @@
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) _STL_VERIFY(expression, message)
 #else // ^^^ MSVC, HIPCC, WIN32 ^^^ / vvv !MSVC STL, HIPCC (Linux/glibc) vvv
 #  ifdef NDEBUG
-// Reintroduce the __assert_fail declaration
+// Reintroduce the __assert_fail / __assert_rtn declaration
 extern "C" {
 #    if !_CCCL_CUDA_COMPILER(CLANG) && !defined(_CCCL_COMPILER_HIPCC) && !defined(_CCCL_COMPILER_HIPRTC)
 _CCCL_HOST_DEVICE
 #    endif // !_CCCL_CUDA_COMPILER(CLANG)
-  void
-  __assert_fail(const char* __assertion, const char* __file, unsigned int __line, const char* __function) noexcept
+#    if _CCCL_OS(APPLE)
+void __assert_rtn(const char* __function, const char* __assertion, const char* __file, unsigned int __line) noexcept
   __attribute__((__noreturn__));
+#    else // ^^^ _CCCL_OS(APPLE) ^^^ / vvv !_CCCL_OS(APPLE) ^^^
+void __assert_fail(const char* __assertion, const char* __file, unsigned int __line, const char* __function) noexcept
+  __attribute__((__noreturn__));
+#    endif // !_CCCL_OS(APPLE)
 }
 #  endif // NDEBUG
-#  define _CCCL_ASSERT_IMPL_HOST(expression, message)      \
-    _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
-    ? (void) 0 : __assert_fail(message, __FILE__, __LINE__, __func__)
-#endif // !MSVC STL, HIPCC (Linux/glibc)
+// <<<<<<< OLD CODE from e013e2deca (5253cfc280) - COMMENTED OUT
+// #  define _CCCL_ASSERT_IMPL_HOST(expression, message)      \
+//     _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
+//     ? (void) 0 : __assert_fail(message, __FILE__, __LINE__, __func__)
+// #endif // !MSVC STL, HIPCC (Linux/glibc)
+// =======
+
+#  if _CCCL_OS(APPLE)
+#    define _CCCL_ASSERT_IMPL_HOST(expression, message)      \
+      _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
+      ? (void) 0 : __assert_rtn(__func__, __FILE__, __LINE__, __message__)
+#  else // ^^^ _CCCL_OS(APPLE) ^^^ / vvv !_CCCL_OS(APPLE) ^^^
+#    define _CCCL_ASSERT_IMPL_HOST(expression, message)      \
+      _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
+      ? (void) 0 : __assert_fail(message, __FILE__, __LINE__, __func__)
+#  endif // !_CCCL_OS(APPLE)
+#endif // !MSVC STL
+// >>>>>>> END NEW CODE (5253cfc280)
 
 //! Use custom implementations with nvcc on device and the host ones with clang-cuda and nvhpc
 //! _CCCL_ASSERT_IMPL_DEVICE should never be used directly
-#if _CCCL_OS(QNX)
+#if _CCCL_OS(QNX) || _CCCL_OS(APPLE)
 #  define _CCCL_ASSERT_IMPL_DEVICE(expression, message) ((void) 0)
 #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 // NOTE(HIP/AMD): Use _wassert on Windows, __assertfail on Linux
