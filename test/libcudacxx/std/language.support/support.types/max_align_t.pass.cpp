@@ -25,8 +25,12 @@
 // // THE SOFTWARE.
 // =======
 // cuda::std::pod is deprecated in C++20
-// ADDITIONAL_COMPILE_DEFINITIONS: _LIBCUDACXX_DISABLE_DEPRECATION_WARNINGS
-// >>>>>>> END NEW CODE (8c9e7d41da)
+// <<<<<<< OLD CODE from 13416251e7 (9ca02126a0) - COMMENTED OUT
+// // ADDITIONAL_COMPILE_DEFINITIONS: _LIBCUDACXX_DISABLE_DEPRECATION_WARNINGS
+// // >>>>>>> END NEW CODE (8c9e7d41da)
+// =======
+// ADDITIONAL_COMPILE_DEFINITIONS: CCCL_IGNORE_DEPRECATED_API
+// >>>>>>> END NEW CODE (9ca02126a0)
 
 #include <cuda/std/cstddef>
 #include <cuda/std/type_traits>
