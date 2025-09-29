@@ -51,11 +51,11 @@
 #include <cuda/__type_traits/is_floating_point.h>
 #include <cuda/std/__cmath/isnan.h>
 #include <cuda/std/__concepts/concept_macros.h>
-#include <cuda/std/__floating_point/fp.h>
+#include <cuda/std/__type_traits/conditional.h>
 #include <cuda/std/__type_traits/is_extended_arithmetic.h>
 #include <cuda/std/__type_traits/is_integral.h>
+#include <cuda/std/__type_traits/is_same.h>
 #include <cuda/std/__type_traits/promote.h>
-#include <cuda/std/limits>
 
 #include <nv/target>
 
@@ -70,6 +70,10 @@
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
+
+/***********************************************************************************************************************
+ * fmax
+ **********************************************************************************************************************/
 
 // We do explicitly also enable GCC here, because that makes the condition below simpler
 #if _CCCL_CHECK_BUILTIN(builtin_fmax) || _CCCL_COMPILER(GCC)
@@ -98,13 +102,12 @@ _CCCL_REQUIRES(is_floating_point_v<_Tp>)
 #  define _CCCL_USE_BUILTIN_FMAX() 0
 #endif // _CCCL_BUILTIN_FABSF
 
-// fmax
 _CCCL_TEMPLATE(class _Tp)
 _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
 [[nodiscard]] _CCCL_API constexpr conditional_t<is_integral_v<_Tp>, double, _Tp> fmax(_Tp __x, _Tp __y) noexcept
 {
 #if _CCCL_HAS_NVFP16()
-  if constexpr (is_same_v<_Tp, __half>)
+  if constexpr (is_same_v<_Tp, ::__half>)
   {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
     return ::__hmax(__x, __y);
@@ -117,7 +120,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
   else
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-    if constexpr (is_same_v<_Tp, __nv_bfloat16>)
+    if constexpr (is_same_v<_Tp, ::__nv_bfloat16>)
   {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
     return ::__hmax(__x, __y);
@@ -135,17 +138,27 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
     }
     else
     {
-#if _CCCL_USE_BUILTIN_FMAX()
       if (!::cuda::std::__cccl_default_is_constant_evaluated())
       {
+#if _CCCL_HAS_FLOAT128()
+        if constexpr (is_same_v<_Tp, __float128>)
+        {
+          NV_IF_TARGET(NV_PROVIDES_SM_100, (return ::__nv_fp128_fmax(__x, __y);))
+        }
+        else
+#endif // _CCCL_HAS_FLOAT128()
+#if _CCCL_USE_BUILTIN_FMAX()
+          if constexpr (is_floating_point_v<_Tp>)
+        {
 // GCC builtins do not treat NaN properly
 #  if _CCCL_COMPILER(GCC)
-        NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::std::__with_builtin_fmax(__x, __y);))
+          NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::std::__with_builtin_fmax(__x, __y);))
 #  else // ^^^ _CCCL_COMPILER(GCC) ^^^ / vvv !_CCCL_COMPILER(GCC)
-        return ::cuda::std::__with_builtin_fmax(__x, __y);
+          return ::cuda::std::__with_builtin_fmax(__x, __y);
 #  endif // !_CCCL_COMPILER(GCC)
-      }
+        }
 #endif // _CCCL_USE_BUILTIN_FMAX
+      }
       if (::cuda::std::isnan(__x))
       {
         return __y;
@@ -154,7 +167,10 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
       {
         return __x;
       }
-      return __x < __y ? __y : __x;
+      else
+      {
+        return __x < __y ? __y : __x;
+      }
     }
 }
 
@@ -179,7 +195,9 @@ _CCCL_REQUIRES(::cuda::is_floating_point_v<_Tp> _CCCL_AND ::cuda::is_floating_po
   return ::cuda::std::fmax(static_cast<__result_type>(__x), static_cast<__result_type>(__y));
 }
 
-// fmin
+/***********************************************************************************************************************
+ * fmin
+ **********************************************************************************************************************/
 
 // We do explicitly also enable GCC here, because that makes the condition below simpler
 #if _CCCL_CHECK_BUILTIN(builtin_fmin) || _CCCL_COMPILER(GCC)
@@ -213,7 +231,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
 [[nodiscard]] _CCCL_API constexpr conditional_t<is_integral_v<_Tp>, double, _Tp> fmin(_Tp __x, _Tp __y) noexcept
 {
 #if _CCCL_HAS_NVFP16()
-  if constexpr (is_same_v<_Tp, __half>)
+  if constexpr (is_same_v<_Tp, ::__half>)
   {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
     return ::__hmin(__x, __y);
@@ -226,7 +244,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
   else
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-    if constexpr (is_same_v<_Tp, __nv_bfloat16>)
+    if constexpr (is_same_v<_Tp, ::__nv_bfloat16>)
   {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
     return ::__hmin(__x, __y);
@@ -244,17 +262,26 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
     }
     else
     {
-#if _CCCL_USE_BUILTIN_FMAX()
       if (!::cuda::std::__cccl_default_is_constant_evaluated())
       {
+#if _CCCL_HAS_FLOAT128()
+        if constexpr (is_same_v<_Tp, __float128>)
+        {
+          NV_IF_TARGET(NV_PROVIDES_SM_100, (return ::__nv_fp128_fmin(__x, __y);))
+        }
+#endif // _CCCL_HAS_FLOAT128()
+#if _CCCL_USE_BUILTIN_FMAX()
+        if constexpr (is_floating_point_v<_Tp>)
+        {
 // GCC builtins do not treat NaN properly
 #  if _CCCL_COMPILER(GCC)
-        NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::std::__with_builtin_fmin(__x, __y);))
+          NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::std::__with_builtin_fmin(__x, __y);))
 #  else // ^^^ _CCCL_COMPILER(GCC) ^^^ / vvv !_CCCL_COMPILER(GCC)
-        return ::cuda::std::__with_builtin_fmin(__x, __y);
+          return ::cuda::std::__with_builtin_fmin(__x, __y);
 #  endif // !_CCCL_COMPILER(GCC)
-      }
+        }
 #endif // _CCCL_USE_BUILTIN_FMAX
+      }
       if (::cuda::std::isnan(__x))
       {
         return __y;
