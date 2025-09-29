@@ -48,16 +48,22 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/std/__bit/popcount.h>
 #include <cuda/std/__concepts/concept_macros.h>
 #include <cuda/std/__floating_point/fp.h>
 #include <cuda/std/__type_traits/is_constant_evaluated.h>
+#include <cuda/std/__type_traits/is_floating_point.h>
 #include <cuda/std/__type_traits/is_integral.h>
 
-// MSVC and clang cuda need the host side functions included
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// <<<<<<< OLD CODE from 3e6217018d (6610f61628) - COMMENTED OUT
+// // MSVC and clang cuda need the host side functions included
+// #if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// #  include <math.h>
+// #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// =======
+#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || !_CCCL_CUDA_COMPILATION()
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || !_CCCL_CUDA_COMPILATION()
+// >>>>>>> END NEW CODE (6610f61628)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -185,10 +191,16 @@ template <class _Tp>
 #if _CCCL_HAS_FLOAT128()
 [[nodiscard]] _CCCL_API constexpr bool isnan(__float128 __x) noexcept
 {
+  // __builtin_isnan is not efficient for __float128, prefer __nv_fp128_isnan at run-time
+  if (!::cuda::std::__cccl_default_is_constant_evaluated())
+  {
+    NV_IF_TARGET(NV_PROVIDES_SM_100, (return ::__nv_fp128_isnan(__x);)) // preserve NaN behavior even with optimization
+                                                                        // flags
+  }
 #  if defined(_CCCL_BUILTIN_ISNAN)
   return _CCCL_BUILTIN_ISNAN(__x);
 #  else // ^^^ _CCCL_BUILTIN_ISNAN ^^^ / vvv !_CCCL_BUILTIN_ISNAN vvv
-  return ::cuda::std::__isnan_impl(__x);
+  return __x != __x;
 #  endif // ^^^ !_CCCL_BUILTIN_ISNAN ^^^
 }
 #endif // _CCCL_HAS_FLOAT128()
