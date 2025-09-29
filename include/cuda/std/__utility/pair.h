@@ -307,7 +307,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
   template <class... _Args1, class... _Args2>
   _CCCL_API inline _CCCL_CONSTEXPR_CXX20
   pair(piecewise_construct_t __pc, tuple<_Args1...> __first_args, tuple<_Args2...> __second_args) noexcept(
-    (is_nothrow_constructible<_T1, _Args1...>::value && is_nothrow_constructible<_T2, _Args2...>::value))
+    (is_nothrow_constructible_v<_T1, _Args1...> && is_nothrow_constructible_v<_T2, _Args2...>) )
       : __base(__pc,
                __first_args,
                __second_args,
@@ -424,8 +424,13 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
   }
 
   // std assignments
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-  template <class _UT1 = _T1, enable_if_t<is_copy_assignable<_UT1>::value && is_copy_assignable<_T2>::value, int> = 0>
+// <<<<<<< OLD CODE from 9a9957e3d3 (c10ee27461) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+//   template <class _UT1 = _T1, enable_if_t<is_copy_assignable<_UT1>::value && is_copy_assignable<_T2>::value, int> = 0>
+// =======
+#if !_CCCL_COMPILER(NVRTC)
+  template <class _UT1 = _T1, enable_if_t<is_copy_assignable_v<_UT1> && is_copy_assignable_v<_T2>, int> = 0>
+// >>>>>>> END NEW CODE (c10ee27461)
   _CCCL_HOST constexpr pair& operator=(::std::pair<_T1, _T2> const& __p) noexcept(
     is_nothrow_copy_assignable_v<_T1> && is_nothrow_copy_assignable_v<_T2>)
   {
@@ -434,7 +439,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     return *this;
   }
 
-  template <class _UT1 = _T1, enable_if_t<is_move_assignable<_UT1>::value && is_move_assignable<_T2>::value, int> = 0>
+  template <class _UT1 = _T1, enable_if_t<is_move_assignable_v<_UT1> && is_move_assignable_v<_T2>, int> = 0>
   _CCCL_HOST constexpr pair& operator=(::std::pair<_T1, _T2>&& __p) noexcept(
     is_nothrow_copy_assignable_v<_T1> && is_nothrow_copy_assignable_v<_T2>)
   {
@@ -527,7 +532,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
 #endif // _CCCL_STD_VER >= 2023
 
   _CCCL_API inline _CCCL_CONSTEXPR_CXX20 void
-  swap(pair& __p) noexcept(__is_nothrow_swappable<_T1>::value && __is_nothrow_swappable<_T2>::value)
+  swap(pair& __p) noexcept(is_nothrow_swappable_v<_T1> && is_nothrow_swappable_v<_T2>)
   {
     using ::cuda::std::swap;
     swap(this->first, __p.first);
@@ -536,7 +541,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
 
 #if _CCCL_STD_VER >= 2023
   _CCCL_API constexpr void swap(const pair& __p) const
-    noexcept(__is_nothrow_swappable<const _T1>::value && __is_nothrow_swappable<const _T2>::value)
+    noexcept(is_nothrow_swappable_v<const _T1> && is_nothrow_swappable_v<const _T2>)
   {
     using ::cuda::std::swap;
     swap(this->first, __p.first);
@@ -636,16 +641,15 @@ struct common_type<pair<_T1, _T2>, pair<_U1, _U2>>
 #endif // _CCCL_STD_VER >= 2023
 
 template <class _T1, class _T2>
-_CCCL_API inline _CCCL_CONSTEXPR_CXX20 enable_if_t<__is_swappable<_T1>::value && __is_swappable<_T2>::value, void>
-swap(pair<_T1, _T2>& __x,
-     pair<_T1, _T2>& __y) noexcept((__is_nothrow_swappable<_T1>::value && __is_nothrow_swappable<_T2>::value))
+_CCCL_API inline _CCCL_CONSTEXPR_CXX20 enable_if_t<is_nothrow_swappable_v<_T1> && is_nothrow_swappable_v<_T2>, void>
+swap(pair<_T1, _T2>& __x, pair<_T1, _T2>& __y) noexcept((is_nothrow_swappable_v<_T1> && is_nothrow_swappable_v<_T2>) )
 {
   __x.swap(__y);
 }
 
 #if _CCCL_STD_VER >= 2023
 template <class _T1, class _T2>
-  requires(__is_swappable<const _T1>::value && __is_swappable<const _T2>::value)
+  requires(is_nothrow_swappable_v<const _T1> && is_nothrow_swappable_v<const _T2>)
 _CCCL_API constexpr void swap(const pair<_T1, _T2>& __x, const pair<_T1, _T2>& __y) noexcept(noexcept(__x.swap(__y)))
 {
   __x.swap(__y);
