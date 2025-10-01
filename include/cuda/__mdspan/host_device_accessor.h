@@ -48,6 +48,7 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/__driver/driver_api.h>
 #include <cuda/__memory/address_space.h>
 #include <cuda/std/__concepts/concept_macros.h>
 #include <cuda/std/__cuda/api_wrapper.h>
@@ -139,10 +140,11 @@ class __host_accessor : public _Accessor
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
 // >>>>>>> END NEW CODE (752febcc68)
     {
-      ::cudaPointerAttributes __ptr_attrib{};
       auto __p1 = ::cuda::std::to_address(__p);
-      _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
-      return __ptr_attrib.hostPointer != nullptr || __ptr_attrib.type == ::cudaMemoryTypeUnregistered;
+      ::CUmemorytype __type{};
+      const auto __status =
+        ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __p1);
+      return (__status != ::cudaSuccess) || __type == ::CU_MEMORYTYPE_HOST;
     }
     else
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
@@ -260,10 +262,11 @@ class __device_accessor : public _Accessor
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
 // >>>>>>> END NEW CODE (752febcc68)
     {
-      ::cudaPointerAttributes __ptr_attrib{};
       auto __p1 = ::cuda::std::to_address(__p);
-      _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
-      return __ptr_attrib.devicePointer != nullptr || __ptr_attrib.type == ::cudaMemoryTypeUnregistered;
+      ::CUmemorytype __type{};
+      const auto __status =
+        ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __p1);
+      return (__status != ::cudaSuccess) || __type == ::CU_MEMORYTYPE_DEVICE;
     }
     else
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
@@ -394,19 +397,27 @@ class __managed_accessor : public _Accessor
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
 // >>>>>>> END NEW CODE (752febcc68)
     {
-      ::cudaPointerAttributes __ptr_attrib{};
-      auto __p1 = ::cuda::std::to_address(__p);
-      _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
-      // NOTE(HIP/AMD): the upstream "devicePointer == hostPointer" heuristic
-      // works on HIP too — hipMallocManaged() populates both pointers to the
-      // same address, plain hipMalloc() leaves hostPointer null, and
-      // unregistered host memory leaves both null. The only HIP-specific gap
-      // is that __managed__ global variables are currently never reported as
-      // managed by HIP's hipPointerGetAttributes() (they show up with both
-      // pointers null), so they can't be used with cuda::managed_mdspan on
-      // HIP until that is fixed in the HIP runtime. See WAR-18 in
-      // CHANGELOG_v3.1.md.
-      return __ptr_attrib.devicePointer != nullptr && __ptr_attrib.hostPointer == __ptr_attrib.devicePointer;
+// <<<<<<< OLD CODE from f041471af3 (70d9c084ec) - COMMENTED OUT
+//       ::cudaPointerAttributes __ptr_attrib{};
+//       auto __p1 = ::cuda::std::to_address(__p);
+//       _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
+//       // NOTE(HIP/AMD): the upstream "devicePointer == hostPointer" heuristic
+//       // works on HIP too — hipMallocManaged() populates both pointers to the
+//       // same address, plain hipMalloc() leaves hostPointer null, and
+//       // unregistered host memory leaves both null. The only HIP-specific gap
+//       // is that __managed__ global variables are currently never reported as
+//       // managed by HIP's hipPointerGetAttributes() (they show up with both
+//       // pointers null), so they can't be used with cuda::managed_mdspan on
+//       // HIP until that is fixed in the HIP runtime. See WAR-18 in
+//       // CHANGELOG_v3.1.md.
+//       return __ptr_attrib.devicePointer != nullptr && __ptr_attrib.hostPointer == __ptr_attrib.devicePointer;
+// =======
+      const auto __p1 = ::cuda::std::to_address(__p);
+      bool __is_managed{};
+      const auto __status =
+        ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_IS_MANAGED>(__is_managed, __p1);
+      return (__status != ::cudaSuccess) || __is_managed;
+// >>>>>>> END NEW CODE (70d9c084ec)
     }
     else
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
