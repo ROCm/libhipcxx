@@ -43,11 +43,17 @@
 #  pragma system_header
 #endif // no system header
 
-#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+// <<<<<<< OLD CODE from cf89579d84 (d4218e3403) - COMMENTED OUT
+// #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+// =======
+#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+
+// >>>>>>> END NEW CODE (d4218e3403)
 #  include <cuda/__driver/driver_api.h>
 #  include <cuda/__runtime/types.h>
+#  include <cuda/std/span>
+#  include <cuda/std/string_view>
 
-#  include <string>
 #  include <vector>
 
 #  include <cuda/std/__cccl/prologue.h>
@@ -143,29 +149,34 @@ public:
     return memory_location{::cudaMemLocationTypeDevice, get()};
   }
 
-  //! @brief Retrieve string with the name of this device.
+  //! @brief Retrieve the name of this device.
   //!
-  //! @return String containing the name of this device.
-  [[nodiscard]] ::std::string name() const
-  {
-    constexpr int __max_name_length = 256;
-    ::std::string __name(256, 0);
-
-#ifndef _CCCL_HIP_COMPILER
-    // For some reason there is no separate name query in CUDA runtime
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-//     _CUDA_DRIVER::__deviceGetName(__name.data(), __max_name_length, get());
-// #else
-//     // HIP uses runtime API to get device name
-//     cudaDeviceProp __prop;
-//     _CCCL_TRY_CUDA_API(::cudaGetDeviceProperties, "Failed to get device properties", &__prop, get());
-//     __name = __prop.name;
-// #endif
+// <<<<<<< OLD CODE from cf89579d84 (d4218e3403) - COMMENTED OUT
+//   //! @return String containing the name of this device.
+//   [[nodiscard]] ::std::string name() const
+//   {
+//     constexpr int __max_name_length = 256;
+//     ::std::string __name(256, 0);
+//
+// #ifndef _CCCL_HIP_COMPILER
+//     // For some reason there is no separate name query in CUDA runtime
+// // <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
+// //     _CUDA_DRIVER::__deviceGetName(__name.data(), __max_name_length, get());
+// // #else
+// //     // HIP uses runtime API to get device name
+// //     cudaDeviceProp __prop;
+// //     _CCCL_TRY_CUDA_API(::cudaGetDeviceProperties, "Failed to get device properties", &__prop, get());
+// //     __name = __prop.name;
+// // #endif
+// // =======
+//     ::cuda::__driver::__deviceGetName(__name.data(), __max_name_length, get());
+// // >>>>>>> END NEW CODE (752febcc68)
+//     return __name;
+//   }
 // =======
-    ::cuda::__driver::__deviceGetName(__name.data(), __max_name_length, get());
-// >>>>>>> END NEW CODE (752febcc68)
-    return __name;
-  }
+  //! @return String view containing the name of this device.
+  [[nodiscard]] ::cuda::std::string_view name() const;
+// >>>>>>> END NEW CODE (d4218e3403)
 
   //! @brief Queries if its possible for this device to directly access specified device's memory.
   //!
@@ -193,13 +204,12 @@ public:
   // TODO we might want to include the calling device, depends on what we decide
   // peer access APIs
 
-  //! @brief Retrieve a vector of `device_ref`s that are peers of this device
+  //! @brief Retrieve `device_ref`s that are peers of this device
   //!
-  //! The device on which this API is called is not included in the vector,
-  //! if a full group of peer devices is needed, it needs to be pushed_back separately.
+  //! The device on which this API is called is not included in the vector.
   //!
   //! @throws cuda_error if any peer access query fails
-  ::std::vector<device_ref> peer_devices() const;
+  [[nodiscard]] ::cuda::std::span<const device_ref> peers() const;
 };
 
 _CCCL_END_NAMESPACE_CUDA
