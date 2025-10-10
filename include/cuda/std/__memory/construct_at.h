@@ -72,8 +72,13 @@
 #endif // _CCCL_CUDA_COMPILER(CLANG)
 
 #if _CCCL_STD_VER >= 2020 // need to backfill ::std::construct_at
-#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#    include <memory>
+// <<<<<<< OLD CODE from 49a0439bc0 (32b9595a12) - COMMENTED OUT
+// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #    include <memory>
+// =======
+#  if !_CCCL_COMPILER(NVRTC)
+#    include <cuda/std/__cccl/memory_wrapper.h>
+// >>>>>>> END NEW CODE (32b9595a12)
 #  endif // _CCCL_COMPILER(NVRTC)
 
 // NOTE(HIP/AMD): HIPRTC requires explicit std::construct_at fallback definition.
