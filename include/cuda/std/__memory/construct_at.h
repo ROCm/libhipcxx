@@ -72,14 +72,18 @@
 #endif // _CCCL_CUDA_COMPILER(CLANG)
 
 #if _CCCL_STD_VER >= 2020 // need to backfill ::std::construct_at
-// <<<<<<< OLD CODE from 49a0439bc0 (32b9595a12) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #    include <memory>
+// <<<<<<< OLD CODE from 9dd87113c9 (c52e23b41f) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 49a0439bc0 (32b9595a12) - COMMENTED OUT
+// // #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// // #    include <memory>
+// // =======
+// #  if !_CCCL_COMPILER(NVRTC)
+// #    include <cuda/std/__cccl/memory_wrapper.h>
+// // >>>>>>> END NEW CODE (32b9595a12)
+// #  endif // _CCCL_COMPILER(NVRTC)
 // =======
-#  if !_CCCL_COMPILER(NVRTC)
-#    include <cuda/std/__cccl/memory_wrapper.h>
-// >>>>>>> END NEW CODE (32b9595a12)
-#  endif // _CCCL_COMPILER(NVRTC)
+#  include <cuda/std/__cccl/memory_wrapper.h>
+// >>>>>>> END NEW CODE (c52e23b41f)
 
 // NOTE(HIP/AMD): HIPRTC requires explicit std::construct_at fallback definition.
 // The __cpp_lib_constexpr_dynamic_alloc macro may be defined by system headers

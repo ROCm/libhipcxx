@@ -56,14 +56,20 @@
 #include <cuda/std/__utility/forward.h>
 #include <cuda/std/cstddef>
 
-// <<<<<<< OLD CODE from 49a0439bc0 (32b9595a12) - COMMENTED OUT
-// #if defined(_CCCL_HAS_CONSTEXPR_ALLOCATION) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  include <memory>
+// <<<<<<< OLD CODE from 9dd87113c9 (c52e23b41f) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 49a0439bc0 (32b9595a12) - COMMENTED OUT
+// // #if defined(_CCCL_HAS_CONSTEXPR_ALLOCATION) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// // #  include <memory>
+// // =======
+// #if defined(_CCCL_HAS_CONSTEXPR_ALLOCATION) && !_CCCL_COMPILER(NVRTC)
+// #  include <cuda/std/__cccl/memory_wrapper.h>
+// // >>>>>>> END NEW CODE (32b9595a12)
+// #endif // _CCCL_HAS_CONSTEXPR_ALLOCATION && !_CCCL_COMPILER(NVRTC)
 // =======
-#if defined(_CCCL_HAS_CONSTEXPR_ALLOCATION) && !_CCCL_COMPILER(NVRTC)
+#ifdef _CCCL_HAS_CONSTEXPR_ALLOCATION
 #  include <cuda/std/__cccl/memory_wrapper.h>
-// >>>>>>> END NEW CODE (32b9595a12)
-#endif // _CCCL_HAS_CONSTEXPR_ALLOCATION && !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HAS_CONSTEXPR_ALLOCATION
+// >>>>>>> END NEW CODE (c52e23b41f)
 
 #include <cuda/std/__cccl/prologue.h>
 
