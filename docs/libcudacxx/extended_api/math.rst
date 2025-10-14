@@ -46,6 +46,7 @@ This page covers the math extended API, providing integer arithmetic utilities i
    math/neg
    math/uabs
    math/fast_mod_div
+   math/mul_hi
 
 .. list-table::
    :widths: 25 45 30
@@ -115,3 +116,8 @@ This page covers the math extended API, providing integer arithmetic utilities i
      - Fast Modulo/Division
      - CCCL 3.1.0
      - CUDA 13.1
+
+   * - :ref:`mul_hi <libcudacxx-extended-api-math-mul-hi>`
+     - Most significant half of the product
+     - CCCL 3.2.0
+     - CUDA 13.2
