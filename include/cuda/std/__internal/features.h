@@ -98,9 +98,12 @@
 #  define _LIBCUDACXX_HAS_NVBF16() 0
 #endif // _CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2)
 
-// NVCC does not have a way of silencing non '_' prefixed UDLs
-#if !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPCC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  define _LIBCUDACXX_HAS_STL_LITERALS
-#endif // !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC)
-
+// <<<<<<< OLD CODE from befceb921c (2a2be284cb) - COMMENTED OUT
+// // NVCC does not have a way of silencing non '_' prefixed UDLs
+// #if !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPCC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  define _LIBCUDACXX_HAS_STL_LITERALS
+// #endif // !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC)
+//
+// =======
+// >>>>>>> END NEW CODE (2a2be284cb)
 #endif // _CUDA_STD___INTERNAL_FEATURES_H
