@@ -434,6 +434,7 @@ int main(int, char**)
   }
 #if TEST_CUDA_COMPILER(NVCC) || defined(TEST_COMPILER_HIPCC) || defined(__HIPCC__)
   { // extended lambda
+#  if _CCCL_CUDACC_AT_LEAST(12, 3)
     NV_IF_TARGET(
       NV_IS_DEVICE,
       (test_lambda<int>([] __host__ __device__() -> int {
@@ -445,6 +446,7 @@ int main(int, char**)
        test_lambda<SD>([] __host__ __device__() -> SD {
          return {};
        });))
+#  endif // _CCCL_CUDACC_AT_LEAST(12, 3)
     test_lambda<double>(cuda::proclaim_return_type<double>([] __device__() -> double {
       return 42.0;
     }));
