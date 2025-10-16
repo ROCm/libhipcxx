@@ -54,16 +54,23 @@
 #include <cuda/std/__type_traits/is_floating_point.h>
 #include <cuda/std/__type_traits/is_integral.h>
 
-// <<<<<<< OLD CODE from 3e6217018d (6610f61628) - COMMENTED OUT
-// // MSVC and clang cuda need the host side functions included
-// #if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// <<<<<<< OLD CODE from 1302b4cecc (ae5c64bec5) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 3e6217018d (6610f61628) - COMMENTED OUT
+// // // MSVC and clang cuda need the host side functions included
+// // #if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// // #  include <math.h>
+// // #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// // =======
+// #if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || !_CCCL_CUDA_COMPILATION()
 // #  include <math.h>
-// #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || !_CCCL_CUDA_COMPILATION()
+// // >>>>>>> END NEW CODE (6610f61628)
 // =======
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || !_CCCL_CUDA_COMPILATION()
+// MSVC and clang cuda need the host side functions included
+#if _CCCL_HOST_COMPILATION() || _CCCL_CUDA_COMPILER(CLANG)
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || !_CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (6610f61628)
+#endif // _CCCL_HOST_COMPILATION() || _CCCL_CUDA_COMPILER(CLANG)
+// >>>>>>> END NEW CODE (ae5c64bec5)
 
 #include <cuda/std/__cccl/prologue.h>
 
