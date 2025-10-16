@@ -53,8 +53,14 @@
 #  include <cuda/std/__type_traits/enable_if.h>
 #  include <cuda/std/__type_traits/is_constructible.h>
 
-#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#    include <sstream> // for std::basic_ostringstream
+// <<<<<<< OLD CODE from 2160484d68 (36f786f792) - COMMENTED OUT
+// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #    include <sstream> // for std::basic_ostringstream
+// =======
+// todo: find a way to get rid of this include
+#  if !_CCCL_COMPILER(NVRTC)
+#    include <complex> // for std::complex stream operators
+// >>>>>>> END NEW CODE (36f786f792)
 #  endif // !_CCCL_COMPILER(NVRTC)
 
 #  include <cuda/std/__cccl/prologue.h>

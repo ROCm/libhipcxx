@@ -50,6 +50,7 @@
 
 #include <cuda/std/__complex/vector_support.h>
 #include <cuda/std/__concepts/concept_macros.h>
+#include <cuda/std/__fwd/complex.h>
 #include <cuda/std/__fwd/get.h>
 #include <cuda/std/__tuple_dir/tuple_element.h>
 #include <cuda/std/__tuple_dir/tuple_size.h>
@@ -63,10 +64,16 @@
 #include <cuda/std/limits>
 
 // Compatibility helpers for thrust to convert between `std::complex` and `cuda::std::complex`
-// NOTE(HIP/AMD): Also exclude for HIPRTC to avoid system math.h enum conflicts
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  include <complex>
-#  include <sstream> // for std::basic_ostringstream
+// <<<<<<< OLD CODE from 2160484d68 (36f786f792) - COMMENTED OUT
+// // NOTE(HIP/AMD): Also exclude for HIPRTC to avoid system math.h enum conflicts
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <complex>
+// #  include <sstream> // for std::basic_ostringstream
+// =======
+// todo: find a way to get rid of this include
+#if !_CCCL_COMPILER(NVRTC)
+#  include <complex> // for std::complex stream operators
+// >>>>>>> END NEW CODE (36f786f792)
 
 #  define _LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__c) reinterpret_cast<const _Up(&)[2]>(__c)[0]
 #  define _LIBCUDACXX_ACCESS_STD_COMPLEX_IMAG(__c) reinterpret_cast<const _Up(&)[2]>(__c)[1]
