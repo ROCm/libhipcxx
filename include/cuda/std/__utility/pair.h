@@ -83,11 +83,14 @@
 #include <cuda/std/__utility/piecewise_construct.h>
 #include <cuda/std/cstddef>
 
-// Provide compatibility between `std::pair` and `cuda::std::pair`
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  include <utility>
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-
+// <<<<<<< OLD CODE from 2160484d68 (36f786f792) - COMMENTED OUT
+// // Provide compatibility between `std::pair` and `cuda::std::pair`
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <utility>
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+//
+// =======
+// >>>>>>> END NEW CODE (36f786f792)
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
