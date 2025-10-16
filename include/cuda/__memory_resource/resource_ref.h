@@ -48,6 +48,7 @@
 #  include <cuda/__memory_resource/get_property.h>
 #  include <cuda/__memory_resource/properties.h>
 #  include <cuda/__memory_resource/resource.h>
+#  include <cuda/__stream/stream_ref.h>
 #  include <cuda/std/__concepts/concept_macros.h>
 #  include <cuda/std/__memory/addressof.h>
 #  include <cuda/std/__type_traits/is_base_of.h>
@@ -56,7 +57,6 @@
 #  include <cuda/std/__utility/exchange.h>
 #  include <cuda/std/__utility/move.h>
 #  include <cuda/std/cstddef>
-#  include <cuda/stream_ref>
 
 #  include <cuda/std/__cccl/prologue.h>
 

@@ -32,7 +32,7 @@
 // UNSUPPORTED: nvrtc, hiprtc
 
 #include <cuda/std/type_traits>
-#include <cuda/stream_ref>
+#include <cuda/stream>
 
 __host__ __device__ void test()
 {

@@ -81,6 +81,6 @@ adopted through inheritance, it is not properly suited for heterogeneous systems
 With the current design it ranges from cumbersome to impossible to verify whether a memory resource provides allocations
 that are e.g. accessible on device, or whether it can utilize other allocation mechanisms.
 
-To better support asynchronous HIP `stream-ordered allocations <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html>`__
-libhipcxx provides :ref:`cuda::stream_ref <libcudacxx-extended-api-streams-stream-ref>` as a wrapper around
-``hipStream_t``. The definition of ``cuda::stream_ref`` can be found in the ``<cuda/stream_ref>`` header.
+To better support asynchronous CUDA `stream-ordered allocations <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#stream-ordered-memory-allocator>`__
+libcu++ provides :ref:`cuda::stream_ref <libcudacxx-extended-api-streams-stream-ref>` as a wrapper around
+``cudaStream_t``. The definition of ``cuda::stream_ref`` can be found in the ``<cuda/stream>`` header.
