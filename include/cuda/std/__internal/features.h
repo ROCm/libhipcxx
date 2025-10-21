@@ -98,12 +98,29 @@
 #  define _LIBCUDACXX_HAS_NVBF16() 0
 #endif // _CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2)
 
-// <<<<<<< OLD CODE from befceb921c (2a2be284cb) - COMMENTED OUT
-// // NVCC does not have a way of silencing non '_' prefixed UDLs
-// #if !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPCC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  define _LIBCUDACXX_HAS_STL_LITERALS
-// #endif // !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC)
-//
+// <<<<<<< OLD CODE from 6efaca82a9 (cfe657d109) - COMMENTED OUT
+// // <<<<<<< OLD CODE from befceb921c (2a2be284cb) - COMMENTED OUT
+// // // NVCC does not have a way of silencing non '_' prefixed UDLs
+// // #if !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPCC) && !defined(_CCCL_COMPILER_HIPRTC)
+// // #  define _LIBCUDACXX_HAS_STL_LITERALS
+// // #endif // !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC)
+// //
+// // =======
+// // >>>>>>> END NEW CODE (2a2be284cb)
 // =======
-// >>>>>>> END NEW CODE (2a2be284cb)
+// Clang provides 128b atomics as a builtin
+#if defined(CCCL_ENABLE_EXPERIMENTAL_HOST_ATOMICS_128B)
+#  define _CCCL_HOST_128_ATOMICS_ENABLED() 1
+#  define _CCCL_HOST_128_ATOMICS_MAYBE()   0
+// GCC does not provide 128b atomics, but they may be available as a library, this requires opt-in usage.
+// See: https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html "-mcx16" for more
+#elif _CCCL_COMPILER(CLANG) || _CCCL_COMPILER(GCC)
+#  define _CCCL_HOST_128_ATOMICS_ENABLED() 0
+#  define _CCCL_HOST_128_ATOMICS_MAYBE()   1
+#else
+#  define _CCCL_HOST_128_ATOMICS_ENABLED() 0
+#  define _CCCL_HOST_128_ATOMICS_MAYBE()   0
+#endif
+
+// >>>>>>> END NEW CODE (cfe657d109)
 #endif // _CUDA_STD___INTERNAL_FEATURES_H
