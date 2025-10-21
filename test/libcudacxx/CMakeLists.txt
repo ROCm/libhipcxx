@@ -73,7 +73,7 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   # TODO: Use project properties to get path to binary.
   # Should also set up dependency on the project when NVRTC is enabled
   foreach (include IN ITEMS ${CUDA_INCLUDE_DIR})
-    set(LIBCUDACXX_TEST_COMPILER_FLAGS "${LIBCUDACXX_TEST_COMPILER_FLAGS} -I'${include}'")
+    string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -I'${include}'")
   endforeach()
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/nvidia/nvrtc/nvrtcc")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
@@ -94,45 +94,50 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-int128")
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-float128")
 else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
+  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
   set(LIBCUDACXX_FORCE_INCLUDE "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include.h")
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CUDA_COMPILER}")
 # >>>>>>> END NEW CODE (6ea2021a22)
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
-  set(LIBCUDACXX_FORCE_INCLUDE "")
-  set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${HIP_INCLUDE_DIR}'")
-  # NOTE(HIP/AMD): We need to identify clang version to find from the path to clang new header.
-  # The header is used in libhipcxx/include/cuda/std/__memory/construct_at.h.
-  execute_process(
-    COMMAND "${HIP_HIPCC_EXECUTABLE}" --print-resource-dir
-    OUTPUT_VARIABLE _clang_abs_resource_dir
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    COMMAND_ERROR_IS_FATAL ANY
-  )
-  cmake_path(GET _clang_abs_resource_dir FILENAME _clang_version)
-  set(_clang_include_dir "lib/llvm/lib/clang/${_clang_version}/include")
-  set(_clang_cuda_wrappers_dir "${_clang_include_dir}/cuda_wrappers")
-  string(JOIN " " LIBCUDACXX_TEST_COMPILER_FLAGS
-    -I${HIP_INCLUDE_DIR}
-    -I${HIP_INCLUDE_DIR}/../${_clang_include_dir}
-    -I${HIP_INCLUDE_DIR}/../${_clang_cuda_wrappers_dir}
-  )
-  # Use the NVRTCC utility to run the built test outputs
-  set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
-else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
-  if (LIBCUDACXX_ENABLE_CUDA)
-    set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/libcudacxx/force_include.h")
-    set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CUDA_COMPILER}")
-    set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
-    set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
-  elseif(LIBCUDACXX_ENABLE_HIP)
-    set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/libcudacxx/force_include_hip.h")
-    #temporary workaround until we've found a way to make cmake find hipcc
-    set(LIBCUDACXX_CUDA_COMPILER "${HIP_HIPCC_EXECUTABLE}")
-    set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
-    set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
-    set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
-    set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
-  endif()
+# <<<<<<< OLD CODE from 6efaca82a9 (cfe657d109) - COMMENTED OUT
+#   set(LIBCUDACXX_FORCE_INCLUDE "")
+#   set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${HIP_INCLUDE_DIR}'")
+#   # NOTE(HIP/AMD): We need to identify clang version to find from the path to clang new header.
+#   # The header is used in libhipcxx/include/cuda/std/__memory/construct_at.h.
+#   execute_process(
+#     COMMAND "${HIP_HIPCC_EXECUTABLE}" --print-resource-dir
+#     OUTPUT_VARIABLE _clang_abs_resource_dir
+#     OUTPUT_STRIP_TRAILING_WHITESPACE
+#     COMMAND_ERROR_IS_FATAL ANY
+#   )
+#   cmake_path(GET _clang_abs_resource_dir FILENAME _clang_version)
+#   set(_clang_include_dir "lib/llvm/lib/clang/${_clang_version}/include")
+#   set(_clang_cuda_wrappers_dir "${_clang_include_dir}/cuda_wrappers")
+#   string(JOIN " " LIBCUDACXX_TEST_COMPILER_FLAGS
+#     -I${HIP_INCLUDE_DIR}
+#     -I${HIP_INCLUDE_DIR}/../${_clang_include_dir}
+#     -I${HIP_INCLUDE_DIR}/../${_clang_cuda_wrappers_dir}
+#   )
+#   # Use the NVRTCC utility to run the built test outputs
+#   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
+# else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
+#   if (LIBCUDACXX_ENABLE_CUDA)
+#     set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/libcudacxx/force_include.h")
+#     set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CUDA_COMPILER}")
+#     set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
+#     set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
+#   elseif(LIBCUDACXX_ENABLE_HIP)
+#     set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/libcudacxx/force_include_hip.h")
+#     #temporary workaround until we've found a way to make cmake find hipcc
+#     set(LIBCUDACXX_CUDA_COMPILER "${HIP_HIPCC_EXECUTABLE}")
+#     set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
+#     set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+#     set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
+#     set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
+#     set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
+#   endif()
+# =======
+# >>>>>>> END NEW CODE (cfe657d109)
 endif()
 
 # enable exceptions and assertions in tests
@@ -144,6 +149,10 @@ string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_OPTIONAL_REF")
 # Disable dialect deprecation
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT")
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DLIBCUDACXX_IGNORE_DEPRECATED_ABI")
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS " -latomic")
+endif()
 
 if (NOT MSVC AND NOT ${CMAKE_CUDA_COMPILER_ID} STREQUAL "Clang")
   set(LIBCUDACXX_WARNING_LEVEL "--compiler-options=-Wall --compiler-options=-Wextra")
