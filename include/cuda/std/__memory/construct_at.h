@@ -47,6 +47,7 @@
 #include <cuda/std/__iterator/access.h>
 #include <cuda/std/__memory/addressof.h>
 #include <cuda/std/__memory/voidify.h>
+#include <cuda/std/__new/device_new.h>
 #include <cuda/std/__type_traits/enable_if.h>
 #include <cuda/std/__type_traits/integral_constant.h>
 #include <cuda/std/__type_traits/is_arithmetic.h>
@@ -60,17 +61,20 @@
 #include <cuda/std/__utility/forward.h>
 #include <cuda/std/__utility/move.h>
 
-// NOTE(HIP/AMD): We need to include new header to get the correct device definitions.
-#if defined(__HIPCC_RTC__)
-  #if __has_include("new")
-    #include <new>
-  #endif
-#endif
-
-#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_COMPILER_HIPCC)
-#  include <new>
-#endif // _CCCL_CUDA_COMPILER(CLANG)
-
+// <<<<<<< OLD CODE from 1ca38c53a1 (ca306fd297) - COMMENTED OUT
+// // NOTE(HIP/AMD): We need to include new header to get the correct device definitions.
+// #if defined(__HIPCC_RTC__)
+//   #if __has_include("new")
+//     #include <new>
+//   #endif
+// #endif
+//
+// #if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_COMPILER_HIPCC)
+// #  include <new>
+// #endif // _CCCL_CUDA_COMPILER(CLANG)
+//
+// =======
+// >>>>>>> END NEW CODE (ca306fd297)
 #if _CCCL_STD_VER >= 2020 // need to backfill ::std::construct_at
 // <<<<<<< OLD CODE from 9dd87113c9 (c52e23b41f) - COMMENTED OUT
 // // <<<<<<< OLD CODE from 49a0439bc0 (32b9595a12) - COMMENTED OUT
