@@ -28,6 +28,7 @@
 //
 // UNSUPPORTED: libcpp-has-no-threads
 // UNSUPPORTED: pre-sm-90
+// ADDITIONAL_COMPILE_DEFINITIONS: CCCL_IGNORE_DEPRECATED_API
 
 // NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
 // UNSUPPORTED: hipcc, hiprtc
