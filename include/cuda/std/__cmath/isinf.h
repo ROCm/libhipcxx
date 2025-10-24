@@ -56,10 +56,16 @@
 #include <cuda/std/__type_traits/is_integral.h>
 #include <cuda/std/limits>
 
-// MSVC and clang cuda need the host side functions included
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// <<<<<<< OLD CODE from d1959e54ce (23a3ad0f1d) - COMMENTED OUT
+// // MSVC and clang cuda need the host side functions included
+// #if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// #  include <math.h>
+// #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// =======
+#if !_CCCL_COMPILER(NVRTC)
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+#endif // !_CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (23a3ad0f1d)
 
 #include <cuda/std/__cccl/prologue.h>
 
