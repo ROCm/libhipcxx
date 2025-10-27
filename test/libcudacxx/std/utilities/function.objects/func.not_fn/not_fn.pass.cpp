@@ -31,6 +31,7 @@
 
 #include <cuda/std/functional>
 #include <cuda/std/type_traits>
+#include <cuda/std/utility>
 // #include <cuda/std/string>
 #include <cuda/std/cassert>
 
