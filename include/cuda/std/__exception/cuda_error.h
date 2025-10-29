@@ -44,27 +44,37 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/std/__exception/terminate.h>
-#include <cuda/std/source_location>
+// <<<<<<< OLD CODE from a3cfc082ba (866ab6399e) - COMMENTED OUT
+// #include <cuda/std/__exception/terminate.h>
+// #include <cuda/std/source_location>
+//
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if !_CCCL_COMPILER(NVRTC)
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+#  include <cuda/std/__exception/exception_macros.h>
+#  include <cuda/std/__exception/terminate.h>
+#  include <cuda/std/source_location>
+
+#  include <nv/target>
+
+// >>>>>>> END NEW CODE (866ab6399e)
 #  include <cstdio>
 #  include <stdexcept>
-#endif // !_CCCL_COMPILER(NVRTC)
 
-#include <nv/target>
-
-#include <cuda/std/__cccl/prologue.h>
+#  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from a3cfc082ba (866ab6399e) - COMMENTED OUT
+// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// =======
+#  if _CCCL_HAS_CTK()
+// >>>>>>> END NEW CODE (866ab6399e)
 using __cuda_error_t = ::cudaError_t;
-#else
+#  else
 using __cuda_error_t = int;
-#endif
-
-#if _CCCL_HAS_EXCEPTIONS()
+#  endif
 
 namespace __detail
 {
@@ -131,31 +141,13 @@ private:
   [[maybe_unused]] const char* __api                  = nullptr,
   [[maybe_unused]] ::cuda::std::source_location __loc = ::cuda::std::source_location::current())
 {
-  NV_IF_TARGET(NV_IS_HOST, (throw ::cuda::cuda_error(__status, __msg, __api, __loc);), (::cuda::std::terminate();))
+  _CCCL_THROW(::cuda::cuda_error(__status, __msg, __api, __loc));
 }
-#else // ^^^ _CCCL_HAS_EXCEPTIONS() ^^^ / vvv !_CCCL_HAS_EXCEPTIONS() vvv
-class cuda_error
-{
-public:
-  _CCCL_API inline cuda_error(const __cuda_error_t,
-                              const char*,
-                              const char*                  = nullptr,
-                              ::cuda::std::source_location = ::cuda::std::source_location::current()) noexcept
-  {}
-};
-
-[[noreturn]] _CCCL_API inline void __throw_cuda_error(
-  const __cuda_error_t,
-  const char*,
-  const char*                  = nullptr,
-  ::cuda::std::source_location = ::cuda::std::source_location::current())
-{
-  ::cuda::std::terminate();
-}
-#endif // !_CCCL_HAS_EXCEPTIONS()
 
 _CCCL_END_NAMESPACE_CUDA
 
-#include <cuda/std/__cccl/epilogue.h>
+#  include <cuda/std/__cccl/epilogue.h>
+
+#endif // !_CCCL_COMPILER(NVRTC)
 
 #endif // _CUDA_STD___EXCEPTION_CUDA_ERROR_H
