@@ -70,7 +70,7 @@ It gives more control over the synchronization with a barrier than ``memcpy_asyn
 Currently, ``memcpy_async_tx`` has no synchronous fallback mechanism, i.e., it does not work on older hardware
 (pre-CUDA Compute Capability 9.0, i.e., pre-Hopper).
 
- .. _libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx-example:
+.. _libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx-example:
 
 Example
 -------
