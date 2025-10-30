@@ -50,7 +50,7 @@
 
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
-#  include <cuda/std/__cuda/api_wrapper.h>
+#  include <cuda/__runtime/api_wrapper.h>
 #  include <cuda/std/__memory/addressof.h>
 
 #  include <nv/target>
