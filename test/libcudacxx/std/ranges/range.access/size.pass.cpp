@@ -278,17 +278,11 @@ struct SizeMemberDisabled
   }
 };
 
-namespace cuda
-{
-namespace std
-{
-namespace ranges
+namespace cuda::std::ranges
 {
 template <>
 inline constexpr bool disable_sized_range<SizeMemberDisabled> = true;
 }
-} // namespace std
-} // namespace cuda
 
 struct ImproperlyDisabledMember
 {
@@ -300,17 +294,12 @@ struct ImproperlyDisabledMember
 
 // Intentionally disabling "const ConstSizeMemberDisabled". This doesn't disable anything
 // because T is always uncvrefed before being checked.
-namespace cuda
-{
-namespace std
-{
-namespace ranges
+
+namespace cuda::std::ranges
 {
 template <>
 inline constexpr bool disable_sized_range<const ImproperlyDisabledMember> = true;
 }
-} // namespace std
-} // namespace cuda
 
 struct SizeFunctionDisabled
 {
@@ -320,17 +309,11 @@ struct SizeFunctionDisabled
   }
 };
 
-namespace cuda
-{
-namespace std
-{
-namespace ranges
+namespace cuda::std::ranges
 {
 template <>
 inline constexpr bool disable_sized_range<SizeFunctionDisabled> = true;
 }
-} // namespace std
-} // namespace cuda
 
 struct ImproperlyDisabledFunction
 {
@@ -340,17 +323,11 @@ struct ImproperlyDisabledFunction
   }
 };
 
-namespace cuda
-{
-namespace std
-{
-namespace ranges
+namespace cuda::std::ranges
 {
 template <>
 inline constexpr bool disable_sized_range<const ImproperlyDisabledFunction> = true;
 }
-} // namespace std
-} // namespace cuda
 
 static_assert(cuda::std::is_invocable_v<RangeSizeT, ImproperlyDisabledMember&>, "");
 static_assert(cuda::std::is_invocable_v<RangeSizeT, const ImproperlyDisabledMember&>, "");
@@ -496,17 +473,11 @@ struct DisabledSizeRangeWithBeginEnd
   }
 };
 
-namespace cuda
-{
-namespace std
-{
-namespace ranges
+namespace cuda::std::ranges
 {
 template <>
 inline constexpr bool disable_sized_range<DisabledSizeRangeWithBeginEnd> = true;
 }
-} // namespace std
-} // namespace cuda
 
 struct SizeBeginAndEndMembers
 {
