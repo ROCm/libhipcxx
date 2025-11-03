@@ -78,7 +78,6 @@ using __cuda_error_t = int;
 
 namespace __detail
 {
-
 struct __msg_storage
 {
   char __buffer[512]{0};
@@ -108,7 +107,6 @@ static char* __format_cuda_error(
     __msg);
   return __msg_buffer.__buffer;
 }
-
 } // namespace __detail
 
 /**
