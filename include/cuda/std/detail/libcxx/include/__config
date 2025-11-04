@@ -61,10 +61,15 @@ extern "C++" {
 #    define __has_extension(__x) 0
 #  endif
 
-#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#    define _LIBCUDACXX_PREFERRED_ALIGNOF(_T) __alignof(_T)
+# <<<<<<< OLD CODE from 1e2a16a57d (cbad585c64) - COMMENTED OUT
+# #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# #    define _LIBCUDACXX_PREFERRED_ALIGNOF(_T) __alignof(_T)
+# =======
+#  if !_CCCL_COMPILER(NVRTC)
+#    define _LIBCUDACXX_PREFERRED_ALIGNOF(_Tp) __alignof(_Tp)
+# >>>>>>> END NEW CODE (cbad585c64)
 #  else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
-#    define _LIBCUDACXX_PREFERRED_ALIGNOF(_T) alignof(_T)
+#    define _LIBCUDACXX_PREFERRED_ALIGNOF(_Tp) alignof(_Tp)
 #  endif // ^^^^ _CCCL_COMPILER(NVRTC) ^^^
 
 #  if _CCCL_COMPILER(MSVC)
