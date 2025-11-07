@@ -32,24 +32,30 @@
 
 This page documents ``cuda::bitfield_insert``, which inserts the lower bits of a source value into a destination value at a specified bit position and width.
 
-.. code:: cpp
+Defined in the ``<cuda/bit>`` header.
+
+.. code:: cuda
+
+   namespace cuda {
 
    template <typename T>
-   [[nodiscard]] constexpr T
-   bitfield_insert(T dest, T source, int start, int width) noexcept;
+   [[nodiscard]] __host__ __device__ constexpr
+   T bitfield_insert(T dest, T source, int start, int width) noexcept;
+
+   } // namespace cuda
 
 The function extracts the lower bitfield of size ``width`` from ``source`` and inserts it into ``dest`` at position ``start``.
 
 **Parameters**
 
-- ``dest``: The value to insert the bitfield.
+- ``dest``: The value to insert the bitfield into.
 - ``source``: The value from which to extract the bitfield.
 - ``start``: Initial position of the bitfield.
 - ``width``: Width of the bitfield.
 
 **Return value**
 
-``((value << start) & mask) | (source & ~mask)``, where ``mask`` is a bitmask of width ``width``.
+``((source << start) & mask) | (dest & ~mask)``, where ``mask`` is a bitmask of width ``width`` at position ``start``.
 
 **Constraints**
 
@@ -57,17 +63,17 @@ The function extracts the lower bitfield of size ``width`` from ``source`` and i
 
 **Preconditions**
 
-- ``start >= 0 && start <= num_bits(T)``
-- ``width >= 0 && width <= num_bits(T)``
-- ``start + width <= num_bits(T)``
+- ``start >= 0 && start <= num_bits(T)``.
+- ``width >= 0 && width <= num_bits(T)``.
+- ``start + width <= num_bits(T)``.
 
 **Performance considerations**
 
 ..
    The function performs the following operations in CUDA for ``uint8_t``, ``uint16_t``, ``uint32_t``:
 
-   - ``SM < 70``: ``BFI``
-   - ``SM >= 70``: ``BMSK``, bitwise operation x5
+- ``SM < 70``: ``BFI``.
+- ``SM >= 70``: ``BMSK``, bitwise operation x5.
 
 .. note::
 
@@ -76,12 +82,12 @@ The function extracts the lower bitfield of size ``width`` from ``source`` and i
 ..
    .. note::
 
-      GCC <= 8 uses a slow path with more instructions even in CUDA
+    GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------
 
-.. code:: cpp
+.. code:: cuda
 
     #include <cuda/bit>
     #include <cuda/std/cassert>
@@ -98,5 +104,4 @@ Example
         return 0;
     }
 
-..
-   `See it on Godbolt 🔗 <https://godbolt.org/z/Phs8czqes>`_
+`See it on Godbolt 🔗 <https://godbolt.org/z/4Thzz516M>`__
