@@ -32,11 +32,17 @@
 
 This page documents ``cuda::bitmask``, which generates an integer bitmask of a specified width starting at a given bit position.
 
-.. code:: cpp
+Defined in the ``<cuda/bit>`` header.
+
+.. code:: cuda
+
+   namespace cuda {
 
    template <typename T = uint32_t>
-   [[nodiscard]] constexpr T
-   bitmask(int start, int width) noexcept;
+   [[nodiscard]] __host__ __device__ constexpr
+   T bitmask(int start, int width) noexcept;
+
+   } // namespace cuda
 
 The function generates a bitmask of size ``width`` starting at position ``start``.
 
@@ -47,7 +53,7 @@ The function generates a bitmask of size ``width`` starting at position ``start`
 
 **Return value**
 
-Bitmask of size ``width`` starting at ``start``.
+Bitmask of size ``width`` starting at position ``start``.
 
 **Constraints**
 
@@ -55,17 +61,17 @@ Bitmask of size ``width`` starting at ``start``.
 
 **Preconditions**
 
-- ``start >= 0 && start <= num_bits(T)``
-- ``width >= 0 && width <= num_bits(T)``
-- ``start + width <= num_bits(T)``
+- ``start >= 0 && start <= num_bits(T)``.
+- ``width >= 0 && width <= num_bits(T)``.
+- ``start + width <= num_bits(T)``.
 
 **Performance considerations**
 
 ..
    The function performs the following operations in device code:
 
-   - ``uint8_t``, ``uint16_t``, ``uint32_t``: ``BMSK``
-   - ``uint64_t``: ``SHL`` x4, ``ADD`` x2
+- ``uint8_t``, ``uint16_t``, ``uint32_t``: ``BMSK``.
+- ``uint64_t``: ``SHL`` x4, ``ADD`` x2.
 
 .. note::
 
@@ -74,12 +80,12 @@ Bitmask of size ``width`` starting at ``start``.
 ..
    .. note::
 
-      GCC <= 8 uses a slow path with more instructions even in CUDA
+    GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------
 
-.. code:: cpp
+.. code:: cuda
 
     #include <cuda/bit>
     #include <cuda/std/cassert>
@@ -96,5 +102,4 @@ Example
         return 0;
     }
 
-..
-   `See it on Godbolt 🔗 <https://godbolt.org/z/PPqP8rTPd>`_
+`See it on Godbolt 🔗 <https://godbolt.org/z/habGohz7T>`__
