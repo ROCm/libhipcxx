@@ -63,8 +63,17 @@ include(CTest)
 enable_testing()
 
 # Add codegen module
-option(libhipcxx_ENABLE_CODEGEN "Enable libhipcxx's atomics backend codegen and tests." OFF)
-if (libhipcxx_ENABLE_CODEGEN)
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+# option(libhipcxx_ENABLE_CODEGEN "Enable libhipcxx's atomics backend codegen and tests." OFF)
+# if (libhipcxx_ENABLE_CODEGEN)
+# =======
+option(
+  libcudacxx_ENABLE_CODEGEN
+  "Enable libcudacxx's atomics backend codegen and tests."
+  OFF
+)
+if (libcudacxx_ENABLE_CODEGEN)
+# >>>>>>> END NEW CODE (75d398a0e0)
   add_subdirectory(codegen)
 endif()
 
@@ -92,24 +101,28 @@ endif()
 
 if (LIBCUDACXX_ENABLE_CUDA)
   enable_language(CUDA)
-elseif (LIBCUDACXX_ENABLE_HIP)
-  # sync variables used by HIP CMake package etc.
-  if ("${AMDGPU_TARGETS}" STREQUAL "")
-    set(AMDGPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
-  elseif(NOT "${AMDGPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
-    message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and AMDGPU_TARGETS! Using AMDGPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', AMDGPU_TARGETS='${AMDGPU_TARGETS}'")
-    set(CMAKE_HIP_ARCHITECTURES ${AMDGPU_TARGETS})
-  endif()
-  if ("${GPU_TARGETS}" STREQUAL "")
-    set(GPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
-  elseif(NOT "${GPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
-    message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and GPU_TARGETS! Using GPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', GPU_TARGETS='${GPU_TARGETS}'")
-    set(CMAKE_HIP_ARCHITECTURES ${GPU_TARGETS})
-  endif()
-
-  find_package(hip REQUIRED)
-  enable_language(HIP)
-endif ()
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+# elseif (LIBCUDACXX_ENABLE_HIP)
+#   # sync variables used by HIP CMake package etc.
+#   if ("${AMDGPU_TARGETS}" STREQUAL "")
+#     set(AMDGPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
+#   elseif(NOT "${AMDGPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
+#     message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and AMDGPU_TARGETS! Using AMDGPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', AMDGPU_TARGETS='${AMDGPU_TARGETS}'")
+#     set(CMAKE_HIP_ARCHITECTURES ${AMDGPU_TARGETS})
+#   endif()
+#   if ("${GPU_TARGETS}" STREQUAL "")
+#     set(GPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
+#   elseif(NOT "${GPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
+#     message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and GPU_TARGETS! Using GPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', GPU_TARGETS='${GPU_TARGETS}'")
+#     set(CMAKE_HIP_ARCHITECTURES ${GPU_TARGETS})
+#   endif()
+#
+#   find_package(hip REQUIRED)
+#   enable_language(HIP)
+# endif ()
+# =======
+endif()
+# >>>>>>> END NEW CODE (75d398a0e0)
 
 # <<<<<<< OLD CODE from 90c10be92c (98b11f3297) - COMMENTED OUT
 # # For Windows we should avoid symlinks by copying the file content (test, utils, and include/hip folder)

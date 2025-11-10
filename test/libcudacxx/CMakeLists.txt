@@ -52,9 +52,17 @@ if (LIBCUDACXX_ENABLE_CUDA)
 # =======
 foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
   set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
-  set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
-endforeach ()
-# >>>>>>> END NEW CODE (1789a7554e)
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+#   set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
+# endforeach ()
+# # >>>>>>> END NEW CODE (1789a7554e)
+# =======
+  set(
+    LIBCUDACXX_COMPUTE_ARCHS_STRING
+    "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}"
+  )
+endforeach()
+# >>>>>>> END NEW CODE (75d398a0e0)
 
   # Separate the architectures with a space
   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
@@ -62,12 +70,20 @@ endforeach ()
     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
   endforeach ()
 
-  message(STATUS "Enabled HIP architectures:${_compute_message}")
-
-  option(LIBHIPCXX_TEST_WITH_HIPRTC
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+#   message(STATUS "Enabled HIP architectures:${_compute_message}")
+#
+#   option(LIBHIPCXX_TEST_WITH_HIPRTC
+#   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
+#   OFF)
+# endif()
+# =======
+option(
+  LIBCUDACXX_TEST_WITH_NVRTC
   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
-  OFF)
-endif()
+  OFF
+)
+# >>>>>>> END NEW CODE (75d398a0e0)
 
 if (LIBCUDACXX_TEST_WITH_NVRTC)
   # TODO: Use project properties to get path to binary.
@@ -75,27 +91,43 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   foreach (include IN ITEMS ${CUDA_INCLUDE_DIR})
     string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -I'${include}'")
   endforeach()
-  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/nvidia/nvrtc/nvrtcc")
+  set(
+    LIBCUDACXX_CUDA_COMPILER
+    "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/nvidia/nvrtc/nvrtcc"
+  )
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "True")
   # Use the NVRTCC utility to run the built test outputs
-  set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
-# <<<<<<< OLD CODE from f1c3a9dfff (6ea2021a22) - COMMENTED OUT
-# elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
-#   # TODO: Use project properties to get path to binary.
-#   # Should also set up dependency on the project when NVRTC is enabled
-#   set(CMAKE_CUDA_COMPILER_ID "HIPCC")
-#   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
-#   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
-#   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
-#   set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+#   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
+# # <<<<<<< OLD CODE from f1c3a9dfff (6ea2021a22) - COMMENTED OUT
+# # elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
+# #   # TODO: Use project properties to get path to binary.
+# #   # Should also set up dependency on the project when NVRTC is enabled
+# #   set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+# #   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
+# #   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
+# #   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
+# #   set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
+# # =======
 # =======
+  set(
+    LIBCUDACXX_EXECUTOR
+    "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())"
+  )
+# >>>>>>> END NEW CODE (75d398a0e0)
   # Enable 128-bit types for NVRTC
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-int128")
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-float128")
 else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
-  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
-  set(LIBCUDACXX_FORCE_INCLUDE "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include.h")
+  string(
+    APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
+    " -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE"
+  )
+  set(
+    LIBCUDACXX_FORCE_INCLUDE
+    "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include.h"
+  )
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CUDA_COMPILER}")
 # >>>>>>> END NEW CODE (6ea2021a22)
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
@@ -147,15 +179,24 @@ string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_ASSERTIONS")
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_OPTIONAL_REF")
 
 # Disable dialect deprecation
-string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT")
-string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DLIBCUDACXX_IGNORE_DEPRECATED_ABI")
+string(
+  APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
+  " -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT"
+)
+string(
+  APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
+  " -DLIBCUDACXX_IGNORE_DEPRECATED_ABI"
+)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS " -latomic")
 endif()
 
 if (NOT MSVC AND NOT ${CMAKE_CUDA_COMPILER_ID} STREQUAL "Clang")
-  set(LIBCUDACXX_WARNING_LEVEL "--compiler-options=-Wall --compiler-options=-Wextra")
+  set(
+    LIBCUDACXX_WARNING_LEVEL
+    "--compiler-options=-Wall --compiler-options=-Wextra"
+  )
 endif()
 
 if (MSVC)
@@ -176,30 +217,39 @@ if (MSVC)
 endif()
 
 if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "Clang")
-  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
+  string(
+    APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
     " ${CMAKE_CUDA_FLAGS}"
     " -Xclang -fcuda-allow-variadic-functions"
     " -Xclang -Wno-unused-parameter"
     " -Wno-unknown-cuda-version"
     " ${LIBCUDACXX_FORCE_INCLUDE}"
-    " -I${libhipcxx_SOURCE_DIR}/include"
-    " ${LIBCUDACXX_WARNING_LEVEL}")
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+#     " -I${libhipcxx_SOURCE_DIR}/include"
+#     " ${LIBCUDACXX_WARNING_LEVEL}")
+# =======
+    " -I${libcudacxx_SOURCE_DIR}/include"
+    " ${LIBCUDACXX_WARNING_LEVEL}"
+  )
+# >>>>>>> END NEW CODE (75d398a0e0)
 
-  string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS
+  string(
+    APPEND LIBCUDACXX_TEST_LINKER_FLAGS
     " ${CMAKE_CUDA_FLAGS}"
     " -L${CUDAToolkit_LIBRARY_DIR}"
     " -lcuda"
-    " -lcudart")
+    " -lcudart"
+  )
 elseif (${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVIDIA")
-  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
+  string(
+    APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
     " ${LIBCUDACXX_FORCE_INCLUDE}"
     " ${LIBCUDACXX_WARNING_LEVEL}"
-    " -Wno-deprecated-gpu-targets")
+    " -Wno-deprecated-gpu-targets"
+  )
 elseif (${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVHPC")
-  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
-    " -stdpar")
-  string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS
-    " -stdpar")
+  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -stdpar")
+  string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS " -stdpar")
 endif()
 
 if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
@@ -254,81 +304,164 @@ include(AddLLVM)
 
 set(LIBCUDACXX_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
-set(LIBCUDACXX_TARGET_INFO "libcudacxx.test.target_info.LocalTI" CACHE STRING
-"TargetInfo to use when setting up test environment.")
-set(LIBCUDACXX_EXECUTOR "None" CACHE STRING
-"Executor to use when running tests.")
+set(
+  LIBCUDACXX_TARGET_INFO
+  "libcudacxx.test.target_info.LocalTI"
+  CACHE STRING
+  "TargetInfo to use when setting up test environment."
+)
+set(
+  LIBCUDACXX_EXECUTOR
+  "None"
+  CACHE STRING
+  "Executor to use when running tests."
+)
 
-set(LIBCUDACXX_TEST_TIMEOUT "200" CACHE STRING "Enable test timeouts (Default = 200, Off = 0)")
+set(
+  LIBCUDACXX_TEST_TIMEOUT
+  "200"
+  CACHE STRING
+  "Enable test timeouts (Default = 200, Off = 0)"
+)
 
-set(AUTO_GEN_COMMENT "## Autogenerated by libcudacxx configuration.\n# Do not edit!")
+set(
+  AUTO_GEN_COMMENT
+  "## Autogenerated by libcudacxx configuration.\n# Do not edit!"
+)
 
 set(lit_site_cfg_path "${CMAKE_CURRENT_BINARY_DIR}/lit.site.cfg")
 configure_lit_site_cfg(
   "${CMAKE_CURRENT_SOURCE_DIR}/lit.site.cfg.in"
-  "${lit_site_cfg_path}")
+  "${lit_site_cfg_path}"
+)
 
-# Set dependencies for hiprtcc executable when using HIPRTC tests
-set(LIBHIPCXX_TEST_DEPENDS "")
-if(LIBHIPCXX_TEST_WITH_HIPRTC)
-  list(APPEND LIBHIPCXX_TEST_DEPENDS libcudacxx.nvrtcc)
-endif()
-
-add_lit_testsuite(check-hipcxx
-  "Running libhip++ tests"
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+# # Set dependencies for hiprtcc executable when using HIPRTC tests
+# set(LIBHIPCXX_TEST_DEPENDS "")
+# if(LIBHIPCXX_TEST_WITH_HIPRTC)
+#   list(APPEND LIBHIPCXX_TEST_DEPENDS libcudacxx.nvrtcc)
+# endif()
+#
+# add_lit_testsuite(check-hipcxx
+#   "Running libhip++ tests"
+#   "${CMAKE_CURRENT_BINARY_DIR}"
+#   DEPENDS ${LIBHIPCXX_TEST_DEPENDS})
+# =======
+add_lit_testsuite(check-cudacxx
+  "Running libcu++ tests"
   "${CMAKE_CURRENT_BINARY_DIR}"
-  DEPENDS ${LIBHIPCXX_TEST_DEPENDS})
+)
+# >>>>>>> END NEW CODE (75d398a0e0)
 
 find_program(libcudacxx_LIT lit REQUIRED)
 
-set(libcudacxx_LIT_FLAGS "" CACHE STRING "Semi-colon separated list of flags passed to the invocation of lit.")
+set(
+  libcudacxx_LIT_FLAGS
+  ""
+  CACHE STRING
+  "Semi-colon separated list of flags passed to the invocation of lit."
+)
 message(STATUS "libcudacxx_LIT_FLAGS: ${libcudacxx_LIT_FLAGS}")
 
-# Restricted to avoid oversubscribing the GPU:
-set(libcudacxx_LIT_PARALLEL_LEVEL 8 CACHE STRING
-"Parallelism used to run libcudacxx's lit test suite."
-)
-
-if (LIBCUDACXX_ENABLE_CUDA)
-  if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
-    # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
-    # Only executed if explicitly requested.
-    add_custom_target(libcudacxx.test.lit.precompile
-      DEPENDS libcudacxx.test.public_headers libcudacxx.test.internal_headers libcudacxx.test.public_headers_host_only
-      COMMAND "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
-      "${libcudacxx_LIT}" -vv --no-progress-bar --time-tests ${libcudacxx_LIT_FLAGS}
-      "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
-    )
-
-  endif()
-elseif(LIBCUDACXX_ENABLE_HIP)
-  if (NOT LIBHIPCXX_TEST_WITH_HIPRTC)
-    # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
-    # Only executed if explicitly requested.
-    add_custom_target(libcudacxx.test.lit.precompile
-      DEPENDS libcudacxx.test.public_headers libcudacxx.test.internal_headers libcudacxx.test.public_headers_host_only
-      COMMAND "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
-      "${libcudacxx_LIT}" -vv --no-progress-bar ${libcudacxx_LIT_FLAGS} -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
-    )
-
-  endif()
+if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
+  # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
+  # Only executed if explicitly requested.
+  add_custom_target(
+    libcudacxx.test.lit.precompile
+    DEPENDS
+      libcudacxx.test.public_headers
+      libcudacxx.test.internal_headers
+      libcudacxx.test.public_headers_host_only
+    # gersemi: off
+    COMMAND
+      "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
+        "${libcudacxx_LIT}"
+          -vv --no-progress-bar --time-tests
+          ${libcudacxx_LIT_FLAGS}
+          "-Dexecutor=\"NoopExecutor()\""
+          "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
+    # gersemi: on
+  )
 endif()
 
-add_test(NAME libcudacxx.test.lit COMMAND
-  "${CMAKE_COMMAND}" -E env
-    "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
-  "${libcudacxx_LIT}" -vv --no-progress-bar --time-tests ${libcudacxx_LIT_FLAGS}
-    -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
+# >>>>>>> END NEW CODE (75d398a0e0)
+# Restricted to avoid oversubscribing the GPU:
+set(
+  libcudacxx_LIT_PARALLEL_LEVEL
+  8
+  CACHE STRING
+  "Parallelism used to run libcudacxx's lit test suite."
 )
 
-set_tests_properties(libcudacxx.test.lit PROPERTIES
-  TIMEOUT 10800 # 3hr, some CI machines are slow
-  RUN_SERIAL TRUE
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+# if (LIBCUDACXX_ENABLE_CUDA)
+#   if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
+#     # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
+#     # Only executed if explicitly requested.
+#     add_custom_target(libcudacxx.test.lit.precompile
+#       DEPENDS libcudacxx.test.public_headers libcudacxx.test.internal_headers libcudacxx.test.public_headers_host_only
+#       COMMAND "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
+#       "${libcudacxx_LIT}" -vv --no-progress-bar --time-tests ${libcudacxx_LIT_FLAGS}
+#       "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
+#     )
+#
+#   endif()
+# elseif(LIBCUDACXX_ENABLE_HIP)
+#   if (NOT LIBHIPCXX_TEST_WITH_HIPRTC)
+#     # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
+#     # Only executed if explicitly requested.
+#     add_custom_target(libcudacxx.test.lit.precompile
+#       DEPENDS libcudacxx.test.public_headers libcudacxx.test.internal_headers libcudacxx.test.public_headers_host_only
+#       COMMAND "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
+#       "${libcudacxx_LIT}" -vv --no-progress-bar ${libcudacxx_LIT_FLAGS} -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
+#     )
+#
+#   endif()
+# endif()
+#
+# add_test(NAME libcudacxx.test.lit COMMAND
+#   "${CMAKE_COMMAND}" -E env
+#     "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
+#   "${libcudacxx_LIT}" -vv --no-progress-bar --time-tests ${libcudacxx_LIT_FLAGS}
+#     -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
+# =======
+add_test(
+  NAME libcudacxx.test.lit
+  # gersemi: off
+  COMMAND
+    "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
+      "${libcudacxx_LIT}"
+        -vv --no-progress-bar --time-tests
+        ${libcudacxx_LIT_FLAGS}
+        -j "${libcudacxx_LIT_PARALLEL_LEVEL}"
+        "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
+  # gersemi: on
+# >>>>>>> END NEW CODE (75d398a0e0)
 )
 
-# Add c2h tests (CUDA only - c2h infrastructure is CUDA-specific):
-if(LIBCUDACXX_ENABLE_CUDA)
-  cccl_get_c2h()
+set_tests_properties(
+  libcudacxx.test.lit
+  PROPERTIES
+    # 3hr, some CI machines are slow
+    TIMEOUT 10800
+    RUN_SERIAL TRUE
+)
+
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+# # Add c2h tests (CUDA only - c2h infrastructure is CUDA-specific):
+# if(LIBCUDACXX_ENABLE_CUDA)
+#   cccl_get_c2h()
+# =======
+# Add c2h tests:
+cccl_get_c2h()
+
+file(
+  GLOB_RECURSE test_srcs
+  RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+  CONFIGURE_DEPENDS
+  *.cu
+)
+# >>>>>>> END NEW CODE (75d398a0e0)
 
 # <<<<<<< OLD CODE from 6b318af440 (8dad8721b7) - COMMENTED OUT
 #   file(GLOB_RECURSE test_srcs
@@ -347,12 +480,25 @@ function(libcudacxx_add_test target_name_var source)
 
   add_executable(${target_name} "${source}")
   cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-  target_include_directories(${target_name} PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common")
-  target_link_libraries(${target_name} PRIVATE
-    libcudacxx::libcudacxx
-    cccl.c2h.main
-    libcudacxx.compiler_interface
-# >>>>>>> END NEW CODE (8dad8721b7)
+# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
+#   target_include_directories(${target_name} PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common")
+#   target_link_libraries(${target_name} PRIVATE
+#     libcudacxx::libcudacxx
+#     cccl.c2h.main
+#     libcudacxx.compiler_interface
+# # >>>>>>> END NEW CODE (8dad8721b7)
+# =======
+  target_include_directories(
+    ${target_name}
+    PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
+  )
+  target_link_libraries(
+    ${target_name}
+    PRIVATE #
+      libcudacxx::libcudacxx
+      cccl.c2h.main
+      libcudacxx.compiler_interface
+# >>>>>>> END NEW CODE (75d398a0e0)
   )
 
   set(c2h_all_target "libcudacxx.test.c2h_all")
