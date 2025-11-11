@@ -32,11 +32,17 @@
 
 This page documents ``cuda::round_up``, which rounds an integral value up to the smallest multiple of a given base.
 
+Defined in the ``<cuda/cmath>`` header.
+
 .. code:: cpp
 
+   namespace cuda {
+
    template <typename T, typename U>
-   [[nodiscard]] __host__ __device__ inline constexpr
+   [[nodiscard]] __host__ __device__ constexpr
    cuda::std::common_type_t<T, U> round_up(T value, U base_multiple) noexcept;
+
+   } // namespace cuda
 
 The function computes the round up to the smallest multiple of an integral or enumerator value :math:`ceil(\frac{value}{base\_multiple}) * base\_multiple`.
 
@@ -87,4 +93,4 @@ Example
     }
 
 ..
-   `See it on Godbolt 🔗 <https://godbolt.org/z/9vcxo3d8j>`_
+   `See it on Godbolt 🔗 <https://godbolt.org/z/WacYfxsTT>`__

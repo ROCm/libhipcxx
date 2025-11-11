@@ -30,23 +30,25 @@
 ``cuda::ilog2`` and ``cuda::ilog10``
 ====================================
 
+Defined in the ``<cuda/cmath>`` header.
+
 .. code:: cuda
 
+   namespace cuda {
+
    template <typename T>
-   [[nodiscard]] __host__ __device__ inline constexpr
+   [[nodiscard]] __host__ __device__ constexpr
    int ilog2(T value) noexcept;
 
-.. code:: cpp
-
    template <typename T>
-   [[nodiscard]] __host__ __device__ inline constexpr
+   [[nodiscard]] __host__ __device__ constexpr
    int ceil_ilog2(T value) noexcept;
 
-.. code:: cuda
-
    template <typename T>
-   [[nodiscard]] __host__ __device__ inline constexpr
+   [[nodiscard]] __host__ __device__ constexpr
    int ilog10(T value) noexcept;
+
+   } // namespace cuda
 
 The functions compute the logarithm to the base 2 and 10 of an integer value.
 
@@ -79,7 +81,7 @@ The functions compute the logarithm to the base 2 and 10 of an integer value.
 Example
 -------
 
-.. code:: cpp
+.. code:: cuda
 
     #include <cuda/cmath>
     #include <cuda/std/cassert>
@@ -99,4 +101,4 @@ Example
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/nqrYvrGTq>`_
+`See it on Godbolt 🔗 <https://godbolt.org/z/7W3WaGd3c>`__

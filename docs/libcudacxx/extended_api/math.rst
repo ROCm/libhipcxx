@@ -62,11 +62,13 @@ This page covers the math extended API, providing integer arithmetic utilities i
 
    * - :ref:`round_up <libcudacxx-extended-api-math-round-up>`
      - Round up to the next multiple
-     - libhipcxx 3.0
+     - CCCL 3.0.0
+     - CUDA 13.0
 
    * - :ref:`round_down <libcudacxx-extended-api-math-round-down>`
      - Round down to the previous multiple
-     - libhipcxx 3.0
+     - CCCL 3.0.0
+     - CUDA 13.0
 
    * - :ref:`ilog2 <libcudacxx-extended-api-math-ilog>`
      - Integer logarithm to the base 2
