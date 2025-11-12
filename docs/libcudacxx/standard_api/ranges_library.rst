@@ -56,11 +56,11 @@ All library features are available from C++17 onwards. The concepts can be used 
 
 .. code:: cpp
 
-   template<cuda::std::contiguos_range Range>
-   void do_something_with_ranges_in_cpp20(Range&& range) {...}
+    template<cuda::std::contiguous_range Range>
+    void do_something_with_ranges_in_cpp20(Range&& range) {...}
 
-   template<class Range, cuda::std::enable_if_t<cuda::std::contiguos_range<Range>, int> = 0>
-   void do_something_with_ranges_in_cpp17(Range&& range) {...}
+    template<class Range, cuda::std::enable_if_t<cuda::std::contiguous_range<Range>, int> = 0>
+    void do_something_with_ranges_in_cpp17(Range&& range) {...}
 
 Restrictions
 ------------
