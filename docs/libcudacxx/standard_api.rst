@@ -36,6 +36,7 @@ This page covers the libhipcxx standard API, summarizing C++ and C standard libr
    :hidden:
    :maxdepth: 2
 
+   standard_api/algorithms_library
    standard_api/c_library
    standard_api/concepts_library
    standard_api/container_library
