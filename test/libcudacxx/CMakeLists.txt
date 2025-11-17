@@ -28,28 +28,37 @@ macro(pythonize_bool var)
   endif()
 endmacro()
 
-if (LIBCUDACXX_ENABLE_CUDA)
-
-  find_package(CUDAToolkit REQUIRED)
-  get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
-
-  set(LIBCUDACXX_HIGHEST_COMPUTE_ARCH 90)
-
-# <<<<<<< OLD CODE from 6def8aee26 (1789a7554e) - COMMENTED OUT
-#   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
-#     set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
-#     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
-#   endforeach ()
+# <<<<<<< OLD CODE from 25946f69f5 (3d984d016c) - COMMENTED OUT
+# if (LIBCUDACXX_ENABLE_CUDA)
 #
-#   message(STATUS "Enabled CUDA architectures:${_compute_message}")
+#   find_package(CUDAToolkit REQUIRED)
+#   get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
 #
-# elseif(LIBCUDACXX_ENABLE_HIP)
+#   set(LIBCUDACXX_HIGHEST_COMPUTE_ARCH 90)
 #
-#   # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
-#   if (NOT LIBCUDACXX_COMPUTE_ARCHS)
-#     set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
-#   endif()
+# # <<<<<<< OLD CODE from 6def8aee26 (1789a7554e) - COMMENTED OUT
+# #   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
+# #     set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
+# #     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
+# #   endforeach ()
+# #
+# #   message(STATUS "Enabled CUDA architectures:${_compute_message}")
+# #
+# # elseif(LIBCUDACXX_ENABLE_HIP)
+# #
+# #   # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
+# #   if (NOT LIBCUDACXX_COMPUTE_ARCHS)
+# #     set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
+# #   endif()
+# # =======
 # =======
+#add dlpack
+cccl_get_dlpack()
+
+find_package(CUDAToolkit REQUIRED)
+get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
+
+# >>>>>>> END NEW CODE (3d984d016c)
 foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
   set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
 # <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
@@ -174,6 +183,7 @@ endif()
 
 # enable exceptions and assertions in tests
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_ASSERTIONS")
+string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -I ${dlpack_SOURCE_DIR}/include")
 
 # enable optional<T&>
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_OPTIONAL_REF")
