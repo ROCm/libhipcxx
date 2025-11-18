@@ -1,25 +1,70 @@
-# MIT License
+# <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
+# # MIT License
+# #
+# # Modifications Copyright (C) 2024-2026 Advanced Micro Devices, Inc. All rights reserved.
+# #
+# # Permission is hereby granted, free of charge, to any person obtaining a copy
+# # of this software and associated documentation files (the "Software"), to deal
+# # in the Software without restriction, including without limitation the rights
+# # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# # copies of the Software, and to permit persons to whom the Software is
+# # furnished to do so, subject to the following conditions:
+# #
+# # The above copyright notice and this permission notice shall be included in all
+# # copies or substantial portions of the Software.
+# #
+# # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# # SOFTWARE.
 #
-# Modifications Copyright (C) 2024-2026 Advanced Micro Devices, Inc. All rights reserved.
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+# =======
+###############################################################################
+### C2H tests:
+cccl_get_c2h()
 
+file(
+  GLOB_RECURSE test_srcs
+  RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+  CONFIGURE_DEPENDS
+  *.cu
+)
+
+set(c2h_all_target "libcudacxx.test.c2h_all")
+add_custom_target(${c2h_all_target})
+
+function(libcudacxx_add_test target_name_var source)
+  string(REPLACE "/" "." target_name "${source}")
+  string(PREPEND target_name "libcudacxx.test.")
+  string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
+  set(${target_name_var} ${target_name} PARENT_SCOPE)
+
+  add_executable(${target_name} "${source}")
+  cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
+  target_include_directories(
+    ${target_name}
+    PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
+  )
+  target_link_libraries(
+    ${target_name}
+    PRIVATE libcudacxx::libcudacxx libcudacxx.compiler_interface cccl.c2h.main
+  )
+
+  add_dependencies(${c2h_all_target} ${target_name})
+
+  add_test(NAME ${target_name} COMMAND ${target_name})
+endfunction()
+
+foreach (test_src IN LISTS test_srcs)
+  libcudacxx_add_test(test_target "${test_src}")
+endforeach()
+
+###############################################################################
+### Lit tests:
+# >>>>>>> END NEW CODE (6c02fd08b5)
 macro(pythonize_bool var)
   if (${var})
     set(${var} True)
@@ -73,12 +118,16 @@ elseif(LIBCUDACXX_ENABLE_HIP)
     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
   endforeach ()
 
-  message(STATUS "Enabled HIP architectures:${_compute_message}")
-
-  option(LIBHIPCXX_TEST_WITH_HIPRTC
-  "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
-  OFF)
-endif()
+# <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
+#   message(STATUS "Enabled HIP architectures:${_compute_message}")
+#
+#   option(LIBHIPCXX_TEST_WITH_HIPRTC
+#   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
+#   OFF)
+# endif()
+# =======
+message(STATUS "Lit enabled CUDA architectures:${_compute_message}")
+# >>>>>>> END NEW CODE (6c02fd08b5)
 
 option(
   LIBCUDACXX_TEST_WITH_NVRTC
@@ -241,9 +290,6 @@ if (NOT MSVC AND NOT ${CMAKE_CUDA_COMPILER_ID} STREQUAL "Clang")
 endif()
 
 if (MSVC)
-  # sccache cannot handle the -Fd option generationg pdb files
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT Embedded)
-
   # We want to use cudaLaunchKernelEx which is guarded by __cplusplus
   if ("${CMAKE_CUDA_COMPILER_VERSION}" LESS "12.3.0")
     string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -Xcompiler=/Zc:__cplusplus")
@@ -396,10 +442,19 @@ if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
   # Only executed if explicitly requested.
   add_custom_target(
     libcudacxx.test.lit.precompile
+    # HACK: There is no way to tell CMake/ninja to always build a target serially,
+    # so we make this target depend on all other libcudacxx targets to avoid oversubscribing
+    # the build machine.
+    # FIXME: This has nasty side effects:
+    # - It's fragile and must be updated every time we add new targets to libcudacxx
+    # - It oversubs `-dev` presets that configure libcudacxx alongside other CCCL projects
+    # - It makes it impossible to just build this target alone since it brings in the world
+    # See related issue https://github.com/NVIDIA/cccl/issues/6163.
     DEPENDS
       libcudacxx.test.public_headers
       libcudacxx.test.internal_headers
       libcudacxx.test.public_headers_host_only
+      libcudacxx.test.c2h_all
     # gersemi: off
     COMMAND
       "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
@@ -456,204 +511,207 @@ set_tests_properties(
     TIMEOUT 10800
     RUN_SERIAL TRUE
 )
-
-# NOTE(HIP/AMD): on HIP we also pull in the c2h subdirectory so the
-# cccl.c2h / cccl.c2h.main library targets exist, but only as a
-# Catch2-only stripped-down build (see c2h/CMakeLists.txt). The
-# per-test executables below are now also enabled under HIP, with
-# a HIP-only skip-list for the *.cu test files that use thrust /
-# cub / cooperative_groups (none of which are wired up in this
-# tree).
+# <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
 #
-# NOTE(HIP/AMD): cccl_get_c2h() pulls add_subdirectory(c2h), and
-# c2h/CMakeLists.txt unconditionally calls cccl_get_catch2(), which
-# CPM-resolves to 'git clone gh:catchorg/Catch2#3.8.1'. That git
-# clone fails in air-gapped CI containers. Provide an opt-out
-# 'LIBCUDACXX_ENABLE_C2H_TESTS' (default ON to preserve the existing
-# behaviour) so air-gapped builds can run with
-# '-DLIBCUDACXX_ENABLE_C2H_TESTS=OFF'. The lit test suite (which is
-# the bulk of the test coverage) does not depend on c2h / Catch2 at
-# all, so disabling c2h on air-gapped CI loses only the c2h-style
-# per-test executables (libcudacxx.test.*.cu); 'ctest' / lit / the
-# header-self-contained tests still run.
-option(
-  LIBCUDACXX_ENABLE_C2H_TESTS
-  "Enable the c2h test framework (catch2-based per-test .cu executables). Disabling this skips the cccl_get_catch2() git fetch and the libcudacxx.test.c2h_all umbrella target. Default ON."
-  ON
-)
-if (LIBCUDACXX_ENABLE_C2H_TESTS)
-  cccl_get_c2h()
-endif()
-
-# NOTE(HIP/AMD): rocThrust is found inside c2h/CMakeLists.txt (see
-# cccl_get_c2h() above), but the resulting 'rocthrust_FOUND' variable
-# is local to that subdirectory. Re-do the lookup here so we can use
-# the result to (a) decide whether to skip-list thrust-using tests
-# below and (b) link 'roc::rocthrust' to the per-test executable.
-if (LIBCUDACXX_ENABLE_HIP)
-  find_package(rocthrust QUIET CONFIG)
-endif()
-
-if(LIBCUDACXX_ENABLE_C2H_TESTS AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP))
-  file(
-    GLOB_RECURSE test_srcs
-    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-    CONFIGURE_DEPENDS
-    *.cu
-  )
-
-  if (LIBCUDACXX_ENABLE_HIP)
-    # NOTE(HIP/AMD): per-test skip-list. These depend on upstream-CUDA-only
-    # feature surfaces; enable them only when the corresponding HIP support
-    # has landed.
-    set(LIBCUDACXX_C2H_HIP_SKIP_LIST
-      # Use cuda::device::current_arch_id / current_arch_traits /
-      # current_compute_capability which are not yet wired into the
-      # libhipcxx HIP bridge (need a HIP-side AMDGCN architecture
-      # registry).
-      cuda/ccclrt/device/arch_id.c2h.cu
-      cuda/ccclrt/device/arch_traits.c2h.cu
-      cuda/ccclrt/device/compute_capability.c2h.cu
-    )
-    # If rocThrust is NOT available, also skip the thrust-using test;
-    # otherwise leave it in the build and link rocThrust to the
-    # per-test executable (handled below).
-    if (NOT rocthrust_FOUND)
-      list(APPEND LIBCUDACXX_C2H_HIP_SKIP_LIST
-        cuda/containers/uninitialized_async_buffer.cu)
-    endif()
-  endif()
-
-  set(c2h_all_target "libcudacxx.test.c2h_all")
-  add_custom_target(${c2h_all_target})
-
-  # NOTE(HIP/AMD): see the long-form comment inside libcudacxx_add_test()
-  # below for the rationale. Briefly: commit 7b770425d9 extended the strict
-  # cccl warning regime ('-Wall -Wextra -Werror') to the HIP language;
-  # several upstream NVIDIA c2h test sources (which we import verbatim and
-  # don't fork) carry pre-existing low-severity warnings that now hard-fail
-  # the build. We relax exactly four categories on HIP for c2h test
-  # executables only, via this INTERFACE library. It MUST be linked AFTER
-  # libcudacxx.compiler_interface (which carries the '-Wall -Wextra') so
-  # that clang sees the '-Wno-*' flags LATER on the command line and
-  # therefore wins the left-to-right precedence battle. Linking order in
-  # target_link_libraries() is what controls the resulting -W flag order
-  # on the compile command.
-  if (LIBCUDACXX_ENABLE_HIP)
-    add_library(libcudacxx.test.c2h_warning_relaxation INTERFACE)
-    target_compile_options(libcudacxx.test.c2h_warning_relaxation INTERFACE
-      -Wno-unused-parameter
-      -Wno-unused-variable
-      -Wno-unused-value
-      -Wno-sign-compare
-    )
-  endif()
-
-  function(libcudacxx_add_test target_name_var source)
-    string(REPLACE "/" "." target_name "${source}")
-    string(PREPEND target_name "libcudacxx.test.")
-    string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
-    set(${target_name_var} ${target_name} PARENT_SCOPE)
-
-    add_executable(${target_name} "${source}")
-    if (LIBCUDACXX_ENABLE_HIP)
-      # The .cu file extension defaults to LANGUAGE CUDA in CMake.
-      # Force LANGUAGE HIP on HIP builds so hipcc / clang -x hip
-      # picks the file up. Mirrors the pattern in c2h/CMakeLists.txt.
-      set_source_files_properties("${source}" PROPERTIES LANGUAGE HIP)
-    else()
-      cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-    endif()
-    target_include_directories(
-      ${target_name}
-      PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
-    )
-    target_link_libraries(
-      ${target_name}
-      PRIVATE #
-        libcudacxx::libcudacxx
-        cccl.c2h.main
-        libcudacxx.compiler_interface
-    )
-    # NOTE(HIP/AMD): link rocThrust to every c2h test on HIP when it is
-    # available. The thrust-using tests (currently
-    # uninitialized_async_buffer.cu) need it on the link line; the
-    # other tests don't reference any thrust symbol and the link is a
-    # no-op for them. Cheaper to do this unconditionally than to
-    # maintain a per-test "needs rocthrust" allow-list.
-    if (LIBCUDACXX_ENABLE_HIP AND TARGET roc::rocthrust)
-      target_link_libraries(${target_name} PRIVATE roc::rocthrust)
-    endif()
-
-    # NOTE(HIP/AMD): the c2h test sources are upstream NVIDIA cccl test
-    # code imported wholesale; we don't maintain a HIP-side fork of them.
-    # libcudacxx.compiler_interface (extended to HIP in commit
-    # 7b770425d9 "cccl warning flags to HIP language") is intentionally
-    # strict for OUR headers (catches HIP-port regressions), but several
-    # of the imported tests carry pre-existing low-severity warnings
-    # that surface as -Werror under that strict regime:
-    #
-    #   * -Wunused-parameter   : ccclrt hierarchy tests parametrise
-    #                            kernels on a 'dims' type and consume
-    #                            only its compile-time properties.
-    #   * -Wunused-variable    : variables declared for the host-side
-    #                            assertions are not referenced from the
-    #                            device-side checks (and vice versa).
-    #   * -Wunused-value       : tests that intentionally ignore the
-    #                            [[nodiscard]] return of '::cudaXxx()'
-    #                            (aliased to hipXxx on HIP) for "best
-    #                            effort" cleanup / error-probe paths.
-    #   * -Wsign-compare       : comparison of CG_GRID_NUM_BLOCKS()
-    #                            (unsigned) vs cuda::grid.count(...)
-    #                            (signed index_type) in the hierarchy
-    #                            tests.
-    #
-    # Relax these four categories on HIP for c2h test executables only.
-    # The libhipcxx headers stay under the full strict warning set; this
-    # opt-out applies strictly to UPSTREAM test code we don't want to
-    # police-edit with cast-noise just to silence per-builder warnings
-    # that aren't in the upstream NV path.
-    #
-    # The -Wno-* options are wired via the INTERFACE library
-    # 'libcudacxx.test.c2h_warning_relaxation' (defined below this
-    # function in the c2h-tests block) and LINKED AFTER
-    # libcudacxx.compiler_interface so that the resulting compile-line
-    # order places these '-Wno-*' flags AFTER the upstream
-    # '-Wall -Wextra' that would otherwise re-enable them. Clang
-    # processes -W flags left-to-right, so order is load-bearing here.
-    if (LIBCUDACXX_ENABLE_HIP AND TARGET libcudacxx.test.c2h_warning_relaxation)
-      target_link_libraries(
-        ${target_name}
-        PRIVATE libcudacxx.test.c2h_warning_relaxation
-      )
-    endif()
-
-    add_dependencies(${c2h_all_target} ${target_name})
-
-    add_test(NAME ${target_name} COMMAND ${target_name})
-  endfunction()
-
-  foreach (test_src IN LISTS test_srcs)
-    if (LIBCUDACXX_ENABLE_HIP)
-      list(FIND LIBCUDACXX_C2H_HIP_SKIP_LIST "${test_src}" _skip_idx)
-      if (NOT _skip_idx EQUAL -1)
-        message(STATUS "c2h test (HIP skip-list): ${test_src}")
-        continue()
-      endif()
-    endif()
-    libcudacxx_add_test(test_target "${test_src}")
-  endforeach()
-elseif (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
-  # NOTE(HIP/AMD): when c2h tests are disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF,
-  # used in air-gapped CI to avoid the cccl_get_catch2() git fetch), still
-  # define an *empty* 'libcudacxx.test.c2h_all' target. The
-  # 'libcudacxx-base' build preset in CMakePresets.json lists this target
-  # by name; without this stub a 'cmake --build --preset libcudacxx-cppNN'
-  # invocation would fail with 'ninja: error: unknown target
-  # libcudacxx.test.c2h_all'. Building the empty target is a near-zero-cost
-  # no-op.
-  add_custom_target(libcudacxx.test.c2h_all)
-  message(STATUS
-    "c2h tests disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF). "
-    "libcudacxx.test.c2h_all defined as an empty stub.")
-endif()
+# # NOTE(HIP/AMD): on HIP we also pull in the c2h subdirectory so the
+# # cccl.c2h / cccl.c2h.main library targets exist, but only as a
+# # Catch2-only stripped-down build (see c2h/CMakeLists.txt). The
+# # per-test executables below are now also enabled under HIP, with
+# # a HIP-only skip-list for the *.cu test files that use thrust /
+# # cub / cooperative_groups (none of which are wired up in this
+# # tree).
+# #
+# # NOTE(HIP/AMD): cccl_get_c2h() pulls add_subdirectory(c2h), and
+# # c2h/CMakeLists.txt unconditionally calls cccl_get_catch2(), which
+# # CPM-resolves to 'git clone gh:catchorg/Catch2#3.8.1'. That git
+# # clone fails in air-gapped CI containers. Provide an opt-out
+# # 'LIBCUDACXX_ENABLE_C2H_TESTS' (default ON to preserve the existing
+# # behaviour) so air-gapped builds can run with
+# # '-DLIBCUDACXX_ENABLE_C2H_TESTS=OFF'. The lit test suite (which is
+# # the bulk of the test coverage) does not depend on c2h / Catch2 at
+# # all, so disabling c2h on air-gapped CI loses only the c2h-style
+# # per-test executables (libcudacxx.test.*.cu); 'ctest' / lit / the
+# # header-self-contained tests still run.
+# option(
+#   LIBCUDACXX_ENABLE_C2H_TESTS
+#   "Enable the c2h test framework (catch2-based per-test .cu executables). Disabling this skips the cccl_get_catch2() git fetch and the libcudacxx.test.c2h_all umbrella target. Default ON."
+#   ON
+# )
+# if (LIBCUDACXX_ENABLE_C2H_TESTS)
+#   cccl_get_c2h()
+# endif()
+#
+# # NOTE(HIP/AMD): rocThrust is found inside c2h/CMakeLists.txt (see
+# # cccl_get_c2h() above), but the resulting 'rocthrust_FOUND' variable
+# # is local to that subdirectory. Re-do the lookup here so we can use
+# # the result to (a) decide whether to skip-list thrust-using tests
+# # below and (b) link 'roc::rocthrust' to the per-test executable.
+# if (LIBCUDACXX_ENABLE_HIP)
+#   find_package(rocthrust QUIET CONFIG)
+# endif()
+#
+# if(LIBCUDACXX_ENABLE_C2H_TESTS AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP))
+#   file(
+#     GLOB_RECURSE test_srcs
+#     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+#     CONFIGURE_DEPENDS
+#     *.cu
+#   )
+#
+#   if (LIBCUDACXX_ENABLE_HIP)
+#     # NOTE(HIP/AMD): per-test skip-list. These depend on upstream-CUDA-only
+#     # feature surfaces; enable them only when the corresponding HIP support
+#     # has landed.
+#     set(LIBCUDACXX_C2H_HIP_SKIP_LIST
+#       # Use cuda::device::current_arch_id / current_arch_traits /
+#       # current_compute_capability which are not yet wired into the
+#       # libhipcxx HIP bridge (need a HIP-side AMDGCN architecture
+#       # registry).
+#       cuda/ccclrt/device/arch_id.c2h.cu
+#       cuda/ccclrt/device/arch_traits.c2h.cu
+#       cuda/ccclrt/device/compute_capability.c2h.cu
+#     )
+#     # If rocThrust is NOT available, also skip the thrust-using test;
+#     # otherwise leave it in the build and link rocThrust to the
+#     # per-test executable (handled below).
+#     if (NOT rocthrust_FOUND)
+#       list(APPEND LIBCUDACXX_C2H_HIP_SKIP_LIST
+#         cuda/containers/uninitialized_async_buffer.cu)
+#     endif()
+#   endif()
+#
+#   set(c2h_all_target "libcudacxx.test.c2h_all")
+#   add_custom_target(${c2h_all_target})
+#
+#   # NOTE(HIP/AMD): see the long-form comment inside libcudacxx_add_test()
+#   # below for the rationale. Briefly: commit 7b770425d9 extended the strict
+#   # cccl warning regime ('-Wall -Wextra -Werror') to the HIP language;
+#   # several upstream NVIDIA c2h test sources (which we import verbatim and
+#   # don't fork) carry pre-existing low-severity warnings that now hard-fail
+#   # the build. We relax exactly four categories on HIP for c2h test
+#   # executables only, via this INTERFACE library. It MUST be linked AFTER
+#   # libcudacxx.compiler_interface (which carries the '-Wall -Wextra') so
+#   # that clang sees the '-Wno-*' flags LATER on the command line and
+#   # therefore wins the left-to-right precedence battle. Linking order in
+#   # target_link_libraries() is what controls the resulting -W flag order
+#   # on the compile command.
+#   if (LIBCUDACXX_ENABLE_HIP)
+#     add_library(libcudacxx.test.c2h_warning_relaxation INTERFACE)
+#     target_compile_options(libcudacxx.test.c2h_warning_relaxation INTERFACE
+#       -Wno-unused-parameter
+#       -Wno-unused-variable
+#       -Wno-unused-value
+#       -Wno-sign-compare
+#     )
+#   endif()
+#
+#   function(libcudacxx_add_test target_name_var source)
+#     string(REPLACE "/" "." target_name "${source}")
+#     string(PREPEND target_name "libcudacxx.test.")
+#     string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
+#     set(${target_name_var} ${target_name} PARENT_SCOPE)
+#
+#     add_executable(${target_name} "${source}")
+#     if (LIBCUDACXX_ENABLE_HIP)
+#       # The .cu file extension defaults to LANGUAGE CUDA in CMake.
+#       # Force LANGUAGE HIP on HIP builds so hipcc / clang -x hip
+#       # picks the file up. Mirrors the pattern in c2h/CMakeLists.txt.
+#       set_source_files_properties("${source}" PROPERTIES LANGUAGE HIP)
+#     else()
+#       cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
+#     endif()
+#     target_include_directories(
+#       ${target_name}
+#       PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
+#     )
+#     target_link_libraries(
+#       ${target_name}
+#       PRIVATE #
+#         libcudacxx::libcudacxx
+#         cccl.c2h.main
+#         libcudacxx.compiler_interface
+#     )
+#     # NOTE(HIP/AMD): link rocThrust to every c2h test on HIP when it is
+#     # available. The thrust-using tests (currently
+#     # uninitialized_async_buffer.cu) need it on the link line; the
+#     # other tests don't reference any thrust symbol and the link is a
+#     # no-op for them. Cheaper to do this unconditionally than to
+#     # maintain a per-test "needs rocthrust" allow-list.
+#     if (LIBCUDACXX_ENABLE_HIP AND TARGET roc::rocthrust)
+#       target_link_libraries(${target_name} PRIVATE roc::rocthrust)
+#     endif()
+#
+#     # NOTE(HIP/AMD): the c2h test sources are upstream NVIDIA cccl test
+#     # code imported wholesale; we don't maintain a HIP-side fork of them.
+#     # libcudacxx.compiler_interface (extended to HIP in commit
+#     # 7b770425d9 "cccl warning flags to HIP language") is intentionally
+#     # strict for OUR headers (catches HIP-port regressions), but several
+#     # of the imported tests carry pre-existing low-severity warnings
+#     # that surface as -Werror under that strict regime:
+#     #
+#     #   * -Wunused-parameter   : ccclrt hierarchy tests parametrise
+#     #                            kernels on a 'dims' type and consume
+#     #                            only its compile-time properties.
+#     #   * -Wunused-variable    : variables declared for the host-side
+#     #                            assertions are not referenced from the
+#     #                            device-side checks (and vice versa).
+#     #   * -Wunused-value       : tests that intentionally ignore the
+#     #                            [[nodiscard]] return of '::cudaXxx()'
+#     #                            (aliased to hipXxx on HIP) for "best
+#     #                            effort" cleanup / error-probe paths.
+#     #   * -Wsign-compare       : comparison of CG_GRID_NUM_BLOCKS()
+#     #                            (unsigned) vs cuda::grid.count(...)
+#     #                            (signed index_type) in the hierarchy
+#     #                            tests.
+#     #
+#     # Relax these four categories on HIP for c2h test executables only.
+#     # The libhipcxx headers stay under the full strict warning set; this
+#     # opt-out applies strictly to UPSTREAM test code we don't want to
+#     # police-edit with cast-noise just to silence per-builder warnings
+#     # that aren't in the upstream NV path.
+#     #
+#     # The -Wno-* options are wired via the INTERFACE library
+#     # 'libcudacxx.test.c2h_warning_relaxation' (defined below this
+#     # function in the c2h-tests block) and LINKED AFTER
+#     # libcudacxx.compiler_interface so that the resulting compile-line
+#     # order places these '-Wno-*' flags AFTER the upstream
+#     # '-Wall -Wextra' that would otherwise re-enable them. Clang
+#     # processes -W flags left-to-right, so order is load-bearing here.
+#     if (LIBCUDACXX_ENABLE_HIP AND TARGET libcudacxx.test.c2h_warning_relaxation)
+#       target_link_libraries(
+#         ${target_name}
+#         PRIVATE libcudacxx.test.c2h_warning_relaxation
+#       )
+#     endif()
+#
+#     add_dependencies(${c2h_all_target} ${target_name})
+#
+#     add_test(NAME ${target_name} COMMAND ${target_name})
+#   endfunction()
+#
+#   foreach (test_src IN LISTS test_srcs)
+#     if (LIBCUDACXX_ENABLE_HIP)
+#       list(FIND LIBCUDACXX_C2H_HIP_SKIP_LIST "${test_src}" _skip_idx)
+#       if (NOT _skip_idx EQUAL -1)
+#         message(STATUS "c2h test (HIP skip-list): ${test_src}")
+#         continue()
+#       endif()
+#     endif()
+#     libcudacxx_add_test(test_target "${test_src}")
+#   endforeach()
+# elseif (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
+#   # NOTE(HIP/AMD): when c2h tests are disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF,
+#   # used in air-gapped CI to avoid the cccl_get_catch2() git fetch), still
+#   # define an *empty* 'libcudacxx.test.c2h_all' target. The
+#   # 'libcudacxx-base' build preset in CMakePresets.json lists this target
+#   # by name; without this stub a 'cmake --build --preset libcudacxx-cppNN'
+#   # invocation would fail with 'ninja: error: unknown target
+#   # libcudacxx.test.c2h_all'. Building the empty target is a near-zero-cost
+#   # no-op.
+#   add_custom_target(libcudacxx.test.c2h_all)
+#   message(STATUS
+#     "c2h tests disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF). "
+#     "libcudacxx.test.c2h_all defined as an empty stub.")
+# endif()
+# =======
+# >>>>>>> END NEW CODE (6c02fd08b5)
