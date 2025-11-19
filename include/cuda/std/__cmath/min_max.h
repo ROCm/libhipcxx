@@ -129,7 +129,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
     }
     else
     {
-      if (!::cuda::std::__cccl_default_is_constant_evaluated())
+      _CCCL_IF_NOT_CONSTEVAL_DEFAULT
       {
 #if _CCCL_HAS_FLOAT128()
         if constexpr (is_same_v<_Tp, __float128>)
@@ -253,7 +253,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
     }
     else
     {
-      if (!::cuda::std::__cccl_default_is_constant_evaluated())
+      _CCCL_IF_NOT_CONSTEVAL_DEFAULT
       {
 #if _CCCL_HAS_FLOAT128()
         if constexpr (is_same_v<_Tp, __float128>)

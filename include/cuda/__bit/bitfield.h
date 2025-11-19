@@ -46,7 +46,6 @@
 #include <cuda/__bit/bitmask.h>
 #include <cuda/std/__limits/numeric_limits.h>
 #include <cuda/std/__type_traits/conditional.h>
-#include <cuda/std/__type_traits/is_constant_evaluated.h>
 #include <cuda/std/__type_traits/is_unsigned_integer.h>
 #include <cuda/std/cstdint>
 #include <cuda/std/limits>
@@ -103,7 +102,7 @@ bitfield_insert(const _Tp __dest, const _Tp __source, int __start, int __width) 
 #ifndef __HIP_PLATFORM_AMD__
   if constexpr (sizeof(_Tp) <= sizeof(uint64_t))
   {
-    if (!::cuda::std::__cccl_default_is_constant_evaluated())
+    _CCCL_IF_NOT_CONSTEVAL_DEFAULT
     {
       // clang-format off
       NV_DISPATCH_TARGET( // all SM < 70
@@ -131,7 +130,7 @@ template <typename _Tp>
 #ifndef __HIP_PLATFORM_AMD__
   if constexpr (sizeof(_Tp) <= sizeof(uint32_t))
   {
-    if (!::cuda::std::__cccl_default_is_constant_evaluated())
+    _CCCL_IF_NOT_CONSTEVAL_DEFAULT
     {
       // clang-format off
       NV_DISPATCH_TARGET( // all SM < 70
