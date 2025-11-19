@@ -48,7 +48,6 @@
 #include <cuda/std/__algorithm/clamp.h>
 #include <cuda/std/__algorithm/max.h>
 #include <cuda/std/__bit/bit_cast.h>
-#include <cuda/std/__type_traits/is_constant_evaluated.h>
 #include <cuda/std/__utility/to_underlying.h>
 #include <cuda/std/cstddef>
 #include <cuda/std/cstdint>
@@ -166,7 +165,7 @@ enum class __l2_descriptor_mode_t : uint32_t
 [[nodiscard]] _CCCL_API constexpr uint64_t
 __l2_interleave(__l2_evict_t __primary, __l2_evict_t __secondary, float __fraction)
 {
-  if (!::cuda::std::__cccl_default_is_constant_evaluated())
+  _CCCL_IF_NOT_CONSTEVAL_DEFAULT
   {
 #ifndef _CCCL_HIP_COMPILER
     NV_IF_ELSE_TARGET(
