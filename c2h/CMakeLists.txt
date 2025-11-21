@@ -128,47 +128,67 @@ if (LIBCUDACXX_ENABLE_HIP AND C2H_ENABLE_CURAND)
     "INTERFACE here and generators*.cu (the curand consumer) is skipped.")
 endif()
 
-# Library sources: under HIP the thrust-heavy generators*.cu translation
-# units are skipped; the Catch2 framework + helpers are still present
-# via cccl.c2h.main (catch2_runner.cpp + catch2_runner_helper.cu).
-if (LIBCUDACXX_ENABLE_HIP)
-  add_library(cccl.c2h INTERFACE)
-else()
-  add_library(
-    cccl.c2h
-    STATIC
-    generators.cu
-    generators_gen_values.cu
-    generators_uniform_offsets.cu
-    generators_vector.cu
-  )
-endif()
-if (LIBCUDACXX_ENABLE_HIP)
-  include(${CMAKE_SOURCE_DIR}/cmake/CCCLC2hHipDeps.cmake)
-  target_include_directories(cccl.c2h INTERFACE "${C2H_SOURCE_DIR}/include")
-  target_link_libraries(
-    cccl.c2h
-    INTERFACE #
-      CCCL::CCCL
-      Catch2::Catch2
-      cccl.compiler_interface_cpp17
-  )
-  # Threads::Threads + hip::host attached via the shared helper -- see
-  # cmake/CCCLC2hHipDeps.cmake for the manylinux/glibc < 2.34 pthread
-  # weak-stub rationale that requires '-pthread' on every HIP test
-  # executable that constructs a 'cuda::device_ref' / 'cuda::stream'.
-  cccl_c2h_attach_hip_deps(cccl.c2h SCOPE INTERFACE)
-else()
-  target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
-  target_link_libraries(
-    cccl.c2h
-    PUBLIC #
-      CCCL::CCCL
-      Catch2::Catch2
-      cccl.compiler_interface_cpp17
-  )
-  cccl_configure_target(cccl.c2h DIALECT 17)
-endif()
+# <<<<<<< OLD CODE from 23063816f0 (3fd8e38e4b) - COMMENTED OUT
+# # Library sources: under HIP the thrust-heavy generators*.cu translation
+# # units are skipped; the Catch2 framework + helpers are still present
+# # via cccl.c2h.main (catch2_runner.cpp + catch2_runner_helper.cu).
+# if (LIBCUDACXX_ENABLE_HIP)
+#   add_library(cccl.c2h INTERFACE)
+# else()
+#   add_library(
+#     cccl.c2h
+#     STATIC
+#     generators.cu
+#     generators_gen_values.cu
+#     generators_uniform_offsets.cu
+#     generators_vector.cu
+#   )
+# endif()
+# if (LIBCUDACXX_ENABLE_HIP)
+#   include(${CMAKE_SOURCE_DIR}/cmake/CCCLC2hHipDeps.cmake)
+#   target_include_directories(cccl.c2h INTERFACE "${C2H_SOURCE_DIR}/include")
+#   target_link_libraries(
+#     cccl.c2h
+#     INTERFACE #
+#       CCCL::CCCL
+#       Catch2::Catch2
+#       cccl.compiler_interface_cpp17
+#   )
+#   # Threads::Threads + hip::host attached via the shared helper -- see
+#   # cmake/CCCLC2hHipDeps.cmake for the manylinux/glibc < 2.34 pthread
+#   # weak-stub rationale that requires '-pthread' on every HIP test
+#   # executable that constructs a 'cuda::device_ref' / 'cuda::stream'.
+#   cccl_c2h_attach_hip_deps(cccl.c2h SCOPE INTERFACE)
+# else()
+#   target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
+#   target_link_libraries(
+#     cccl.c2h
+#     PUBLIC #
+#       CCCL::CCCL
+#       Catch2::Catch2
+#       cccl.compiler_interface_cpp17
+#   )
+#   cccl_configure_target(cccl.c2h DIALECT 17)
+# endif()
+# =======
+add_library(
+  cccl.c2h
+  STATIC
+  generators.cu
+  generators_gen_values.cu
+  generators_uniform_offsets.cu
+  generators_vector.cu
+)
+target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
+target_link_libraries(
+  cccl.c2h
+  PUBLIC #
+    cccl.compiler_interface
+    CCCL::CCCL
+    Catch2::Catch2
+)
+cccl_configure_target(cccl.c2h DIALECT 17)
+# >>>>>>> END NEW CODE (3fd8e38e4b)
 
 if (C2H_ENABLE_CURAND)
   target_link_libraries(cccl.c2h PRIVATE CUDA::curand)

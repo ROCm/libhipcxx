@@ -67,20 +67,26 @@ foreach (item IN LISTS CMAKE_CUDA_ARCHITECTURES)
 endforeach()
 
 function(libcudacxx_create_public_header_test header_name headertest_src)
-  # Create the default target for that file. The TU is always written to
-  # disk as '.cu' (see configure_file in libcudacxx_add_public_header_test
-  # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
-  # association by tagging the source file with LANGUAGE HIP, which routes
-  # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
-  # natively, so no separate '.cpp' shadow file is needed.
-  set(public_headertest_${header_name} verify_${header_name})
+# <<<<<<< OLD CODE from 23063816f0 (3fd8e38e4b) - COMMENTED OUT
+#   # Create the default target for that file. The TU is always written to
+#   # disk as '.cu' (see configure_file in libcudacxx_add_public_header_test
+#   # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
+#   # association by tagging the source file with LANGUAGE HIP, which routes
+#   # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
+#   # natively, so no separate '.cpp' shadow file is needed.
+#   set(public_headertest_${header_name} verify_${header_name})
+#   add_library(public_headertest_${header_name} SHARED "${headertest_src}.cu")
+#   if (LIBCUDACXX_ENABLE_HIP)
+#     set_source_files_properties(
+#       "${headertest_src}.cu"
+#       PROPERTIES LANGUAGE HIP
+#     )
+#   endif()
+# =======
+  # Create the default target for that file
   add_library(public_headertest_${header_name} SHARED "${headertest_src}.cu")
-  if (LIBCUDACXX_ENABLE_HIP)
-    set_source_files_properties(
-      "${headertest_src}.cu"
-      PROPERTIES LANGUAGE HIP
-    )
-  endif()
+  cccl_configure_target(public_headertest_${header_name})
+# >>>>>>> END NEW CODE (3fd8e38e4b)
   target_include_directories(
     public_headertest_${header_name}
     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
@@ -88,10 +94,6 @@ function(libcudacxx_create_public_header_test header_name headertest_src)
   target_compile_definitions(
     public_headertest_${header_name}
     PRIVATE _CCCL_HEADER_TEST
-  )
-  cccl_configure_target(
-    public_headertest_${header_name}
-    DIALECT ${CMAKE_CUDA_STANDARD}
   )
 
   # Bring in the global CCCL compile definitions
