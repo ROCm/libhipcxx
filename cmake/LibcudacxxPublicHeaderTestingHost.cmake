@@ -79,23 +79,26 @@ endif()
 
 function(libcudacxx_create_public_header_test_host header_name headertest_src)
   # Create the default target for that file
-  set(public_headers_host_only_${header_name} verify_${header_name})
   add_library(
     public_headers_host_only_${header_name}
     SHARED
     "${headertest_src}.cpp"
   )
-  # NOTE(HIP/AMD): tag the configured headertest TU with LANGUAGE HIP so
-  # it goes through the HIP toolchain rather than the plain CXX host
-  # compiler -- this exercises the same compilation pipeline our HIP
-  # consumers use. Lessons-learned ported from the upgrade/3.1_base
-  # test/public_headers_host_only/CMakeLists.txt.
-  if (LIBCUDACXX_ENABLE_HIP)
-    set_source_files_properties(
-      "${headertest_src}.cpp"
-      PROPERTIES LANGUAGE HIP
-    )
-  endif()
+# <<<<<<< OLD CODE from 23063816f0 (3fd8e38e4b) - COMMENTED OUT
+#   # NOTE(HIP/AMD): tag the configured headertest TU with LANGUAGE HIP so
+#   # it goes through the HIP toolchain rather than the plain CXX host
+#   # compiler -- this exercises the same compilation pipeline our HIP
+#   # consumers use. Lessons-learned ported from the upgrade/3.1_base
+#   # test/public_headers_host_only/CMakeLists.txt.
+#   if (LIBCUDACXX_ENABLE_HIP)
+#     set_source_files_properties(
+#       "${headertest_src}.cpp"
+#       PROPERTIES LANGUAGE HIP
+#     )
+#   endif()
+# =======
+  cccl_configure_target(public_headers_host_only_${header_name})
+# >>>>>>> END NEW CODE (3fd8e38e4b)
   target_include_directories(
     public_headers_host_only_${header_name}
     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
@@ -109,10 +112,6 @@ function(libcudacxx_create_public_header_test_host header_name headertest_src)
   target_compile_options(
     public_headers_host_only_${header_name}
     PRIVATE ${public_host_header_cxx_compile_options}
-  )
-  cccl_configure_target(
-    public_headers_host_only_${header_name}
-    DIALECT ${CMAKE_CXX_STANDARD}
   )
 
   # Bring in the global CCCL compile definitions
