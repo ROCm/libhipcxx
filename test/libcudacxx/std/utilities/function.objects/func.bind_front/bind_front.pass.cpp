@@ -217,11 +217,15 @@ __host__ __device__ constexpr bool test()
     assert(h(2, 2, 2) == 9);
   }
 
-  // Make sure we don't treat cuda::std::reference_wrapper specially.
-#if TEST_STD_VER > 2017
-#  if TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC) // reference_wrapper requires `addressof` which is currently not supported with nvrtc
+// <<<<<<< OLD CODE from 665e48f869 (293e038cb0) - COMMENTED OUT
+//   // Make sure we don't treat cuda::std::reference_wrapper specially.
+// #if TEST_STD_VER > 2017
+// #  if TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC) // reference_wrapper requires `addressof` which is currently not supported with nvrtc
+// =======
+#if TEST_COMPILER(NVRTC) // reference_wrapper requires `addressof` which is currently not supported with nvrtc
+// >>>>>>> END NEW CODE (293e038cb0)
   if (!TEST_IS_CONSTANT_EVALUATED())
-#  endif // TEST_COMPILER(NVRTC)
+#endif // TEST_COMPILER(NVRTC)
   {
     auto add = [](cuda::std::reference_wrapper<int> a, cuda::std::reference_wrapper<int> b) {
       return a.get() + b.get();
@@ -230,7 +234,6 @@ __host__ __device__ constexpr bool test()
     auto f = cuda::std::bind_front(add, cuda::std::ref(i));
     assert(f(cuda::std::ref(j)) == 3);
   }
-#endif
 
   // Make sure we can call a function that's a pointer to a member function.
   {
