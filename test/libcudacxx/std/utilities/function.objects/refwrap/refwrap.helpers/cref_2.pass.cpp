@@ -43,7 +43,7 @@ struct A
 __host__ __device__ void cref(A) {}
 } // namespace adl
 
-__host__ __device__ TEST_CONSTEXPR_CXX20 bool test()
+__host__ __device__ constexpr bool test()
 {
   {
     const int i                                = 0;
@@ -63,9 +63,11 @@ __host__ __device__ TEST_CONSTEXPR_CXX20 bool test()
 int main(int, char**)
 {
   test();
-#if TEST_STD_VER > 2017 && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from 665e48f869 (293e038cb0) - COMMENTED OUT
+// #if TEST_STD_VER > 2017 && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
+// =======
+// >>>>>>> END NEW CODE (293e038cb0)
   static_assert(test());
-#endif // TEST_STD_VER > 2017 && !TEST_COMPILER(NVRTC)
 
   return 0;
 }
