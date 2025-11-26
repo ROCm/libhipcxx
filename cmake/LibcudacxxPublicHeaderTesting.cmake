@@ -86,11 +86,14 @@ function(libcudacxx_create_public_header_test header_name headertest_src)
   # Create the default target for that file
   add_library(public_headertest_${header_name} SHARED "${headertest_src}.cu")
   cccl_configure_target(public_headertest_${header_name})
-# >>>>>>> END NEW CODE (3fd8e38e4b)
-  target_include_directories(
-    public_headertest_${header_name}
-    PRIVATE "${libcudacxx_SOURCE_DIR}/include"
-  )
+# <<<<<<< OLD CODE from 8c38351f70 (59ad1b152f) - COMMENTED OUT
+# # >>>>>>> END NEW CODE (3fd8e38e4b)
+#   target_include_directories(
+#     public_headertest_${header_name}
+#     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
+#   )
+# =======
+# >>>>>>> END NEW CODE (59ad1b152f)
   target_compile_definitions(
     public_headertest_${header_name}
     PRIVATE _CCCL_HEADER_TEST
