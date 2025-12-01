@@ -43,6 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/__cmath/sincos.h>
 #include <cuda/std/__cmath/abs.h>
 #include <cuda/std/__cmath/hypot.h>
 #include <cuda/std/__cmath/inverse_trigonometric_functions.h>
@@ -161,12 +162,13 @@ template <class _Tp>
     }
     return complex<_Tp>(numeric_limits<_Tp>::quiet_NaN(), numeric_limits<_Tp>::quiet_NaN());
   }
-  _Tp __x = __rho * ::cuda::std::cos(__theta);
+  const auto [__sin_theta, __cos_theta] = ::cuda::sincos(__theta);
+  _Tp __x                               = __rho * __cos_theta;
   if (::cuda::std::isnan(__x))
   {
     __x = _Tp(0);
   }
-  _Tp __y = __rho * ::cuda::std::sin(__theta);
+  _Tp __y = __rho * __sin_theta;
   if (::cuda::std::isnan(__y))
   {
     __y = _Tp(0);
