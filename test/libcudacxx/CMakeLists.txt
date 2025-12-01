@@ -50,7 +50,9 @@ function(libcudacxx_add_test target_name_var source)
   )
   target_link_libraries(
     ${target_name}
-    PRIVATE libcudacxx::libcudacxx libcudacxx.compiler_interface cccl.c2h.main
+    PRIVATE #
+      libcudacxx.compiler_interface
+      cccl.c2h.main
   )
 
   add_dependencies(${c2h_all_target} ${target_name})
@@ -73,22 +75,29 @@ macro(pythonize_bool var)
   endif()
 endmacro()
 
-# NOTE(HIP/AMD): dlpack is *only* consumed by the NV-only TMA descriptor
-# code in 'include/cuda/__tma/make_tma_descriptor.h', whose entire body is
-# guarded by '_CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC) &&
-# _CCCL_HAS_INCLUDE(<dlpack/dlpack.h>)'. The matching test
-# 'test/libcudacxx/cuda/tma/make_tma_descriptor.pass.cpp' is itself marked
-# '// UNSUPPORTED: hipcc, hiprtc' and 'pre-sm-90'. On HIP-only builds the
-# dlpack include is therefore dead code -- and 'cccl_get_dlpack()' would
-# otherwise call CPM/'git clone gh:dmlc/dlpack#v1.2', which fails in
-# air-gapped CI containers (observed on the ROCm-DS Jenkins job
-# 'libhipcxx/155': 'Failed to clone repository ...dlpack...'). Gate the
-# fetch on 'LIBCUDACXX_ENABLE_CUDA' so HIP-only builds skip it entirely.
-if (LIBCUDACXX_ENABLE_CUDA)
-  cccl_get_dlpack()
-endif()
+# <<<<<<< OLD CODE from 25553efa55 (db7afd3e8d) - COMMENTED OUT
+# # NOTE(HIP/AMD): dlpack is *only* consumed by the NV-only TMA descriptor
+# # code in 'include/cuda/__tma/make_tma_descriptor.h', whose entire body is
+# # guarded by '_CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC) &&
+# # _CCCL_HAS_INCLUDE(<dlpack/dlpack.h>)'. The matching test
+# # 'test/libcudacxx/cuda/tma/make_tma_descriptor.pass.cpp' is itself marked
+# # '// UNSUPPORTED: hipcc, hiprtc' and 'pre-sm-90'. On HIP-only builds the
+# # dlpack include is therefore dead code -- and 'cccl_get_dlpack()' would
+# # otherwise call CPM/'git clone gh:dmlc/dlpack#v1.2', which fails in
+# # air-gapped CI containers (observed on the ROCm-DS Jenkins job
+# # 'libhipcxx/155': 'Failed to clone repository ...dlpack...'). Gate the
+# # fetch on 'LIBCUDACXX_ENABLE_CUDA' so HIP-only builds skip it entirely.
+# if (LIBCUDACXX_ENABLE_CUDA)
+#   cccl_get_dlpack()
+# endif()
+#
+# if (LIBCUDACXX_ENABLE_CUDA)
+# =======
+cccl_get_cudatoolkit()
+cccl_get_dlpack()
 
-if (LIBCUDACXX_ENABLE_CUDA)
+get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
+# >>>>>>> END NEW CODE (db7afd3e8d)
 
   find_package(CUDAToolkit REQUIRED)
   get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
