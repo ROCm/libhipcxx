@@ -40,33 +40,37 @@ else()
 endif()
 
 cccl_get_catch2()
-
-# NOTE(HIP/AMD): on HIP we don't ship a full CCCL distribution
-# (no CUB / Thrust packages), so find_package(CCCL CONFIG REQUIRED)
-# would fail looking for lib/cmake/cccl/cccl-config.cmake. The only
-# CCCL component we ship is libcudacxx; the parent CMakeLists
-# (CMakeLists.txt:245-249) pre-defines CCCL::CCCL as an alias for
-# libcudacxx::libcudacxx so that subsequent
-# target_link_libraries(... CCCL::CCCL ...) calls in this file resolve
-# correctly. Verify the alias actually exists rather than silently
-# reaching the link line later with a missing target. Once a HIP-aware
-# cccl-config.cmake exists upstream, this whole branch can collapse to
-# the unconditional find_package() below.
-if (LIBCUDACXX_ENABLE_HIP)
-  if (NOT TARGET CCCL::CCCL)
-    message(FATAL_ERROR
-      "CCCL::CCCL alias must be pre-defined by the parent project on HIP "
-      "(see top-level CMakeLists.txt:245-249). Cannot continue without it.")
-  endif()
-else()
-  find_package(
-    CCCL
-    CONFIG
-    REQUIRED
-    NO_DEFAULT_PATH # Only check the explicit HINTS below:
-    HINTS "${CCCL_SOURCE_DIR}/lib/cmake/cccl/"
-  )
-endif()
+# <<<<<<< OLD CODE from 25553efa55 (db7afd3e8d) - COMMENTED OUT
+#
+# # NOTE(HIP/AMD): on HIP we don't ship a full CCCL distribution
+# # (no CUB / Thrust packages), so find_package(CCCL CONFIG REQUIRED)
+# # would fail looking for lib/cmake/cccl/cccl-config.cmake. The only
+# # CCCL component we ship is libcudacxx; the parent CMakeLists
+# # (CMakeLists.txt:245-249) pre-defines CCCL::CCCL as an alias for
+# # libcudacxx::libcudacxx so that subsequent
+# # target_link_libraries(... CCCL::CCCL ...) calls in this file resolve
+# # correctly. Verify the alias actually exists rather than silently
+# # reaching the link line later with a missing target. Once a HIP-aware
+# # cccl-config.cmake exists upstream, this whole branch can collapse to
+# # the unconditional find_package() below.
+# if (LIBCUDACXX_ENABLE_HIP)
+#   if (NOT TARGET CCCL::CCCL)
+#     message(FATAL_ERROR
+#       "CCCL::CCCL alias must be pre-defined by the parent project on HIP "
+#       "(see top-level CMakeLists.txt:245-249). Cannot continue without it.")
+#   endif()
+# else()
+#   find_package(
+#     CCCL
+#     CONFIG
+#     REQUIRED
+#     NO_DEFAULT_PATH # Only check the explicit HINTS below:
+#     HINTS "${CCCL_SOURCE_DIR}/lib/cmake/cccl/"
+#   )
+# endif()
+# =======
+cccl_get_cccl()
+# >>>>>>> END NEW CODE (db7afd3e8d)
 
 if (LIBCUDACXX_ENABLE_HIP)
   find_package(hip REQUIRED)
