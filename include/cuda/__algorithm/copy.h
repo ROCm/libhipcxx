@@ -52,9 +52,13 @@
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__algorithm/common.h>
-#  include <cuda/__driver/driver_api.h>
-#  include <cuda/__runtime/ensure_current_context.h>
-#  include <cuda/__stream/device_transform.h>
+// <<<<<<< OLD CODE from 006753940d (7034964082) - COMMENTED OUT
+// #  include <cuda/__driver/driver_api.h>
+// #  include <cuda/__runtime/ensure_current_context.h>
+// #  include <cuda/__stream/device_transform.h>
+// =======
+#  include <cuda/__stream/launch_transform.h>
+// >>>>>>> END NEW CODE (7034964082)
 #  include <cuda/__stream/stream_ref.h>
 #  include <cuda/std/__concepts/concept_macros.h>
 #  include <cuda/std/mdspan>
@@ -186,8 +190,8 @@ _CCCL_HOST_API void copy_bytes(stream_ref __stream, _SrcTy&& __src, _DstTy&& __d
 {
   ::cuda::__detail::__copy_bytes_impl(
     __stream,
-    ::cuda::std::span(device_transform(__stream, ::cuda::std::forward<_SrcTy>(__src))),
-    ::cuda::std::span(device_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))),
+    ::cuda::std::span(launch_transform(__stream, ::cuda::std::forward<_SrcTy>(__src))),
+    ::cuda::std::span(launch_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))),
     __config);
 }
 
@@ -215,8 +219,8 @@ _CCCL_HOST_API void copy_bytes(stream_ref __stream, _SrcTy&& __src, _DstTy&& __d
 {
   ::cuda::__detail::__copy_bytes_impl(
     __stream,
-    ::cuda::__as_mdspan(device_transform(__stream, ::cuda::std::forward<_SrcTy>(__src))),
-    ::cuda::__as_mdspan(device_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))),
+    ::cuda::__as_mdspan(launch_transform(__stream, ::cuda::std::forward<_SrcTy>(__src))),
+    ::cuda::__as_mdspan(launch_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))),
     __config);
 }
 
