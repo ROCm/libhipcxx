@@ -51,8 +51,12 @@
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__algorithm/common.h>
-#  include <cuda/__driver/driver_api.h>
-#  include <cuda/__stream/device_transform.h>
+// <<<<<<< OLD CODE from 006753940d (7034964082) - COMMENTED OUT
+// #  include <cuda/__driver/driver_api.h>
+// #  include <cuda/__stream/device_transform.h>
+// =======
+#  include <cuda/__stream/launch_transform.h>
+// >>>>>>> END NEW CODE (7034964082)
 #  include <cuda/__stream/stream_ref.h>
 #  include <cuda/std/__concepts/concept_macros.h>
 
@@ -91,7 +95,7 @@ _CCCL_HOST_API void __fill_bytes_impl(stream_ref __stream,
 
 //! @brief Launches an operation to bytewise fill the memory into the provided stream.
 //!
-//! The destination needs to be or device_transform to a `contiguous_range` and convert to `cuda::std::span`.
+//! The destination needs to be or launch_transform to a `contiguous_range` and convert to `cuda::std::span`.
 //! The element type of the destination is required to be trivially copyable.
 //!
 //! The destination cannot reside in pagable host memory.
@@ -104,12 +108,12 @@ _CCCL_REQUIRES(__spannable<transformed_device_argument_t<_DstTy>>)
 _CCCL_HOST_API void fill_bytes(stream_ref __stream, _DstTy&& __dst, ::cuda::std::uint8_t __value)
 {
   ::cuda::__detail::__fill_bytes_impl(
-    __stream, ::cuda::std::span(device_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))), __value);
+    __stream, ::cuda::std::span(launch_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))), __value);
 }
 
 //! @brief Launches an operation to bytewise fill the memory into the provided stream.
 //!
-//! Destination needs to be or device_transform to an instance of `cuda::std::mdspan`.
+//! Destination needs to be or launch_transform to an instance of `cuda::std::mdspan`.
 //! It can also convert to `cuda::std::mdspan`, but the type needs to
 //! contain `mdspan` template arguments as member aliases named `value_type`,
 //! `extents_type`, `layout_type` and `accessor_type`. The resulting mdspan is required to
@@ -126,7 +130,7 @@ _CCCL_REQUIRES(__mdspannable<transformed_device_argument_t<_DstTy>>)
 _CCCL_HOST_API void fill_bytes(stream_ref __stream, _DstTy&& __dst, ::cuda::std::uint8_t __value)
 {
   ::cuda::__detail::__fill_bytes_impl(
-    __stream, __as_mdspan(device_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))), __value);
+    __stream, __as_mdspan(launch_transform(__stream, ::cuda::std::forward<_DstTy>(__dst))), __value);
 }
 
 _CCCL_END_NAMESPACE_CUDA
