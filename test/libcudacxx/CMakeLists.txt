@@ -226,10 +226,6 @@ elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
     "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())"
   )
 else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
-  string(
-    APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
-    " -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE"
-  )
   set(
     LIBCUDACXX_FORCE_INCLUDE
     "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include.h"
