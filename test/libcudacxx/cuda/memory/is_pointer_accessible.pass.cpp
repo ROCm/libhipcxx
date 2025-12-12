@@ -69,11 +69,13 @@ void test_accessible_pointer(
 {
   assert(cuda::is_host_accessible(ptr) == is_host_accessible);
   assert(cuda::is_device_accessible(ptr, device) == is_device_accessible);
+  assert(cuda::__is_device_or_managed_memory(ptr) == is_device_accessible);
   assert(cuda::is_managed(ptr) == is_managed_accessible);
   if constexpr (!cuda::std::is_same_v<Pointer, const void*> && !cuda::std::is_same_v<Pointer, void*>)
   {
     assert(cuda::is_host_accessible(ptr + 1) == is_host_accessible);
     assert(cuda::is_device_accessible(ptr + 1, device) == is_device_accessible);
+    assert(cuda::__is_device_or_managed_memory(ptr + 1) == is_device_accessible);
     assert(cuda::is_managed(ptr + 1) == is_managed_accessible);
   }
 }
@@ -197,6 +199,7 @@ bool test_multiple_devices()
 
   /// DEVICE 1 CONTEXT
   cuda::__ensure_current_context ctx1(dev1);
+  assert(cuda::__is_device_or_managed_memory(device_ptr0) == true);
   assert(cuda::is_device_accessible(device_ptr0, dev0) == true);
 #if !defined(__HIP_PLATFORM_AMD__)
   // NOTE(HIP/AMD): on CUDA, cudaMalloc returns memory from the
@@ -222,7 +225,11 @@ bool test_multiple_devices()
   {
     return true;
   }
-#if !defined(__HIP_PLATFORM_AMD__)
+// <<<<<<< OLD CODE from da1c60728f (4f809b6633) - COMMENTED OUT
+// #if !defined(__HIP_PLATFORM_AMD__)
+// =======
+  assert(cuda::__is_device_or_managed_memory(device_ptr0) == true);
+// >>>>>>> END NEW CODE (4f809b6633)
   assert(cuda::is_device_accessible(device_ptr0, dev1) == false);
 #endif // !__HIP_PLATFORM_AMD__
 
@@ -274,7 +281,11 @@ bool test_multiple_devices_from_pool()
   // for an arbitrary pair of contexts. Cannot distinguish pre/post
   // hipDeviceEnablePeerAccess on a peer-capable system.
   assert(cuda::is_device_accessible(ptr, dev1) == false);
-#endif // !__HIP_PLATFORM_AMD__
+// <<<<<<< OLD CODE from da1c60728f (4f809b6633) - COMMENTED OUT
+// #endif // !__HIP_PLATFORM_AMD__
+// =======
+  assert(cuda::__is_device_or_managed_memory(ptr) == true);
+// >>>>>>> END NEW CODE (4f809b6633)
 
   // NOTE(HIP/AMD): see comment in test_multiple_devices() above --
   // skip the self-peer enable on HIP. The post-enable assertions
