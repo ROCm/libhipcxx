@@ -31,8 +31,11 @@
 
 // UNSUPPORTED: nvrtc
 // UNSUPPORTED: pre-sm-90
-// UNSUPPORTED: hipcc, hiprtc
-
+// <<<<<<< OLD CODE from 657c26241f (067d4ce84e) - COMMENTED OUT
+// // UNSUPPORTED: hipcc, hiprtc
+//
+// =======
+// >>>>>>> END NEW CODE (067d4ce84e)
 #include <dlpack/dlpack.h> // to include before the make_from_dlpack.h
 //
 #include <cuda/std/array>
