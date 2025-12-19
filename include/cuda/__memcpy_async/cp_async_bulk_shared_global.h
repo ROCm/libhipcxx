@@ -47,8 +47,8 @@
 #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #  if __cccl_ptx_isa >= 800
 
+#    include <cuda/__memcpy_async/elect_one.h>
 #    include <cuda/__ptx/instructions/cp_async_bulk.h>
-#    include <cuda/__ptx/instructions/elect_sync.h>
 #    include <cuda/__ptx/instructions/mbarrier_expect_tx.h>
 #    include <cuda/__ptx/ptx_dot_variants.h>
 #    include <cuda/__ptx/ptx_helper_functions.h>
@@ -61,12 +61,6 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-template <typename _Group>
-[[nodiscard]] _CCCL_DEVICE _CCCL_FORCEINLINE bool __elect_from_group(const _Group& __g) noexcept
-{
-  return __g.thread_rank() == 0;
-}
-
 extern "C" _CCCL_DEVICE void __cuda_ptx_cp_async_bulk_shared_global_is_not_supported_before_SM_90__();
 template <typename _Group>
 inline _CCCL_DEVICE void __cp_async_bulk_shared_global_and_expect_tx(
@@ -75,7 +69,7 @@ inline _CCCL_DEVICE void __cp_async_bulk_shared_global_and_expect_tx(
   // https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async-bulk
   NV_IF_ELSE_TARGET(
     NV_PROVIDES_SM_90,
-    (if (__elect_from_group(__g)) {
+    (if (::cuda::device::__group_elect_one(__g)) {
       ::cuda::ptx::cp_async_bulk(
         ::cuda::std::conditional_t<__cccl_ptx_isa >= 860, ::cuda::ptx::space_shared_t, ::cuda::ptx::space_cluster_t>{},
         ::cuda::ptx::space_global,
