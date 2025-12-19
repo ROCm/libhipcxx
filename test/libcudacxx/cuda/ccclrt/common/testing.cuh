@@ -42,39 +42,43 @@
 #include <exception> // IWYU pragma: keep
 #include <sstream>
 
+#include "utility.cuh"
 #include <c2h/catch2_test_helper.h>
 
 #define CUDART(call) REQUIRE((call) == cudaSuccess)
 
-__device__ inline void ccclrt_require_impl(
-  bool condition, const char* condition_text, const char* filename, unsigned int linenum, const char* funcname)
-{
-  if (!condition)
-  {
-    // TODO do warp aggregate prints for easier readability?
-    printf("%s:%u: %s: block: [%d,%d,%d], thread: [%d,%d,%d] Condition `%s` failed.\n",
-           filename,
-           linenum,
-           funcname,
-           blockIdx.x,
-           blockIdx.y,
-           blockIdx.z,
-           threadIdx.x,
-           threadIdx.y,
-           threadIdx.z,
-           condition_text);
-    // NOTE(HIP/AMD): on CUDA '__trap()' is a free function intrinsic;
-    // on HIP/AMDGCN there is no '__trap' free function but
-    // '__builtin_trap()' compiles down to the equivalent
-    // s_trap instruction (clang-hip mode).
-#if defined(__HIP_PLATFORM_AMD__)
-    __builtin_trap();
-#else
-    __trap();
-#endif // !__HIP_PLATFORM_AMD__
-  }
-}
-
+// <<<<<<< OLD CODE from d90f64b90a (276eb830de) - COMMENTED OUT
+// __device__ inline void ccclrt_require_impl(
+//   bool condition, const char* condition_text, const char* filename, unsigned int linenum, const char* funcname)
+// {
+//   if (!condition)
+//   {
+//     // TODO do warp aggregate prints for easier readability?
+//     printf("%s:%u: %s: block: [%d,%d,%d], thread: [%d,%d,%d] Condition `%s` failed.\n",
+//            filename,
+//            linenum,
+//            funcname,
+//            blockIdx.x,
+//            blockIdx.y,
+//            blockIdx.z,
+//            threadIdx.x,
+//            threadIdx.y,
+//            threadIdx.z,
+//            condition_text);
+//     // NOTE(HIP/AMD): on CUDA '__trap()' is a free function intrinsic;
+//     // on HIP/AMDGCN there is no '__trap' free function but
+//     // '__builtin_trap()' compiles down to the equivalent
+//     // s_trap instruction (clang-hip mode).
+// #if defined(__HIP_PLATFORM_AMD__)
+//     __builtin_trap();
+// #else
+//     __trap();
+// #endif // !__HIP_PLATFORM_AMD__
+//   }
+// }
+//
+// =======
+// >>>>>>> END NEW CODE (276eb830de)
 // There is a problem with clang-cuda and nv/target, but we don't need the device side macros yet,
 // disable them for now
 //
