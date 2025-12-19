@@ -43,22 +43,24 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/__fwd/hierarchy.h>
-#include <cuda/__hierarchy/level_dimensions.h>
-#include <cuda/__hierarchy/traits.h>
-#include <cuda/std/__type_traits/fold.h>
-#include <cuda/std/__type_traits/is_same.h>
-#include <cuda/std/__type_traits/remove_cvref.h>
-#include <cuda/std/__type_traits/type_list.h>
-#include <cuda/std/__utility/declval.h>
-#include <cuda/std/__utility/integer_sequence.h>
-#include <cuda/std/array>
-#include <cuda/std/span>
-#include <cuda/std/tuple>
+#if _CCCL_HAS_CTK()
 
-#include <nv/target>
+#  include <cuda/__fwd/hierarchy.h>
+#  include <cuda/__hierarchy/level_dimensions.h>
+#  include <cuda/__hierarchy/traits.h>
+#  include <cuda/std/__type_traits/fold.h>
+#  include <cuda/std/__type_traits/is_same.h>
+#  include <cuda/std/__type_traits/remove_cvref.h>
+#  include <cuda/std/__type_traits/type_list.h>
+#  include <cuda/std/__utility/declval.h>
+#  include <cuda/std/__utility/integer_sequence.h>
+#  include <cuda/std/array>
+#  include <cuda/std/span>
+#  include <cuda/std/tuple>
 
-#include <cuda/std/__cccl/prologue.h>
+#  include <nv/target>
+
+#  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
@@ -276,8 +278,12 @@ struct __hierarchy_extents_helper
 };
 
 template <class _Tp, size_t... _Extents>
-[[nodiscard]] _CCCL_DEVICE constexpr auto
-__static_index_hint([[maybe_unused]] const dimensions<_Tp, _Extents...>& __dims, ::dim3 __index)
+// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
+// [[nodiscard]] _CCCL_DEVICE constexpr auto
+// __static_index_hint([[maybe_unused]] const dimensions<_Tp, _Extents...>& __dims, ::dim3 __index)
+// =======
+[[nodiscard]] _CCCL_DEVICE constexpr auto __static_index_hint(const dimensions<_Tp, _Extents...>&, ::dim3 __index)
+// >>>>>>> END NEW CODE (1a270882e7)
 {
   // __dims is taken by reference for ADL / consistency with related helpers,
   // but the body only needs the static '_Extents' from the template param to
@@ -404,10 +410,10 @@ struct hierarchy_dimensions
       : levels(__ls)
   {}
 
-#if !defined(_CCCL_NO_THREE_WAY_COMPARISON) && !_CCCL_COMPILER(MSVC, <, 19, 39) && !_CCCL_COMPILER(GCC, <, 12)
+#  if !defined(_CCCL_NO_THREE_WAY_COMPARISON) && !_CCCL_COMPILER(MSVC, <, 19, 39) && !_CCCL_COMPILER(GCC, <, 12)
   [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr bool operator==(const hierarchy_dimensions&) const noexcept = default;
-#else // ^^^ !_CCCL_NO_THREE_WAY_COMPARISON ^^^ / vvv
-      // _CCCL_NO_THREE_WAY_COMPARISON vvv
+#  else // ^^^ !_CCCL_NO_THREE_WAY_COMPARISON ^^^ / vvv
+        // _CCCL_NO_THREE_WAY_COMPARISON vvv
   [[nodiscard]] _CCCL_API friend constexpr bool
   operator==(const hierarchy_dimensions& __left, const hierarchy_dimensions& __right) noexcept
   {
@@ -419,7 +425,7 @@ struct hierarchy_dimensions
   {
     return __left.levels != __right.levels;
   }
-#endif // _CCCL_NO_THREE_WAY_COMPARISON
+#  endif // _CCCL_NO_THREE_WAY_COMPARISON
 
 private:
   // This being static is a bit of a hack to make extents_type working without
@@ -857,12 +863,12 @@ public:
     }
   }
 
-#ifndef _CCCL_DOXYGEN_INVOKED // Do not document
+#  ifndef _CCCL_DOXYGEN_INVOKED // Do not document
   constexpr hierarchy_dimensions combine([[maybe_unused]] __empty_hierarchy __empty) const
   {
     return *this;
   }
-#endif // _CCCL_DOXYGEN_INVOKED
+#  endif // _CCCL_DOXYGEN_INVOKED
 };
 
 // TODO consider having LUnit optional argument for template argument deduction
@@ -942,6 +948,8 @@ constexpr auto hierarchy_add_level(const hierarchy_dimensions<_Unit, _Levels...>
 }
 _CCCL_END_NAMESPACE_CUDA
 
-#include <cuda/std/__cccl/epilogue.h>
+#  include <cuda/std/__cccl/epilogue.h>
+
+#endif // _CCCL_HAS_CTK()
 
 #endif // _CUDA___HIERARCHY_HIERARCHY_DIMENSIONS_H

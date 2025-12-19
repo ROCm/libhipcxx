@@ -43,14 +43,18 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/std/__functional/invoke.h>
-#include <cuda/std/__utility/move.h>
-#include <cuda/std/__utility/unreachable.h>
-#include <cuda/std/cstdint>
+#if _CCCL_CUDA_COMPILATION()
 
-#include <nv/target>
+#  include <cuda/std/__functional/invoke.h>
+#  include <cuda/std/__utility/move.h>
+#  include <cuda/std/__utility/unreachable.h>
+#  include <cuda/std/cstdint>
 
-#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// =======
+#  include <nv/target>
+// >>>>>>> END NEW CODE (1a270882e7)
 
 #  include <cuda/std/__cccl/prologue.h>
 

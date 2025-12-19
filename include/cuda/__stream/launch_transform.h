@@ -48,21 +48,40 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/__stream/stream_ref.h>
-#include <cuda/__type_traits/is_instantiable_with.h>
-#include <cuda/std/__memory/addressof.h>
-#include <cuda/std/__memory/construct_at.h>
-#include <cuda/std/__new/launder.h>
-#include <cuda/std/__optional/optional.h>
-#include <cuda/std/__tuple_dir/ignore.h>
-#include <cuda/std/__type_traits/decay.h>
-#include <cuda/std/__type_traits/is_callable.h>
-#include <cuda/std/__type_traits/is_reference.h>
-#include <cuda/std/__utility/declval.h>
-#include <cuda/std/__utility/forward.h>
-#include <cuda/std/__utility/move.h>
+// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
+// #include <cuda/__stream/stream_ref.h>
+// #include <cuda/__type_traits/is_instantiable_with.h>
+// #include <cuda/std/__memory/addressof.h>
+// #include <cuda/std/__memory/construct_at.h>
+// #include <cuda/std/__new/launder.h>
+// #include <cuda/std/__optional/optional.h>
+// #include <cuda/std/__tuple_dir/ignore.h>
+// #include <cuda/std/__type_traits/decay.h>
+// #include <cuda/std/__type_traits/is_callable.h>
+// #include <cuda/std/__type_traits/is_reference.h>
+// #include <cuda/std/__utility/declval.h>
+// #include <cuda/std/__utility/forward.h>
+// #include <cuda/std/__utility/move.h>
+//
+// #include <cuda/std/__cccl/prologue.h>
+// =======
+#if _CCCL_HAS_CTK()
 
-#include <cuda/std/__cccl/prologue.h>
+#  include <cuda/__stream/stream_ref.h>
+#  include <cuda/__type_traits/is_instantiable_with.h>
+#  include <cuda/std/__memory/addressof.h>
+#  include <cuda/std/__memory/construct_at.h>
+#  include <cuda/std/__new/launder.h>
+#  include <cuda/std/__optional/optional.h>
+#  include <cuda/std/__type_traits/decay.h>
+#  include <cuda/std/__type_traits/is_callable.h>
+#  include <cuda/std/__type_traits/is_reference.h>
+#  include <cuda/std/__utility/declval.h>
+#  include <cuda/std/__utility/forward.h>
+#  include <cuda/std/__utility/move.h>
+
+#  include <cuda/std/__cccl/prologue.h>
+// >>>>>>> END NEW CODE (1a270882e7)
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 namespace __detail
@@ -216,6 +235,8 @@ using transformed_device_argument_t _CCCL_NODEBUG_ALIAS =
 
 _CCCL_END_NAMESPACE_CUDA
 
-#include <cuda/std/__cccl/epilogue.h>
+#  include <cuda/std/__cccl/epilogue.h>
+
+#endif // _CCCL_HAS_CTK()
 
 #endif // _CUDA__STREAM_LAUNCH_TRANSFORM_H
