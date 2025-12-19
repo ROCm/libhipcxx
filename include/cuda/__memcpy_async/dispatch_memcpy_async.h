@@ -77,8 +77,8 @@ template <::cuda::std::size_t _Align, typename _Group>
   char* __dest_char,
   char const* __src_char,
   ::cuda::std::size_t __size,
-  ::cuda::std::uint32_t __allowed_completions,
-  ::cuda::std::uint64_t* __bar_handle)
+  [[maybe_unused]] ::cuda::std::uint32_t __allowed_completions,
+  [[maybe_unused]] ::cuda::std::uint64_t* __bar_handle)
 {
   ::cuda::__cp_async_fallback_mechanism<_Align>(__group, __dest_char, __src_char, __size);
   return __completion_mechanism::__sync;
@@ -90,8 +90,8 @@ template <::cuda::std::size_t _Align, typename _Group>
   char* __dest_char,
   char const* __src_char,
   ::cuda::std::size_t __size,
-  ::cuda::std::uint32_t __allowed_completions,
-  ::cuda::std::uint64_t* __bar_handle)
+  [[maybe_unused]] ::cuda::std::uint32_t __allowed_completions,
+  [[maybe_unused]] ::cuda::std::uint64_t* __bar_handle)
 {
 #if __cccl_ptx_isa >= 800
   NV_IF_TARGET(
@@ -136,8 +136,8 @@ template <::cuda::std::size_t _Align, typename _Group>
   char* __dest_char,
   char const* __src_char,
   ::cuda::std::size_t __size,
-  ::cuda::std::uint32_t __allowed_completions,
-  ::cuda::std::uint64_t* __bar_handle)
+  [[maybe_unused]] ::cuda::std::uint32_t __allowed_completions,
+  [[maybe_unused]] ::cuda::std::uint64_t* __bar_handle)
 {
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE,
@@ -171,8 +171,8 @@ template <::cuda::std::size_t _Align, typename _Group>
   _Group const& __group,
   char* __dest_char,
   char const* __src_char,
-  ::cuda::std::size_t __size,
-  ::cuda::std::uint32_t __allowed_completions)
+  [[maybe_unused]] ::cuda::std::size_t __size,
+  [[maybe_unused]] ::cuda::std::uint32_t __allowed_completions)
 {
   _CCCL_ASSERT(!(__allowed_completions & uint32_t(__completion_mechanism::__mbarrier_complete_tx)),
                "Cannot allow mbarrier_complete_tx completion mechanism when not passing a barrier. ");
