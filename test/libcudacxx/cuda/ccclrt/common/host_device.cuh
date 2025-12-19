@@ -91,10 +91,10 @@ void test_host_dev(const Dims& dims, const Lambda& lambda, const Filters&... fil
     cudaLaunchAttribute attrs[1];
     config.attrs = &attrs[0];
 
-    config.blockDim = dims.extents(cuda::thread, cuda::block);
+    config.blockDim = dims.extents(cuda::gpu_thread, cuda::block);
     config.gridDim  = dims.extents(cuda::block, cuda::grid);
 
-    if constexpr (cuda::has_level<cuda::cluster_level, decltype(dims)>)
+    if constexpr (cuda::has_level_v<cuda::cluster_level, decltype(dims)>)
     {
 #if defined(__HIP_PLATFORM_AMD__)
       // NOTE(HIP/AMD): cluster dimension is a Hopper (sm_90+) NVPTX
