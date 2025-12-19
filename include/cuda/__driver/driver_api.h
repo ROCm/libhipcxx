@@ -67,6 +67,8 @@
 #    include <dlfcn.h>
 #  endif
 
+#  include <stdexcept>
+
 #  include <cuda.h>
 
 #  include <cuda/std/__cccl/prologue.h>
