@@ -43,17 +43,27 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
+// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+//
+// #  include <cuda/__device/arch_id.h>
+// #  include <cuda/__device/compute_capability.h>
+// #  include <cuda/__fwd/devices.h>
+// #  include <cuda/std/__exception/cuda_error.h>
+// #  include <cuda/std/__type_traits/always_false.h>
+// #  include <cuda/std/cstdint>
+// #  include <cuda/std/limits>
+// =======
+#include <cuda/__device/arch_id.h>
+#include <cuda/__device/compute_capability.h>
+#include <cuda/__fwd/devices.h>
+#include <cuda/std/__exception/cuda_error.h>
+#include <cuda/std/__type_traits/always_false.h>
+#include <cuda/std/cstdint>
+#include <cuda/std/limits>
+// >>>>>>> END NEW CODE (1a270882e7)
 
-#  include <cuda/__device/arch_id.h>
-#  include <cuda/__device/compute_capability.h>
-#  include <cuda/__fwd/devices.h>
-#  include <cuda/std/__exception/cuda_error.h>
-#  include <cuda/std/__type_traits/always_false.h>
-#  include <cuda/std/cstdint>
-#  include <cuda/std/limits>
-
-#  include <cuda/std/__cccl/prologue.h>
+#include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
@@ -529,7 +539,11 @@ template <>
     case arch_id::sm_121a:
       return ::cuda::arch_traits<arch_id::sm_121a>();
     default:
+#if _CCCL_HAS_CTK()
       ::cuda::__throw_cuda_error(::cudaErrorInvalidValue, "Traits requested for an unknown architecture");
+#else // ^^^ _CCCL_HAS_CTK() ^^^ / vvv !_CCCL_HAS_CTK() vvv
+      ::cuda::__throw_cuda_error(/*cudaErrorInvalidValue*/ 1, "Traits requested for an unknown architecture");
+#endif // ^^^ !_CCCL_HAS_CTK() ^^^
       break;
   }
 }
@@ -544,7 +558,7 @@ template <>
 
 _CCCL_END_NAMESPACE_CUDA
 
-#  if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION()
 
 _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE
 
@@ -557,19 +571,21 @@ _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE
 template <class _Dummy = void>
 [[nodiscard]] _CCCL_DEVICE_API inline _CCCL_TARGET_CONSTEXPR ::cuda::arch_traits_t current_arch_traits() noexcept
 {
-#    if _CCCL_DEVICE_COMPILATION()
+#  if _CCCL_DEVICE_COMPILATION()
   return ::cuda::arch_traits_for(::cuda::device::current_arch_id<_Dummy>());
-#    else // ^^^ _CCCL_DEVICE_COMPILATION() ^^^ / vvv !_CCCL_DEVICE_COMPILATION() vvv
+#  else // ^^^ _CCCL_DEVICE_COMPILATION() ^^^ / vvv !_CCCL_DEVICE_COMPILATION() vvv
   return {};
-#    endif // ^^^ !_CCCL_DEVICE_COMPILATION() ^^^
+#  endif // ^^^ !_CCCL_DEVICE_COMPILATION() ^^^
 }
 
 _CCCL_END_NAMESPACE_CUDA_DEVICE
 
-#  endif // _CCCL_CUDA_COMPILATION
+#endif // _CCCL_CUDA_COMPILATION
 
-#  include <cuda/std/__cccl/epilogue.h>
-
-#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
+// #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// =======
+#include <cuda/std/__cccl/epilogue.h>
+// >>>>>>> END NEW CODE (1a270882e7)
 
 #endif // _CUDA___DEVICE_ARCH_TRAITS_H

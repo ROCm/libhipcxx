@@ -38,11 +38,13 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/std/__type_traits/decay.h>
-#include <cuda/std/__type_traits/type_set.h>
-#include <cuda/std/cstddef>
+#if _CCCL_HAS_CTK()
 
-#include <cuda/std/__cccl/prologue.h>
+#  include <cuda/std/__type_traits/decay.h>
+#  include <cuda/std/__type_traits/type_set.h>
+#  include <cuda/std/cstddef>
+
+#  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_MR
 
@@ -142,6 +144,8 @@ struct __memory_accessability_from_properties
 
 _CCCL_END_NAMESPACE_CUDA_MR
 
-#include <cuda/std/__cccl/epilogue.h>
+#  include <cuda/std/__cccl/epilogue.h>
+
+#endif // _CCCL_HAS_CTK()
 
 #endif //_CUDA___MEMORY_RESOURCE_PROPERTIES_H
