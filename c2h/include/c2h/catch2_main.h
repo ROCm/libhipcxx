@@ -35,7 +35,7 @@
 #  include <thrust/detail/config/device_system.h>
 #endif // !__HIP_PLATFORM_AMD__
 
-#include <iostream>
+#include <c2h/detail/generators.cuh>
 
 //! @file
 //! This file includes a custom Catch2 main function. When CMake is configured to build each test as a separate
@@ -91,7 +91,15 @@ int main(int argc, char* argv[])
   }
 
   set_device(device_id);
-#  endif // _C2H_HAS_DEVICE_RUNTIME
-  return session.run();
+// <<<<<<< OLD CODE from 76dd2c49cc (5bfdc304e0) - COMMENTED OUT
+// #  endif // _C2H_HAS_DEVICE_RUNTIME
+//   return session.run();
+// =======
+#  endif // THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
+  c2h::detail::init_generator();
+  const auto ret = session.run();
+  c2h::detail::cleanup_generator();
+  return ret;
+// >>>>>>> END NEW CODE (5bfdc304e0)
 }
 #endif // C2H_CONFIG_MAIN
