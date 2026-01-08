@@ -6,45 +6,50 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
-
-// MIT License
+// <<<<<<< OLD CODE from b4d4b3a498 (f15a370917) - COMMENTED OUT
 //
-// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// // MIT License
+// //
+// // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// //
+// // Permission is hereby granted, free of charge, to any person obtaining a copy
+// // of this software and associated documentation files (the "Software"), to deal
+// // in the Software without restriction, including without limitation the rights
+// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// // copies of the Software, and to permit persons to whom the Software is
+// // furnished to do so, subject to the following conditions:
+// //
+// // The above copyright notice and this permission notice shall be included in all
+// // copies or substantial portions of the Software.
+// //
+// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// // SOFTWARE.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-// UNSUPPORTED: nvhpc, nvrtc, hiprtc
+// // UNSUPPORTED: nvhpc, nvrtc, hiprtc
+// =======
+// UNSUPPORTED: nvrtc
+// >>>>>>> END NEW CODE (f15a370917)
 
 #include <cuda/mdspan>
 
 #include "test_macros.h"
 
-__host__ __device__ void device_accessor_test()
+bool device_accessor_test()
 {
   int array[] = {1, 2, 3, 4};
   using ext_t = cuda::std::extents<int, 4>;
   cuda::device_mdspan<int, ext_t> d_md{array, ext_t{}};
-  unused(d_md[0]);
+  unused(d_md);
+  return true;
 }
 
 int main(int, char**)
 {
-  device_accessor_test();
+  NV_IF_TARGET(NV_IS_HOST, (assert(device_accessor_test());))
   return 0;
 }
