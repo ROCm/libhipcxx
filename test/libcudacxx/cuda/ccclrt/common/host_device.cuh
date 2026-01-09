@@ -91,22 +91,26 @@ void test_host_dev(const Dims& dims, const Lambda& lambda, const Filters&... fil
     cudaLaunchAttribute attrs[1];
     config.attrs = &attrs[0];
 
-    config.blockDim = dims.extents(cuda::gpu_thread, cuda::block);
-    config.gridDim  = dims.extents(cuda::block, cuda::grid);
+    config.blockDim = dim3{cuda::gpu_thread.dims(cuda::block, dims)};
+    config.gridDim  = dim3{cuda::block.dims(cuda::grid, dims)};
 
-    if constexpr (cuda::has_level_v<cuda::cluster_level, decltype(dims)>)
+    if constexpr (Dims::has_level(cuda::cluster))
     {
-#if defined(__HIP_PLATFORM_AMD__)
-      // NOTE(HIP/AMD): cluster dimension is a Hopper (sm_90+) NVPTX
-      // feature; AMDGCN has no equivalent. The HIP runtime does not
-      // expose 'cudaLaunchAttributeClusterDimension' nor a
-      // 'clusterDim' member on hipLaunchAttributeValue. The only
-      // place this branch fires is when the user constructed a
-      // hierarchy with cuda::cluster_level, which only makes sense
-      // on Hopper -- on HIP this branch is dead code.
-      config.numAttrs = 0;
-#else
-      dim3 cluster_dims                            = dims.extents(cuda::block, cuda::cluster);
+// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
+// #if defined(__HIP_PLATFORM_AMD__)
+//       // NOTE(HIP/AMD): cluster dimension is a Hopper (sm_90+) NVPTX
+//       // feature; AMDGCN has no equivalent. The HIP runtime does not
+//       // expose 'cudaLaunchAttributeClusterDimension' nor a
+//       // 'clusterDim' member on hipLaunchAttributeValue. The only
+//       // place this branch fires is when the user constructed a
+//       // hierarchy with cuda::cluster_level, which only makes sense
+//       // on Hopper -- on HIP this branch is dead code.
+//       config.numAttrs = 0;
+// #else
+//       dim3 cluster_dims                            = dims.extents(cuda::block, cuda::cluster);
+// =======
+      dim3 cluster_dims{cuda::block.dims(cuda::cluster, dims)};
+// >>>>>>> END NEW CODE (8ad18e3528)
       config.attrs[config.numAttrs].id             = cudaLaunchAttributeClusterDimension;
       config.attrs[config.numAttrs].val.clusterDim = {cluster_dims.x, cluster_dims.y, cluster_dims.z};
       config.numAttrs                              = 1;
