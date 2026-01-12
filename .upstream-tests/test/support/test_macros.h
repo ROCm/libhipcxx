@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -548,6 +548,14 @@ __host__ __device__ constexpr bool unused(T&&...)
 #  define ASSERT_WITH_OPERATOR_NEW_FALLBACKS(...) ((void) (__VA_ARGS__))
 #else
 #  define ASSERT_WITH_OPERATOR_NEW_FALLBACKS(...) assert(__VA_ARGS__)
+#endif
+
+#ifdef __HIP_PLATFORM_AMD__
+#if defined(__GFX9__)
+#if !defined(__gfx90a__) and !defined(__gfx906__) and !defined(__gfx908__)
+#define LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
+#endif
+#endif
 #endif
 
 #if defined(__GNUC__)

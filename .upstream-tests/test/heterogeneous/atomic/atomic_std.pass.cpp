@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -51,8 +51,13 @@ void kernel_invoker()
   validate_pinned<cuda::std::atomic<unsigned long>, bitwise_atomic_testers>();
   validate_pinned<cuda::std::atomic<unsigned long long>, bitwise_atomic_testers>();
 
+#ifdef LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
   validate_pinned<cuda::std::atomic<float>, arithmetic_atomic_testers>();
   validate_pinned<cuda::std::atomic<double>, arithmetic_atomic_testers>();
+#else
+  validate_pinned<cuda::std::atomic<float>, basic_testers>();
+  validate_pinned<cuda::std::atomic<double>, basic_testers>();
+#endif
 
   validate_pinned<cuda::std::atomic<big_not_lockfree_type>, basic_testers>();
 }
