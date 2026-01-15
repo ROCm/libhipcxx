@@ -1,68 +1,79 @@
-# <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
-# # MIT License
+# <<<<<<< OLD CODE from 1775f7af09 (e53f30e95e) - COMMENTED OUT
+# # <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
+# # # MIT License
+# # #
+# # # Modifications Copyright (C) 2024-2026 Advanced Micro Devices, Inc. All rights reserved.
+# # #
+# # # Permission is hereby granted, free of charge, to any person obtaining a copy
+# # # of this software and associated documentation files (the "Software"), to deal
+# # # in the Software without restriction, including without limitation the rights
+# # # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# # # copies of the Software, and to permit persons to whom the Software is
+# # # furnished to do so, subject to the following conditions:
+# # #
+# # # The above copyright notice and this permission notice shall be included in all
+# # # copies or substantial portions of the Software.
+# # #
+# # # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# # # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# # # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# # # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# # # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# # # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# # # SOFTWARE.
 # #
-# # Modifications Copyright (C) 2024-2026 Advanced Micro Devices, Inc. All rights reserved.
-# #
-# # Permission is hereby granted, free of charge, to any person obtaining a copy
-# # of this software and associated documentation files (the "Software"), to deal
-# # in the Software without restriction, including without limitation the rights
-# # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# # copies of the Software, and to permit persons to whom the Software is
-# # furnished to do so, subject to the following conditions:
-# #
-# # The above copyright notice and this permission notice shall be included in all
-# # copies or substantial portions of the Software.
-# #
-# # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# # SOFTWARE.
-#
+# # =======
 # =======
+option(
+  LIBCUDACXX_TEST_WITH_NVRTC
+  "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
+  OFF
+)
+
+# >>>>>>> END NEW CODE (e53f30e95e)
 ###############################################################################
 ### C2H tests:
 cccl_get_c2h()
 
-file(
-  GLOB_RECURSE test_srcs
-  RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-  CONFIGURE_DEPENDS
-  *.cu
-)
-
 set(c2h_all_target "libcudacxx.test.c2h_all")
 add_custom_target(${c2h_all_target})
 
-function(libcudacxx_add_test target_name_var source)
-  string(REPLACE "/" "." target_name "${source}")
-  string(PREPEND target_name "libcudacxx.test.")
-  string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
-  set(${target_name_var} ${target_name} PARENT_SCOPE)
-
-  add_executable(${target_name} "${source}")
-  cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-  target_include_directories(
-    ${target_name}
-    PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
-  )
-  target_link_libraries(
-    ${target_name}
-    PRIVATE #
-      libcudacxx.compiler_interface
-      cccl.c2h.main
+if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
+  file(
+    GLOB_RECURSE test_srcs
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+    CONFIGURE_DEPENDS
+    *.cu
   )
 
-  add_dependencies(${c2h_all_target} ${target_name})
+  function(libcudacxx_add_test target_name_var source)
+    string(REPLACE "/" "." target_name "${source}")
+    string(PREPEND target_name "libcudacxx.test.")
+    string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
+    set(${target_name_var} ${target_name} PARENT_SCOPE)
 
-  add_test(NAME ${target_name} COMMAND ${target_name})
-endfunction()
+    add_executable(${target_name} "${source}")
+    cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
+    target_include_directories(
+      ${target_name}
+      PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
+    )
+    target_link_libraries(
+      ${target_name}
+      PRIVATE #
+        libcudacxx.compiler_interface
+        cccl.c2h.main
+    )
 
-foreach (test_src IN LISTS test_srcs)
-  libcudacxx_add_test(test_target "${test_src}")
-endforeach()
+    add_dependencies(${c2h_all_target} ${target_name})
+
+    add_test(NAME ${target_name} COMMAND ${target_name})
+  endfunction()
+
+  foreach (test_src IN LISTS test_srcs)
+    libcudacxx_add_test(test_target "${test_src}")
+  endforeach()
+endif()
 
 ###############################################################################
 ### Lit tests:
@@ -137,12 +148,6 @@ elseif(LIBCUDACXX_ENABLE_HIP)
 # =======
 message(STATUS "Lit enabled CUDA architectures:${_compute_message}")
 # >>>>>>> END NEW CODE (6c02fd08b5)
-
-option(
-  LIBCUDACXX_TEST_WITH_NVRTC
-  "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
-  OFF
-)
 
 if (LIBCUDACXX_TEST_WITH_NVRTC)
   # TODO: Use project properties to get path to binary.
