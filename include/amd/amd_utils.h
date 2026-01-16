@@ -35,6 +35,8 @@
 #endif
 #endif
 
+#include <type_traits>
+
 namespace libhipcxx
 {
   __host__ __device__ inline void __trap(){
@@ -81,11 +83,15 @@ namespace libhipcxx
   __device__ inline int __FFS<unsigned long long>(unsigned long long v) {
     return __ffsll(static_cast<unsigned long long int>(v));
   }
+
   #if !defined(_CCCL_COMPILER_HIPRTC)
+  // Only define if uint64_t and unsigned long long are different types (for Windows they are identical)
+  #if !defined(_WIN32)
   template <>
-  __device__ inline int __FFS<uint64_t>(uint64_t v) {
+  __device__ inline int __FFS<unsigned long>(unsigned long v) {
     return __ffsll(static_cast<unsigned long long int>(v));
   }
+  #endif
   #endif
   #endif
 }
