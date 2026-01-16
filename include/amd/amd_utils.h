@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,8 @@
 #define __device__
 #endif
 #endif
+
+#include <type_traits>
 
 namespace libhipcxx
 {
@@ -78,11 +80,15 @@ namespace libhipcxx
   __device__ inline int __FFS<unsigned long long>(unsigned long long v) {
     return __ffsll(static_cast<unsigned long long int>(v));
   }
+
   #if !defined(_CCCL_COMPILER_HIPRTC)
+  // Only define if uint64_t and unsigned long long are different types (for Windows they are identical)
+  #if !defined(_WIN32)
   template <>
-  __device__ inline int __FFS<uint64_t>(uint64_t v) {
+  __device__ inline int __FFS<unsigned long>(unsigned long v) {
     return __ffsll(static_cast<unsigned long long int>(v));
   }
+  #endif
   #endif
   #endif
 }
