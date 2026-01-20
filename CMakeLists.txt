@@ -111,6 +111,35 @@ elseif (LIBCUDACXX_ENABLE_HIP)
   enable_language(HIP)
 endif ()
 
+# For Windows we should avoid symlinks by copying the file content (test, utils, and include/hip folder)
+if(WIN32)
+  message(STATUS "Checking ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip for symlink")
+  # Delete hip symlink if not already a copy
+  if(IS_SYMLINK "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
+    file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
+    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
+  endif()
+  # Delete test symlink if not already a copy
+  if(IS_SYMLINK "${CMAKE_CURRENT_SOURCE_DIR}/test")
+    file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/test")
+    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/test")
+  endif()
+  # Delete test symlink if not already a copy
+  if(IS_SYMLINK "${CMAKE_CURRENT_SOURCE_DIR}/utils")
+    file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/utils")
+    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/utils")
+  endif()
+  # Create a copy of cuda as hip folder
+  message(STATUS "Copying cuda folder to hip to allow for hip/cuda aliasing.")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/include/cuda/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip/")
+  # Create a copy of .upstream_test/test as test folder
+  message(STATUS "Copying .upstream_tests/test folder to test.")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/test/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/test/")
+  # Create a copy of .upstream_test/utils as utils folder
+  message(STATUS "Copying .upstream_tests/utils folder to utils.")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/utils/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/utils/")
+endif()
+
 # As part of the TheRock testing process, we need the source directory within the build folder
 # since we need to configure, build and run the tests from within the tester using lit.
 # The reason for this is that lit cannot seperately generate binaries in the build step
