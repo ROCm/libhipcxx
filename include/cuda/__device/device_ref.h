@@ -55,6 +55,10 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
+_CCCL_DIAG_PUSH
+_CCCL_DIAG_SUPPRESS_CLANG("-Wmissing-braces")
+// clang complains about missing braces in CUmemLocation constructor but GCC complains if we add them
+
 ::cuda::std::size_t __physical_devices_count();
 
 //! @brief A non-owning representation of a CUDA device
@@ -180,6 +184,8 @@ public:
                                                                                   // <cuda/__device/physical_device.h>
                                                                                   // to avoid circular dependency
 };
+
+_CCCL_DIAG_POP
 
 _CCCL_END_NAMESPACE_CUDA
 
