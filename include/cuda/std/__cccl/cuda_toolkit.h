@@ -44,12 +44,16 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): _CCCL_HAS_CTK() must be false under HIP. _CCCL_CUDA_COMPILATION()
-// already excludes hipcc/hiprtc (see compiler.h), but a stray cuda_runtime_api.h on
-// the include path could still flip _CCCL_HAS_INCLUDE on a HIP host, so guard
-// explicitly here. HIP support for CTK-gated APIs is opted in at each consumer site
-// via "_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()".
-#if (_CCCL_CUDA_COMPILATION() || _CCCL_HAS_INCLUDE(<cuda_runtime_api.h>)) && !_CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from 8af8026676 (64e508c7d9) - COMMENTED OUT
+// // NOTE(HIP/AMD): _CCCL_HAS_CTK() must be false under HIP. _CCCL_CUDA_COMPILATION()
+// // already excludes hipcc/hiprtc (see compiler.h), but a stray cuda_runtime_api.h on
+// // the include path could still flip _CCCL_HAS_INCLUDE on a HIP host, so guard
+// // explicitly here. HIP support for CTK-gated APIs is opted in at each consumer site
+// // via "_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()".
+// #if (_CCCL_CUDA_COMPILATION() || _CCCL_HAS_INCLUDE(<cuda_runtime_api.h>)) && !_CCCL_HIP_COMPILATION()
+// =======
+#if _CCCL_CUDA_COMPILATION() || __has_include(<cuda_runtime_api.h>)
+// >>>>>>> END NEW CODE (64e508c7d9)
 #  define _CCCL_HAS_CTK() 1
 #else // ^^^ has cuda toolkit ^^^ / vvv no cuda toolkit vvv
 #  define _CCCL_HAS_CTK() 0
