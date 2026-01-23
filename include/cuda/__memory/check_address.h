@@ -43,10 +43,6 @@
 #  pragma system_header
 #endif // no system header
 
-// including cuda/std/limits generates a circular dependency because:
-//    numeric_limits -> bit_cast -> cstring -> check_address
-// <cuda/std/__utility/cmp.h> also includes cuda/std/limits
-#include <cuda/std/climits>
 #include <cuda/std/cstddef>
 #include <cuda/std/cstdint>
 // NOTE(HIP/AMD): cuda::device::__is_smem_valid_address_range and the
@@ -99,22 +95,38 @@ _CCCL_BEGIN_NAMESPACE_CUDA
   {
     return false;
   }
-  auto __limit = ::cuda::std::uintptr_t{UINTMAX_MAX} - static_cast<::cuda::std::uintptr_t>(__n);
+
+  // use (~::cuda::std::uintptr_t{0}) instead of cuda::std::numeric_limits<cuda::std::uintptr_t>::max() to avoid
+  // circular dependency because:
+  //    numeric_limits -> bit_cast -> cstring -> check_address
+  // <cuda/std/__utility/cmp.h> also includes cuda/std/limits
+  const auto __limit = (~::cuda::std::uintptr_t{0}) - static_cast<::cuda::std::uintptr_t>(__n);
+
   if (reinterpret_cast<::cuda::std::uintptr_t>(__ptr) > __limit)
   {
     return false;
   }
-#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-  // clang-format off
-  NV_IF_TARGET(NV_IS_DEVICE, (
-    if (::cuda::device::__internal_is_address_from(__ptr, ::cuda::device::address_space::shared) &&
-        !::cuda::device::__is_smem_valid_address_range(__ptr, __n))
-    {
-      return false;
-    }
-  ));
-  // clang-format on
-#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from 84877729a7 (b22808825c) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+//   // clang-format off
+//   NV_IF_TARGET(NV_IS_DEVICE, (
+//     if (::cuda::device::__internal_is_address_from(__ptr, ::cuda::device::address_space::shared) &&
+//         !::cuda::device::__is_smem_valid_address_range(__ptr, __n))
+//     {
+//       return false;
+//     }
+//   ));
+//   // clang-format on
+// #endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// =======
+  NV_IF_TARGET(NV_IS_DEVICE, ({
+                 if (::cuda::device::__internal_is_address_from(__ptr, ::cuda::device::address_space::shared)
+                     && !::cuda::device::__is_smem_valid_address_range(__ptr, __n))
+                 {
+                   return false;
+                 }
+               }));
+// >>>>>>> END NEW CODE (b22808825c)
   return (__ptr != nullptr);
 }
 
@@ -126,10 +138,10 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 [[nodiscard]] _CCCL_API inline bool
 __are_ptrs_overlapping(const void* __ptr_lhs, const void* __ptr_rhs, ::cuda::std::size_t __n) noexcept
 {
-  auto __ptr1_start = static_cast<const char*>(__ptr_lhs);
-  auto __ptr2_start = static_cast<const char*>(__ptr_rhs);
-  auto __ptr1_end   = __ptr1_start + __n;
-  auto __ptr2_end   = __ptr2_start + __n;
+  const auto __ptr1_start = static_cast<const char*>(__ptr_lhs);
+  const auto __ptr2_start = static_cast<const char*>(__ptr_rhs);
+  const auto __ptr1_end   = __ptr1_start + __n;
+  const auto __ptr2_end   = __ptr2_start + __n;
   return __ptr1_start < __ptr2_end && __ptr2_start < __ptr1_end;
 }
 
