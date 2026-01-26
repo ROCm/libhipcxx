@@ -40,6 +40,7 @@ This page covers the mdspan extended API, providing the restrict_accessor and re
    mdspan/restrict_accessor
    mdspan/shared_memory_accessor
    mdspan/mdspan_to_dlpack
+   mdspan/dlpack_to_mdspan
 
 .. list-table::
    :widths: 25 45 30
@@ -66,5 +67,10 @@ This page covers the mdspan extended API, providing the restrict_accessor and re
 
    * - :ref:`mdspan to dlpack <libcudacxx-extended-api-mdspan-mdspan-to-dlpack>`
      - Convert a ``mdspan`` to a ``DLTensor``
+     - CCCL 3.2.0
+     - CUDA 13.2
+
+   * - :ref:`dlpack to mdspan <libcudacxx-extended-api-mdspan-dlpack-to-mdspan>`
+     - Convert a ``DLTensor`` to a ``mdspan``
      - CCCL 3.2.0
      - CUDA 13.2
