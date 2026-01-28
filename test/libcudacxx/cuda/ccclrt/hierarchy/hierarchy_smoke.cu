@@ -59,60 +59,64 @@
 
 namespace cg = cooperative_groups;
 
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-// #if defined(__HIP_PLATFORM_AMD__)
-// // NOTE(HIP/AMD): HIP's cooperative_groups::grid_group exposes only
-// // thread_rank() / is_valid() / sync() / group_dim(), missing the
-// // CUDA 11.6+ block_rank() / block_index() / num_blocks() /
-// // dim_blocks() and the corresponding thread_block::dim_threads().
-// // Provide polyfills that compute these from raw blockIdx / gridDim /
-// // blockDim built-ins, so the upstream-style kernel below compiles
-// // and exercises the same correlation against
-// // cuda::hierarchy::* / cuda::grid / cuda::block expressions on HIP.
-// namespace
-// {
-// __device__ inline unsigned int __cccl_hip_grid_block_rank() noexcept
-// {
-//   return blockIdx.x + blockIdx.y * gridDim.x + blockIdx.z * gridDim.x * gridDim.y;
-// }
-// __device__ inline dim3 __cccl_hip_grid_block_index() noexcept
-// {
-//   return dim3(blockIdx.x, blockIdx.y, blockIdx.z);
-// }
-// __device__ inline unsigned long long __cccl_hip_grid_num_blocks() noexcept
-// {
-//   return static_cast<unsigned long long>(gridDim.x) * gridDim.y * gridDim.z;
-// }
-// __device__ inline dim3 __cccl_hip_grid_dim_blocks() noexcept
-// {
-//   return dim3(gridDim.x, gridDim.y, gridDim.z);
-// }
-// __device__ inline dim3 __cccl_hip_block_dim_threads() noexcept
-// {
-//   return dim3(blockDim.x, blockDim.y, blockDim.z);
-// }
-// __device__ inline dim3 __cccl_hip_block_thread_index() noexcept
-// {
-//   return dim3(threadIdx.x, threadIdx.y, threadIdx.z);
-// }
-// } // namespace
-// #  define CG_GRID_BLOCK_RANK(g)    __cccl_hip_grid_block_rank()
-// #  define CG_GRID_BLOCK_INDEX(g)   __cccl_hip_grid_block_index()
-// #  define CG_GRID_NUM_BLOCKS(g)    __cccl_hip_grid_num_blocks()
-// #  define CG_GRID_DIM_BLOCKS(g)    __cccl_hip_grid_dim_blocks()
-// #  define CG_BLOCK_DIM_THREADS(b)  __cccl_hip_block_dim_threads()
-// #  define CG_BLOCK_THREAD_INDEX(b) __cccl_hip_block_thread_index()
-// #else
-// #  define CG_GRID_BLOCK_RANK(g)    (g).block_rank()
-// #  define CG_GRID_BLOCK_INDEX(g)   (g).block_index()
-// #  define CG_GRID_NUM_BLOCKS(g)    (g).num_blocks()
-// #  define CG_GRID_DIM_BLOCKS(g)    (g).dim_blocks()
-// #  define CG_BLOCK_DIM_THREADS(b)  (b).dim_threads()
-// #  define CG_BLOCK_THREAD_INDEX(b) (b).thread_index()
-// #endif // !__HIP_PLATFORM_AMD__
+// <<<<<<< OLD CODE from 9e8e084a8d (0a10a1f035) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
+// // #if defined(__HIP_PLATFORM_AMD__)
+// // // NOTE(HIP/AMD): HIP's cooperative_groups::grid_group exposes only
+// // // thread_rank() / is_valid() / sync() / group_dim(), missing the
+// // // CUDA 11.6+ block_rank() / block_index() / num_blocks() /
+// // // dim_blocks() and the corresponding thread_block::dim_threads().
+// // // Provide polyfills that compute these from raw blockIdx / gridDim /
+// // // blockDim built-ins, so the upstream-style kernel below compiles
+// // // and exercises the same correlation against
+// // // cuda::hierarchy::* / cuda::grid / cuda::block expressions on HIP.
+// // namespace
+// // {
+// // __device__ inline unsigned int __cccl_hip_grid_block_rank() noexcept
+// // {
+// //   return blockIdx.x + blockIdx.y * gridDim.x + blockIdx.z * gridDim.x * gridDim.y;
+// // }
+// // __device__ inline dim3 __cccl_hip_grid_block_index() noexcept
+// // {
+// //   return dim3(blockIdx.x, blockIdx.y, blockIdx.z);
+// // }
+// // __device__ inline unsigned long long __cccl_hip_grid_num_blocks() noexcept
+// // {
+// //   return static_cast<unsigned long long>(gridDim.x) * gridDim.y * gridDim.z;
+// // }
+// // __device__ inline dim3 __cccl_hip_grid_dim_blocks() noexcept
+// // {
+// //   return dim3(gridDim.x, gridDim.y, gridDim.z);
+// // }
+// // __device__ inline dim3 __cccl_hip_block_dim_threads() noexcept
+// // {
+// //   return dim3(blockDim.x, blockDim.y, blockDim.z);
+// // }
+// // __device__ inline dim3 __cccl_hip_block_thread_index() noexcept
+// // {
+// //   return dim3(threadIdx.x, threadIdx.y, threadIdx.z);
+// // }
+// // } // namespace
+// // #  define CG_GRID_BLOCK_RANK(g)    __cccl_hip_grid_block_rank()
+// // #  define CG_GRID_BLOCK_INDEX(g)   __cccl_hip_grid_block_index()
+// // #  define CG_GRID_NUM_BLOCKS(g)    __cccl_hip_grid_num_blocks()
+// // #  define CG_GRID_DIM_BLOCKS(g)    __cccl_hip_grid_dim_blocks()
+// // #  define CG_BLOCK_DIM_THREADS(b)  __cccl_hip_block_dim_threads()
+// // #  define CG_BLOCK_THREAD_INDEX(b) __cccl_hip_block_thread_index()
+// // #else
+// // #  define CG_GRID_BLOCK_RANK(g)    (g).block_rank()
+// // #  define CG_GRID_BLOCK_INDEX(g)   (g).block_index()
+// // #  define CG_GRID_NUM_BLOCKS(g)    (g).num_blocks()
+// // #  define CG_GRID_DIM_BLOCKS(g)    (g).dim_blocks()
+// // #  define CG_BLOCK_DIM_THREADS(b)  (b).dim_threads()
+// // #  define CG_BLOCK_THREAD_INDEX(b) (b).thread_index()
+// // #endif // !__HIP_PLATFORM_AMD__
+// // =======
+// using size_t3 = cuda::__vector_type_t<cuda::std::size_t, 3>;
+// // >>>>>>> END NEW CODE (8ad18e3528)
 // =======
-using size_t3 = cuda::__vector_type_t<cuda::std::size_t, 3>;
-// >>>>>>> END NEW CODE (8ad18e3528)
+using size_t3 = cuda::vector_type_t<cuda::std::size_t, 3>;
+// >>>>>>> END NEW CODE (0a10a1f035)
 
 struct basic_test_single_dim
 {
