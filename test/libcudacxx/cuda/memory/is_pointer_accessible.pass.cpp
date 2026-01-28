@@ -34,6 +34,7 @@
 #include <cuda/__runtime/ensure_current_context.h>
 #include <cuda/devices>
 #include <cuda/memory>
+#include <cuda/memory_pool>
 #include <cuda/std/cassert>
 
 // NOTE(HIP/AMD): the upstream-named <cuda_runtime_api.h> does not exist
@@ -182,7 +183,10 @@ bool test_memory_pool()
     test_memory_pool_impl(cudaMemAllocationTypePinned, cudaMemLocationTypeDevice, false, true, false);
 
 #if _CCCL_CTK_AT_LEAST(12, 2)
-    test_memory_pool_impl(cudaMemAllocationTypePinned, cudaMemLocationTypeHost, true, false, false);
+    if (cuda::__is_host_memory_pool_supported())
+    {
+      test_memory_pool_impl(cudaMemAllocationTypePinned, cudaMemLocationTypeHost, true, false, false);
+    }
 #endif // _CCCL_CTK_AT_LEAST(12, 2)
 #if _CCCL_CTK_AT_LEAST(13, 0)
     // TODO(fbusato): check if this can be improved in future releases
@@ -331,11 +335,16 @@ bool test_multiple_devices_from_pool()
   return true;
 }
 
+void test()
+{
+  assert(test_basic());
+  assert(test_multiple_devices());
+  assert(test_memory_pool());
+  assert(test_multiple_devices_from_pool());
+}
+
 int main(int, char**)
 {
-  NV_IF_TARGET(NV_IS_HOST, (assert(test_basic());))
-  NV_IF_TARGET(NV_IS_HOST, (assert(test_memory_pool());))
-  NV_IF_TARGET(NV_IS_HOST, (assert(test_multiple_devices());))
-  NV_IF_TARGET(NV_IS_HOST, (assert(test_multiple_devices_from_pool());))
+  NV_IF_TARGET(NV_IS_HOST, (test();))
   return 0;
 }
