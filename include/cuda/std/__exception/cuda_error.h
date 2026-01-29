@@ -47,12 +47,12 @@
 // =======
 #include <cuda/std/__exception/exception_macros.h>
 #include <cuda/std/__exception/msg_storage.h>
+#include <cuda/std/__host_stdlib/stdexcept>
 #include <cuda/std/source_location>
 // >>>>>>> END NEW CODE (ac82f7b5b2)
 
 #if !_CCCL_COMPILER(NVRTC)
 #  include <cstdio>
-#  include <stdexcept>
 #endif // !_CCCL_COMPILER(NVRTC)
 
 #include <cuda/std/__cccl/prologue.h>

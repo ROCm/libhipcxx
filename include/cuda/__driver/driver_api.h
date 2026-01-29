@@ -57,6 +57,7 @@
 
 #  include <cuda/std/__cstddef/types.h>
 #  include <cuda/std/__exception/cuda_error.h>
+#  include <cuda/std/__host_stdlib/stdexcept>
 #  include <cuda/std/__internal/namespaces.h>
 #  include <cuda/std/__limits/numeric_limits.h>
 #  include <cuda/std/__type_traits/always_false.h>
@@ -66,8 +67,6 @@
 #  else
 #    include <dlfcn.h>
 #  endif
-
-#  include <stdexcept>
 
 #  include <cuda.h>
 
