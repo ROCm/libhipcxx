@@ -68,7 +68,7 @@
 #endif // _CCCL_CUDA_COMPILER(CLANG)
 
 #if _CCCL_STD_VER >= 2020 // need to backfill ::std::construct_at
-#  include <cuda/std/__cccl/memory_wrapper.h>
+#  include <cuda/std/__host_stdlib/memory>
 
 // NOTE(HIP/AMD): HIPRTC requires explicit std::construct_at fallback definition.
 // The __cpp_lib_constexpr_dynamic_alloc macro may be defined by system headers
