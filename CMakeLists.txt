@@ -285,24 +285,30 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   add_subdirectory(test)
 endif()
 
-# Package configuration
-set(CPACK_DEBIAN_ARCHIVE_TYPE "gnutar")
-
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.TXT")
-set(CPACK_RPM_PACKAGE_LICENSE "ASL 2.0 AND MIT")
-
-if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
-  set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+# <<<<<<< OLD CODE from c2bdf97e06 (823b415528) - COMMENTED OUT
+# # Package configuration
+# set(CPACK_DEBIAN_ARCHIVE_TYPE "gnutar")
+#
+# set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.TXT")
+# set(CPACK_RPM_PACKAGE_LICENSE "ASL 2.0 AND MIT")
+#
+# if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
+#   set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+# endif()
+#
+# set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "\${CPACK_PACKAGING_INSTALL_PREFIX}" )
+#
+# rocm_create_package(
+#   NAME libhipcxx
+#   DESCRIPTION "ROCm libhipcxx library"
+#   # FIXME(HIP/AMD): A maintainer string is required
+#   # Set to the following when available:
+#   # MAINTAINER "libhipcxx-maintainer@amd.com"
+#   MAINTAINER "AMD, Inc."
+#   HEADER_ONLY
+# )
+# =======
+if (CCCL_ENABLE_BENCHMARKS)
+  add_subdirectory(benchmarks)
 endif()
-
-set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "\${CPACK_PACKAGING_INSTALL_PREFIX}" )
-
-rocm_create_package(
-  NAME libhipcxx
-  DESCRIPTION "ROCm libhipcxx library"
-  # FIXME(HIP/AMD): A maintainer string is required
-  # Set to the following when available:
-  # MAINTAINER "libhipcxx-maintainer@amd.com"
-  MAINTAINER "AMD, Inc."
-  HEADER_ONLY
-)
+# >>>>>>> END NEW CODE (823b415528)
