@@ -42,12 +42,12 @@
 #  pragma system_header
 #endif // no system header
 
-#if !_CCCL_COMPILER(NVRTC)
-#  include <stdexcept>
-#endif // !_CCCL_COMPILER(NVRTC)
-
 #include <cuda/std/__exception/terminate.h>
-#include <cuda/std/__floating_point/cuda_fp_types.h>
+// <<<<<<< OLD CODE from 6679bf087e (6f0f385d4f) - COMMENTED OUT
+// #include <cuda/std/__floating_point/cuda_fp_types.h>
+// =======
+#include <cuda/std/__host_stdlib/stdexcept>
+// >>>>>>> END NEW CODE (6f0f385d4f)
 #include <cuda/std/__type_traits/is_arithmetic.h>
 #include <cuda/std/__type_traits/is_constructible.h>
 #include <cuda/std/__type_traits/is_same.h>
