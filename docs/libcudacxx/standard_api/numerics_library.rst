@@ -41,6 +41,7 @@ This page covers the numerics library headers available in libhipcxx, including 
    numerics_library/linalg
    numerics_library/numbers
    numerics_library/numeric
+   numerics_library/random
 
 Any Standard C++ header not listed below is omitted.
 
@@ -82,3 +83,9 @@ Any Standard C++ header not listed below is omitted.
      - Numeric algorithms
      - libhipcxx 2.7
      - `\<numeric\> <https://en.cppreference.com/w/cpp/header/numeric>`_
+
+   * - :ref:`\<cuda/std/random\> <libcudacxx-standard-api-numerics-random>`
+     - Random number generation
+     - CCCL 3.3.0
+     - CUDA 13.3
+     - `\<random\> <https://en.cppreference.com/w/cpp/header/random>`_
