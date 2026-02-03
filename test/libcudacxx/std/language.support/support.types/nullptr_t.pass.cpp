@@ -29,7 +29,7 @@
 
 #include "test_macros.h"
 
-// typedef decltype(nullptr) nullptr_t;
+// using nullptr_t = decltype(nullptr);
 
 struct A
 {
@@ -57,7 +57,7 @@ __host__ __device__ void test_conversions()
 template <class T>
 struct Voider
 {
-  typedef void type;
+  using type = void;
 };
 template <class T, class = void>
 struct has_less : cuda::std::false_type
