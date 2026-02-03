@@ -63,9 +63,9 @@ int main(int, char**)
 #if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   test<wchar_t>(WCHAR_MIN);
 #endif // !TEST_COMPILER(NVRTC)
-#if TEST_STD_VER > 2017 && defined(__cpp_char8_t)
+#if _CCCL_HAS_CHAR8_T()
   test<char8_t>(0);
-#endif
+#endif // _CCCL_HAS_CHAR8_T()
   test<char16_t>(0);
   test<char32_t>(0);
   test<short>(SHRT_MIN);
