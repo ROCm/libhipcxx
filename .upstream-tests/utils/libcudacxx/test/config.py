@@ -6,7 +6,7 @@
 #
 # ===----------------------------------------------------------------------===##
 
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -779,9 +779,9 @@ class Configuration(object):
                 # using this feature. (Also see llvm.org/PR32730)
                 self.config.available_features.add("LIBCUDACXX-WINDOWS-FIXME")
 
-        if "msvc" not in self.config.available_features:
+        if "msvc" not in self.config.available_features and not self.is_windows:
             # Attempt to detect the glibc version by querying for __GLIBC__
-            # in 'features.h'.
+            # in 'features.h'. This is only available on Linux systems.
             macros = self.cxx.dumpMacros(flags=["-include", "features.h"])
             if isinstance(macros, dict) and "__GLIBC__" in macros:
                 maj_v, min_v = (macros["__GLIBC__"], macros["__GLIBC_MINOR__"])
@@ -803,7 +803,9 @@ class Configuration(object):
         if self.is_windows:
             # FIXME: Can we remove this?
             self.cxx.compile_flags += ["-D_CRT_SECURE_NO_WARNINGS"]
-            self.cxx.compile_flags += ["--use-local-env"]
+            # --use-local-env is only supported by nvcc on Windows, not by hipcc or clang
+            if self.cxx.type == "nvcc":
+                self.cxx.compile_flags += ["--use-local-env"]
             # Required so that tests using min/max don't fail on Windows,
             # and so that those tests don't have to be changed to tolerate
             # this insanity.
@@ -923,9 +925,10 @@ class Configuration(object):
                 elif arch == "gfx1100" or arch == "gfx1101": # RDNA3
                     pre_gfx1200 = True
                     pre_gfx1201 = True
-                if arch in ["gfx908", "gfx90a", "gfx940", "gfx941", "gfx942", "gfx1030", "gfx1100", "gfx1101", "gfx1200", "gfx1201"]:
-                  arch_flag = '--offload-arch={0}'.format(arch)
-                  self.cxx.compile_flags += [arch_flag]
+                # Add --offload-arch for all valid gfx architectures
+                if arch.startswith("gfx"):
+                    arch_flag = '--offload-arch={0}'.format(arch)
+                    self.cxx.compile_flags += [arch_flag]
         if pre_gfx908:
             self.config.available_features.add("pre-gfx908")
         if pre_gfx90a:
@@ -1306,7 +1309,9 @@ class Configuration(object):
             self.cxx.link_flags += ["-ccbin={0}".format(nvcc_host_compiler)]
 
         if self.is_windows:
-            self.cxx.link_flags += ["--use-local-env"]
+            # --use-local-env is only supported by nvcc on Windows, not by hipcc or clang
+            if self.cxx.type == "nvcc":
+                self.cxx.link_flags += ["--use-local-env"]
 
         # Configure library path
         self.configure_link_flags_cxx_library_path()
@@ -1333,7 +1338,9 @@ class Configuration(object):
             self.configure_extra_library_flags()
         elif self.cxx_stdlib_under_test == "libstdc++":
             self.config.available_features.add("c++experimental")
-            self.cxx.link_flags += ["-lm", "-pthread"]
+            # These libraries don't exist on Windows
+            if not self.is_windows:
+                self.cxx.link_flags += ["-lm", "-pthread"]
         elif self.cxx_stdlib_under_test == "msvc":
             # FIXME: Correctly setup debug/release flags here.
             pass
