@@ -52,7 +52,7 @@ struct NonTrivialCopy
 __host__ __device__ constexpr bool tests()
 {
   {
-    typedef cuda::std::array<double, 3> Array;
+    using Array = cuda::std::array<double, 3>;
     Array array = {1.1, 2.2, 3.3};
     Array copy  = array;
     copy        = array;
@@ -61,7 +61,7 @@ __host__ __device__ constexpr bool tests()
     unused(copy);
   }
   {
-    typedef cuda::std::array<double const, 3> Array;
+    using Array = cuda::std::array<double const, 3>;
     Array array = {1.1, 2.2, 3.3};
     Array copy  = array;
     unused(copy);
@@ -70,7 +70,7 @@ __host__ __device__ constexpr bool tests()
     unused(copy);
   }
   {
-    typedef cuda::std::array<double, 0> Array;
+    using Array = cuda::std::array<double, 0>;
     Array array = {};
     Array copy  = array;
     copy        = array;
@@ -80,7 +80,7 @@ __host__ __device__ constexpr bool tests()
   }
   {
     // const arrays of size 0 should disable the implicit copy assignment operator.
-    typedef cuda::std::array<double const, 0> Array;
+    using Array = cuda::std::array<double const, 0>;
     Array array = {};
     Array copy  = array;
     static_assert(cuda::std::is_copy_constructible<Array>::value, "");
@@ -88,7 +88,7 @@ __host__ __device__ constexpr bool tests()
     unused(copy);
   }
   {
-    typedef cuda::std::array<NoDefault, 0> Array;
+    using Array = cuda::std::array<NoDefault, 0>;
     Array array = {};
     Array copy  = array;
     copy        = array;
@@ -97,7 +97,7 @@ __host__ __device__ constexpr bool tests()
     unused(copy);
   }
   {
-    typedef cuda::std::array<NoDefault const, 0> Array;
+    using Array = cuda::std::array<NoDefault const, 0>;
     Array array = {};
     Array copy  = array;
     static_assert(cuda::std::is_copy_constructible<Array>::value, "");
@@ -107,7 +107,7 @@ __host__ __device__ constexpr bool tests()
 
   // Make sure we can implicitly copy a cuda::std::array of a non-trivially copyable type
   {
-    typedef cuda::std::array<NonTrivialCopy, 0> Array;
+    using Array = cuda::std::array<NonTrivialCopy, 0>;
     Array array = {};
     Array copy  = array;
     copy        = array;
@@ -120,7 +120,7 @@ __host__ __device__ constexpr bool tests()
   if (!TEST_IS_CONSTANT_EVALUATED())
 #endif // TEST_CUDA_COMPILER(NVCC)
   {
-    typedef cuda::std::array<NonTrivialCopy, 1> Array;
+    using Array = cuda::std::array<NonTrivialCopy, 1>;
     Array array = {};
     Array copy  = array;
     copy        = array;
@@ -132,7 +132,7 @@ __host__ __device__ constexpr bool tests()
   if (!TEST_IS_CONSTANT_EVALUATED())
 #endif // TEST_CUDA_COMPILER(NVCC)
   {
-    typedef cuda::std::array<NonTrivialCopy, 2> Array;
+    using Array = cuda::std::array<NonTrivialCopy, 2>;
     Array array = {};
     Array copy  = array;
     copy        = array;

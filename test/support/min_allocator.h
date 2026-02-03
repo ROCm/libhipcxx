@@ -46,7 +46,7 @@ template <class T>
 class bare_allocator
 {
 public:
-  typedef T value_type;
+  using value_type = T;
 
   __host__ __device__ bare_allocator() noexcept {}
 
@@ -90,7 +90,7 @@ public:
   }
 
 public:
-  typedef T value_type;
+  using value_type = T;
 
   template <class U>
   __host__ __device__ no_default_allocator(no_default_allocator<U>) noexcept
@@ -143,7 +143,7 @@ template <class T>
 class malloc_allocator : public malloc_allocator_base
 {
 public:
-  typedef T value_type;
+  using value_type = T;
 
   __host__ __device__ malloc_allocator() noexcept
   {
@@ -184,8 +184,8 @@ TEST_GLOBAL_VARIABLE bool cpp03_allocator_construct_called = false;
 template <class T>
 struct cpp03_allocator : bare_allocator<T>
 {
-  typedef T value_type;
-  typedef value_type* pointer;
+  using value_type = T;
+  using pointer    = value_type*;
 
   // Returned value is not used but it's not prohibited.
   __host__ __device__ pointer construct(pointer p, const value_type& val)
@@ -205,8 +205,8 @@ TEST_GLOBAL_VARIABLE bool cpp03_overload_allocator_construct_called = false;
 template <class T>
 struct cpp03_overload_allocator : bare_allocator<T>
 {
-  typedef T value_type;
-  typedef value_type* pointer;
+  using value_type = T;
+  using pointer    = value_type*;
 
   __host__ __device__ void construct(pointer p, const value_type& val)
   {
@@ -327,11 +327,11 @@ public:
     return ptr_ != nullptr;
   }
 
-  typedef cuda::std::ptrdiff_t difference_type;
-  typedef T& reference;
-  typedef T* pointer;
-  typedef T value_type;
-  typedef cuda::std::random_access_iterator_tag iterator_category;
+  using difference_type   = cuda::std::ptrdiff_t;
+  using reference         = T&;
+  using pointer           = T*;
+  using value_type        = T;
+  using iterator_category = cuda::std::random_access_iterator_tag;
 
   __host__ __device__ reference operator*() const
   {
@@ -468,11 +468,11 @@ public:
     return ptr_ != nullptr;
   }
 
-  typedef cuda::std::ptrdiff_t difference_type;
-  typedef const T& reference;
-  typedef const T* pointer;
-  typedef const T value_type;
-  typedef cuda::std::random_access_iterator_tag iterator_category;
+  using difference_type   = cuda::std::ptrdiff_t;
+  using reference         = const T&;
+  using pointer           = const T*;
+  using value_type        = const T;
+  using iterator_category = cuda::std::random_access_iterator_tag;
 
   __host__ __device__ reference operator*() const
   {
@@ -609,8 +609,8 @@ template <class T>
 class min_allocator
 {
 public:
-  typedef T value_type;
-  typedef min_pointer<T> pointer;
+  using value_type = T;
+  using pointer    = min_pointer<T>;
 
   min_allocator() = default;
   template <class U>
@@ -641,7 +641,7 @@ template <class T>
 class explicit_allocator
 {
 public:
-  typedef T value_type;
+  using value_type = T;
 
   __host__ __device__ explicit_allocator() noexcept {}
 
