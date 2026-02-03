@@ -6,7 +6,7 @@
 #
 #===----------------------------------------------------------------------===##
 
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -390,8 +390,8 @@ class CXXCompiler(object):
             source_files = os.path.join(os.path.dirname(os.path.abspath(__file__)), "empty.cpp")
 
         old_flags = flags
-        # Assume MSVC flags on Windows
-        if platform.system() == 'Windows':
+        # Use MSVC-specific flags only for MSVC compiler
+        if self.type == 'msvc':
             flags = ['/Zc:preprocessor', '/PD'] + old_flags
             cmd, out, err, rc = self.preprocess(source_files, flags=flags, cwd=cwd)
             # Older MSVC does not support dumping macros
@@ -410,6 +410,10 @@ class CXXCompiler(object):
                 cmd, out, err, rc = self.preprocess(source_files, flags=flags, cwd=cwd)
 
         if rc != 0:
+            print(f"DEBUG: Macro dump failed with rc={rc}")
+            print(f"DEBUG: Command: {cmd}")
+            print(f"DEBUG: stdout: {out}")
+            print(f"DEBUG: stderr: {err}")
             raise BaseException("Macros failed to dump")
 
         parsed_macros = {}
