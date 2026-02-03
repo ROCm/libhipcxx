@@ -214,28 +214,36 @@ elseif (NOT LIBCUDACXX_ENABLE_HIP)
   target_compile_definitions(cccl.c2h PRIVATE C2H_HAS_CURAND=0)
 endif()
 
-# <<<<<<< OLD CODE from 5bdee904e5 (b0ca1b2dbc) - COMMENTED OUT
-# # The Catch2 runner. Under HIP we tag the .cu file with LANGUAGE HIP so
-# # it compiles through hipcc / clang -x hip. catch2_runner_helper.{inl,cu}
-# # only uses cuda* runtime API symbols that are shimmed by
-# # <libhipcxx/__amd/cuda_runtime.h>, so no source changes needed.
-# add_library(cccl.c2h.main OBJECT catch2_runner.cpp catch2_runner_helper.cu)
-# if (LIBCUDACXX_ENABLE_HIP)
-#   # NOTE(HIP/AMD): catch2_runner.cpp transitively includes
-#   # <libhipcxx/__amd/cuda_runtime.h> which pulls <hip/hip_runtime.h>. The latter
-#   # uses _Float16 / __bf16 which are HIP-clang specific extensions, so
-#   # we have to compile the runner through clang -x hip even though
-#   # the file extension is .cpp.
-#   set_source_files_properties(
-#     catch2_runner.cpp catch2_runner_helper.cu
-#     PROPERTIES LANGUAGE HIP
-#   )
-#   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
-#   cccl_c2h_attach_hip_deps(cccl.c2h.main SCOPE PUBLIC)
-# else()
-#   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
-# endif()
+# <<<<<<< OLD CODE from de35987c51 (d1887233a4) - COMMENTED OUT
+# # <<<<<<< OLD CODE from 5bdee904e5 (b0ca1b2dbc) - COMMENTED OUT
+# # # The Catch2 runner. Under HIP we tag the .cu file with LANGUAGE HIP so
+# # # it compiles through hipcc / clang -x hip. catch2_runner_helper.{inl,cu}
+# # # only uses cuda* runtime API symbols that are shimmed by
+# # # <libhipcxx/__amd/cuda_runtime.h>, so no source changes needed.
+# # add_library(cccl.c2h.main OBJECT catch2_runner.cpp catch2_runner_helper.cu)
+# # if (LIBCUDACXX_ENABLE_HIP)
+# #   # NOTE(HIP/AMD): catch2_runner.cpp transitively includes
+# #   # <libhipcxx/__amd/cuda_runtime.h> which pulls <hip/hip_runtime.h>. The latter
+# #   # uses _Float16 / __bf16 which are HIP-clang specific extensions, so
+# #   # we have to compile the runner through clang -x hip even though
+# #   # the file extension is .cpp.
+# #   set_source_files_properties(
+# #     catch2_runner.cpp catch2_runner_helper.cu
+# #     PROPERTIES LANGUAGE HIP
+# #   )
+# #   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
+# #   cccl_c2h_attach_hip_deps(cccl.c2h.main SCOPE PUBLIC)
+# # else()
+# #   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
+# # endif()
+# # =======
 # =======
+set_target_properties(
+  cccl.c2h
+  PROPERTIES CXX_VISIBILITY_PRESET "default" CUDA_VISIBILITY_PRESET "default"
+)
+
+# >>>>>>> END NEW CODE (d1887233a4)
 add_library(cccl.c2h.main OBJECT catch2_runner.cu catch2_runner_helper.cu)
 target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
 # >>>>>>> END NEW CODE (b0ca1b2dbc)
