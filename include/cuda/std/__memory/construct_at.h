@@ -70,13 +70,17 @@
 #if _CCCL_STD_VER >= 2020 // need to backfill ::std::construct_at
 #  include <cuda/std/__host_stdlib/memory>
 
-// NOTE(HIP/AMD): HIPRTC requires explicit std::construct_at fallback definition.
-// The __cpp_lib_constexpr_dynamic_alloc macro may be defined by system headers
-// (e.g., /usr/include/c++/13/version) that get included indirectly through <new>.
-// However, HIPRTC cannot include <memory> (excluded above), so std::construct_at
-// is not available even when the macro indicates library support.
-// We force the fallback definition for HIPRTC regardless of the macro state.
-#if !defined(__cpp_lib_constexpr_dynamic_alloc) || defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from 88a3588ffa (ca9f334a5a) - COMMENTED OUT
+// // NOTE(HIP/AMD): HIPRTC requires explicit std::construct_at fallback definition.
+// // The __cpp_lib_constexpr_dynamic_alloc macro may be defined by system headers
+// // (e.g., /usr/include/c++/13/version) that get included indirectly through <new>.
+// // However, HIPRTC cannot include <memory> (excluded above), so std::construct_at
+// // is not available even when the macro indicates library support.
+// // We force the fallback definition for HIPRTC regardless of the macro state.
+// #if !defined(__cpp_lib_constexpr_dynamic_alloc) || defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#  if __cpp_lib_constexpr_dynamic_alloc < 201907L
+// >>>>>>> END NEW CODE (ca9f334a5a)
 namespace std
 {
 _CCCL_EXEC_CHECK_DISABLE
@@ -93,7 +97,7 @@ _CCCL_API constexpr _Tp* construct_at(_Tp* __location, _Args&&... __args)
 #    endif
 }
 } // namespace std
-#  endif // __cpp_lib_constexpr_dynamic_alloc
+#  endif // __cpp_lib_constexpr_dynamic_alloc < 201907L
 #endif // _CCCL_STD_VER >= 2020
 
 #include <cuda/std/__cccl/prologue.h>
