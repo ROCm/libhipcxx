@@ -55,7 +55,7 @@ struct TestFn
         int32_t a;
         int32_t b;
       };
-      typedef cuda::std::atomic<key> A;
+      using A = cuda::std::atomic<key>;
       Selector<A, constructor_initializer> sel;
       A& t = *sel.construct();
       cuda::std::atomic_init(&t, key{1, 2});
@@ -72,7 +72,7 @@ struct TestFn
         int32_t a;
         int32_t b;
       };
-      typedef cuda::std::atomic<key> A;
+      using A = cuda::std::atomic<key>;
       Selector<A, constructor_initializer> sel;
       A& t = *sel.construct();
       cuda::std::atomic_init(&t, key{1, 2});
