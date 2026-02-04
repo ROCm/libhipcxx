@@ -946,6 +946,7 @@ class Configuration(object):
                 compute_archs = self.get_all_major_compute_capabilities()
 
             compute_archs = sorted(set(re.split("\\s|;|,", compute_archs)))
+            arch_flags = []
             for s in compute_archs:
                 # Split arch and mode i.e. 80-virtual -> 80, virtual
                 arch, *mode = re.split("-", s)
@@ -968,63 +969,69 @@ class Configuration(object):
                     pre_sm_90 = True
                 if arch < 90 or (arch == 90 and subarchitecture < "a"):
                     pre_sm_90a = True
-                arch_flag = real_arch_format.format(str(arch) + subarchitecture)
+                arch = str(arch) + subarchitecture
+                arch_flags += [real_arch_format.format(arch)]
                 if mode.count("virtual"):
-                    arch_flag = virt_arch_format.format(str(arch) + subarchitecture)
-                self.cxx.compile_flags += [arch_flag]
-        elif compute_archs and (self.cxx.type == 'hipcc' or self.cxx.type == 'hiprtcc'):
-            pre_gfx90a = False
-            pre_gfx908 = False
-            pre_gfx942 = False
-            pre_gfx1030 = False
-            pre_gfx1100 = False
-            pre_gfx1101 = False
-            pre_gfx1200 = False
-            pre_gfx1201 = False
-            pre_sm_32  = False
-            pre_sm_60  = False
-            pre_sm_70  = False
-            pre_sm_80  = False
-            pre_sm_90  = False
-            compute_archs = set(sorted(re.split('\s|;|,', compute_archs)))
-            for arch in compute_archs:
-                if arch == "gfx908": 
-                    pre_gfx90a = True
-                    pre_gfx942 = True
-                    pre_gfx1200 = True
-                    pre_gfx1201 = True
-                elif arch == "gfx90a":
-                    pre_gfx942 = True
-                    pre_gfx1200 = True
-                    pre_gfx1201 = True
-                elif arch == "gfx1030": # RDNA2
-                    pre_gfx1100 = True
-                    pre_gfx1101 = True
-                    pre_gfx1200 = True
-                    pre_gfx1201 = True
-                elif arch == "gfx1100" or arch == "gfx1101": # RDNA3
-                    pre_gfx1200 = True
-                    pre_gfx1201 = True
-                # Add --offload-arch for all valid gfx architectures
-                if arch.startswith("gfx"):
-                    arch_flag = '--offload-arch={0}'.format(arch)
-                    self.cxx.compile_flags += [arch_flag]
-        if pre_gfx908:
-            self.config.available_features.add("pre-gfx908")
-        if pre_gfx90a:
-            self.config.available_features.add("pre-gfx90a")
-        if pre_gfx942:
-            self.config.available_features.add("pre-gfx942")
-        if pre_gfx1030:
-            self.config.available_features.add("pre-gfx1030")
-        if pre_gfx1100:
-            self.config.available_features.add("pre-gfx1100")
-        if pre_gfx1101:
-            self.config.available_features.add("pre-gfx1101")
-        if pre_gfx1200:
-            self.config.available_features.add("pre-gfx1200")
-        if pre_gfx1201:
-            self.config.available_features.add("pre-gfx1201")
+# <<<<<<< OLD CODE from a23aba822d (6a80cd16fe) - COMMENTED OUT
+#                     arch_flag = virt_arch_format.format(str(arch) + subarchitecture)
+#                 self.cxx.compile_flags += [arch_flag]
+#         elif compute_archs and (self.cxx.type == 'hipcc' or self.cxx.type == 'hiprtcc'):
+#             pre_gfx90a = False
+#             pre_gfx908 = False
+#             pre_gfx942 = False
+#             pre_gfx1030 = False
+#             pre_gfx1100 = False
+#             pre_gfx1101 = False
+#             pre_gfx1200 = False
+#             pre_gfx1201 = False
+#             pre_sm_32  = False
+#             pre_sm_60  = False
+#             pre_sm_70  = False
+#             pre_sm_80  = False
+#             pre_sm_90  = False
+#             compute_archs = set(sorted(re.split('\s|;|,', compute_archs)))
+#             for arch in compute_archs:
+#                 if arch == "gfx908": 
+#                     pre_gfx90a = True
+#                     pre_gfx942 = True
+#                     pre_gfx1200 = True
+#                     pre_gfx1201 = True
+#                 elif arch == "gfx90a":
+#                     pre_gfx942 = True
+#                     pre_gfx1200 = True
+#                     pre_gfx1201 = True
+#                 elif arch == "gfx1030": # RDNA2
+#                     pre_gfx1100 = True
+#                     pre_gfx1101 = True
+#                     pre_gfx1200 = True
+#                     pre_gfx1201 = True
+#                 elif arch == "gfx1100" or arch == "gfx1101": # RDNA3
+#                     pre_gfx1200 = True
+#                     pre_gfx1201 = True
+#                 # Add --offload-arch for all valid gfx architectures
+#                 if arch.startswith("gfx"):
+#                     arch_flag = '--offload-arch={0}'.format(arch)
+#                     self.cxx.compile_flags += [arch_flag]
+#         if pre_gfx908:
+#             self.config.available_features.add("pre-gfx908")
+#         if pre_gfx90a:
+#             self.config.available_features.add("pre-gfx90a")
+#         if pre_gfx942:
+#             self.config.available_features.add("pre-gfx942")
+#         if pre_gfx1030:
+#             self.config.available_features.add("pre-gfx1030")
+#         if pre_gfx1100:
+#             self.config.available_features.add("pre-gfx1100")
+#         if pre_gfx1101:
+#             self.config.available_features.add("pre-gfx1101")
+#         if pre_gfx1200:
+#             self.config.available_features.add("pre-gfx1200")
+#         if pre_gfx1201:
+#             self.config.available_features.add("pre-gfx1201")
+# =======
+                    arch_flags += [virt_arch_format.format(arch)]
+            self.cxx.compile_flags += sorted(arch_flags)
+# >>>>>>> END NEW CODE (6a80cd16fe)
         if pre_sm_32:
             self.config.available_features.add("pre-sm-32")
         if pre_sm_60:
