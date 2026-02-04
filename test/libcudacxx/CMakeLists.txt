@@ -112,44 +112,48 @@ cccl_get_dlpack()
 get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
 # >>>>>>> END NEW CODE (db7afd3e8d)
 
-  find_package(CUDAToolkit REQUIRED)
-  get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
-
-  set(LIBCUDACXX_HIGHEST_COMPUTE_ARCH 90)
-
-  foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
-    set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
-    set(
-      LIBCUDACXX_COMPUTE_ARCHS_STRING
-      "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}"
-    )
-  endforeach()
-
-  message(STATUS "Enabled CUDA architectures:${_compute_message}")
-
-elseif(LIBCUDACXX_ENABLE_HIP)
-
-  # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
-  if (NOT LIBCUDACXX_COMPUTE_ARCHS)
-    set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
-  endif()
-
-  # Separate the architectures with a space
-  foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
-    set(_compute_message "${_compute_message} ${COMPUTE_ARCH}")
-    set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
-  endforeach ()
-
-# <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
-#   message(STATUS "Enabled HIP architectures:${_compute_message}")
+# <<<<<<< OLD CODE from a23aba822d (6a80cd16fe) - COMMENTED OUT
+#   find_package(CUDAToolkit REQUIRED)
+#   get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
 #
-#   option(LIBHIPCXX_TEST_WITH_HIPRTC
-#   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
-#   OFF)
-# endif()
+#   set(LIBCUDACXX_HIGHEST_COMPUTE_ARCH 90)
+#
+#   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
+#     set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
+#     set(
+#       LIBCUDACXX_COMPUTE_ARCHS_STRING
+#       "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}"
+#     )
+#   endforeach()
+#
+#   message(STATUS "Enabled CUDA architectures:${_compute_message}")
+#
+# elseif(LIBCUDACXX_ENABLE_HIP)
+#
+#   # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
+#   if (NOT LIBCUDACXX_COMPUTE_ARCHS)
+#     set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
+#   endif()
+#
+#   # Separate the architectures with a space
+#   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
+#     set(_compute_message "${_compute_message} ${COMPUTE_ARCH}")
+#     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
+#   endforeach ()
+#
+# # <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
+# #   message(STATUS "Enabled HIP architectures:${_compute_message}")
+# #
+# #   option(LIBHIPCXX_TEST_WITH_HIPRTC
+# #   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
+# #   OFF)
+# # endif()
+# # =======
+# message(STATUS "Lit enabled CUDA architectures:${_compute_message}")
+# # >>>>>>> END NEW CODE (6c02fd08b5)
 # =======
-message(STATUS "Lit enabled CUDA architectures:${_compute_message}")
-# >>>>>>> END NEW CODE (6c02fd08b5)
+message(STATUS "Lit enabled CUDA architectures: ${CMAKE_CUDA_ARCHITECTURES}")
+# >>>>>>> END NEW CODE (6a80cd16fe)
 
 if (LIBCUDACXX_TEST_WITH_NVRTC)
   # TODO: Use project properties to get path to binary.
@@ -346,20 +350,23 @@ elseif (${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVHPC")
   string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS " -stdpar")
 endif()
 
-if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "HIPCC")
-  message(STATUS "libcudacxx_SOURCE_DIR: ${libcudacxx_SOURCE_DIR}" )
-  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
-#    "${LIBCUDACXX_TEST_COMPILER_FLAGS} \
-    " ${LIBCUDACXX_FORCE_INCLUDE}" 
-    " -I${CMAKE_SOURCE_DIR}/include"
-    " -I${libcudacxx_SOURCE_DIR}/include"
-    " -I${libcudacxx_SOURCE_DIR}/include/libhipcxx"
-#    " CACHE INTERNAL "Flags for libcxx testing."
-  )
-endif()
-
-set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${CMAKE_HIP_ARCHITECTURES}")
-
+# <<<<<<< OLD CODE from a23aba822d (6a80cd16fe) - COMMENTED OUT
+# if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "HIPCC")
+#   message(STATUS "libcudacxx_SOURCE_DIR: ${libcudacxx_SOURCE_DIR}" )
+#   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
+# #    "${LIBCUDACXX_TEST_COMPILER_FLAGS} \
+#     " ${LIBCUDACXX_FORCE_INCLUDE}" 
+#     " -I${CMAKE_SOURCE_DIR}/include"
+#     " -I${libcudacxx_SOURCE_DIR}/include"
+#     " -I${libcudacxx_SOURCE_DIR}/include/libhipcxx"
+# #    " CACHE INTERNAL "Flags for libcxx testing."
+#   )
+# endif()
+#
+# set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${CMAKE_HIP_ARCHITECTURES}")
+#
+# =======
+# >>>>>>> END NEW CODE (6a80cd16fe)
 include(AddLLVM)
 
 set(LIBCUDACXX_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
@@ -445,6 +452,7 @@ if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
           "-Dexecutor=\"NoopExecutor()\""
           "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
     # gersemi: on
+    USES_TERMINAL
   )
 endif()
 
@@ -482,14 +490,15 @@ add_test(
         ${libcudacxx_LIT_FLAGS}
         ${_libcudacxx_lit_j_flag}
         "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
-  # gersemi: on
+    # gersemi: on
+    USES_TERMINAL
 )
 
 set_tests_properties(
   libcudacxx.test.lit
   PROPERTIES
-    # 3hr, some CI machines are slow
-    TIMEOUT 10800
+    # 6hr to match CI timeout
+    TIMEOUT 21600
     RUN_SERIAL TRUE
 )
 # <<<<<<< OLD CODE from 0aacfef654 (6c02fd08b5) - COMMENTED OUT
