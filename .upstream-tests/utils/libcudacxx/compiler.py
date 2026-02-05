@@ -430,6 +430,10 @@ class CXXCompiler(object):
     def getTriple(self):
         if self.type == "msvc":
             return "x86_64-pc-windows-msvc"
+        # hiprtcc on Windows doesn't have a real compiler executable to query
+        # Return default Windows triple for clang
+        if self.type == "hiprtcc" and platform.system() == 'Windows':
+            return "x86_64-pc-windows-gnu"
         cmd = [self.path] + self.flags + ['-dumpmachine']
         return libcudacxx.util.capture(cmd).strip()
 
