@@ -76,7 +76,8 @@ elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
   # TODO: Use project properties to get path to binary.
   # Should also set up dependency on the project when NVRTC is enabled
   set(CMAKE_CUDA_COMPILER_ID "HIPCC")
-  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/amd/hiprtc/hiprtcc")
+  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
+  message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
@@ -199,9 +200,16 @@ configure_lit_site_cfg(
   "${CMAKE_CURRENT_SOURCE_DIR}/lit.site.cfg.in"
   "${lit_site_cfg_path}")
 
+# Set dependencies for hiprtcc executable when using HIPRTC tests
+set(LIBHIPCXX_TEST_DEPENDS "")
+if(LIBHIPCXX_TEST_WITH_HIPRTC)
+  list(APPEND LIBHIPCXX_TEST_DEPENDS libcudacxx.nvrtcc)
+endif()
+
 add_lit_testsuite(check-hipcxx
-  "Running libcu++ tests"
-  "${CMAKE_CURRENT_BINARY_DIR}")
+  "Running libhip++ tests"
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  DEPENDS ${LIBHIPCXX_TEST_DEPENDS})
 
 find_program(libcudacxx_LIT lit REQUIRED)
 
