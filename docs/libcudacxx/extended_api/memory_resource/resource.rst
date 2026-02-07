@@ -26,6 +26,7 @@
   :keywords: libhipcxx, ROCm, HIP, C++, resource concept, async_resource, memory resource, allocate, deallocate, stream-ordered
 
 .. _libcudacxx-extended-api-memory-resources-resource:
+.. _libcudacxx-extended-api-memory-resources-synchronous-resource:
 
 The ``cuda::synchronous_resource`` concept
 -------------------------------------------
@@ -48,7 +49,7 @@ expected ``allocate_sync`` / ``deallocate_sync`` interface and is also equality 
 See below for different memory resources and potential pitfalls.
 
 To demonstrate, the following example defines several resources, only some of which are valid implementations of the
-``cuda::mr::synchronous_resource`` concept. The ``static_assertion``'s will result in compile-time errors for the invalid resources.
+``cuda::mr::synchronous_resource`` concept. The ``static_assertions`` will result in compile-time errors for the invalid resources.
 
 .. code:: cpp
 
