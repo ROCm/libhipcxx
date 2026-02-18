@@ -125,7 +125,6 @@ public:
   //! `stream_ref`.
   //!
   //! @param __lhs The `stream_ref` to compare
-  //! @param __rhs The `invalid_stream_t` to compare
   //! @return true if equal, false if unequal
   [[nodiscard]] _CCCL_API friend bool operator==(const stream_ref& __lhs, const invalid_stream_t&) noexcept
   {
@@ -137,7 +136,6 @@ public:
   //! @note Allows comparison with `cudaStream_t` due to implicit conversion to
   //! `stream_ref`.
   //!
-  //! @param __lhs The `invalid_stream_t` to compare
   //! @param __rhs The `stream_ref` to compare
   //! @return true if equal, false if unequal
   [[nodiscard]] _CCCL_API friend bool operator==(const invalid_stream_t&, const stream_ref& __rhs) noexcept
@@ -164,7 +162,6 @@ public:
   //! `stream_ref`.
   //!
   //! @param __lhs The `stream_ref` to compare
-  //! @param __rhs The `invalid_stream_t` to compare
   //! @return false if equal, true if unequal
   [[nodiscard]] _CCCL_API friend bool operator!=(const stream_ref& __lhs, const invalid_stream_t&) noexcept
   {
@@ -176,7 +173,6 @@ public:
   //! @note Allows comparison with `cudaStream_t` due to implicit conversion to
   //! `stream_ref`.
   //!
-  //! @param __lhs The `invalid_stream_t` to compare
   //! @param __rhs The `stream_ref` to compare
   //! @return false if equal, true if unequal
   [[nodiscard]] _CCCL_API friend bool operator!=(const invalid_stream_t&, const stream_ref& __rhs) noexcept
