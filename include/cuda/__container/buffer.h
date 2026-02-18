@@ -84,7 +84,7 @@ template <class _Env>
 inline constexpr bool __buffer_compatible_env = ::cuda::std::is_same_v<_Env, ::cuda::std::execution::env<>>;
 
 //! @rst
-//! .. _libcudacxx-containers-async-vector:
+//! .. _libcudacxx-containers-buffer:
 //!
 //! buffer
 //! -------------
@@ -182,9 +182,6 @@ private:
   }
 
 public:
-  //! @addtogroup construction
-  //! @{
-
   //! @brief Copy-constructs from a buffer
   //! @param __other The other buffer.
   _CCCL_HIDE_FROM_ABI explicit buffer(const buffer& __other)
@@ -357,10 +354,7 @@ public:
       __buf_.size());
   }
 #  endif // _CCCL_DOXYGEN_INVOKED
-  //! @}
 
-  //! @addtogroup iterators
-  //! @{
   //! @brief Returns an iterator to the first element of the buffer. If the
   //! buffer is empty, the returned iterator will be equal to end().
   [[nodiscard]] _CCCL_HIDE_FROM_ABI iterator begin() noexcept
@@ -505,7 +499,6 @@ public:
 
   //! @}
 
-  //! @addtogroup access
   //! @brief Returns a reference to the \p __n 'th element of the async_vector
   //! @param __n The index of the element we want to access
   //! @note Does not synchronize with the stored stream
@@ -524,10 +517,6 @@ public:
     return __unwrapped_begin()[__n];
   }
 
-  //! @}
-
-  //! @addtogroup size
-  //! @{
   //! @brief Returns the current number of elements stored in the buffer.
   [[nodiscard]] _CCCL_HIDE_FROM_ABI size_type size() const noexcept
   {
@@ -539,7 +528,6 @@ public:
   {
     return __buf_.size() == 0;
   }
-  //! @}
 
   //! @rst
   //! Returns a \c const reference to the :ref:`any_resource <libcudacxx-memory-resource-any-resource>` that holds the
