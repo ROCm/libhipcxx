@@ -33,6 +33,8 @@
 #ifndef _LIBCUDACXX___CSTDLIB_ALIGNED_ALLOC_H
 #define _LIBCUDACXX___CSTDLIB_ALIGNED_ALLOC_H
 
+// NOTE(HIP/AMD): Currently aligned_alloc is not supported
+#if !defined(__HIP_PLATFORM_AMD__)
 #include <cuda/std/detail/__config>
 
 #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
@@ -53,7 +55,7 @@
 
 #include <nv/target>
 
-#if _CCCL_HAS_CUDA_COMPILER() && !defined(__HIP_PLATFORM_AMD__)
+#if _CCCL_HAS_CUDA_COMPILER()
 extern "C" _CCCL_DEVICE void* __cuda_syscall_aligned_malloc(size_t, size_t);
 #endif // _CCCL_HAS_CUDA_COMPILER()
 
@@ -84,5 +86,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, s
 #endif
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#endif // !defined(__HIP_PLATFORM_AMD__)
 
 #endif // _LIBCUDACXX___CSTDLIB_ALIGNED_ALLOC_H
