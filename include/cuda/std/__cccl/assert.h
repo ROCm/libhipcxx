@@ -91,7 +91,12 @@
 #elif _CCCL_HAS_INCLUDE(<yvals.h>) && _CCCL_COMPILER(MSVC) // MSVC uses _STL_VERIFY from <yvals.h>
 #  include <yvals.h>
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) _STL_VERIFY(expression, message)
-#else // ^^^ MSVC STL ^^^ / vvv !MSVC STL vvv
+// NOTE(HIP/AMD): for hipcc on Windows __assert_fail is not available
+#elif defined(_CCCL_COMPILER_HIPCC) && defined(_WIN32)
+#  define _CCCL_ASSERT_IMPL_HOST(expression, message)      \
+    _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
+    ? (void) 0 : __builtin_trap()
+#else // ^^^ HIPCC, WIN32 ^^^ / vvv !MSVC STL, HIPCC (Linux/glibc) vvv
 #  ifdef NDEBUG
 // Reintroduce the __assert_fail declaration
 extern "C" {
@@ -106,7 +111,7 @@ _CCCL_HOST_DEVICE
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message)      \
     _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
     ? (void) 0 : __assert_fail(message, __FILE__, __LINE__, __func__)
-#endif // !MSVC STL
+#endif // !MSVC STL, HIPCC (Linux/glibc)
 
 //! Use custom implementations with nvcc on device and the host ones with clang-cuda and nvhpc
 //! _CCCL_ASSERT_IMPL_DEVICE should never be used directly
