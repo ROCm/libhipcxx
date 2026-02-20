@@ -26,7 +26,11 @@
 # .inl files are not globbed for, because they are not supposed to be used as public
 # entrypoints.
 
-include(${CMAKE_CURRENT_LIST_DIR}/CCCLC2hHipDeps.cmake)
+# <<<<<<< OLD CODE from f17cf0067f (5c6dd87a64) - COMMENTED OUT
+# include(${CMAKE_CURRENT_LIST_DIR}/CCCLC2hHipDeps.cmake)
+# =======
+cccl_get_cudatoolkit()
+# >>>>>>> END NEW CODE (5c6dd87a64)
 
 # Meta target for all configs' header builds:
 add_custom_target(libcudacxx.test.public_headers_host_only)
