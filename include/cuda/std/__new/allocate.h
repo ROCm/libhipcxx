@@ -39,16 +39,17 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/std/__new/device_new.h>
 #include <cuda/std/cstddef>
 
-#if _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  include <new> // for align_val_t
+// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
+// #if _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <new> // for align_val_t
+// =======
+#if _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() && !_CCCL_COMPILER(NVRTC)
+#  include <cuda/std/__host_stdlib/new> // for align_val_t
+// >>>>>>> END NEW CODE (332e134db7)
 #endif // _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() !_CCCL_COMPILER(NVRTC)
-
-// clang-cuda only provides device flavors of operator new, so we need to pull in <new> here
-#if _CCCL_CUDA_COMPILER(CLANG)
-#  include <new>
-#endif // _CCCL_CUDA_COMPILER(CLANG)
 
 #if __cpp_sized_deallocation < 201309L
 #  define _LIBCUDACXX_HAS_SIZED_DEALLOCATION() 0

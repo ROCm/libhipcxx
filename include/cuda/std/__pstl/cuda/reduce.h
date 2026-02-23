@@ -68,15 +68,17 @@ _CCCL_DIAG_POP
 #  include <cuda/__stream/get_stream.h>
 #  include <cuda/__stream/stream_ref.h>
 #  include <cuda/std/__exception/cuda_error.h>
+#  include <cuda/std/__exception/exception_macros.h>
 #  include <cuda/std/__execution/env.h>
 #  include <cuda/std/__execution/policy.h>
 #  include <cuda/std/__functional/invoke.h>
+#  include <cuda/std/__host_stdlib/new>
+#  include <cuda/std/__host_stdlib/stdexcept>
 #  include <cuda/std/__iterator/distance.h>
 #  include <cuda/std/__iterator/iterator_traits.h>
 #  include <cuda/std/__iterator/next.h>
 #  include <cuda/std/__memory/addressof.h>
 #  include <cuda/std/__memory/construct_at.h>
-#  include <cuda/std/__new/bad_alloc.h>
 #  include <cuda/std/__numeric/reduce.h>
 #  include <cuda/std/__pstl/dispatch.h>
 #  include <cuda/std/__type_traits/always_false.h>
@@ -84,12 +86,15 @@ _CCCL_DIAG_POP
 #  include <cuda/std/__utility/forward.h>
 #  include <cuda/std/__utility/move.h>
 
-// On HIP the cuda* runtime symbols come from <libhipcxx/__amd/cuda_runtime.h>
-// (pulled globally via <cuda/std/detail/__config>); there is no <cuda_runtime.h>.
-#  if !_CCCL_HIP_COMPILATION()
-#    include <cuda_runtime.h>
-#  endif
-
+// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
+// // On HIP the cuda* runtime symbols come from <libhipcxx/__amd/cuda_runtime.h>
+// // (pulled globally via <cuda/std/detail/__config>); there is no <cuda_runtime.h>.
+// #  if !_CCCL_HIP_COMPILATION()
+// #    include <cuda_runtime.h>
+// #  endif
+//
+// =======
+// >>>>>>> END NEW CODE (332e134db7)
 #  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD_EXECUTION
@@ -229,7 +234,7 @@ struct __pstl_dispatch<__pstl_algorithm::__reduce, __execution_backend::__cuda>
       {
         if (__err.status() == cudaErrorMemoryAllocation)
         {
-          ::cuda::std::__throw_bad_alloc();
+          _CCCL_THROW(::std::bad_alloc);
         }
         else
         {
