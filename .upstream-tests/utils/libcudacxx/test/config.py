@@ -369,6 +369,9 @@ class Configuration(object):
             cxx is not None and os.path.basename(cxx) == "clang-cl.exe"
         )
 
+        if platform.system() == "Windows":
+            self.config.available_features.add("windows_amd")
+
         # Build CXXCompiler manually for NVRTCC
         if nvrtc is True:
             cxx_type = "nvrtcc"
