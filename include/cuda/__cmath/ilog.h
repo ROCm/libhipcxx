@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _LIBCUDACXX___CMATH_ILOG
 #define _LIBCUDACXX___CMATH_ILOG
 
@@ -142,7 +164,9 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr int ilog10(_Tp __t) noexcept
   if constexpr (sizeof(_Tp) <= sizeof(uint32_t))
   {
     _CCCL_ASSERT(__log10_approx < static_cast<int>(::cuda::__power_of_10_32bit().size()), "out of bounds");
-    if constexpr (_CUDA_VSTD::is_same_v<_Tp, uint32_t>)
+    // NOTE(HIP/AMD): on Windows unsigned long is 32 bits, but on other platforms it's 64 bits,
+    // so we need to check for both types here
+    if constexpr (_CUDA_VSTD::is_same_v<_Tp, uint32_t> or _CUDA_VSTD::is_same_v<_Tp, unsigned long>)
     {
       // don't replace +1 with >= because wraparound behavior is needed here
       __log10_approx += static_cast<uint32_t>(__t) + 1 > __power_of_10_32bit()[__log10_approx];
