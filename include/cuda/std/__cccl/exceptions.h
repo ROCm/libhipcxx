@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@
 #  if defined(CCCL_DISABLE_EXCEPTIONS) // Escape hatch for users to manually disable exceptions
 #    define _CCCL_NO_EXCEPTIONS
 #  elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) || (_CCCL_COMPILER(MSVC) && _CPPUNWIND == 0) \
-    || (!_CCCL_COMPILER(MSVC) && !__EXCEPTIONS) // Catches all non msvc based compilers
+    || (!_CCCL_COMPILER(MSVC) && !__EXCEPTIONS && !defined(__HIP_PLATFORM_AMD__)) // Catches all non msvc based compilers
 #    define _CCCL_NO_EXCEPTIONS
 #  endif
 #endif // !_CCCL_NO_EXCEPTIONS
