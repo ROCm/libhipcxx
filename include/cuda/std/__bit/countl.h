@@ -118,7 +118,7 @@ template <typename _Tp>
 
 #  if !_CCCL_COMPILER(NVRTC)
 template <typename _Tp>
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST int __cccl_countl_zero_impl_host(_Tp __v) noexcept
+[[nodiscard]] _CCCL_HOST_API int __cccl_countl_zero_impl_host(_Tp __v) noexcept
 {
 #    if _CCCL_COMPILER(MSVC)
   constexpr auto __digits = numeric_limits<_Tp>::digits;
@@ -135,7 +135,7 @@ template <typename _Tp>
 
 #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 template <typename _Tp>
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE int __cccl_countl_zero_impl_device(_Tp __v) noexcept
+[[nodiscard]] _CCCL_DEVICE_API int __cccl_countl_zero_impl_device(_Tp __v) noexcept
 {
   if constexpr (sizeof(_Tp) == sizeof(uint32_t))
   {
