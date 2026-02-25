@@ -102,3 +102,9 @@ Any Standard C++ header not listed below is omitted.
      - Provides array manipulation functions such as ``memcpy``, ``memset`` and ``memcmp``
      - libhipcxx 3.0
      - `\<cstring\> <https://en.cppreference.com/w/cpp/header/cstring>`_
+
+   * - ``<cuda/std/ctime>``
+     - Provides ``clock``, ``difftime``, ``time`` and ``timespec_get`` functions
+     - CCCL 3.1.0
+     - CUDA 13.1
+     - `\<ctime\> <https://en.cppreference.com/w/cpp/header/ctime>`_
