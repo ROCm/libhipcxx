@@ -4,7 +4,7 @@
 // under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-// SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES.
+// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
 
@@ -43,24 +43,32 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/std/__host_stdlib/time.h>
+
 #if _CCCL_CUDA_COMPILATION()
 #  include <cuda/__ptx/instructions/get_sreg.h>
 #endif // _CCCL_CUDA_COMPILATION()
 
-// NOTE(HIP/AMD): _LIBCUDACXX_HIP_TSC_CLOCKRATE /
-// _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE used by
-// __cccl_time_impl_device() / __cccl_timespec_get_impl_device() are
-// supplied transitively by <cuda/std/detail/__config> ->
-// <libhipcxx/__amd/hip_tsc_clockrate.h> on HIP.
+# <<<<<<< OLD CODE from 99414cfb4c (30ef996b42) - COMMENTED OUT
+# // NOTE(HIP/AMD): _LIBCUDACXX_HIP_TSC_CLOCKRATE /
+# // _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE used by
+# // __cccl_time_impl_device() / __cccl_timespec_get_impl_device() are
+# // supplied transitively by <cuda/std/detail/__config> ->
+# // <libhipcxx/__amd/hip_tsc_clockrate.h> on HIP.
+#
+# // NOTE(HIP/AMD): Under hipRTC, including host <time.h> drags in host <stddef.h>
+# // on the JIT include path, which redefines max_align_t / byte (already provided
+# // by cuda::std's <cstddef>) and breaks compilation. Treat hipRTC like NVRTC:
+# // define the C time types we need manually instead of pulling in host <time.h>.
+# // clock_t (which the NVRTC path gets from the runtime) is declared here for HIP.
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# #  include <time.h>
+# #else
+# =======
+#include <cuda/std/__cccl/prologue.h>
 
-// NOTE(HIP/AMD): Under hipRTC, including host <time.h> drags in host <stddef.h>
-// on the JIT include path, which redefines max_align_t / byte (already provided
-// by cuda::std's <cstddef>) and breaks compilation. Treat hipRTC like NVRTC:
-// define the C time types we need manually instead of pulling in host <time.h>.
-// clock_t (which the NVRTC path gets from the runtime) is declared here for HIP.
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  include <time.h>
-#else
+#if _CCCL_COMPILER(NVRTC)
+# >>>>>>> END NEW CODE (30ef996b42)
 #  define TIME_UTC 1
 
 using time_t = long long int;
@@ -75,8 +83,6 @@ struct timespec
 // below picks it up).
 #endif // _CCCL_COMPILER(NVRTC)
 
-#include <cuda/std/__cccl/prologue.h>
-
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 using ::clock_t;
@@ -84,21 +90,9 @@ using ::size_t;
 using ::time_t;
 using ::timespec;
 
-// glibc defines clock and other functions as macros, we need to prevent our symbols being redefined by them
-
 // clock
 
-// We cannot just do `using ::clock` here, for clang-cuda the signature doesn't match.
-#if defined(clock)
-#  pragma push_macro("clock")
-#  undef clock
-#  define _LIBCUDACXX_POP_CLOCK_MACRO
-#endif // clock
 [[nodiscard]] _CCCL_API inline clock_t clock() noexcept
-#ifdef _LIBCUDACXX_POP_CLOCK_MACRO
-#  pragma pop_macro("clock")
-#  undef _LIBCUDACXX_POP_CLOCK_MACRO
-#endif // _LIBCUDACXX_POP_CLOCK_MACRO
 {
   NV_IF_ELSE_TARGET(
     NV_IS_HOST,
@@ -115,24 +109,20 @@ using ::timespec;
 
 // difftime
 
-#if defined(difftime)
-#  pragma push_macro("difftime")
-#  undef difftime
-#  define _LIBCUDACXX_POP_DIFFTIME_MACRO
-#endif // difftime
 [[nodiscard]] _CCCL_API constexpr double difftime(time_t __end, time_t __start) noexcept
-#ifdef _LIBCUDACXX_POP_DIFFTIME_MACRO
-#  pragma pop_macro("difftime")
-#  undef _LIBCUDACXX_POP_DIFFTIME_MACRO
-#endif // _LIBCUDACXX_POP_DIFFTIME_MACRO
 {
   return static_cast<double>(__end - __start);
 }
 
 // time
 
-#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE time_t __cccl_time_impl_device(time_t* __v) noexcept
+# <<<<<<< OLD CODE from 99414cfb4c (30ef996b42) - COMMENTED OUT
+# #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+# [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE time_t __cccl_time_impl_device(time_t* __v) noexcept
+# =======
+#if _CCCL_CUDA_COMPILATION()
+[[nodiscard]] _CCCL_DEVICE_API inline time_t __cccl_time_impl_device(time_t* __v) noexcept
+# >>>>>>> END NEW CODE (30ef996b42)
 {
 #  if defined(__HIP_DEVICE_COMPILE__)
   // NOTE(HIP/AMD): wall_clock64() returns TSC cycles, not nanoseconds. The TSC
@@ -157,16 +147,7 @@ using ::timespec;
 }
 #endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
-#if defined(time)
-#  pragma push_macro("time")
-#  undef time
-#  define _LIBCUDACXX_POP_TIME_MACRO
-#endif // time
 _CCCL_API inline time_t time(time_t* __v) noexcept
-#ifdef _LIBCUDACXX_POP_TIME_MACRO
-#  pragma pop_macro("time")
-#  undef _LIBCUDACXX_POP_TIME_MACRO
-#endif // _LIBCUDACXX_POP_TIME_MACRO
 {
   NV_IF_ELSE_TARGET(NV_IS_HOST, (return ::time(__v);), (return ::cuda::std::__cccl_time_impl_device(__v);))
 }
@@ -175,10 +156,15 @@ _CCCL_API inline time_t time(time_t* __v) noexcept
 
 // timespec_get
 
-#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE int __cccl_timespec_get_impl_device(timespec* __ts, int __base) noexcept
+# <<<<<<< OLD CODE from 99414cfb4c (30ef996b42) - COMMENTED OUT
+# #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+# [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE int __cccl_timespec_get_impl_device(timespec* __ts, int __base) noexcept
+# =======
+#  if _CCCL_CUDA_COMPILATION()
+[[nodiscard]] _CCCL_DEVICE_API inline int __cccl_timespec_get_impl_device(timespec* __ts, int __base) noexcept
+# >>>>>>> END NEW CODE (30ef996b42)
 {
-  if (__base != TIME_UTC)
+  if (__ts == nullptr || __base != TIME_UTC)
   {
     return 0;
   }
@@ -208,17 +194,7 @@ _CCCL_API inline time_t time(time_t* __v) noexcept
 }
 #  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
-#  if defined(timespec_get)
-#    pragma push_macro("timespec_get")
-#    undef timespec_get
-#    define _LIBCUDACXX_POP_TIMESPEC_GET_MACRO
-#  endif // timespec_get
-template <int = 0>
 [[nodiscard]] _CCCL_API inline int timespec_get(timespec* __ts, int __base) noexcept
-#  ifdef _LIBCUDACXX_POP_TIMESPEC_GET_MACRO
-#    pragma pop_macro("timespec_get")
-#    undef _LIBCUDACXX_POP_TIMESPEC_GET_MACRO
-#  endif // _LIBCUDACXX_POP_TIMESPEC_GET_MACRO
 {
   NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return ::timespec_get(__ts, __base);),
