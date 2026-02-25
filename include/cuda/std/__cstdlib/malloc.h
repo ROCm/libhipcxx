@@ -60,8 +60,13 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 using ::free;
 using ::malloc;
 
-#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-[[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
+// <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
+// =======
+#if _CCCL_CUDA_COMPILATION()
+[[nodiscard]] _CCCL_DEVICE_API inline void* __calloc_device(size_t __n, size_t __size) noexcept
+// >>>>>>> END NEW CODE (215dc6e187)
 {
   void* __ptr{};
   // check for overflow through a hypothetical larger integer

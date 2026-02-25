@@ -74,7 +74,7 @@ protected:
 
 #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __apply_prop(void* __p) const
+  [[nodiscard]] _CCCL_DEVICE_API void* __apply_prop(void* __p) const
   {
     return ::cuda::__associate(__p, _AccessProperty{});
   }
@@ -102,8 +102,13 @@ protected:
 
   _CCCL_HIDE_FROM_ABI __annotated_ptr_base() noexcept = default;
 
-#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __apply_prop(void* __p) const
+// <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+//   [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __apply_prop(void* __p) const
+// =======
+#if _CCCL_CUDA_COMPILATION()
+  [[nodiscard]] _CCCL_DEVICE_API void* __apply_prop(void* __p) const
+// >>>>>>> END NEW CODE (215dc6e187)
   {
     return ::cuda::__associate_raw_descriptor(__p, __prop);
   }
