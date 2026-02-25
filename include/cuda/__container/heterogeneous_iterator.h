@@ -105,14 +105,14 @@ public:
 
   //! @brief Dereference a \c heterogeneous_iterator
   //! @return A reference to the element the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST constexpr reference operator*() const noexcept
+  [[nodiscard]] _CCCL_HOST_API constexpr reference operator*() const noexcept
   {
     return *__ptr_;
   }
 
   //! @brief Operator arrow on a \c heterogeneous_iterator
   //! @return A pointer to the element the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST constexpr pointer operator->() const noexcept
+  [[nodiscard]] _CCCL_HOST_API constexpr pointer operator->() const noexcept
   {
     return __ptr_;
   }
@@ -120,8 +120,7 @@ public:
   //! @brief Dereference a \c heterogeneous_iterator
   //! @param __count The offset at which we want to dereference
   //! @return A reference of the \p __count th element after the one the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST constexpr reference
-  operator[](const difference_type __count) const noexcept
+  [[nodiscard]] _CCCL_HOST_API constexpr reference operator[](const difference_type __count) const noexcept
   {
     return *(__ptr_ + __count);
   }
@@ -152,14 +151,14 @@ public:
 
   //! @brief Dereference a \c heterogeneous_iterator
   //! @return A reference to the element the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE constexpr reference operator*() const noexcept
+  [[nodiscard]] _CCCL_DEVICE_API constexpr reference operator*() const noexcept
   {
     return *__ptr_;
   }
 
   //! @brief Operator arrow on a \c heterogeneous_iterator
   //! @return A pointer to the element the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE constexpr pointer operator->() const noexcept
+  [[nodiscard]] _CCCL_DEVICE_API constexpr pointer operator->() const noexcept
   {
     return __ptr_;
   }
@@ -167,8 +166,7 @@ public:
   //! @brief Dereference a \c heterogeneous_iterator
   //! @param __count The offset at which we want to dereference
   //! @return A reference of the \p __count th element after the one the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE constexpr reference
-  operator[](const difference_type __count) const noexcept
+  [[nodiscard]] _CCCL_DEVICE_API constexpr reference operator[](const difference_type __count) const noexcept
   {
     return *(__ptr_ + __count);
   }
@@ -193,20 +191,20 @@ public:
 
   _CCCL_HIDE_FROM_ABI __heterogeneous_iterator_access() = default;
 
-  _CCCL_HIDE_FROM_ABI _CCCL_HOST_DEVICE explicit constexpr __heterogeneous_iterator_access(pointer __ptr) noexcept
+  _CCCL_API explicit constexpr __heterogeneous_iterator_access(pointer __ptr) noexcept
       : __ptr_(__ptr)
   {}
 
   //! @brief Dereference a \c heterogeneous_iterator
   //! @return A reference to the element the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST_DEVICE constexpr reference operator*() const noexcept
+  [[nodiscard]] _CCCL_API constexpr reference operator*() const noexcept
   {
     return *__ptr_;
   }
 
   //! @brief Operator arrow on a \c heterogeneous_iterator
   //! @return A pointer to the element the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST_DEVICE constexpr pointer operator->() const noexcept
+  [[nodiscard]] _CCCL_API constexpr pointer operator->() const noexcept
   {
     return __ptr_;
   }
@@ -214,8 +212,7 @@ public:
   //! @brief Dereference a \c heterogeneous_iterator
   //! @param __count The offset at which we want to dereference
   //! @return A reference to the `__count` element after the one the iterator points to
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST_DEVICE constexpr reference
-  operator[](const difference_type __count) const noexcept
+  [[nodiscard]] _CCCL_API constexpr reference operator[](const difference_type __count) const noexcept
   {
     return *(__ptr_ + __count);
   }
