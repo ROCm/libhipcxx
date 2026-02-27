@@ -35,8 +35,7 @@ This page documents ``cuda::std::numeric`` in libhipcxx, which provides constexp
 Omissions
 ---------
 
-- Currently we do not expose any parallel algorithms.
-- Saturation arithmetics have not been implemented yet.
+-  Currently we do not expose any parallel algorithms.
 
 Extensions
 ----------
