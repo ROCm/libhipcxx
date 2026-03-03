@@ -43,11 +43,11 @@
 
 #if _CCCL_CTK_AT_LEAST(13, 0) && !_CCCL_OS(WINDOWS)
 #  define TEST_TYPES cuda::managed_memory_pool, cuda::device_memory_pool, cuda::pinned_memory_pool
-#elif _CCCL_CTK_AT_LEAST(12, 6)
+#elif _CCCL_CTK_AT_LEAST(12, 9)
 #  define TEST_TYPES cuda::device_memory_pool, cuda::pinned_memory_pool
-#else // ^^^ _CCCL_CTK_AT_LEAST(12, 6) ^^^ / vvv _CCCL_CTK_BELOW(12, 6)
+#else // ^^^ _CCCL_CTK_AT_LEAST(12, 9) ^^^ / vvv _CCCL_CTK_BELOW(12, 9)
 #  define TEST_TYPES cuda::device_memory_pool
-#endif // ^^^ _CCCL_CTK_BELOW(12, 6) ^^^
+#endif // ^^^ _CCCL_CTK_BELOW(12, 9) ^^^
 
 // check if pinned and managed pools are supported
 
@@ -67,9 +67,9 @@ void pool_static_asserts()
 #if _CCCL_CTK_AT_LEAST(13, 0)
 template void pool_static_asserts<cuda::managed_memory_pool>();
 #endif // _CCCL_CTK_AT_LEAST(13, 0)
-#if _CCCL_CTK_AT_LEAST(12, 6)
+#if _CCCL_CTK_AT_LEAST(12, 9)
 template void pool_static_asserts<cuda::pinned_memory_pool>();
-#endif // _CCCL_CTK_AT_LEAST(12, 6)
+#endif // _CCCL_CTK_AT_LEAST(12, 9)
 template void pool_static_asserts<cuda::device_memory_pool>();
 
 #if _CCCL_CTK_AT_LEAST(13, 0)
@@ -87,7 +87,7 @@ PoolType construct_pool([[maybe_unused]] int device_id, cuda::memory_pool_proper
   }
   else
   {
-#if _CCCL_CTK_AT_LEAST(12, 6)
+#if _CCCL_CTK_AT_LEAST(12, 9)
     if constexpr (cuda::std::is_same_v<PoolType, cuda::pinned_memory_pool>)
     {
       return cuda::pinned_memory_pool(0, props);
@@ -98,7 +98,7 @@ PoolType construct_pool([[maybe_unused]] int device_id, cuda::memory_pool_proper
       return cuda::managed_memory_pool(props);
 #  endif // _CCCL_CTK_AT_LEAST(13, 0)
     }
-#endif // _CCCL_CTK_AT_LEAST(12, 6)
+#endif // _CCCL_CTK_AT_LEAST(12, 9)
   }
 }
 
@@ -222,7 +222,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
       pool_properties.location.type = ::cudaMemLocationTypeDevice;
       pool_properties.location.id   = current_device;
     }
-#if _CCCL_CTK_AT_LEAST(12, 6)
+#if _CCCL_CTK_AT_LEAST(12, 9)
     else if (cuda::std::is_same_v<memory_pool, cuda::pinned_memory_pool>)
     {
       pool_properties.allocType     = ::cudaMemAllocationTypePinned;
@@ -237,7 +237,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
       pool_properties.location.id   = 0;
     }
 #  endif // _CCCL_CTK_AT_LEAST(13, 0)
-#endif // _CCCL_CTK_AT_LEAST(12, 6)
+#endif // _CCCL_CTK_AT_LEAST(12, 9)
     else
     {
       REQUIRE(false);
@@ -669,7 +669,7 @@ C2H_CCCLRT_TEST("device_memory_pool::enable_access", "[memory_resource]")
   }
 }
 
-#if _CCCL_CTK_AT_LEAST(12, 6)
+#if _CCCL_CTK_AT_LEAST(12, 9)
 C2H_CCCLRT_TEST("pinned_memory_pool::enable_access", "[memory_resource]")
 {
   cuda::pinned_memory_pool pool{0};
@@ -682,7 +682,7 @@ C2H_CCCLRT_TEST("pinned_memory_pool::enable_access", "[memory_resource]")
   // pool.enable_access_from(cuda::devices[0]);
   // CCCLRT_CHECK(pool.is_accessible_from(cuda::devices[0]));
 }
-#endif // _CCCL_CTK_AT_LEAST(12, 6)
+#endif // _CCCL_CTK_AT_LEAST(12, 9)
 
 #if !_CCCL_OS(WINDOWS)
 C2H_CCCLRT_TEST("device_memory_pool with allocation handle", "[memory_resource]")
@@ -714,7 +714,7 @@ C2H_CCCLRT_TEST("device_memory_pool with allocation handle", "[memory_resource]"
   CHECK(ensure_export_handle(get, static_cast<cudaMemAllocationHandleType>(props.allocation_handle_type)));
 }
 
-#  if _CCCL_CTK_AT_LEAST(12, 6)
+#  if _CCCL_CTK_AT_LEAST(12, 9)
 C2H_CCCLRT_TEST("pinned_memory_pool with allocation handle", "[memory_resource]")
 {
   if (!(cuda::device_attributes::memory_pool_supported_handle_types(cuda::devices[0])
@@ -737,7 +737,7 @@ C2H_CCCLRT_TEST("pinned_memory_pool with allocation handle", "[memory_resource]"
   // Ensure that we disable export
   CHECK(ensure_export_handle(get, static_cast<cudaMemAllocationHandleType>(props.allocation_handle_type)));
 }
-#  endif // _CCCL_CTK_AT_LEAST(12, 6)
+#  endif // _CCCL_CTK_AT_LEAST(12, 9)
 
 // managed memory pool does not support allocation handles yet.
 #endif // !_CCCL_OS(WINDOWS)
@@ -789,7 +789,7 @@ C2H_CCCLRT_TEST("managed_memory_pool conversion to resource_ref", "[memory_resou
 }
 #endif // _CCCL_CTK_AT_LEAST(13, 0) && !_CCCL_OS(WINDOWS)
 
-#if _CCCL_CTK_AT_LEAST(12, 6)
+#if _CCCL_CTK_AT_LEAST(12, 9)
 C2H_CCCLRT_TEST("pinned_memory_pool conversion to resource_ref", "[memory_resource]")
 {
   int current_device = 0;
@@ -821,4 +821,4 @@ C2H_CCCLRT_TEST("pinned_memory_pool conversion to resource_ref", "[memory_resour
     CHECK((ref1 == ref2));
   }
 }
-#endif // _CCCL_CTK_AT_LEAST(12, 6)
+#endif // _CCCL_CTK_AT_LEAST(12, 9)
