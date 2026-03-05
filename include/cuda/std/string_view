@@ -848,19 +848,33 @@ _CCCL_CTAD_HOST_DEVICE basic_string_view(_Range&&) -> basic_string_view<::cuda::
 
 #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 template <class _CharT, class _Alloc>
-_CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string<_CharT, ::std::char_traits<_CharT>, _Alloc>)
-  -> basic_string_view<_CharT>;
+# <<<<<<< OLD CODE from a21032c8e3 (f36c9c936b) - COMMENTED OUT
+# _CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string<_CharT, ::std::char_traits<_CharT>, _Alloc>)
+#   -> basic_string_view<_CharT>;
+#
+# template <class _CharT, class _Traits, class _Alloc>
+# _CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string<_CharT, _Traits, _Alloc>) -> basic_string_view<_CharT, _Traits>;
+# =======
+basic_string_view(::std::basic_string<_CharT, ::std::char_traits<_CharT>, _Alloc>) -> basic_string_view<_CharT>;
 
 template <class _CharT, class _Traits, class _Alloc>
-_CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string<_CharT, _Traits, _Alloc>) -> basic_string_view<_CharT, _Traits>;
+basic_string_view(::std::basic_string<_CharT, _Traits, _Alloc>) -> basic_string_view<_CharT, _Traits>;
+# >>>>>>> END NEW CODE (f36c9c936b)
 #endif // !_CCCL_COMPILER(NVRTC)
 
 #if __cpp_lib_string_view >= 201606L
 template <class _CharT>
-_CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string_view<_CharT>) -> basic_string_view<_CharT>;
+# <<<<<<< OLD CODE from a21032c8e3 (f36c9c936b) - COMMENTED OUT
+# _CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string_view<_CharT>) -> basic_string_view<_CharT>;
+#
+# template <class _CharT, class _Traits>
+# _CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string_view<_CharT, _Traits>) -> basic_string_view<_CharT, _Traits>;
+# =======
+basic_string_view(::std::basic_string_view<_CharT>) -> basic_string_view<_CharT>;
 
 template <class _CharT, class _Traits>
-_CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string_view<_CharT, _Traits>) -> basic_string_view<_CharT, _Traits>;
+basic_string_view(::std::basic_string_view<_CharT, _Traits>) -> basic_string_view<_CharT, _Traits>;
+# >>>>>>> END NEW CODE (f36c9c936b)
 #endif // __cpp_lib_string_view >= 201606L
 
 // operator <<
