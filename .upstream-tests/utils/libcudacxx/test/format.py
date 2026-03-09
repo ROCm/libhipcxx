@@ -209,7 +209,7 @@ class LibcxxTestFormat(object):
             time_out_detected = False
             compile_cmd = "None"
             out = "None"
-            retry_count = 0
+            retry_count = -1
             while retry_count < max_retry:
                 retry_count += 1
                 try:
@@ -263,9 +263,9 @@ class LibcxxTestFormat(object):
                     max_retry += 1
                 elif retry_count >= max_retry:
                     if run_should_pass:
-                        report += f"Compiled test failed unexpectedly after {retry_count} attempt(s)!"
+                        report += f"Compiled test failed unexpectedly after {retry_count} retry attempt(s)!"
                     else:
-                        report += f"Compiled test succeeded unexpectedly after {retry_count} attempt(s)!"
+                        report += f"Compiled test succeeded unexpectedly after {retry_count} retry attempt(s)!"
                     if time_out_detected:
                         return lit.Test.Result(lit.Test.TIMEOUT, report)
                     return lit.Test.Result(lit.Test.FAIL, report)
