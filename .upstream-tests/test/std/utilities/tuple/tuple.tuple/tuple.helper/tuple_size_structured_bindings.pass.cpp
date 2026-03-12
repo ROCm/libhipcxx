@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -169,7 +169,8 @@ __host__ __device__ void test_after_tuple_size_specialization()
 {
   Test const t{99};
   auto& [p] = t;
-#if !(_CCCL_COMPILER(NVRTC) && defined(__CUDA_ARCH__)) && !defined(_CCCL_COMPILER_HIPRTC) // nvbug4053842
+  // NOTE(HIP/AMD): Windows fails here as it seems that it doesn't use custom get() with structured bindings.
+#if !(_CCCL_COMPILER(NVRTC) && defined(__CUDA_ARCH__)) && !defined(_CCCL_COMPILER_HIPRTC) && !_CCCL_OS(WINDOWS) // nvbug4053842
   assert(p == -1);
 #endif
 }
