@@ -37,6 +37,7 @@ This page covers the mdspan extended API, providing the restrict_accessor and re
    :maxdepth: 1
 
    mdspan/host_device_accessor
+   mdspan/layout_stride_relaxed
    mdspan/restrict_accessor
    mdspan/shared_memory_accessor
    mdspan/mdspan_to_dlpack
@@ -52,6 +53,11 @@ This page covers the mdspan extended API, providing the restrict_accessor and re
 
    * - :ref:`host/device/managed mdspan and accessor <libcudacxx-extended-api-mdspan-host-device-accessor>`
      - CUDA memory space ``mdspan`` and accessors
+     - CCCL 3.0.0
+     - CUDA 13.0
+
+   * - :ref:`layout_stride_relaxed <libcudacxx-extended-api-mdspan-layout-stride-relaxed>`
+     - Layout mapping policy with negative/zero strides and offset support
      - CCCL 3.0.0
      - CUDA 13.0
 
