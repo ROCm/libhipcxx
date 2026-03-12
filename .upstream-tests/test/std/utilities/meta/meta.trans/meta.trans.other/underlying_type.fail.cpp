@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -27,6 +27,12 @@
 
 // underlying_type
 // Mandates: enum must not be an incomplete enumeration type.
+
+// NOTE(AMD/HIP): On Windows with HIPCC, the incomplete enum error (E1) only appears
+// during the device compilation pass, not the host compilation pass. The clang
+// -verify mode only checks host compilation diagnostics, causing this test to fail
+// because the expected error is not found during the host pass.
+// UNSUPPORTED: windows_amd
 
 #include <cuda/std/climits>
 #include <cuda/std/type_traits>
