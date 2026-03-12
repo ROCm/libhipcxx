@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -41,7 +41,13 @@ struct A
 {
   int m[0];
 };
+// NOTE(HIP/AMD): On Windows with MSVC ABI, zero-length arrays result in sizeof(A) == 4
+// On GCC/Clang with SysV ABI, sizeof(A) == 0
+#if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
+static_assert(sizeof(A) == 4, ""); // Windows MSVC ABI requires minimum size
+#else
 static_assert(sizeof(A) == 0, ""); // an extension supported by GCC and Clang
+#endif
 
 int main(int, char**)
 {
