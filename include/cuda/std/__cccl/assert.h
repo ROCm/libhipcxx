@@ -88,15 +88,10 @@
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
 #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) // There is no host standard library in nvrtc
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
-#elif _CCCL_HAS_INCLUDE(<yvals.h>) && _CCCL_COMPILER(MSVC) // MSVC uses _STL_VERIFY from <yvals.h>
+#elif _CCCL_HAS_INCLUDE(<yvals.h>) && (_CCCL_COMPILER(MSVC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32))) // MSVC uses _STL_VERIFY from <yvals.h>
 #  include <yvals.h>
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) _STL_VERIFY(expression, message)
-// NOTE(HIP/AMD): for hipcc on Windows __assert_fail is not available
-#elif defined(_CCCL_COMPILER_HIPCC) && defined(_WIN32)
-#  define _CCCL_ASSERT_IMPL_HOST(expression, message)      \
-    _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
-    ? (void) 0 : __builtin_trap()
-#else // ^^^ HIPCC, WIN32 ^^^ / vvv !MSVC STL, HIPCC (Linux/glibc) vvv
+#else // ^^^ MSVC, HIPCC, WIN32 ^^^ / vvv !MSVC STL, HIPCC (Linux/glibc) vvv
 #  ifdef NDEBUG
 // Reintroduce the __assert_fail declaration
 extern "C" {
@@ -124,8 +119,8 @@ _CCCL_HOST_DEVICE
     _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
     ? (void) 0 : __assertfail()
     // ? (void) 0 : __assertfail(message, __FILE__, __LINE__, __func__, sizeof(char))
-#elif _CCCL_CUDA_COMPILER(NVCC) //! Use __assert_fail to implement device side asserts
-#  if _CCCL_COMPILER(MSVC)
+#elif _CCCL_CUDA_COMPILER(NVCC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32)) //! Use __assert_fail to implement device side asserts
+#  if _CCCL_COMPILER(MSVC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32))
 #    define _CCCL_ASSERT_IMPL_DEVICE(expression, message)    \
       _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
       ? (void) 0 : _wassert(_CRT_WIDE(#message), __FILEW__, __LINE__)
