@@ -44,110 +44,136 @@ if ("Clang" STREQUAL "${CMAKE_CUDA_COMPILER_ID}")
   list(FILTER public_headers EXCLUDE REGEX "annotated_ptr")
 endif()
 
-# NOTE(HIP/AMD): same block-list pattern as the internal/host-only
-# sweeps (PR #217 review). New upstream headers under SKIP_DIRS will
-# surface as build failures rather than being silently filtered out.
-if (LIBCUDACXX_ENABLE_HIP)
-  include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
-  libcudacxx_filter_backend_headers(public_headers
-    BACKEND HIP
-    SKIP_DIRS
-      cuda/ptx cuda/barrier cuda/latch cuda/semaphore
-      cuda/annotated_ptr cuda/pipeline cuda/memcpy_async
-      cuda/std/barrier cuda/std/latch cuda/std/semaphore
-  )
-endif()
-
-# We need to handle atomic headers differently as they do not compile on architectures below sm70
-set(architectures_at_least_sm70)
-foreach (item IN LISTS CMAKE_CUDA_ARCHITECTURES)
-  if (item GREATER_EQUAL 70)
-    list(APPEND architectures_at_least_sm70 ${item})
-  endif()
-endforeach()
-
-function(libcudacxx_create_public_header_test header_name headertest_src)
-  # Create the default target for that file. The TU is always written to
-  # disk as '.cu' (see configure_file in libcudacxx_add_public_header_test
-  # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
-  # association by tagging the source file with LANGUAGE HIP, which routes
-  # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
-  # natively, so no separate '.cpp' shadow file is needed.
-  add_library(public_headertest_${header_name} SHARED "${headertest_src}.cu")
-  cccl_configure_target(public_headertest_${header_name})
-  if (LIBCUDACXX_ENABLE_HIP)
-    set_source_files_properties(
-      "${headertest_src}.cu"
-      PROPERTIES LANGUAGE HIP
-    )
-  endif()
-  target_include_directories(
-    public_headertest_${header_name}
-    PRIVATE "${libcudacxx_SOURCE_DIR}/include"
-  )
-  target_compile_definitions(
-    public_headertest_${header_name}
-    PRIVATE _CCCL_HEADER_TEST
-  )
-
-  # Bring in the global CCCL compile definitions
-  target_link_libraries(
-    public_headertest_${header_name}
-    PUBLIC libcudacxx.compiler_interface
-  )
-  # NOTE(HIP/AMD): under HIP, also link the HIP device runtime.
-  if (LIBCUDACXX_ENABLE_HIP)
-    target_link_libraries(
-      public_headertest_${header_name}
-      PUBLIC hip::device
-    )
+# <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
+# # NOTE(HIP/AMD): same block-list pattern as the internal/host-only
+# # sweeps (PR #217 review). New upstream headers under SKIP_DIRS will
+# # surface as build failures rather than being silently filtered out.
+# if (LIBCUDACXX_ENABLE_HIP)
+#   include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
+#   libcudacxx_filter_backend_headers(public_headers
+#     BACKEND HIP
+#     SKIP_DIRS
+#       cuda/ptx cuda/barrier cuda/latch cuda/semaphore
+#       cuda/annotated_ptr cuda/pipeline cuda/memcpy_async
+#       cuda/std/barrier cuda/std/latch cuda/std/semaphore
+#   )
+# endif()
+#
+# # We need to handle atomic headers differently as they do not compile on architectures below sm70
+# set(architectures_at_least_sm70)
+# foreach (item IN LISTS CMAKE_CUDA_ARCHITECTURES)
+#   if (item GREATER_EQUAL 70)
+#     list(APPEND architectures_at_least_sm70 ${item})
+# =======
+function(libcudacxx_add_public_header_test_target target_name)
+  if (NOT ARGN)
+    return()
+# >>>>>>> END NEW CODE (49a588ce37)
   endif()
 
-  # Ensure that if this is an atomic header, we only include the right architectures
-  # (CUDA-only; the HIP path skipped these via the regex above).
-  if (NOT LIBCUDACXX_ENABLE_HIP)
-    string(
-      REGEX MATCH
-      "atomic|barrier|latch|semaphore|annotated_ptr|pipeline"
-      match
-      "${header}"
-    )
-    if (match)
-      # Ensure that we only compile the header when we have some architectures enabled
-      if (NOT architectures_at_least_sm70)
-        return()
-      endif()
-      set_target_properties(
-        public_headertest_${header_name}
-        PROPERTIES CUDA_ARCHITECTURES "${architectures_at_least_sm70}"
-      )
-    endif()
-  endif()
-
-  add_dependencies(
-    libcudacxx.test.public_headers
-    public_headertest_${header_name}
+# <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
+# function(libcudacxx_create_public_header_test header_name headertest_src)
+#   # Create the default target for that file. The TU is always written to
+#   # disk as '.cu' (see configure_file in libcudacxx_add_public_header_test
+#   # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
+#   # association by tagging the source file with LANGUAGE HIP, which routes
+#   # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
+#   # natively, so no separate '.cpp' shadow file is needed.
+#   add_library(public_headertest_${header_name} SHARED "${headertest_src}.cu")
+#   cccl_configure_target(public_headertest_${header_name})
+#   if (LIBCUDACXX_ENABLE_HIP)
+#     set_source_files_properties(
+#       "${headertest_src}.cu"
+#       PROPERTIES LANGUAGE HIP
+#     )
+#   endif()
+#   target_include_directories(
+#     public_headertest_${header_name}
+#     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
+#   )
+#   target_compile_definitions(
+#     public_headertest_${header_name}
+#     PRIVATE _CCCL_HEADER_TEST
+#   )
+#
+#   # Bring in the global CCCL compile definitions
+#   target_link_libraries(
+#     public_headertest_${header_name}
+#     PUBLIC libcudacxx.compiler_interface
+#   )
+#   # NOTE(HIP/AMD): under HIP, also link the HIP device runtime.
+#   if (LIBCUDACXX_ENABLE_HIP)
+#     target_link_libraries(
+#       public_headertest_${header_name}
+#       PUBLIC hip::device
+#     )
+#   endif()
+#
+#   # Ensure that if this is an atomic header, we only include the right architectures
+#   # (CUDA-only; the HIP path skipped these via the regex above).
+#   if (NOT LIBCUDACXX_ENABLE_HIP)
+#     string(
+#       REGEX MATCH
+#       "atomic|barrier|latch|semaphore|annotated_ptr|pipeline"
+#       match
+#       "${header}"
+#     )
+#     if (match)
+#       # Ensure that we only compile the header when we have some architectures enabled
+#       if (NOT architectures_at_least_sm70)
+#         return()
+#       endif()
+#       set_target_properties(
+#         public_headertest_${header_name}
+#         PROPERTIES CUDA_ARCHITECTURES "${architectures_at_least_sm70}"
+#       )
+#     endif()
+#   endif()
+#
+#   add_dependencies(
+#     libcudacxx.test.public_headers
+#     public_headertest_${header_name}
+#   )
+# endfunction()
+#
+# function(libcudacxx_add_public_header_test header)
+#   # ${header} contains the "/" from the subfolder, replace by "_" for actual names
+#   string(REPLACE "/" "_" header_name "${header}")
+#
+#   # Create the source file for the header target from the template. The TU
+#   # is always written as '.cu' regardless of backend; on HIP the
+#   # libcudacxx_create_public_header_test helper overrides CMake's default
+#   # '.cu -> LANGUAGE CUDA' association via set_source_files_properties.
+#   set(headertest_src "headers/${header_name}")
+#   configure_file(
+#     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/header_test.cpp.in"
+#     "${headertest_src}.cu"
+#   )
+#
+#   # Create the default target for that file
+#   libcudacxx_create_public_header_test(${header_name} ${headertest_src})
+# endfunction()
+#
+# foreach (header IN LISTS public_headers)
+#   libcudacxx_add_public_header_test(${header})
+# endforeach()
+# =======
+  cccl_generate_header_tests(
+    ${target_name}
+    libcudacxx/include
+    NO_METATARGETS
+    LANGUAGE CUDA
+    HEADER_TEMPLATE "${libcudacxx_SOURCE_DIR}/cmake/header_test.cpp.in"
+    HEADERS ${ARGN}
   )
+
+  target_compile_definitions(${target_name} PRIVATE _CCCL_HEADER_TEST)
+  target_link_libraries(${target_name} PUBLIC libcudacxx.compiler_interface)
+  add_dependencies(libcudacxx.test.public_headers ${target_name})
 endfunction()
 
-function(libcudacxx_add_public_header_test header)
-  # ${header} contains the "/" from the subfolder, replace by "_" for actual names
-  string(REPLACE "/" "_" header_name "${header}")
-
-  # Create the source file for the header target from the template. The TU
-  # is always written as '.cu' regardless of backend; on HIP the
-  # libcudacxx_create_public_header_test helper overrides CMake's default
-  # '.cu -> LANGUAGE CUDA' association via set_source_files_properties.
-  set(headertest_src "headers/${header_name}")
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/header_test.cpp.in"
-    "${headertest_src}.cu"
-  )
-
-  # Create the default target for that file
-  libcudacxx_create_public_header_test(${header_name} ${headertest_src})
-endfunction()
-
-foreach (header IN LISTS public_headers)
-  libcudacxx_add_public_header_test(${header})
-endforeach()
+libcudacxx_add_public_header_test_target(
+  libcudacxx.test.public_headers.base
+  ${public_headers}
+)
+# >>>>>>> END NEW CODE (49a588ce37)
