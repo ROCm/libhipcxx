@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -133,9 +133,16 @@ _CCCL_HIDE_FROM_ABI int __host_runtime_ctz(_Tp __x) noexcept
 template <typename _Tp>
 _LIBCUDACXX_HIDE_FROM_ABI int __runtime_ctz(_Tp __x) noexcept
 {
+  // NOTE(HIP/AMD): On Windows, __clz/__brev intrinsics are unreliable, use constexpr path
   NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX,
-                    (return sizeof(_Tp) == sizeof(uint32_t) ? __clz(__brev(static_cast<uint32_t>(__x)))
-                                                            : __clzll(__brevll(static_cast<uint64_t>(__x)));),
+                    (
+#if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
+                     return _CUDA_VSTD::__constexpr_ctz(__x);
+#else
+                     return sizeof(_Tp) == sizeof(uint32_t) ? __clz(__brev(static_cast<uint32_t>(__x)))
+                                                            : __clzll(__brevll(static_cast<uint64_t>(__x)));
+#endif
+                    ),
                     (return _CUDA_VSTD::__host_runtime_ctz(__x);))
 }
 
