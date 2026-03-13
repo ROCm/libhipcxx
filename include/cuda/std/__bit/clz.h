@@ -122,7 +122,7 @@ _LIBCUDACXX_HIDE_FROM_ABI int __runtime_clz(_Tp __x) noexcept
                     (if constexpr (sizeof(_Tp) == sizeof(uint32_t)) {
                        return __clz(static_cast<uint32_t>(__x));
                      } else {
-                       // On Windows, use manual implementation for 64-bit to avoid __clzll issues
+                       // NOTE(HIP/AMD): On Windows, use manual implementation for 64-bit to avoid __clzll issues
 #if defined(_WIN32) || defined(_WIN64)
                        return _CUDA_VSTD::__constexpr_clz(static_cast<uint64_t>(__x));
 #else
