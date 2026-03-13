@@ -35,8 +35,6 @@
 #endif
 #endif
 
-#include <type_traits>
-
 namespace libhipcxx
 {
   __host__ __device__ inline void __trap(){
