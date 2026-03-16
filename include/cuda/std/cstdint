@@ -61,12 +61,22 @@ using uint16_t = unsigned short;
 using uint32_t = unsigned int;
 using uint64_t = unsigned long long;
 
-using int_fast8_t   = int8_t;
-using int_fast16_t  = int16_t;
-using int_fast32_t  = int32_t;
-using int_fast64_t  = int64_t;
-using uint_fast8_t  = uint8_t;
+using int_fast8_t = int8_t;
+#  if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
+// NOTE(HIP/AMD): MSVC defines int_fast16_t as int, not int16_t (short)
+using int_fast16_t = int32_t;
+#  else
+using int_fast16_t = int16_t;
+#  endif
+using int_fast32_t = int32_t;
+using int_fast64_t = int64_t;
+using uint_fast8_t = uint8_t;
+#  if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
+// NOTE(HIP/AMD): MSVC defines uint_fast16_t as unsigned int, not uint16_t (unsigned short)
+using uint_fast16_t = uint32_t;
+#  else
 using uint_fast16_t = uint16_t;
+#  endif
 using uint_fast32_t = uint32_t;
 using uint_fast64_t = uint64_t;
 
