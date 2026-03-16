@@ -45,7 +45,12 @@
 #include <cuda/std/__limits/numeric_limits.h>
 #include <cuda/std/__random/generate_canonical.h>
 #include <cuda/std/__random/is_valid.h>
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from 2afca5fc89 (79196f3321) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+
+#if !_CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (79196f3321)
 #  include <ios>
 #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
