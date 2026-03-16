@@ -53,7 +53,6 @@
 #  include <cuda/std/__exception/exception_macros.h>
 #  include <cuda/std/cassert>
 #  include <cuda/std/cstddef>
-#  include <cuda/std/utility>
 
 #  include <cuda/std/__cccl/prologue.h>
 
