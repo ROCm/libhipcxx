@@ -30,6 +30,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if defined(_MSC_VER) && !defined(__HIP_PLATFORM_AMD__)
+# define NOMINMAX
+#endif
+
 // ignore deprecation warnings
 #if defined(__clang__)
 #  pragma clang diagnostic ignored "-Wdeprecated"

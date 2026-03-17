@@ -30,6 +30,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#if defined(_MSC_VER) && !defined(__HIP_PLATFORM_AMD__)
+# define NOMINMAX
+#endif
+
 // We need to include at least some header so that __cuda_std__ is defined
 #include <cuda/std/version>
 
