@@ -133,7 +133,7 @@ _CCCL_HIDE_FROM_ABI int __host_runtime_ctz(_Tp __x) noexcept
 template <typename _Tp>
 _LIBCUDACXX_HIDE_FROM_ABI int __runtime_ctz(_Tp __x) noexcept
 {
-  // NOTE(HIP/AMD): On Windows, __clz/__brev intrinsics are unreliable, use constexpr path
+  // TODO(HIP/AMD): On Windows, __clz/__brev intrinsics produce wrong results, use constexpr path until fixed (see #167)
   NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX,
                     (
 #if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
