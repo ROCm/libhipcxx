@@ -26,7 +26,8 @@
 // THE SOFTWARE.
 
 // This code triggers https://gcc.gnu.org/bugzilla/show_bug.cgi?id=104568
-// UNSUPPORTED: msvc
+// NOTE(HIP/AMD): On Windows with MSVC ABI, zero-length arrays result in sizeof(A) == 4
+// UNSUPPORTED: msvc, windows_amd
 // UNSUPPORTED: nvrtc, hiprtc
 // UNSUPPORTED: nvhpc
 
@@ -41,13 +42,7 @@ struct A
 {
   int m[0];
 };
-// NOTE(HIP/AMD): On Windows with MSVC ABI, zero-length arrays result in sizeof(A) == 4
-// On GCC/Clang with SysV ABI, sizeof(A) == 0
-#if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
-static_assert(sizeof(A) == 4, ""); // Windows MSVC ABI requires minimum size
-#else
 static_assert(sizeof(A) == 0, ""); // an extension supported by GCC and Clang
-#endif
 
 int main(int, char**)
 {

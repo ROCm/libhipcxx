@@ -29,6 +29,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// NOTE(HIP/AMD): On Windows with MSVC ABI, zero-length arrays result in sizeof(A) == 4
 // UNSUPPORTED: msvc, windows_amd
 
 // cuda::std::ranges::begin
