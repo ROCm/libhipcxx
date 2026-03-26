@@ -99,10 +99,17 @@ function(add_bench_dir bench_dir)
     add_bench(base_bench_target ${base_bench_name} "${bench_src}")
     add_dependencies(${benches_meta_target} ${base_bench_target})
     target_compile_definitions(${base_bench_target} PRIVATE TUNE_BASE=1)
-    # --extended-lambda is an nvcc-only flag; clang-HIP supports device lambdas natively.
-    if (NOT LIBCUDACXX_ENABLE_HIP)
-      target_compile_options(${base_bench_target} PRIVATE "--extended-lambda")
-    endif()
+# <<<<<<< OLD CODE from 2eddf6d094 (b1db6ffd85) - COMMENTED OUT
+#     # --extended-lambda is an nvcc-only flag; clang-HIP supports device lambdas natively.
+#     if (NOT LIBCUDACXX_ENABLE_HIP)
+#       target_compile_options(${base_bench_target} PRIVATE "--extended-lambda")
+#     endif()
+# =======
+    target_compile_options(
+      ${base_bench_target}
+      PRIVATE "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:--extended-lambda>"
+    )
+# >>>>>>> END NEW CODE (b1db6ffd85)
     # benchmarking
     register_cccl_benchmark("${bench_name}" "")
   endforeach()
