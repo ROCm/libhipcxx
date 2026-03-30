@@ -131,15 +131,25 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND (LIBCUDACX
     string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
     set(${target_name_var} ${target_name} PARENT_SCOPE)
 
-    add_executable(${target_name} "${source}")
-    if (LIBCUDACXX_ENABLE_HIP)
-      # The .cu file extension defaults to LANGUAGE CUDA in CMake.
-      # Force LANGUAGE HIP on HIP builds so hipcc / clang -x hip
-      # picks the file up. Mirrors the pattern in c2h/CMakeLists.txt.
-      set_source_files_properties("${source}" PROPERTIES LANGUAGE HIP)
-    else()
-      cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-    endif()
+# <<<<<<< OLD CODE from 313f9fe948 (67794b2eb4) - COMMENTED OUT
+#     add_executable(${target_name} "${source}")
+#     if (LIBCUDACXX_ENABLE_HIP)
+#       # The .cu file extension defaults to LANGUAGE CUDA in CMake.
+#       # Force LANGUAGE HIP on HIP builds so hipcc / clang -x hip
+#       # picks the file up. Mirrors the pattern in c2h/CMakeLists.txt.
+#       set_source_files_properties("${source}" PROPERTIES LANGUAGE HIP)
+#     else()
+#       cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
+#     endif()
+# =======
+    cccl_add_executable(
+      ${target_name}
+      ADD_CTEST
+      NO_METATARGETS
+      DIALECT ${CMAKE_CUDA_STANDARD}
+      SOURCES "${source}"
+    )
+# >>>>>>> END NEW CODE (67794b2eb4)
     target_include_directories(
       ${target_name}
       PRIVATE
@@ -186,8 +196,6 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND (LIBCUDACX
     endif()
 
     add_dependencies(${c2h_all_target} ${target_name})
-
-    add_test(NAME ${target_name} COMMAND ${target_name})
   endfunction()
 
   foreach (test_src IN LISTS test_srcs)

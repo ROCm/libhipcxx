@@ -69,15 +69,24 @@ function(add_bench target_name bench_name bench_src)
   set(bench_target ${bench_name})
   set(${target_name} ${bench_target} PARENT_SCOPE)
 
-  add_executable(${bench_target} "${bench_src}")
-  if (LIBCUDACXX_ENABLE_HIP)
-    set_source_files_properties("${bench_src}" PROPERTIES LANGUAGE HIP)
-    # nvbench_helper.cuh's device paths make [[nodiscard]] hip* calls whose returns
-    # the upstream CUDA code ignores; don't fail -Werror on that (see nvbench_helper).
-    target_compile_options(${bench_target} PRIVATE
-      $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value -Wno-error=unused-result>)
-  endif()
-  cccl_configure_target(${bench_target} DIALECT 17)
+# <<<<<<< OLD CODE from 313f9fe948 (67794b2eb4) - COMMENTED OUT
+#   add_executable(${bench_target} "${bench_src}")
+#   if (LIBCUDACXX_ENABLE_HIP)
+#     set_source_files_properties("${bench_src}" PROPERTIES LANGUAGE HIP)
+#     # nvbench_helper.cuh's device paths make [[nodiscard]] hip* calls whose returns
+#     # the upstream CUDA code ignores; don't fail -Werror on that (see nvbench_helper).
+#     target_compile_options(${bench_target} PRIVATE
+#       $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value -Wno-error=unused-result>)
+#   endif()
+#   cccl_configure_target(${bench_target} DIALECT 17)
+# =======
+  cccl_add_executable(
+    ${bench_target}
+    NO_METATARGETS
+    DIALECT 17
+    SOURCES "${bench_src}"
+  )
+# >>>>>>> END NEW CODE (67794b2eb4)
   target_link_libraries(
     ${bench_target}
     PRIVATE libcudacxx::libcudacxx cccl.nvbench_helper nvbench::main
