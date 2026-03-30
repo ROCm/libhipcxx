@@ -39,7 +39,13 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || defined(__HIPCC_RTC__)
+// <<<<<<< OLD CODE from 93e2bd2672 (51b1bad30b) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || defined(__HIPCC_RTC__)
+// =======
+#include <cuda/std/__cccl/cuda_capabilities.h>
+
+#if _CCCL_CUDA_COMPILATION()
+// >>>>>>> END NEW CODE (51b1bad30b)
 #  define _CCCL_HOST        __host__
 #  define _CCCL_DEVICE      __device__
 #  define _CCCL_HOST_DEVICE __host__ __device__
@@ -71,14 +77,6 @@
       // vvv !_CCCL_DEVICE_COMPILATION() || _CCCL_CUDA_COMPILER(NVHPC) vvv
 #  define _CCCL_GLOBAL_VARIABLE
 #endif // ^^^ !_CCCL_DEVICE_COMPILATION() || _CCCL_CUDA_COMPILER(NVHPC) ^^^
-
-/// In device code, _CCCL_PTX_ARCH() expands to the PTX version for which we are compiling.
-/// In host code, _CCCL_PTX_ARCH()'s value is implementation defined.
-#if !defined(__CUDA_ARCH__)
-#  define _CCCL_PTX_ARCH() 0
-#else
-#  define _CCCL_PTX_ARCH() __CUDA_ARCH__
-#endif
 
 #if (_CCCL_CUDA_COMPILER(NVCC, >=, 12, 8) || _CCCL_CUDA_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG, >=, 20)) \
   && _CCCL_PTX_ARCH() >= 700
