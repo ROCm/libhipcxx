@@ -61,7 +61,7 @@ namespace cuda = hip;
 
 #if THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
 #  include <cuda/memory_resource>
-#  include <cuda/std/__pstl_algorithm>
+#  include <cuda/std/execution>
 #  include <cuda/stream>
 #endif // THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
 
@@ -733,7 +733,7 @@ auto policy(caching_allocator_t& alloc)
 }
 auto cuda_policy(caching_allocator_t& alloc)
 {
-  return cuda::execution::__cub_par_unseq.with(cuda::mr::get_memory_resource, alloc);
+  return cuda::execution::gpu.with(cuda::mr::get_memory_resource, alloc);
 }
 #else
 auto policy(caching_allocator_t&)
@@ -749,7 +749,7 @@ auto policy(caching_allocator_t& alloc, nvbench::launch& launch)
 }
 auto cuda_policy(caching_allocator_t& alloc, nvbench::launch& launch)
 {
-  return cuda::execution::__cub_par_unseq.with(cuda::mr::get_memory_resource, alloc)
+  return cuda::execution::gpu.with(cuda::mr::get_memory_resource, alloc)
     .with(cuda::get_stream, launch.get_stream().get_stream());
 }
 #else
