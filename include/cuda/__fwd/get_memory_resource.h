@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef _CUDA_STD_EXECUTION
-#define _CUDA_STD_EXECUTION
+#ifndef _CUDA___FWD_GET_MEMORY_RESOURCE_H
+#define _CUDA___FWD_GET_MEMORY_RESOURCE_H
 
 #include <cuda/std/detail/__config>
 
@@ -21,10 +21,18 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/__execution/policy.h> // IWYU pragma: export
-#include <cuda/std/__execution/env.h> // IWYU pragma: export
-#include <cuda/std/__execution/policy.h> // IWYU pragma: export
-#include <cuda/std/__type_traits/is_execution_policy.h> // IWYU pragma: export
-#include <cuda/std/version>
+#if _CCCL_HAS_CTK()
 
-#endif //_CUDA_STD_EXECUTION
+#  include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA_MR
+
+struct __get_memory_resource_t;
+
+_CCCL_END_NAMESPACE_CUDA_MR
+
+#  include <cuda/std/__cccl/epilogue.h>
+
+#endif // _CCCL_HAS_CTK()
+
+#endif // _CUDA___FWD_GET_MEMORY_RESOURCE_H
