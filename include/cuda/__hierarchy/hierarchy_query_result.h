@@ -93,6 +93,10 @@ struct hierarchy_query_result
     }
   }
 
+  // Hide SFINAE conversion operators from Doxygen. The _CCCL_TEMPLATE/_CCCL_REQUIRES
+  // macros expand to enable_if_t expressions that Breathe renders as invalid C++ template
+  // parameter lists, causing Sphinx parse errors on the generated struct page.
+#  ifndef _CCCL_DOXYGEN_INVOKED
   _CCCL_TEMPLATE(class _Tp2 = _Tp)
   _CCCL_REQUIRES(::cuda::std::is_same_v<_Tp2, signed char>)
   _CCCL_API constexpr operator char3() const noexcept
@@ -162,16 +166,20 @@ struct hierarchy_query_result
   {
     return {static_cast<unsigned long long>(x), static_cast<unsigned long long>(y), static_cast<unsigned long long>(z)};
   }
-
-  // NOTE(HIP/AMD): on CUDA this type becomes constructible into ::dim3 via
-  // dim3(uint3); HIP's ::dim3 has no uint3 constructor, so provide a direct
-  // conversion to ::dim3 on HIP.
-#  if _CCCL_HIP_COMPILATION()
-  _CCCL_API constexpr operator dim3() const noexcept
-  {
-    return dim3{static_cast<unsigned>(x), static_cast<unsigned>(y), static_cast<unsigned>(z)};
-  }
-#  endif // _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from b05a857845 (f20e019420) - COMMENTED OUT
+//
+//   // NOTE(HIP/AMD): on CUDA this type becomes constructible into ::dim3 via
+//   // dim3(uint3); HIP's ::dim3 has no uint3 constructor, so provide a direct
+//   // conversion to ::dim3 on HIP.
+// #  if _CCCL_HIP_COMPILATION()
+//   _CCCL_API constexpr operator dim3() const noexcept
+//   {
+//     return dim3{static_cast<unsigned>(x), static_cast<unsigned>(y), static_cast<unsigned>(z)};
+//   }
+// #  endif // _CCCL_HIP_COMPILATION()
+// =======
+#  endif // !_CCCL_DOXYGEN_INVOKED
+// >>>>>>> END NEW CODE (f20e019420)
 };
 
 _CCCL_END_NAMESPACE_CUDA

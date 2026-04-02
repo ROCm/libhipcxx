@@ -24,7 +24,7 @@
 .. _libcudacxx-ptx-instructions-st-bulk:
 
 st.bulk
-=======
+========
 
 This page documents the ``cuda::ptx`` wrappers for the st.bulk PTX instruction, which stores a block of bytes from a register-based source to a memory destination.
 
