@@ -36,9 +36,6 @@ This page documents ``cuda::atomic_ref``, an extended form of ``std::atomic_ref`
    :hidden:
    :maxdepth: 1
 
-   atomic/atomic_thread_fence
-   atomic/fetch_max
-   atomic/fetch_min
 
 Defined in header ``<cuda/atomic>``:
 

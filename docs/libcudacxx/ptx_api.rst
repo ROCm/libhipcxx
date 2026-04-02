@@ -24,7 +24,7 @@
 .. _libcudacxx-ptx:
 
 PTX API
-=======
+========
 
 This page documents the ``cuda::ptx`` namespace, which provides C++ wrappers that map one-to-one to PTX instructions for fine-grained control of generated code.
 
