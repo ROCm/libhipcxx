@@ -87,7 +87,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
  * @endcode
  * @par
  *
- * @param hierarchy
+ * @param __hierarchy
  *  Hierarchy that the launch dimensions are requested for
  */
 template <class _BottomLevel, class... _LevelDescs>
