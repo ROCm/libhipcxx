@@ -40,7 +40,7 @@
 #include <cuda/ptx>
 #include <cuda/std/utility>
 
-#include "generated/tcgen05_cp.h"
+#include "generated/tcgen05_cp_cta_group_2.h"
 
 int main(int, char**)
 {
