@@ -4,7 +4,7 @@
 // under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-// SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES.
+// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
 
@@ -160,9 +160,13 @@ struct __rtti : __rtti_base
   [[nodiscard]] _CCCL_API auto __query_interface(__iset_<_Interfaces...>) const noexcept
     -> __vptr_for<__iset_<_Interfaces...>>
   {
-    // TODO: find a way to check at runtime that the requested __iset_ is a subset
-    // of the interfaces in the vtable.
-    return static_cast<__vptr_for<__iset_<_Interfaces...>>>(this);
+    // Verify that every sub-interface in the requested set exists in the vtable.
+    // TODO: Can it be done in a more efficient way?
+    if ((__query_interface(_Interfaces{}) && ...))
+    {
+      return static_cast<__vptr_for<__iset_<_Interfaces...>>>(this);
+    }
+    return nullptr;
   }
 
   // Sequentially search the base_vptr_map for the requested interface by
