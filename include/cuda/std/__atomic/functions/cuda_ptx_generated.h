@@ -1602,8 +1602,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acquire.cta.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1621,8 +1621,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acquire.cluster.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1640,8 +1640,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acquire.gpu.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1659,8 +1659,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acquire.sys.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1678,8 +1678,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.relaxed.cta.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1697,8 +1697,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.relaxed.cluster.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1716,8 +1716,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.relaxed.gpu.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1735,8 +1735,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.relaxed.sys.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1754,8 +1754,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.release.cta.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1773,8 +1773,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.release.cluster.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1792,8 +1792,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.release.gpu.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1811,8 +1811,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.release.sys.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1830,8 +1830,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acq_rel.cta.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1849,8 +1849,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acq_rel.cluster.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1868,8 +1868,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acq_rel.gpu.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1887,8 +1887,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.acq_rel.sys.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1906,8 +1906,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.cta.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1925,8 +1925,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.cluster.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1944,8 +1944,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.gpu.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
@@ -1963,8 +1963,8 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_exchange(
     {
       .reg .b128 _d;
       .reg .b128 _v;
-      mov.b128 _d, {%0, %1};
-      mov.b128 _v, {%4, %5};
+      mov.b128 _d, {%3, %4};
+      mov.b128 _v, {%5, %6};
       atom.cas.sys.b128 _d,[%2],_d,_v;
       mov.b128 {%0, %1}, _d;
     }
