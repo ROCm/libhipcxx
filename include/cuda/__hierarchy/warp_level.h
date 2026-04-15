@@ -62,40 +62,43 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 struct _CCCL_DECLSPEC_EMPTY_BASES warp_level : __native_hierarchy_level_base<warp_level>
 {
   using __next_native_level = block_level;
-
-  using __base_type = __native_hierarchy_level_base<warp_level>;
-
-#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-  using __base_type::index_as;
-
-  _CCCL_TEMPLATE(class _Tp)
-  _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
-// <<<<<<< OLD CODE from ca49929d59 (89b06d96af) - COMMENTED OUT
-//   [[nodiscard]] _CCCL_DEVICE_API static ::cuda::std::dims<1, _Tp> extents_as(const block_level&) noexcept
-//   {
-//     // NOTE(HIP/AMD): wavefront size is 32 on NVIDIA but wave32/wave64 on AMD.
-// #  if _CCCL_HIP_COMPILATION()
-//     return ::cuda::std::dims<1, _Tp>{
-//       static_cast<_Tp>((gpu_thread.count(block) + (_CCCL_HIP_WAVE_SIZE - 1)) / _CCCL_HIP_WAVE_SIZE)};
-// #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-//     return ::cuda::std::dims<1, _Tp>{static_cast<_Tp>((gpu_thread.count(block) + 31) / 32)};
-// #  endif // !_CCCL_HIP_COMPILATION()
-//   }
+// <<<<<<< OLD CODE from a65c61eebf (628a762319) - COMMENTED OUT
+//
+//   using __base_type = __native_hierarchy_level_base<warp_level>;
+//
+// #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+//   using __base_type::index_as;
 //
 //   _CCCL_TEMPLATE(class _Tp)
 //   _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
+// // <<<<<<< OLD CODE from ca49929d59 (89b06d96af) - COMMENTED OUT
+// //   [[nodiscard]] _CCCL_DEVICE_API static ::cuda::std::dims<1, _Tp> extents_as(const block_level&) noexcept
+// //   {
+// //     // NOTE(HIP/AMD): wavefront size is 32 on NVIDIA but wave32/wave64 on AMD.
+// // #  if _CCCL_HIP_COMPILATION()
+// //     return ::cuda::std::dims<1, _Tp>{
+// //       static_cast<_Tp>((gpu_thread.count(block) + (_CCCL_HIP_WAVE_SIZE - 1)) / _CCCL_HIP_WAVE_SIZE)};
+// // #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
+// //     return ::cuda::std::dims<1, _Tp>{static_cast<_Tp>((gpu_thread.count(block) + 31) / 32)};
+// // #  endif // !_CCCL_HIP_COMPILATION()
+// //   }
+// //
+// //   _CCCL_TEMPLATE(class _Tp)
+// //   _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
+// // =======
+// // >>>>>>> END NEW CODE (89b06d96af)
+//   [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> index_as(const block_level&) noexcept
+//   {
+//     // NOTE(HIP/AMD): wavefront size is 32 on NVIDIA but wave32/wave64 on AMD.
+// #  if _CCCL_HIP_COMPILATION()
+//     return {static_cast<_Tp>(gpu_thread.rank(block) / _CCCL_HIP_WAVE_SIZE), 0, 0};
+// #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
+//     return {static_cast<_Tp>(gpu_thread.rank(block) / 32), 0, 0};
+// #  endif // !_CCCL_HIP_COMPILATION()
+//   }
+// #  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 // =======
-// >>>>>>> END NEW CODE (89b06d96af)
-  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> index_as(const block_level&) noexcept
-  {
-    // NOTE(HIP/AMD): wavefront size is 32 on NVIDIA but wave32/wave64 on AMD.
-#  if _CCCL_HIP_COMPILATION()
-    return {static_cast<_Tp>(gpu_thread.rank(block) / _CCCL_HIP_WAVE_SIZE), 0, 0};
-#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-    return {static_cast<_Tp>(gpu_thread.rank(block) / 32), 0, 0};
-#  endif // !_CCCL_HIP_COMPILATION()
-  }
-#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// >>>>>>> END NEW CODE (628a762319)
 };
 
 _CCCL_GLOBAL_CONSTANT warp_level warp;
