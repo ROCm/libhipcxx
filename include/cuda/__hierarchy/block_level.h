@@ -67,8 +67,12 @@ struct _CCCL_DECLSPEC_EMPTY_BASES block_level : __native_hierarchy_level_base<bl
   using __base_type = __native_hierarchy_level_base<block_level>;
   using __base_type::count_as;
 
-#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-  using __base_type::index_as;
+// <<<<<<< OLD CODE from a65c61eebf (628a762319) - COMMENTED OUT
+// #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+//   using __base_type::index_as;
+// =======
+#  if _CCCL_CUDA_COMPILATION()
+// >>>>>>> END NEW CODE (628a762319)
   using __base_type::rank_as;
 
   // interactions with cluster level
@@ -80,15 +84,6 @@ struct _CCCL_DECLSPEC_EMPTY_BASES block_level : __native_hierarchy_level_base<bl
     unsigned __count = 1;
     NV_IF_TARGET(NV_PROVIDES_SM_90, (__count = ::__clusterSizeInBlocks();))
     return static_cast<_Tp>(__count);
-  }
-
-  _CCCL_TEMPLATE(class _Tp)
-  _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
-  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> index_as(const cluster_level&) noexcept
-  {
-    ::dim3 __idx{0u, 0u, 0u};
-    NV_IF_TARGET(NV_PROVIDES_SM_90, (__idx = ::__clusterRelativeBlockIdx();))
-    return {static_cast<_Tp>(__idx.x), static_cast<_Tp>(__idx.y), static_cast<_Tp>(__idx.z)};
   }
 
   _CCCL_TEMPLATE(class _Tp)
@@ -107,13 +102,6 @@ struct _CCCL_DECLSPEC_EMPTY_BASES block_level : __native_hierarchy_level_base<bl
   [[nodiscard]] _CCCL_DEVICE_API static _Tp count_as(const grid_level&) noexcept
   {
     return static_cast<_Tp>(gridDim.x) * static_cast<_Tp>(gridDim.y) * static_cast<_Tp>(gridDim.z);
-  }
-
-  _CCCL_TEMPLATE(class _Tp)
-  _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
-  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> index_as(const grid_level&) noexcept
-  {
-    return {static_cast<_Tp>(blockIdx.x), static_cast<_Tp>(blockIdx.y), static_cast<_Tp>(blockIdx.z)};
   }
 
   _CCCL_TEMPLATE(class _Tp)
