@@ -43,7 +43,11 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from a8b8e0984a (98ec5e3d4f) - COMMENTED OUT
+// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// =======
+#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (98ec5e3d4f)
 
 #  include <cuda/__hierarchy/block_level.h>
 #  include <cuda/__hierarchy/cluster_level.h>
@@ -111,6 +115,10 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from a8b8e0984a (98ec5e3d4f) - COMMENTED OUT
+// #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// =======
+#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (98ec5e3d4f)
 
 #endif // _CUDA___HIERARCHY_GET_LAUNCH_DIMENSIONS_H
