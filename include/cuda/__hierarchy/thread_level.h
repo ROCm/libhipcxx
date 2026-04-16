@@ -46,15 +46,17 @@
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/__fwd/hierarchy.h>
-#  include <cuda/__hierarchy/hierarchy_query_result.h>
 #  include <cuda/__hierarchy/native_hierarchy_level_base.h>
-#  include <cuda/std/__concepts/concept_macros.h>
-#  include <cuda/std/__mdspan/extents.h>
-#  include <cuda/std/__type_traits/is_integer.h>
-
-#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-#    include <cuda/__ptx/instructions/get_sreg.h>
-#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from 6936be391d (a76de88057) - COMMENTED OUT
+// #  include <cuda/std/__concepts/concept_macros.h>
+// #  include <cuda/std/__mdspan/extents.h>
+// #  include <cuda/std/__type_traits/is_integer.h>
+//
+// #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// #    include <cuda/__ptx/instructions/get_sreg.h>
+// #  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// =======
+// >>>>>>> END NEW CODE (a76de88057)
 
 #  include <cuda/std/__cccl/prologue.h>
 
@@ -67,54 +69,57 @@ struct _CCCL_DECLSPEC_EMPTY_BASES thread_level : __native_hierarchy_level_base<t
   using __allowed_below = __allowed_levels<>;
 
   using __next_native_level = block_level;
-
-  using __base_type = __native_hierarchy_level_base<thread_level>;
-
-// <<<<<<< OLD CODE from a65c61eebf (628a762319) - COMMENTED OUT
-// #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-//   using __base_type::index_as;
-// =======
-#  if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (628a762319)
-  using __base_type::rank_as;
-
-  // interactions with warp level
-
-  // NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but is wave32 or
-  // wave64 depending on the AMD GPU architecture, so use _CCCL_HIP_WAVE_SIZE.
-  _CCCL_TEMPLATE(class _Tp)
-  _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
-// <<<<<<< OLD CODE from a65c61eebf (628a762319) - COMMENTED OUT
-// // <<<<<<< OLD CODE from ca49929d59 (89b06d96af) - COMMENTED OUT
-// // #  if _CCCL_HIP_COMPILATION()
-// //   [[nodiscard]]
-// //   _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE> extents_as(const warp_level&) noexcept
-// // #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-// //   [[nodiscard]]
-// //   _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, 32> extents_as(const warp_level&) noexcept
-// // #  endif // !_CCCL_HIP_COMPILATION()
+// <<<<<<< OLD CODE from 6936be391d (a76de88057) - COMMENTED OUT
+//
+//   using __base_type = __native_hierarchy_level_base<thread_level>;
+//
+// // <<<<<<< OLD CODE from a65c61eebf (628a762319) - COMMENTED OUT
+// // #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// //   using __base_type::index_as;
+// // =======
+// #  if _CCCL_CUDA_COMPILATION()
+// // >>>>>>> END NEW CODE (628a762319)
+//   using __base_type::rank_as;
+//
+//   // interactions with warp level
+//
+//   // NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but is wave32 or
+//   // wave64 depending on the AMD GPU architecture, so use _CCCL_HIP_WAVE_SIZE.
+//   _CCCL_TEMPLATE(class _Tp)
+//   _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
+// // <<<<<<< OLD CODE from a65c61eebf (628a762319) - COMMENTED OUT
+// // // <<<<<<< OLD CODE from ca49929d59 (89b06d96af) - COMMENTED OUT
+// // // #  if _CCCL_HIP_COMPILATION()
+// // //   [[nodiscard]]
+// // //   _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE> extents_as(const warp_level&) noexcept
+// // // #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
+// // //   [[nodiscard]]
+// // //   _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, 32> extents_as(const warp_level&) noexcept
+// // // #  endif // !_CCCL_HIP_COMPILATION()
+// // //   {
+// // //     return {};
+// // //   }
+// // //
+// // //   _CCCL_TEMPLATE(class _Tp)
+// // //   _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
+// // // =======
+// // // >>>>>>> END NEW CODE (89b06d96af)
+// //   [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> index_as(const warp_level&) noexcept
 // //   {
-// //     return {};
+// //     return {static_cast<_Tp>(::cuda::ptx::get_sreg_laneid()), 0, 0};
 // //   }
 // //
 // //   _CCCL_TEMPLATE(class _Tp)
 // //   _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
 // // =======
-// // >>>>>>> END NEW CODE (89b06d96af)
-//   [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> index_as(const warp_level&) noexcept
+// // >>>>>>> END NEW CODE (628a762319)
+//   [[nodiscard]] _CCCL_DEVICE_API static _Tp rank_as(const warp_level&) noexcept
 //   {
-//     return {static_cast<_Tp>(::cuda::ptx::get_sreg_laneid()), 0, 0};
+//     return static_cast<_Tp>(::cuda::ptx::get_sreg_laneid());
 //   }
-//
-//   _CCCL_TEMPLATE(class _Tp)
-//   _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
+// #  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 // =======
-// >>>>>>> END NEW CODE (628a762319)
-  [[nodiscard]] _CCCL_DEVICE_API static _Tp rank_as(const warp_level&) noexcept
-  {
-    return static_cast<_Tp>(::cuda::ptx::get_sreg_laneid());
-  }
-#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+// >>>>>>> END NEW CODE (a76de88057)
 };
 
 _CCCL_GLOBAL_CONSTANT thread_level gpu_thread;
