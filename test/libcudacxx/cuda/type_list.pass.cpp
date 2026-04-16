@@ -58,7 +58,7 @@ struct AlwaysFalse
 template <class... Ts>
 struct DoNotInstantiate
 {
-  static_assert(AlwaysFalse<Ts...>::value, "");
+  static_assert(AlwaysFalse<Ts...>::value);
 };
 
 template <class T>
@@ -71,10 +71,10 @@ template <class T>
 struct HasType : ::cuda::std::__type_callable<::cuda::std::__type_quote1<::cuda::std::__type>, T>
 {};
 
-static_assert(!HasType<Incomplete>::value, "");
-static_assert(!HasType<Empty>::value, "");
-static_assert(!HasType<int>::value, "");
-static_assert(HasType<Identity<int>>::value, "");
+static_assert(!HasType<Incomplete>::value);
+static_assert(!HasType<Empty>::value);
+static_assert(!HasType<int>::value);
+static_assert(HasType<Identity<int>>::value);
 
 template <class... Ts>
 struct Types
@@ -112,23 +112,23 @@ struct ForwardFn
 };
 
 // __type
-static_assert(::cuda::std::is_same<::cuda::std::__type<::cuda::std::type_identity<Incomplete>>, Incomplete>::value, "");
+static_assert(::cuda::std::is_same<::cuda::std::__type<::cuda::std::type_identity<Incomplete>>, Incomplete>::value);
 
 // __type_call
-static_assert(::cuda::std::is_same<::cuda::std::__type_call<Fn, Incomplete>, Types<Incomplete>>::value, "");
-static_assert(::cuda::std::is_same<::cuda::std::__type_call<Fn1, Incomplete>, Types<Incomplete>>::value, "");
+static_assert(::cuda::std::is_same<::cuda::std::__type_call<Fn, Incomplete>, Types<Incomplete>>::value);
+static_assert(::cuda::std::is_same<::cuda::std::__type_call<Fn1, Incomplete>, Types<Incomplete>>::value);
 static_assert(::cuda::std::is_same<::cuda::std::__type_call<Fn2, Incomplete, Empty>, Types<Incomplete, Empty>>::value,
               "");
-static_assert(::cuda::std::is_same<::cuda::std::__type_call1<Fn1, Incomplete>, Types<Incomplete>>::value, "");
+static_assert(::cuda::std::is_same<::cuda::std::__type_call1<Fn1, Incomplete>, Types<Incomplete>>::value);
 static_assert(::cuda::std::is_same<::cuda::std::__type_call2<Fn2, Incomplete, Empty>, Types<Incomplete, Empty>>::value,
               "");
 
 // __type_indirect
 #if !defined(SKIP_SFINAE_TESTS)
-static_assert(!::cuda::std::__type_callable<ForwardFn<Fn2>, Incomplete, Empty>::value, "");
-static_assert(!::cuda::std::__type_callable<ForwardFn<::cuda::std::__type_indirect<Fn2>>, Incomplete>::value, "");
+static_assert(!::cuda::std::__type_callable<ForwardFn<Fn2>, Incomplete, Empty>::value);
+static_assert(!::cuda::std::__type_callable<ForwardFn<::cuda::std::__type_indirect<Fn2>>, Incomplete>::value);
 #endif
-static_assert(::cuda::std::__type_callable<ForwardFn<::cuda::std::__type_indirect<Fn2>>, Incomplete, Empty>::value, "");
+static_assert(::cuda::std::__type_callable<ForwardFn<::cuda::std::__type_indirect<Fn2>>, Incomplete, Empty>::value);
 static_assert(
   ::cuda::std::is_same<::cuda::std::__type_call<ForwardFn<::cuda::std::__type_indirect<Fn2>>, Incomplete, Empty>,
                        Types<Incomplete, Empty>>::value,
@@ -147,10 +147,10 @@ _CCCL_HOST_DEVICE constexpr bool test_call_indirect(long)
   return false;
 }
 
-static_assert(test_call_indirect<Incomplete, Empty>(0), "");
+static_assert(test_call_indirect<Incomplete, Empty>(0));
 #if !defined(SKIP_SFINAE_TESTS)
-static_assert(!test_call_indirect<Incomplete>(0), "");
-static_assert(!test_call_indirect<Incomplete, Empty, int>(0), "");
+static_assert(!test_call_indirect<Incomplete>(0));
+static_assert(!test_call_indirect<Incomplete, Empty, int>(0));
 #endif
 
 template <class... Ts>
@@ -220,16 +220,16 @@ static_assert(
   ::cuda::std::is_same<::cuda::std::__type_call<::cuda::std::__type_always<Incomplete>, Empty>, Incomplete>::value, "");
 
 // __type_list
-static_assert(::cuda::std::__type_list<int, float, double>::__size == 3, "");
-static_assert(::cuda::std::__type_list<>::__size == 0, "");
+static_assert(::cuda::std::__type_list<int, float, double>::__size == 3);
+static_assert(::cuda::std::__type_list<>::__size == 0);
 static_assert(
   ::cuda::std::is_same<::cuda::std::__type_call<::cuda::std::__type_list<int, float, double>, Fn, Incomplete, Empty>,
                        Types<int, float, double, Incomplete, Empty>>::value,
   "");
 
 // __type_list_size
-static_assert(::cuda::std::__type_list_size<::cuda::std::__type_list<int, float, double>>::value == 3, "");
-static_assert(::cuda::std::__type_list_size<::cuda::std::__type_list<>>::value == 0, "");
+static_assert(::cuda::std::__type_list_size<::cuda::std::__type_list<int, float, double>>::value == 3);
+static_assert(::cuda::std::__type_list_size<::cuda::std::__type_list<>>::value == 0);
 
 // __type_list_push_back
 static_assert(::cuda::std::is_same<::cuda::std::__type_push_back<::cuda::std::__type_list<int, float>, double>,
@@ -257,19 +257,19 @@ static_assert(::cuda::std::is_same<::cuda::std::__as_type_list<int(float&, doubl
               "");
 
 // __type_callable
-static_assert(::cuda::std::__type_callable<Fn2, Incomplete, Empty>::value, "");
-static_assert(!::cuda::std::__type_callable<Fn2, Incomplete>::value, "");
+static_assert(::cuda::std::__type_callable<Fn2, Incomplete, Empty>::value);
+static_assert(!::cuda::std::__type_callable<Fn2, Incomplete>::value);
 
 // __type_defer
 using EnsureDeferIsLazy = ::cuda::std::__type_defer<DoNotInstantiate<>, Empty>;
 static_assert(
   ::cuda::std::is_same<::cuda::std::__type_defer<Fn2, Incomplete, Empty>::type, Types<Incomplete, Empty>>::value, "");
-static_assert(!HasType<::cuda::std::__type_defer<Fn2, Incomplete>>::value, "");
+static_assert(!HasType<::cuda::std::__type_defer<Fn2, Incomplete>>::value);
 
 // __type_index
 // NOTE: __type_index has a fast path for indices 16 and below.
-static_assert(::cuda::std::__type_index_c<0, Int<42>, double>::value == 42, "");
-static_assert(::cuda::std::__type_index_c<1, int, Int<42>, double>::value == 42, "");
+static_assert(::cuda::std::__type_index_c<0, Int<42>, double>::value == 42);
+static_assert(::cuda::std::__type_index_c<1, int, Int<42>, double>::value == 42);
 static_assert(
   ::cuda::std::__type_index<::cuda::std::integral_constant<::cuda::std::size_t, 1>, int, Int<42>, double>::value == 42,
   "");
@@ -481,8 +481,8 @@ static_assert(
   "");
 
 // __type_at
-static_assert(::cuda::std::__type_at_c<0, ::cuda::std::__type_list<Int<42>, double>>::value == 42, "");
-static_assert(::cuda::std::__type_at_c<1, ::cuda::std::__type_list<int, Int<42>, double>>::value == 42, "");
+static_assert(::cuda::std::__type_at_c<0, ::cuda::std::__type_list<Int<42>, double>>::value == 42);
+static_assert(::cuda::std::__type_at_c<1, ::cuda::std::__type_list<int, Int<42>, double>>::value == 42);
 static_assert(::cuda::std::__type_at<::cuda::std::integral_constant<::cuda::std::size_t, 1>,
                                      ::cuda::std::__type_list<int, Int<42>, double>>::value
                 == 42,
@@ -499,7 +499,7 @@ static_assert(!::cuda::std::__type_callable<::cuda::std::__type_indirect_quote<:
 #endif
 
 // __type_front
-static_assert(::cuda::std::__type_front<::cuda::std::__type_list<Int<42>, double>>::value == 42, "");
+static_assert(::cuda::std::__type_front<::cuda::std::__type_list<Int<42>, double>>::value == 42);
 #if !defined(SKIP_SFINAE_TESTS)
 static_assert(!::cuda::std::__type_callable<::cuda::std::__type_quote1<::cuda::std::__type_front>,
                                             ::cuda::std::__type_list<>>::value,
@@ -507,7 +507,7 @@ static_assert(!::cuda::std::__type_callable<::cuda::std::__type_quote1<::cuda::s
 #endif
 
 // __type_back
-static_assert(::cuda::std::__type_back<::cuda::std::__type_list<double, Int<42>>>::value == 42, "");
+static_assert(::cuda::std::__type_back<::cuda::std::__type_list<double, Int<42>>>::value == 42);
 #if !defined(SKIP_SFINAE_TESTS)
 static_assert(
   !::cuda::std::__type_callable<::cuda::std::__type_quote1<::cuda::std::__type_back>, ::cuda::std::__type_list<>>::value,
@@ -535,7 +535,7 @@ static_assert(::cuda::std::is_same<::cuda::std::__type_switch<2,
               "");
 
 // __type_concat
-static_assert(::cuda::std::is_same<::cuda::std::__type_concat<>, ::cuda::std::__type_list<>>::value, "");
+static_assert(::cuda::std::is_same<::cuda::std::__type_concat<>, ::cuda::std::__type_list<>>::value);
 
 static_assert(
   ::cuda::std::is_same<::cuda::std::__type_concat<::cuda::std::__type_list<int>, ::cuda::std::__type_list<float>>,
@@ -844,12 +844,12 @@ static_assert(
   "");
 
 // __type_sizeof
-static_assert(::cuda::std::__type_call<::cuda::std::__type_sizeof, char[42]>::value == 42, "");
+static_assert(::cuda::std::__type_call<::cuda::std::__type_sizeof, char[42]>::value == 42);
 
 // __type_strict_and
-static_assert(::cuda::std::__type_call<::cuda::std::__type_strict_and>::value, "");
-static_assert(::cuda::std::__type_call<::cuda::std::__type_strict_and, ::cuda::std::true_type>::value, "");
-static_assert(!::cuda::std::__type_call<::cuda::std::__type_strict_and, ::cuda::std::false_type>::value, "");
+static_assert(::cuda::std::__type_call<::cuda::std::__type_strict_and>::value);
+static_assert(::cuda::std::__type_call<::cuda::std::__type_strict_and, ::cuda::std::true_type>::value);
+static_assert(!::cuda::std::__type_call<::cuda::std::__type_strict_and, ::cuda::std::false_type>::value);
 static_assert(
   ::cuda::std::__type_call<::cuda::std::__type_strict_and, ::cuda::std::true_type, ::cuda::std::true_type>::value, "");
 static_assert(
@@ -863,9 +863,9 @@ static_assert(
   "");
 
 // __type_strict_or
-static_assert(!::cuda::std::__type_call<::cuda::std::__type_strict_or>::value, "");
-static_assert(::cuda::std::__type_call<::cuda::std::__type_strict_or, ::cuda::std::true_type>::value, "");
-static_assert(!::cuda::std::__type_call<::cuda::std::__type_strict_or, ::cuda::std::false_type>::value, "");
+static_assert(!::cuda::std::__type_call<::cuda::std::__type_strict_or>::value);
+static_assert(::cuda::std::__type_call<::cuda::std::__type_strict_or, ::cuda::std::true_type>::value);
+static_assert(!::cuda::std::__type_call<::cuda::std::__type_strict_or, ::cuda::std::false_type>::value);
 static_assert(
   ::cuda::std::__type_call<::cuda::std::__type_strict_or, ::cuda::std::true_type, ::cuda::std::true_type>::value, "");
 static_assert(
@@ -877,7 +877,7 @@ static_assert(
   "");
 
 // __type_not
-static_assert(!::cuda::std::__type_call<::cuda::std::__type_not, ::cuda::std::true_type>::value, "");
+static_assert(!::cuda::std::__type_call<::cuda::std::__type_not, ::cuda::std::true_type>::value);
 
 // __type_equal
 static_assert(
@@ -935,9 +935,9 @@ static_assert(::cuda::std::is_same<::cuda::std::__type_pair_second<::cuda::std::
               "");
 
 // __type_value_list
-static_assert(::cuda::std::__type_value_list<int>::__size == 0, "");
-static_assert(::cuda::std::__type_value_list<int, 1>::__size == 1, "");
-static_assert(::cuda::std::__type_value_list<int, 1, 2>::__size == 2, "");
+static_assert(::cuda::std::__type_value_list<int>::__size == 0);
+static_assert(::cuda::std::__type_value_list<int, 1>::__size == 1);
+static_assert(::cuda::std::__type_value_list<int, 1, 2>::__size == 2);
 static_assert(
   ::cuda::std::is_same<
     ::cuda::std::__type_call<::cuda::std::__type_value_list<int, 1, 2>, Fn, Incomplete, Empty>,
@@ -945,7 +945,7 @@ static_assert(
   "");
 
 // __type_iota
-static_assert(::cuda::std::__type_iota<int, 0, 0>::__size == 0, "");
+static_assert(::cuda::std::__type_iota<int, 0, 0>::__size == 0);
 static_assert(::cuda::std::is_same<::cuda::std::__type_iota<int, 0, 1>, ::cuda::std::__type_value_list<int, 0>>::value,
               "");
 static_assert(::cuda::std::is_same<::cuda::std::__type_iota<int, 5, 10>,

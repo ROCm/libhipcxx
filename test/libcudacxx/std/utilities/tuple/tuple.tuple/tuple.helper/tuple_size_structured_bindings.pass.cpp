@@ -138,7 +138,7 @@ struct Test
 template <size_t N>
 __host__ __device__ int get(Test const&)
 {
-  static_assert(N == 0, "");
+  static_assert(N == 0);
   return -1;
 }
 
