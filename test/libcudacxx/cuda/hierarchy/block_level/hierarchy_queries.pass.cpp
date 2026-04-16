@@ -7,31 +7,34 @@
 //
 //===----------------------------------------------------------------------===//
 
-// MIT License
+// <<<<<<< OLD CODE from a8b8e0984a (98ec5e3d4f) - COMMENTED OUT
+// // MIT License
+// //
+// // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// //
+// // Permission is hereby granted, free of charge, to any person obtaining a copy
+// // of this software and associated documentation files (the "Software"), to deal
+// // in the Software without restriction, including without limitation the rights
+// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// // copies of the Software, and to permit persons to whom the Software is
+// // furnished to do so, subject to the following conditions:
+// //
+// // The above copyright notice and this permission notice shall be included in all
+// // copies or substantial portions of the Software.
+// //
+// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// // SOFTWARE.
 //
-// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// // todo: enable with nvrtc
+// // UNSUPPORTED: nvrtc, hiprtc
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-// todo: enable with nvrtc
-// UNSUPPORTED: nvrtc, hiprtc
-
+// =======
+// >>>>>>> END NEW CODE (98ec5e3d4f)
 #include "hierarchy_queries.h"
 
 #include <cuda/hierarchy>
@@ -131,8 +134,10 @@ __device__ void test_block(
 
 __device__ void test_device()
 {
-  // todo: make hierarchy constructible on device
-  // test_thread(cuda::make_hierarchy(cuda::grid_dims(gridDim), cuda::block_dims(blockDim)));
+  test_block(cuda::hierarchy{cuda::gpu_thread, cuda::grid_dims(dim3{gridDim}), cuda::block_dims(dim3{blockDim})},
+             cuda::std::dims<3, unsigned>{gridDim.x, gridDim.y, gridDim.z},
+             cuda::std::extents<unsigned, 1, 1, 1>{},
+             cuda::std::dims<3, unsigned>{blockDim.x, blockDim.y, blockDim.z});
 }
 
 #if !_CCCL_COMPILER(NVRTC)
