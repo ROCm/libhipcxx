@@ -64,40 +64,51 @@ struct Foo
 
 // template<class T>
 //   constexpr unique_ptr<T> make_unique_for_overwrite();
-static_assert(HasMakeUniqueForOverwrite<int>, "");
-static_assert(HasMakeUniqueForOverwrite<Foo>, "");
-static_assert(!HasMakeUniqueForOverwrite<int, int>, "");
-static_assert(!HasMakeUniqueForOverwrite<Foo, Foo>, "");
+static_assert(HasMakeUniqueForOverwrite<int>);
+static_assert(HasMakeUniqueForOverwrite<Foo>);
+static_assert(!HasMakeUniqueForOverwrite<int, int>);
+static_assert(!HasMakeUniqueForOverwrite<Foo, Foo>);
 
 // template<class T>
 //   constexpr unique_ptr<T> make_unique_for_overwrite(size_t n);
-static_assert(HasMakeUniqueForOverwrite<int[], cuda::std::size_t>, "");
-static_assert(HasMakeUniqueForOverwrite<Foo[], cuda::std::size_t>, "");
-static_assert(!HasMakeUniqueForOverwrite<int[]>, "");
-static_assert(!HasMakeUniqueForOverwrite<Foo[]>, "");
-static_assert(!HasMakeUniqueForOverwrite<int[], cuda::std::size_t, int>, "");
-static_assert(!HasMakeUniqueForOverwrite<Foo[], cuda::std::size_t, int>, "");
+static_assert(HasMakeUniqueForOverwrite<int[], cuda::std::size_t>);
+static_assert(HasMakeUniqueForOverwrite<Foo[], cuda::std::size_t>);
+static_assert(!HasMakeUniqueForOverwrite<int[]>);
+static_assert(!HasMakeUniqueForOverwrite<Foo[]>);
+static_assert(!HasMakeUniqueForOverwrite<int[], cuda::std::size_t, int>);
+static_assert(!HasMakeUniqueForOverwrite<Foo[], cuda::std::size_t, int>);
 
 // template<class T, class... Args>
 //   unspecified make_unique_for_overwrite(Args&&...) = delete;
-// NOTE(HIP/AMD): clang 23 regressed SFINAE handling of deleted functions -- selecting
-// the deleted T[N] overload while forming the _CCCL_REQUIRES_EXPR detection escapes the
-// immediate context as a hard error ("call to deleted function") instead of being a
-// substitution failure, so these detection checks fail to compile. Reported upstream
-// (LLVM). clang 24 might already include the fix, but this is not yet confirmed -- it is
-// unclear whether the behavior changes for 24. The gate deactivates only clang 23 and
-// re-enables on clang >= 24; if a future clang 24 still has the bug, this needs
-// revisiting. clang <= 22 evaluates these correctly. See #305.
-#if !(TEST_COMPILER(CLANG, >=, 23) && TEST_COMPILER(CLANG, <, 24))
-static_assert(!HasMakeUniqueForOverwrite<int[2]>, "");
-static_assert(!HasMakeUniqueForOverwrite<int[2], cuda::std::size_t>, "");
-static_assert(!HasMakeUniqueForOverwrite<int[2], int>, "");
-static_assert(!HasMakeUniqueForOverwrite<int[2], int, int>, "");
-static_assert(!HasMakeUniqueForOverwrite<Foo[2]>, "");
-static_assert(!HasMakeUniqueForOverwrite<Foo[2], cuda::std::size_t>, "");
-static_assert(!HasMakeUniqueForOverwrite<Foo[2], int>, "");
-static_assert(!HasMakeUniqueForOverwrite<Foo[2], int, int>, "");
-#endif // clang 23 deleted-function SFINAE regression (LLVM), fixed expected in clang 24
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+// // NOTE(HIP/AMD): clang 23 regressed SFINAE handling of deleted functions -- selecting
+// // the deleted T[N] overload while forming the _CCCL_REQUIRES_EXPR detection escapes the
+// // immediate context as a hard error ("call to deleted function") instead of being a
+// // substitution failure, so these detection checks fail to compile. Reported upstream
+// // (LLVM). clang 24 might already include the fix, but this is not yet confirmed -- it is
+// // unclear whether the behavior changes for 24. The gate deactivates only clang 23 and
+// // re-enables on clang >= 24; if a future clang 24 still has the bug, this needs
+// // revisiting. clang <= 22 evaluates these correctly. See #305.
+// #if !(TEST_COMPILER(CLANG, >=, 23) && TEST_COMPILER(CLANG, <, 24))
+// static_assert(!HasMakeUniqueForOverwrite<int[2]>, "");
+// static_assert(!HasMakeUniqueForOverwrite<int[2], cuda::std::size_t>, "");
+// static_assert(!HasMakeUniqueForOverwrite<int[2], int>, "");
+// static_assert(!HasMakeUniqueForOverwrite<int[2], int, int>, "");
+// static_assert(!HasMakeUniqueForOverwrite<Foo[2]>, "");
+// static_assert(!HasMakeUniqueForOverwrite<Foo[2], cuda::std::size_t>, "");
+// static_assert(!HasMakeUniqueForOverwrite<Foo[2], int>, "");
+// static_assert(!HasMakeUniqueForOverwrite<Foo[2], int, int>, "");
+// #endif // clang 23 deleted-function SFINAE regression (LLVM), fixed expected in clang 24
+// =======
+static_assert(!HasMakeUniqueForOverwrite<int[2]>);
+static_assert(!HasMakeUniqueForOverwrite<int[2], cuda::std::size_t>);
+static_assert(!HasMakeUniqueForOverwrite<int[2], int>);
+static_assert(!HasMakeUniqueForOverwrite<int[2], int, int>);
+static_assert(!HasMakeUniqueForOverwrite<Foo[2]>);
+static_assert(!HasMakeUniqueForOverwrite<Foo[2], cuda::std::size_t>);
+static_assert(!HasMakeUniqueForOverwrite<Foo[2], int>);
+static_assert(!HasMakeUniqueForOverwrite<Foo[2], int, int>);
+// >>>>>>> END NEW CODE (ac28a5deba)
 
 struct WithDefaultConstructor
 {
@@ -112,7 +123,7 @@ __host__ __device__ TEST_CONSTEXPR_CXX23 bool test()
   // single int
   {
     decltype(auto) ptr = cuda::std::make_unique_for_overwrite<int>();
-    static_assert(cuda::std::same_as<cuda::std::unique_ptr<int>, decltype(ptr)>, "");
+    static_assert(cuda::std::same_as<cuda::std::unique_ptr<int>, decltype(ptr)>);
     // memory is available for write, otherwise constexpr test would fail
     *ptr = 5;
   }
@@ -120,7 +131,7 @@ __host__ __device__ TEST_CONSTEXPR_CXX23 bool test()
   // unbounded array int[]
   {
     decltype(auto) ptrs = cuda::std::make_unique_for_overwrite<int[]>(3);
-    static_assert(cuda::std::same_as<cuda::std::unique_ptr<int[]>, decltype(ptrs)>, "");
+    static_assert(cuda::std::same_as<cuda::std::unique_ptr<int[]>, decltype(ptrs)>);
 
     // memory is available for write, otherwise constexpr test would fail
     ptrs[0] = 3;
@@ -131,14 +142,14 @@ __host__ __device__ TEST_CONSTEXPR_CXX23 bool test()
   // single with default constructor
   {
     decltype(auto) ptr = cuda::std::make_unique_for_overwrite<WithDefaultConstructor>();
-    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithDefaultConstructor>, decltype(ptr)>, "");
+    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithDefaultConstructor>, decltype(ptr)>);
     assert(ptr->i == 5);
   }
 
   // unbounded array with default constructor
   {
     decltype(auto) ptrs = cuda::std::make_unique_for_overwrite<WithDefaultConstructor[]>(3);
-    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithDefaultConstructor[]>, decltype(ptrs)>, "");
+    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithDefaultConstructor[]>, decltype(ptrs)>);
     assert(ptrs[0].i == 5);
     assert(ptrs[1].i == 5);
     assert(ptrs[2].i == 5);
@@ -174,7 +185,7 @@ __host__ __device__ void testCustomNew()
   // single with custom operator new
   {
     decltype(auto) ptr = cuda::std::make_unique_for_overwrite<WithCustomNew>();
-    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithCustomNew>, decltype(ptr)>, "");
+    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithCustomNew>, decltype(ptr)>);
 
     assert(WithCustomNew_customNewCalled);
     unused(ptr);
@@ -183,7 +194,7 @@ __host__ __device__ void testCustomNew()
   // unbounded array with custom operator new
   {
     decltype(auto) ptr = cuda::std::make_unique_for_overwrite<WithCustomNew[]>(3);
-    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithCustomNew[]>, decltype(ptr)>, "");
+    static_assert(cuda::std::same_as<cuda::std::unique_ptr<WithCustomNew[]>, decltype(ptr)>);
 
     assert(WithCustomNew_customNewArrCalled);
     unused(ptr);

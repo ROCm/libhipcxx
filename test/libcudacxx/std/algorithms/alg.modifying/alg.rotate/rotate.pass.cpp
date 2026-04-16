@@ -258,7 +258,7 @@ int main(int, char**)
 #if !defined(_CCCL_COMPILER_HIPRTC) and (LIBHIPCXX_ROCM_VERSION_GE(7,11) or LIBHIPCXX_ROCM_VERSION_LE(7,1))
   test();
 #if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
-  static_assert(test(), "");
+  static_assert(test());
 #endif // _CCCL_BUILTIN_IS_CONSTANT_EVALUATED
 #endif
   return 0;

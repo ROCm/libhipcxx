@@ -112,7 +112,7 @@ __global__ void test_kernel()
 int main(int, char**)
 {
   test();
-  static_assert(test(), "");
+  static_assert(test());
 
   return 0;
 }

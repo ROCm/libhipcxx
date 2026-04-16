@@ -90,73 +90,98 @@ struct ExplicitTo
 template <class T>
 __host__ __device__ void test_is_constructible()
 {
-  static_assert((cuda::std::is_constructible<T>::value), "");
-#if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+//   static_assert((cuda::std::is_constructible<T>::value), "");
+// #if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// =======
+  static_assert((cuda::std::is_constructible<T>::value));
+#if !TEST_COMPILER(MSVC)
+// >>>>>>> END NEW CODE (ac28a5deba)
   // The fallback SFINAE version doesn't work reliable with MSVC, and we don't
   // use it, so waive it.
-  static_assert((cuda::std::__cccl_is_constructible<T>::type::value), "");
+  static_assert((cuda::std::__cccl_is_constructible<T>::type::value));
 #endif // !TEST_COMPILER(MSVC)
-  static_assert(cuda::std::is_constructible_v<T>, "");
+  static_assert(cuda::std::is_constructible_v<T>);
 }
 
 template <class T, class A0>
 __host__ __device__ void test_is_constructible()
 {
-  static_assert((cuda::std::is_constructible<T, A0>::value), "");
+  static_assert((cuda::std::is_constructible<T, A0>::value));
 #if !TEST_COMPILER(MSVC)
   // The fallback SFINAE version doesn't work reliable with MSVC, and we don't
   // use it, so waive it.
-  static_assert((cuda::std::__cccl_is_constructible<T, A0>::type::value), "");
+  static_assert((cuda::std::__cccl_is_constructible<T, A0>::type::value));
 #endif // !TEST_COMPILER(MSVC)
-  static_assert((cuda::std::is_constructible_v<T, A0>), "");
+  static_assert((cuda::std::is_constructible_v<T, A0>) );
 }
 
 template <class T, class A0, class A1>
 __host__ __device__ void test_is_constructible()
 {
-  static_assert((cuda::std::is_constructible<T, A0, A1>::value), "");
-#if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+//   static_assert((cuda::std::is_constructible<T, A0, A1>::value), "");
+// #if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// =======
+  static_assert((cuda::std::is_constructible<T, A0, A1>::value));
+#if !TEST_COMPILER(MSVC)
+// >>>>>>> END NEW CODE (ac28a5deba)
   // The fallback SFINAE version doesn't work reliable with MSVC, and we don't
   // use it, so waive it.
-  static_assert((cuda::std::__cccl_is_constructible<T, A0, A1>::type::value), "");
+  static_assert((cuda::std::__cccl_is_constructible<T, A0, A1>::type::value));
 #endif // !TEST_COMPILER(MSVC)
-  static_assert((cuda::std::is_constructible_v<T, A0, A1>), "");
+  static_assert((cuda::std::is_constructible_v<T, A0, A1>) );
 }
 
 template <class T, class A0, class A1, class A2>
 __host__ __device__ void test_is_constructible()
 {
-  static_assert((cuda::std::is_constructible<T, A0, A1, A2>::value), "");
-#if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+//   static_assert((cuda::std::is_constructible<T, A0, A1, A2>::value), "");
+// #if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// =======
+  static_assert((cuda::std::is_constructible<T, A0, A1, A2>::value));
+#if !TEST_COMPILER(MSVC)
+// >>>>>>> END NEW CODE (ac28a5deba)
   // The fallback SFINAE version doesn't work reliable with MSVC, and we don't
   // use it, so waive it.
-  static_assert((cuda::std::__cccl_is_constructible<T, A0, A1, A2>::type::value), "");
+  static_assert((cuda::std::__cccl_is_constructible<T, A0, A1, A2>::type::value));
 #endif // !TEST_COMPILER(MSVC)
-  static_assert((cuda::std::is_constructible_v<T, A0, A1, A2>), "");
+  static_assert((cuda::std::is_constructible_v<T, A0, A1, A2>) );
 }
 
 template <class T>
 __host__ __device__ void test_is_not_constructible()
 {
-  static_assert((!cuda::std::is_constructible<T>::value), "");
-#if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+//   static_assert((!cuda::std::is_constructible<T>::value), "");
+// #if !TEST_COMPILER(MSVC) && !defined(TEST_COMPILER_HIPCC)
+// =======
+  static_assert((!cuda::std::is_constructible<T>::value));
+#if !TEST_COMPILER(MSVC)
+// >>>>>>> END NEW CODE (ac28a5deba)
   // The fallback SFINAE version doesn't work reliable with MSVC, and we don't
   // use it, so waive it.
-  static_assert((!cuda::std::__cccl_is_constructible<T>::type::value), "");
+  static_assert((!cuda::std::__cccl_is_constructible<T>::type::value));
 #endif // !TEST_COMPILER(MSVC)
-  static_assert((!cuda::std::is_constructible_v<T>), "");
+  static_assert((!cuda::std::is_constructible_v<T>) );
 }
 
 template <class T, class A0>
 __host__ __device__ void test_is_not_constructible()
 {
-  static_assert((!cuda::std::is_constructible<T, A0>::value), "");
-#if !TEST_COMPILER(MSVC) && !TEST_COMPILER(CLANG) && !TEST_COMPILER(NVRTC) && !TEST_COMPILER(NVHPC) && !defined(TEST_COMPILER_HIPRTC) 
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+//   static_assert((!cuda::std::is_constructible<T, A0>::value), "");
+// #if !TEST_COMPILER(MSVC) && !TEST_COMPILER(CLANG) && !TEST_COMPILER(NVRTC) && !TEST_COMPILER(NVHPC) && !defined(TEST_COMPILER_HIPRTC) 
+// =======
+  static_assert((!cuda::std::is_constructible<T, A0>::value));
+#if !TEST_COMPILER(MSVC) && !TEST_COMPILER(CLANG) && !TEST_COMPILER(NVRTC) && !TEST_COMPILER(NVHPC)
+// >>>>>>> END NEW CODE (ac28a5deba)
   // The fallback SFINAE version doesn't work reliable with Clang/MSVC/NVRTC/NVHPC, and we don't
   // use it, so waive it.
-  static_assert((!cuda::std::__cccl_is_constructible<T, A0>::type::value), "");
+  static_assert((!cuda::std::__cccl_is_constructible<T, A0>::type::value));
 #endif // !TEST_COMPILER(MSVC) && !TEST_COMPILER(CLANG) && !TEST_COMPILER(NVRTC) && !TEST_COMPILER(NVHPC)
-  static_assert((!cuda::std::is_constructible_v<T, A0>), "");
+  static_assert((!cuda::std::is_constructible_v<T, A0>) );
 }
 
 #if TEST_COMPILER(CLANG)
@@ -289,12 +314,12 @@ int main(int, char**)
 
   // TODO add nvbug tracking
 #if !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC)
-  static_assert(cuda::std::is_constructible<int&&, ExplicitTo<int&&>>::value, "");
+  static_assert(cuda::std::is_constructible<int&&, ExplicitTo<int&&>>::value);
 #endif // !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC)
 
 #if TEST_CUDA_COMPILER(CLANG)
-  static_assert(clang_disallows_valid_static_cast_bug == false, "");
-  static_assert(cuda::std::__cccl_is_constructible<int&&, ExplicitTo<int&&>>::value, "");
+  static_assert(clang_disallows_valid_static_cast_bug == false);
+  static_assert(cuda::std::__cccl_is_constructible<int&&, ExplicitTo<int&&>>::value);
 #endif // TEST_CUDA_COMPILER(CLANG)
 
 // FIXME Compilers disagree about the validity of these tests.
@@ -302,8 +327,13 @@ int main(int, char**)
   test_is_constructible<const int&, ExplicitTo<int>>();
   static_assert(
     clang_disallows_valid_static_cast_bug != cuda::std::__cccl_is_constructible<int&&, ExplicitTo<int>>::value, "");
-  static_assert(cuda::std::is_constructible<int&&, ExplicitTo<int>>::value, "");
-#elif TEST_COMPILER(MSVC) && TEST_CUDA_COMPILER(NVCC) && defined(TEST_COMPILER_HIPCC)
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+//   static_assert(cuda::std::is_constructible<int&&, ExplicitTo<int>>::value, "");
+// #elif TEST_COMPILER(MSVC) && TEST_CUDA_COMPILER(NVCC) && defined(TEST_COMPILER_HIPCC)
+// =======
+  static_assert(cuda::std::is_constructible<int&&, ExplicitTo<int>>::value);
+#elif TEST_COMPILER(MSVC) && TEST_CUDA_COMPILER(NVCC)
+// >>>>>>> END NEW CODE (ac28a5deba)
   // FIXME NVCC and MSVC disagree about the validity of these tests, and give
   //       different answers in host and device code, which is just wonderful.
 #elif TEST_COMPILER(CLANG) && (TEST_CUDA_COMPILER(NVCC) || defined(TEST_COMPILER_HIPCC))
