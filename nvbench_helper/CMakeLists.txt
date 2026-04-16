@@ -39,15 +39,19 @@ cccl_get_nvbench()
 cccl_get_thrust()
 
 add_library(cccl.nvbench_helper OBJECT nvbench_helper/nvbench_helper.cu)
-if (LIBCUDACXX_ENABLE_HIP)
-  set_source_files_properties(nvbench_helper/nvbench_helper.cu PROPERTIES LANGUAGE HIP)
-  # The hip* runtime calls are [[nodiscard]]; the upstream CUDA paths ignore the
-  # returns (cudaError_t is not nodiscard on CUDA). Keep the warning but don't fail
-  # -Werror on it, rather than editing the upstream source.
-  target_compile_options(cccl.nvbench_helper PRIVATE
-    $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value -Wno-error=unused-result>)
-endif()
-cccl_configure_target(cccl.nvbench_helper DIALECT 17)
+# <<<<<<< OLD CODE from 9fa0464b8f (e3b745085e) - COMMENTED OUT
+# if (LIBCUDACXX_ENABLE_HIP)
+#   set_source_files_properties(nvbench_helper/nvbench_helper.cu PROPERTIES LANGUAGE HIP)
+#   # The hip* runtime calls are [[nodiscard]]; the upstream CUDA paths ignore the
+#   # returns (cudaError_t is not nodiscard on CUDA). Keep the warning but don't fail
+#   # -Werror on it, rather than editing the upstream source.
+#   target_compile_options(cccl.nvbench_helper PRIVATE
+#     $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value -Wno-error=unused-result>)
+# endif()
+# cccl_configure_target(cccl.nvbench_helper DIALECT 17)
+# =======
+cccl_configure_target(cccl.nvbench_helper)
+# >>>>>>> END NEW CODE (e3b745085e)
 target_link_libraries(
   cccl.nvbench_helper
   PUBLIC
@@ -94,7 +98,6 @@ if (nvbench_helper_ENABLE_TESTING)
       ${nvbench_helper_test_target}
       ADD_CTEST
       NO_METATARGETS
-      DIALECT 17
       SOURCES
         test/gen_seed.cu
         test/gen_range.cu
