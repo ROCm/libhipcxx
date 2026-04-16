@@ -196,22 +196,22 @@ int main(int, char**)
   }
   {
     // test that the swap
-    static_assert(can_swap<CopyOnly&>(), "");
-    static_assert(can_swap<MoveOnly&>(), "");
-    static_assert(can_swap<NoexceptMoveOnly&>(), "");
+    static_assert(can_swap<CopyOnly&>());
+    static_assert(can_swap<MoveOnly&>());
+    static_assert(can_swap<NoexceptMoveOnly&>());
 
-    static_assert(!can_swap<NotMoveConstructible&>(), "");
-    static_assert(!can_swap<NotMoveAssignable&>(), "");
+    static_assert(!can_swap<NotMoveConstructible&>());
+    static_assert(!can_swap<NotMoveAssignable&>());
 
     CopyOnly c;
     MoveOnly m;
     NoexceptMoveOnly nm;
-    static_assert(!noexcept(cuda::std::swap(c, c)), "");
-    static_assert(!noexcept(cuda::std::swap(m, m)), "");
-    static_assert(noexcept(cuda::std::swap(nm, nm)), "");
+    static_assert(!noexcept(cuda::std::swap(c, c)));
+    static_assert(!noexcept(cuda::std::swap(m, m)));
+    static_assert(noexcept(cuda::std::swap(nm, nm)));
   }
 
-  static_assert(test_swap_constexpr(), "");
+  static_assert(test_swap_constexpr());
 
   test_ambiguous_std<cuda::std::pair<int, int>>(); // has cuda::std::swap overload
 #if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
@@ -223,9 +223,15 @@ int main(int, char**)
   test_ambiguous_std<swap_with_friend<::std::pair<int, int>>>();
 #endif // !TEST_COMPILER(NVRTC)
 
-#if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-  static_assert(cuda::std::is_swappable<cuda::std::pair<::std::pair<int, int>, int>>::value, "");
-  static_assert(cuda::std::is_swappable<swap_with_friend<::std::pair<int, int>>>::value, "");
+// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
+// #if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
+//   static_assert(cuda::std::is_swappable<cuda::std::pair<::std::pair<int, int>, int>>::value, "");
+//   static_assert(cuda::std::is_swappable<swap_with_friend<::std::pair<int, int>>>::value, "");
+// =======
+#if !TEST_COMPILER(NVRTC)
+  static_assert(cuda::std::is_swappable<cuda::std::pair<::std::pair<int, int>, int>>::value);
+  static_assert(cuda::std::is_swappable<swap_with_friend<::std::pair<int, int>>>::value);
+// >>>>>>> END NEW CODE (ac28a5deba)
 #endif // !TEST_COMPILER(NVRTC)
 
   return 0;

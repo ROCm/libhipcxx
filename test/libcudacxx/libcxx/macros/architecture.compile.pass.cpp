@@ -50,6 +50,6 @@
 
 int main(int, char**)
 {
-  static_assert(sizeof(void*) == 8, "");
+  static_assert(sizeof(void*) == 8);
   return 0;
 }

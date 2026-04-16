@@ -109,7 +109,7 @@
 // if not, go take a look at cuda::std::is_unsigned_v
 #if TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC)
 #  include <cuda/std/type_traits>
-static_assert(_CCCL_CHAR_IS_UNSIGNED() == cuda::std::is_unsigned_v<char>, "");
+static_assert(_CCCL_CHAR_IS_UNSIGNED() == cuda::std::is_unsigned_v<char>);
 #endif
 
 int main(int, char**)
