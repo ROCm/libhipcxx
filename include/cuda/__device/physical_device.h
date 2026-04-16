@@ -4,7 +4,7 @@
 // under the Apache License v2.0 with LLVM Exceptions.
 // See https://llvm.org/LICENSE.txt for license information.
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-// SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES.
+// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
 
@@ -193,6 +193,11 @@ _CCCL_HOST_API inline void device_ref::init() const
 #if !_CCCL_HIP_COMPILATION()
   (void) ::cuda::__physical_devices()[__id_].__primary_context();
 #endif
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::CUcontext device_ref::__primary_context() const
+{
+  return ::cuda::__physical_devices()[__id_].__primary_context();
 }
 
 [[nodiscard]] _CCCL_HOST_API inline ::cuda::std::string_view device_ref::name() const
