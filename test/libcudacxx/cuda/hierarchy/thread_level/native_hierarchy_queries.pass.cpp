@@ -42,16 +42,21 @@
 #include <cuda/std/type_traits>
 
 #include "hierarchy_queries.h"
+#include "test_macros.h"
 
-// NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
-// AMD, so the static warp-level expectations below must use the wave size.
-#if _CCCL_HIP_COMPILATION()
-#  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
-#else
-#  define TEST_WARP_SIZE 32
-#endif
-
-__device__ void test_thread()
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// // NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
+// // AMD, so the static warp-level expectations below must use the wave size.
+// #if _CCCL_HIP_COMPILATION()
+// #  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
+// #else
+// #  define TEST_WARP_SIZE 32
+// #endif
+//
+// __device__ void test_thread()
+// =======
+TEST_DEVICE_FUNC void test_thread()
+// >>>>>>> END NEW CODE (5214850b75)
 {
   constexpr cuda::std::size_t dext = cuda::std::dynamic_extent;
 

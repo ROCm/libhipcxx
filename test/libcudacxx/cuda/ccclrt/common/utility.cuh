@@ -54,7 +54,9 @@
 
 #include <new> // IWYU pragma: keep (needed for placement new)
 
-__device__ inline void ccclrt_require_impl(
+#include "test_macros.h"
+
+TEST_DEVICE_FUNC inline void ccclrt_require_impl(
   bool condition, const char* condition_text, const char* filename, unsigned int linenum, const char* funcname)
 {
   if (!condition)
@@ -159,7 +161,7 @@ public:
 template <int N>
 struct assign_n
 {
-  __device__ constexpr void operator()(int* pi) const noexcept
+  TEST_DEVICE_FUNC constexpr void operator()(int* pi) const noexcept
   {
     *pi = N;
   }
@@ -168,7 +170,7 @@ struct assign_n
 template <int N>
 struct verify_n
 {
-  __device__ void operator()(int* pi) const noexcept
+  TEST_DEVICE_FUNC void operator()(int* pi) const noexcept
   {
     // TODO: fix clang CUDA require macro
     // CCCLRT_REQUIRE(*pi == N);
@@ -181,7 +183,7 @@ using verify_42 = verify_n<42>;
 
 struct atomic_add_one
 {
-  __device__ void operator()(int* pi) const noexcept
+  TEST_DEVICE_FUNC void operator()(int* pi) const noexcept
   {
     cuda::atomic_ref atomic_pi(*pi);
     atomic_pi.fetch_add(1);
@@ -190,7 +192,7 @@ struct atomic_add_one
 
 struct atomic_sub_one
 {
-  __device__ void operator()(int* pi) const noexcept
+  TEST_DEVICE_FUNC void operator()(int* pi) const noexcept
   {
     cuda::atomic_ref atomic_pi(*pi);
     atomic_pi.fetch_sub(1);
@@ -199,7 +201,7 @@ struct atomic_sub_one
 
 struct spin_until_80
 {
-  __device__ void operator()(int* pi) const noexcept
+  TEST_DEVICE_FUNC void operator()(int* pi) const noexcept
   {
     cuda::atomic_ref atomic_pi(*pi);
     while (atomic_pi.load() != 80)
@@ -209,7 +211,7 @@ struct spin_until_80
 
 struct empty_kernel
 {
-  __device__ void operator()() const noexcept {}
+  TEST_DEVICE_FUNC void operator()() const noexcept {}
 };
 
 template <class Fn, class... Args>

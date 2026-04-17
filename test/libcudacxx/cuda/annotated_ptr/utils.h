@@ -51,7 +51,7 @@ TEST_DIAG_SUPPRESS_MSVC(4505)
     } while (false)
 #endif
 
-__device__ __host__ void assert_rt_wrap(cudaError_t code, const char* file, int line)
+TEST_FUNC void assert_rt_wrap(cudaError_t code, const char* file, int line)
 {
   if (code != cudaSuccess)
   {
@@ -69,7 +69,7 @@ __device__ __host__ void assert_rt_wrap(cudaError_t code, const char* file, int 
   }
 
 template <typename T, int N>
-__device__ __host__ __noinline__ T* global_alloc()
+TEST_FUNC __noinline__ T* global_alloc()
 {
   T* arr = nullptr;
 
@@ -84,7 +84,7 @@ __device__ __host__ __noinline__ T* global_alloc()
 }
 
 template <typename T, int N>
-__device__ __noinline__ T* shared_alloc()
+TEST_DEVICE_FUNC __noinline__ T* shared_alloc()
 {
   __shared__ T data[N];
 
@@ -96,7 +96,7 @@ __device__ __noinline__ T* shared_alloc()
 }
 
 template <typename T>
-__device__ __host__ __noinline__ void dealloc(T* arr)
+TEST_FUNC __noinline__ void dealloc(T* arr)
 {
   NV_IF_ELSE_TARGET(NV_IS_DEVICE, (free(arr);), assert_rt(cudaFree(arr));)
 }

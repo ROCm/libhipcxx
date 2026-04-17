@@ -39,6 +39,8 @@
 #include <cuda/std/cstring>
 #include <cuda/std/utility>
 
+#include "test_macros.h"
+
 template <class CharT>
 struct TestParsedSpecValues
 {
@@ -49,7 +51,7 @@ struct TestParsedSpecValues
 };
 
 template <class CharT>
-__host__ __device__ TestParsedSpecValues<CharT> make_test_parsed_spec_values() noexcept
+TEST_FUNC TestParsedSpecValues<CharT> make_test_parsed_spec_values() noexcept
 {
   cuda::std::__fmt_spec_std value_std{};
   value_std.__alignment_            = cuda::std::to_underlying(cuda::std::__fmt_spec_alignment::__center);
@@ -68,7 +70,7 @@ __host__ __device__ TestParsedSpecValues<CharT> make_test_parsed_spec_values() n
 }
 
 template <class CharT>
-__host__ __device__ void verify_parsed_spec(const cuda::std::__fmt_parsed_spec<CharT>& value) noexcept
+TEST_FUNC void verify_parsed_spec(const cuda::std::__fmt_parsed_spec<CharT>& value) noexcept
 {
   const auto ref = make_test_parsed_spec_values<CharT>();
   assert(value.__std_.__alignment_ == ref.std.__alignment_);
@@ -82,7 +84,7 @@ __host__ __device__ void verify_parsed_spec(const cuda::std::__fmt_parsed_spec<C
 }
 
 template <class CharT>
-__host__ __device__ void test()
+TEST_FUNC void test()
 {
   static_assert(sizeof(cuda::std::__fmt_parsed_spec<CharT>) == 16);
   assert(offsetof(cuda::std::__fmt_parsed_spec<CharT>, __std_) == 0);
@@ -101,7 +103,7 @@ __host__ __device__ void test()
   verify_parsed_spec(value);
 }
 
-__host__ __device__ void test()
+TEST_FUNC void test()
 {
   test<char>();
 #if _CCCL_HAS_WCHAR_T()

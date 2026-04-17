@@ -40,7 +40,7 @@ struct release
   static constexpr size_t threadcount = N;
 
   template <typename Semaphore>
-  __host__ __device__ static void perform(Semaphore& semaphore)
+  TEST_FUNC static void perform(Semaphore& semaphore)
   {
     semaphore.release(1);
   }
@@ -52,7 +52,7 @@ struct acquire
   static constexpr size_t threadcount = N;
 
   template <typename Semaphore>
-  __host__ __device__ static void perform(Semaphore& semaphore)
+  TEST_FUNC static void perform(Semaphore& semaphore)
   {
     semaphore.acquire();
   }

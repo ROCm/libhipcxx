@@ -292,7 +292,7 @@ C2H_TEST("Configuration combine", "[launch]")
 // are still built and run on HIP.
 #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
 template <typename Config>
-__host__ __device__ void test_queries_on_config(const Config& config)
+TEST_FUNC void test_queries_on_config(const Config& config)
 {
   CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::grid, config) == dim3(1024));
   {

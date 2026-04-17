@@ -55,11 +55,11 @@
 
 struct my_float
 {
-  explicit _CCCL_HOST_DEVICE my_float(float value)
+  explicit TEST_FUNC my_float(float value)
       : value(value)
   {}
 
-  _CCCL_HOST_DEVICE operator float() const
+  TEST_FUNC operator float() const
   {
     return value;
   }
@@ -70,7 +70,7 @@ private:
 static_assert(!cuda::std::is_arithmetic_v<my_float>);
 
 template <class To, class From>
-__host__ __device__ void test_type()
+TEST_FUNC void test_type()
 {
   // 1. Casting zero should always work
   assert(cuda::narrow<To>(From{0}) == To{0});
@@ -102,7 +102,7 @@ __host__ __device__ void test_type()
 }
 
 template <class To>
-__host__ __device__ void test_type()
+TEST_FUNC void test_type()
 {
   test_type<To, signed char>();
   test_type<To, unsigned char>();
@@ -140,7 +140,7 @@ __host__ __device__ void test_type()
   }
 }
 
-__host__ __device__ bool test()
+TEST_FUNC bool test()
 {
   test_type<signed char>();
   test_type<unsigned char>();
