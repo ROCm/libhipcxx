@@ -51,16 +51,21 @@
 
 #include "test_macros.h"
 
-__device__ int device_ptr1[]              = {1, 2, 3, 4};
-// NOTE(HIP/AMD): hipPointerGetAttributes does not recognize
-// '__device__ __managed__' globals as managed memory -- it reports
-// them as type=hipMemoryTypeUnregistered with isManaged=0 (verified
-// on ROCm 7.2). Heap-allocated managed memory via hipMallocManaged
-// reports correctly (type=hipMemoryTypeManaged, isManaged=1), so the
-// 'managed_ptr2' branch below still exercises the managed code path.
-// Keep the symbol declared for compile-time symmetry with upstream
-// but skip the runtime check on HIP.
-__device__ __managed__ int managed_ptr1[] = {1, 2, 3, 4};
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// __device__ int device_ptr1[]              = {1, 2, 3, 4};
+// // NOTE(HIP/AMD): hipPointerGetAttributes does not recognize
+// // '__device__ __managed__' globals as managed memory -- it reports
+// // them as type=hipMemoryTypeUnregistered with isManaged=0 (verified
+// // on ROCm 7.2). Heap-allocated managed memory via hipMallocManaged
+// // reports correctly (type=hipMemoryTypeManaged, isManaged=1), so the
+// // 'managed_ptr2' branch below still exercises the managed code path.
+// // Keep the symbol declared for compile-time symmetry with upstream
+// // but skip the runtime check on HIP.
+// __device__ __managed__ int managed_ptr1[] = {1, 2, 3, 4};
+// =======
+TEST_GLOBAL_VARIABLE int device_ptr1[]      = {1, 2, 3, 4};
+_CCCL_DEVICE __managed__ int managed_ptr1[] = {1, 2, 3, 4};
+// >>>>>>> END NEW CODE (5214850b75)
 
 int host_ptr1[] = {1, 2, 3, 4};
 

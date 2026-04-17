@@ -37,72 +37,80 @@ class MoveOnly
   int data_;
 
 public:
-// NOTE(HIP/AMD): Issue #146.
-#if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
-  __attribute__((optnone)) 
-#endif
-  __host__ __device__ constexpr MoveOnly(int data = 1)
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// // NOTE(HIP/AMD): Issue #146.
+// #if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
+//   __attribute__((optnone)) 
+// #endif
+//   __host__ __device__ constexpr MoveOnly(int data = 1)
+// =======
+  TEST_FUNC constexpr MoveOnly(int data = 1)
+// >>>>>>> END NEW CODE (5214850b75)
       : data_(data)
   {}
 
   MoveOnly(const MoveOnly&)            = delete;
   MoveOnly& operator=(const MoveOnly&) = delete;
 
-  __host__ __device__ constexpr MoveOnly(MoveOnly&& x)
+  TEST_FUNC constexpr MoveOnly(MoveOnly&& x)
       : data_(x.data_)
   {
     x.data_ = 0;
   }
-// NOTE(HIP/AMD): Issue #146.
-#if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
-  __attribute__((optnone)) 
-#endif
-  __host__ __device__ constexpr MoveOnly& operator=(MoveOnly&& x)
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// // NOTE(HIP/AMD): Issue #146.
+// #if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
+//   __attribute__((optnone)) 
+// #endif
+//   __host__ __device__ constexpr MoveOnly& operator=(MoveOnly&& x)
+// =======
+  TEST_FUNC constexpr MoveOnly& operator=(MoveOnly&& x)
+// >>>>>>> END NEW CODE (5214850b75)
   {
     data_   = x.data_;
     x.data_ = 0;
     return *this;
   }
 
-  __host__ __device__ constexpr int get() const
+  TEST_FUNC constexpr int get() const
   {
     return data_;
   }
 
-  __host__ __device__ friend constexpr bool operator==(const MoveOnly& x, const MoveOnly& y)
+  TEST_FUNC friend constexpr bool operator==(const MoveOnly& x, const MoveOnly& y)
   {
     return x.data_ == y.data_;
   }
-  __host__ __device__ friend constexpr bool operator!=(const MoveOnly& x, const MoveOnly& y)
+  TEST_FUNC friend constexpr bool operator!=(const MoveOnly& x, const MoveOnly& y)
   {
     return x.data_ != y.data_;
   }
-  __host__ __device__ friend constexpr bool operator<(const MoveOnly& x, const MoveOnly& y)
+  TEST_FUNC friend constexpr bool operator<(const MoveOnly& x, const MoveOnly& y)
   {
     return x.data_ < y.data_;
   }
-  __host__ __device__ friend constexpr bool operator<=(const MoveOnly& x, const MoveOnly& y)
+  TEST_FUNC friend constexpr bool operator<=(const MoveOnly& x, const MoveOnly& y)
   {
     return x.data_ <= y.data_;
   }
-  __host__ __device__ friend constexpr bool operator>(const MoveOnly& x, const MoveOnly& y)
+  TEST_FUNC friend constexpr bool operator>(const MoveOnly& x, const MoveOnly& y)
   {
     return x.data_ > y.data_;
   }
-  __host__ __device__ friend constexpr bool operator>=(const MoveOnly& x, const MoveOnly& y)
+  TEST_FUNC friend constexpr bool operator>=(const MoveOnly& x, const MoveOnly& y)
   {
     return x.data_ >= y.data_;
   }
 
 #if TEST_STD_VER > 2017 && _LIBCUDACXX_HAS_SPACESHIP_OPERATOR()
-  __host__ __device__ friend constexpr auto operator<=>(const MoveOnly&, const MoveOnly&) = default;
+  TEST_FUNC friend constexpr auto operator<=>(const MoveOnly&, const MoveOnly&) = default;
 #endif // TEST_STD_VER > 2017 && _LIBCUDACXX_HAS_SPACESHIP_OPERATOR()
 
-  __host__ __device__ constexpr MoveOnly operator+(const MoveOnly& x) const
+  TEST_FUNC constexpr MoveOnly operator+(const MoveOnly& x) const
   {
     return MoveOnly(data_ + x.data_);
   }
-  __host__ __device__ constexpr MoveOnly operator*(const MoveOnly& x) const
+  TEST_FUNC constexpr MoveOnly operator*(const MoveOnly& x) const
   {
     return MoveOnly(data_ * x.data_);
   }
@@ -117,7 +125,7 @@ struct cuda::std::hash<MoveOnly>
 {
     using argument_type = MoveOnly;
     using result_type = size_t;
-    __host__ __device__ constexpr size_t operator()(const MoveOnly& x) const {return x.get();}
+    TEST_FUNC constexpr size_t operator()(const MoveOnly& x) const {return x.get();}
 };
 */
 

@@ -58,24 +58,24 @@
 template <class CharT>
 struct TestBase
 {
-  __host__ __device__ constexpr const CharT* range_data() const
+  TEST_FUNC constexpr const CharT* range_data() const
   {
     return range_data_;
   }
-  __host__ __device__ constexpr cuda::std::size_t range_size() const
+  TEST_FUNC constexpr cuda::std::size_t range_size() const
   {
     return cuda::std::char_traits<CharT>::length(range_data());
   }
-  __host__ __device__ constexpr const CharT* conv_data() const
+  TEST_FUNC constexpr const CharT* conv_data() const
   {
     return conv_data_;
   }
 
-  __host__ __device__ constexpr const CharT* begin() const
+  TEST_FUNC constexpr const CharT* begin() const
   {
     return range_data();
   }
-  __host__ __device__ constexpr const CharT* end() const
+  TEST_FUNC constexpr const CharT* end() const
   {
     return range_data() + range_size();
   }
@@ -92,7 +92,7 @@ struct TestBase
 };
 
 template <class CharT>
-__host__ __device__ constexpr void test_from_range()
+TEST_FUNC constexpr void test_from_range()
 {
   using SV = cuda::std::basic_string_view<CharT>;
   using TB = TestBase<CharT>;
@@ -114,7 +114,7 @@ __host__ __device__ constexpr void test_from_range()
   {
     struct NonConstConversionOperator : TB
     {
-      __host__ __device__ constexpr operator SV()
+      TEST_FUNC constexpr operator SV()
       {
         return TB::conv_data();
       }
@@ -132,7 +132,7 @@ __host__ __device__ constexpr void test_from_range()
   {
     struct ConstConversionOperator : TB
     {
-      __host__ __device__ constexpr operator SV() const
+      TEST_FUNC constexpr operator SV() const
       {
         return TB::conv_data();
       }
@@ -252,15 +252,15 @@ __host__ __device__ constexpr void test_from_range()
   {
     struct WithStringViewConversionOperator
     {
-      __host__ __device__ constexpr const CharT* begin() const
+      TEST_FUNC constexpr const CharT* begin() const
       {
         return nullptr;
       }
-      __host__ __device__ constexpr const CharT* end() const
+      TEST_FUNC constexpr const CharT* end() const
       {
         return nullptr;
       }
-      __host__ __device__ constexpr operator SV() const
+      TEST_FUNC constexpr operator SV() const
       {
         return {};
       }
@@ -272,7 +272,7 @@ __host__ __device__ constexpr void test_from_range()
   }
 }
 
-__host__ __device__ constexpr bool test()
+TEST_FUNC constexpr bool test()
 {
   test_from_range<char>();
 #if _CCCL_HAS_CHAR8_T()

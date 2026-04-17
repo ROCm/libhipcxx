@@ -8,29 +8,33 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
-// UNSUPPORTED: nvrtc, hiprtc
-
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// // Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
+// // Permission is hereby granted, free of charge, to any person obtaining a copy
+// // of this software and associated documentation files (the "Software"), to deal
+// // in the Software without restriction, including without limitation the rights
+// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// // copies of the Software, and to permit persons to whom the Software is
+// // furnished to do so, subject to the following conditions:
+// // The above copyright notice and this permission notice shall be included in
+// // all copies or substantial portions of the Software.
+// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// // THE SOFTWARE.
+//
+// // UNSUPPORTED: nvrtc, hiprtc
+//
+// =======
+#include "test_macros.h"
+// >>>>>>> END NEW CODE (5214850b75)
 #include "utils.h"
 
 template <typename T>
-__host__ __device__ __noinline__ void test_global_implicit_property(T ap, cudaAccessProperty cp)
+TEST_FUNC __noinline__ void test_global_implicit_property(T ap, cudaAccessProperty cp)
 {
   // Test implicit conversions
   cudaAccessProperty v = ap;
@@ -47,14 +51,14 @@ __host__ __device__ __noinline__ void test_global_implicit_property(T ap, cudaAc
   assert(x == y);
 }
 
-__host__ __device__ __noinline__ void test_global()
+TEST_FUNC __noinline__ void test_global()
 {
   cuda::access_property o(cuda::access_property::global{});
   uint64_t x = (uint64_t) o;
   unused(x);
 }
 
-__host__ __device__ __noinline__ void test_shared()
+TEST_FUNC __noinline__ void test_shared()
 {
   (void) cuda::access_property::shared{};
 }

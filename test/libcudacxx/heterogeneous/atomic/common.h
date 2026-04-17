@@ -27,19 +27,20 @@
 #include <cuda/std/cassert>
 
 #include "../helpers.h"
+#include "test_macros.h"
 
 template <int Operand>
 struct store_tester
 {
   template <typename A>
-  __host__ __device__ static void initialize(A& a)
+  TEST_FUNC static void initialize(A& a)
   {
     using T = decltype(a.load());
     a.store(static_cast<T>(Operand));
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& a)
+  TEST_FUNC static void validate(A& a)
   {
     using T = decltype(a.load());
     assert(a.load() == static_cast<T>(Operand));
@@ -50,14 +51,14 @@ template <int PreviousValue, int Operand>
 struct exchange_tester
 {
   template <typename A>
-  __host__ __device__ static void initialize(A& a)
+  TEST_FUNC static void initialize(A& a)
   {
     using T = decltype(a.load());
     assert(a.exchange(static_cast<T>(Operand)) == static_cast<T>(PreviousValue));
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& a)
+  TEST_FUNC static void validate(A& a)
   {
     using T = decltype(a.load());
     assert(a.load() == static_cast<T>(Operand));
@@ -72,7 +73,7 @@ struct strong_cas_tester
     ShouldSucceed = (Expected == PreviousValue)
   };
   template <typename A>
-  __host__ __device__ static void initialize(A& a)
+  TEST_FUNC static void initialize(A& a)
   {
     using T    = decltype(a.load());
     T expected = static_cast<T>(Expected);
@@ -81,7 +82,7 @@ struct strong_cas_tester
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& a)
+  TEST_FUNC static void validate(A& a)
   {
     using T = decltype(a.load());
     assert(a.load() == static_cast<T>(Result));
@@ -96,7 +97,7 @@ struct weak_cas_tester
     ShouldSucceed = (Expected == PreviousValue)
   };
   template <typename A>
-  __host__ __device__ static void initialize(A& a)
+  TEST_FUNC static void initialize(A& a)
   {
     using T    = decltype(a.load());
     T expected = static_cast<T>(Expected);
@@ -113,7 +114,7 @@ struct weak_cas_tester
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& a)
+  TEST_FUNC static void validate(A& a)
   {
     using T = decltype(a.load());
     assert(a.load() == static_cast<T>(Result));
@@ -125,14 +126,14 @@ struct weak_cas_tester
   struct operation##_tester                                          \
   {                                                                  \
     template <typename A>                                            \
-    __host__ __device__ static void initialize(A& a)                 \
+    TEST_FUNC static void initialize(A& a)                           \
     {                                                                \
       using T = decltype(a.load());                                  \
       assert(a.operation(Operand) == static_cast<T>(PreviousValue)); \
     }                                                                \
                                                                      \
     template <typename A>                                            \
-    __host__ __device__ static void validate(A& a)                   \
+    TEST_FUNC static void validate(A& a)                             \
     {                                                                \
       using T = decltype(a.load());                                  \
       assert(a.load() == static_cast<T>(ExpectedValue));             \
@@ -175,11 +176,11 @@ using bitwise_atomic_testers =
 class big_not_lockfree_type
 {
 public:
-  __host__ __device__ big_not_lockfree_type() noexcept
+  TEST_FUNC big_not_lockfree_type() noexcept
       : big_not_lockfree_type(0)
   {}
 
-  __host__ __device__ big_not_lockfree_type(int value) noexcept
+  TEST_FUNC big_not_lockfree_type(int value) noexcept
   {
     for (auto&& elem : array)
     {
@@ -187,7 +188,7 @@ public:
     }
   }
 
-  __host__ __device__ friend bool operator==(const big_not_lockfree_type& lhs, const big_not_lockfree_type& rhs) noexcept
+  TEST_FUNC friend bool operator==(const big_not_lockfree_type& lhs, const big_not_lockfree_type& rhs) noexcept
   {
     for (int i = 0; i < 128; ++i)
     {

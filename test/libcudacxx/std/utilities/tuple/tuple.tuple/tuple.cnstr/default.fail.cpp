@@ -50,66 +50,100 @@ struct Explicit
   explicit Explicit() = default;
 };
 
-__host__ __device__ cuda::std::tuple<> test1()
+TEST_FUNC cuda::std::tuple<> test1()
 {
   return {};
 }
 
-__host__ __device__ cuda::std::tuple<Implicit> test2()
+TEST_FUNC cuda::std::tuple<Implicit> test2()
 {
   return {};
 }
-__host__ __device__ cuda::std::tuple<Explicit> test3()
+TEST_FUNC cuda::std::tuple<Explicit> test3()
 {
   return {};
 } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
 
-__host__ __device__ cuda::std::tuple<Implicit, Implicit> test4()
+TEST_FUNC cuda::std::tuple<Implicit, Implicit> test4()
 {
   return {};
 }
-__host__ __device__ cuda::std::tuple<Explicit, Implicit> test5()
+TEST_FUNC cuda::std::tuple<Explicit, Implicit> test5()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Implicit, Explicit> test6()
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Implicit, Explicit> test6()
+// {
+//   return {};
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Explicit, Explicit> test7()
+// =======
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Implicit, Explicit> test6()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Explicit, Explicit> test7()
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Explicit, Explicit> test7()
+// >>>>>>> END NEW CODE (5214850b75)
 {
   return {};
 } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
 
-__host__ __device__ cuda::std::tuple<Implicit, Implicit, Implicit> test8()
+TEST_FUNC cuda::std::tuple<Implicit, Implicit, Implicit> test8()
 {
   return {};
 }
-__host__ __device__ cuda::std::tuple<Implicit, Implicit, Explicit> test9()
+TEST_FUNC cuda::std::tuple<Implicit, Implicit, Explicit> test9()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Implicit, Explicit, Implicit> test10()
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Implicit, Explicit, Implicit> test10()
+// {
+//   return {};
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Implicit, Explicit, Explicit> test11()
+// {
+//   return {};
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Explicit, Implicit, Implicit> test12()
+// {
+//   return {};
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Explicit, Implicit, Explicit> test13()
+// {
+//   return {};
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Explicit, Explicit, Implicit> test14()
+// {
+//   return {};
+// } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
+// __host__ __device__ cuda::std::tuple<Explicit, Explicit, Explicit> test15()
+// =======
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Implicit, Explicit, Implicit> test10()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Implicit, Explicit, Explicit> test11()
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Implicit, Explicit, Explicit> test11()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Explicit, Implicit, Implicit> test12()
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Explicit, Implicit, Implicit> test12()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Explicit, Implicit, Explicit> test13()
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Explicit, Implicit, Explicit> test13()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Explicit, Explicit, Implicit> test14()
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Explicit, Explicit, Implicit> test14()
 {
   return {};
-} // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}
-__host__ __device__ cuda::std::tuple<Explicit, Explicit, Explicit> test15()
+} // expected-error 1 {{chosen constructor is explicit in copy-initialization}}
+TEST_FUNC cuda::std::tuple<Explicit, Explicit, Explicit> test15()
+// >>>>>>> END NEW CODE (5214850b75)
 {
   return {};
 } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}

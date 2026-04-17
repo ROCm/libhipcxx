@@ -44,7 +44,11 @@
 #include "test_macros.h"
 
 template <class T>
-__host__ __device__ void test_isinf(const T pos, bool expected)
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// __host__ __device__ void test_isinf(const T pos, bool expected)
+// =======
+TEST_FUNC constexpr void test_isinf(const T pos, bool expected)
+// >>>>>>> END NEW CODE (5214850b75)
 {
   _CCCL_ASSERT(cuda::std::isinf(pos) == expected, "Positive infinity not correct detected");
 
@@ -71,7 +75,7 @@ __host__ __device__ void test_isinf(const T pos, bool expected)
 }
 
 template <class T>
-__host__ __device__ constexpr void test_type()
+TEST_FUNC constexpr void test_type()
 {
   static_assert(cuda::std::is_same_v<bool, decltype(cuda::std::isinf(T{}))>);
 
@@ -117,7 +121,7 @@ __host__ __device__ constexpr void test_type()
   }
 }
 
-__host__ __device__ constexpr bool test()
+TEST_FUNC constexpr bool test()
 {
   test_type<float>();
   test_type<double>();

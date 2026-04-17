@@ -47,7 +47,7 @@ struct barrier_and_token
   cuda::std::atomic<bool> parity_waiting{false};
 
   template <typename... Args>
-  __host__ __device__ barrier_and_token(Args&&... args)
+  TEST_FUNC barrier_and_token(Args&&... args)
       : barrier{cuda::std::forward<Args>(args)...}
   {}
 };
@@ -57,7 +57,7 @@ struct barrier_arrive_and_wait
   using async = cuda::std::true_type;
 
   template <typename Data>
-  __host__ __device__ static void perform(Data& data)
+  TEST_FUNC static void perform(Data& data)
   {
     while (data.parity_waiting.load(cuda::std::memory_order_acquire) == false)
     {
@@ -73,7 +73,7 @@ struct barrier_parity_wait
   using async = cuda::std::true_type;
 
   template <typename Data>
-  __host__ __device__ static void perform(Data& data)
+  TEST_FUNC static void perform(Data& data)
   {
     data.parity_waiting.store(true, cuda::std::memory_order_release);
     data.parity_waiting.notify_all();
@@ -84,7 +84,7 @@ struct barrier_parity_wait
 struct clear_token
 {
   template <typename Data>
-  __host__ __device__ static void perform(Data& data)
+  TEST_FUNC static void perform(Data& data)
   {
     data.parity_waiting.store(false, cuda::std::memory_order_release);
   }

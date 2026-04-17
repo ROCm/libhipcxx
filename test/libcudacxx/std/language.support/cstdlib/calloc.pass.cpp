@@ -37,7 +37,7 @@
 #include "test_macros.h"
 
 template <class T>
-__host__ __device__ void test_calloc_success(cuda::std::size_t n)
+TEST_FUNC void test_calloc_success(cuda::std::size_t n)
 {
   T* ptr = static_cast<T*>(cuda::std::calloc(n, sizeof(T)));
 
@@ -57,7 +57,7 @@ __host__ __device__ void test_calloc_success(cuda::std::size_t n)
 }
 
 template <class T>
-__host__ __device__ void test_calloc_fail(cuda::std::size_t n)
+TEST_FUNC void test_calloc_fail(cuda::std::size_t n)
 {
   T* ptr = static_cast<T*>(cuda::std::calloc(n, sizeof(T)));
 
@@ -76,7 +76,7 @@ struct BigStruct
 
   int data[n];
 
-  __host__ __device__ bool operator==(const BigStruct& other) const
+  TEST_FUNC bool operator==(const BigStruct& other) const
   {
     for (cuda::std::size_t i{}; i < n; ++i)
     {
@@ -96,7 +96,7 @@ struct alignas(cuda::std::max_align_t) AlignedStruct
 
   char data[n];
 
-  __host__ __device__ bool operator==(const AlignedStruct& other) const
+  TEST_FUNC bool operator==(const AlignedStruct& other) const
   {
     for (cuda::std::size_t i{}; i < n; ++i)
     {
@@ -110,7 +110,7 @@ struct alignas(cuda::std::max_align_t) AlignedStruct
   }
 };
 
-__host__ __device__ void test()
+TEST_FUNC void test()
 {
   test_calloc_success<int>(10);
   test_calloc_success<char>(128);

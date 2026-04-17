@@ -41,7 +41,7 @@
 
 #include <cuda/std/utility>
 
-__host__ __device__ cuda::std::piecewise_construct_t f()
+TEST_FUNC cuda::std::piecewise_construct_t f()
 {
   return {};
 } // expected-error-re 1 {{chosen constructor is explicit in copy-initialization}}

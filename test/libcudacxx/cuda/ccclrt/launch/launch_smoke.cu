@@ -46,6 +46,8 @@
 #endif // !__HIP_PLATFORM_AMD__
 #include <testing.cuh>
 
+#include "test_macros.h"
+
 #if !_CCCL_CUDA_COMPILER(CLANG)
 
 __managed__ bool kernel_run_proof = false;
@@ -59,7 +61,7 @@ void check_kernel_run(cudaStream_t stream)
 
 struct kernel_run_proof_check
 {
-  __device__ void operator()()
+  TEST_DEVICE_FUNC void operator()()
   {
     CCCLRT_CHECK_DEVICE(kernel_run_proof);
     kernel_run_proof = false;
@@ -68,7 +70,7 @@ struct kernel_run_proof_check
 
 struct functor_int_argument
 {
-  __device__ void operator()(int dummy)
+  TEST_DEVICE_FUNC void operator()(int dummy)
   {
     kernel_run_proof = true;
   }
@@ -78,7 +80,7 @@ template <unsigned int BlockSize>
 struct functor_taking_config
 {
   template <typename Config>
-  __device__ void operator()(Config config, int grid_size)
+  TEST_DEVICE_FUNC void operator()(Config config, int grid_size)
   {
     static_assert(cuda::gpu_thread.count(cuda::block, config) == BlockSize);
     CCCLRT_REQUIRE_DEVICE(cuda::block.count(cuda::grid, config) == grid_size);
@@ -111,7 +113,7 @@ template <typename SmemType>
 struct dynamic_smem_single
 {
   template <typename Config>
-  __device__ void operator()(Config config)
+  TEST_DEVICE_FUNC void operator()(Config config)
   {
     decltype(auto) dynamic_smem = cuda::dynamic_shared_memory(config);
     static_assert(::cuda::std::is_same_v<SmemType&, decltype(dynamic_smem)>);
@@ -124,7 +126,7 @@ template <typename SmemType, size_t Extent>
 struct dynamic_smem_span
 {
   template <typename Config>
-  __device__ void operator()(Config config, int size)
+  TEST_DEVICE_FUNC void operator()(Config config, int size)
   {
     auto dynamic_smem = cuda::dynamic_shared_memory(config);
     static_assert(decltype(dynamic_smem)::extent == Extent);
@@ -316,7 +318,7 @@ struct kernel_with_default_config
   }
 
   template <typename Config, typename ConfigCheckFn>
-  __device__ void operator()(Config config, ConfigCheckFn check_fn)
+  TEST_DEVICE_FUNC void operator()(Config config, ConfigCheckFn check_fn)
   {
     check_fn(config);
   }
@@ -325,7 +327,7 @@ struct kernel_with_default_config
 struct verify_callable
 {
   template <typename Config>
-  __device__ void operator()(Config config)
+  TEST_DEVICE_FUNC void operator()(Config config)
   {
     static_assert(cuda::gpu_thread.count(cuda::block, config) == 256);
     // NOTE(HIP/AMD): this assertion lives in a __device__-only functor. clang-hip
@@ -374,7 +376,7 @@ C2H_CCCLRT_TEST("Launch with default config", "")
 struct restrict_assign_functor
 {
   template <typename Config>
-  __device__ void operator()(Config config, int* __restrict__ dst)
+  TEST_DEVICE_FUNC void operator()(Config config, int* __restrict__ dst)
   {
     *dst = 42;
   }
@@ -406,7 +408,7 @@ __managed__ cuda::std::size_t launched_nclusters;
 struct LaunchDimsFunctor
 {
   template <class Config>
-  __device__ void operator()(const Config& config)
+  TEST_DEVICE_FUNC void operator()(const Config& config)
   {
     cuda::atomic_ref(launched_nthreads)++;
 

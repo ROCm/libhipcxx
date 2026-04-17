@@ -37,7 +37,7 @@
 #endif // !TEST_COMPILER(NVRTC)
 
 template <class T, class U>
-__host__ __device__ constexpr void test()
+TEST_FUNC constexpr void test()
 {
   constexpr T maxv = cuda::std::numeric_limits<T>::max();
 
@@ -54,7 +54,7 @@ __host__ __device__ constexpr void test()
 }
 
 template <class T>
-__host__ __device__ constexpr void test()
+TEST_FUNC constexpr void test()
 {
   // Builtin integer types:
   test<T, char>();
@@ -97,7 +97,7 @@ __host__ __device__ constexpr void test()
 #endif // _CCCL_HAS_INT128()
 }
 
-__host__ __device__ constexpr bool test()
+TEST_FUNC constexpr bool test()
 {
   // Builtin integer types:
   test<char>();
