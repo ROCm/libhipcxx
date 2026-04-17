@@ -82,14 +82,18 @@ if (libcudacxx_ENABLE_CODEGEN)
   add_subdirectory(codegen)
 endif()
 
-# Note that this currently returns and skips the rest of the build
-# system.
-option(libhipcxx_ENABLE_CMAKE_TESTS "Enable ctest-based testing." ON)
-if (libhipcxx_ENABLE_CMAKE_TESTS)
-  add_subdirectory(cmake/test)
-endif()
-
-set(CMAKE_MODULE_PATH "${libcudacxx_SOURCE_DIR}/cmake")
+# <<<<<<< OLD CODE from 579d83b25e (ebd62385ab) - COMMENTED OUT
+# # Note that this currently returns and skips the rest of the build
+# # system.
+# option(libhipcxx_ENABLE_CMAKE_TESTS "Enable ctest-based testing." ON)
+# if (libhipcxx_ENABLE_CMAKE_TESTS)
+#   add_subdirectory(cmake/test)
+# endif()
+#
+# set(CMAKE_MODULE_PATH "${libcudacxx_SOURCE_DIR}/cmake")
+# =======
+list(PREPEND CMAKE_MODULE_PATH "${libcudacxx_SOURCE_DIR}/cmake")
+# >>>>>>> END NEW CODE (ebd62385ab)
 set(LLVM_PATH "${libcudacxx_SOURCE_DIR}" CACHE STRING "" FORCE)
 
 # Configuration options.
