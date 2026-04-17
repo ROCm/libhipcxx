@@ -39,7 +39,7 @@
 
 struct PlusOne
 {
-  __host__ __device__ constexpr int operator()(int x) const noexcept
+  TEST_FUNC constexpr int operator()(int x) const noexcept
   {
     return x + 1;
   }
@@ -47,7 +47,7 @@ struct PlusOne
 
 struct PlusOneMutable
 {
-  __host__ __device__ constexpr int operator()(int x) noexcept
+  TEST_FUNC constexpr int operator()(int x) noexcept
   {
     return x + 1;
   }
@@ -55,7 +55,7 @@ struct PlusOneMutable
 
 struct PlusOneMayThrow
 {
-  __host__ __device__ constexpr int operator()(int x) const
+  TEST_FUNC constexpr int operator()(int x) const
   {
     return x + 1;
   }
@@ -75,8 +75,8 @@ struct PlusOneHost
 #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 struct PlusOneDevice
 {
-  __device__ constexpr PlusOneDevice() noexcept {}
-  __device__ constexpr int operator()(int x) const noexcept
+  TEST_DEVICE_FUNC constexpr PlusOneDevice() noexcept {}
+  TEST_DEVICE_FUNC constexpr int operator()(int x) const noexcept
   {
     return x + 1;
   }
@@ -85,8 +85,8 @@ struct PlusOneDevice
 
 struct NotDefaultConstructiblePlusOne
 {
-  __host__ __device__ constexpr NotDefaultConstructiblePlusOne(int) noexcept {}
-  __host__ __device__ constexpr int operator()(int x) const noexcept
+  TEST_FUNC constexpr NotDefaultConstructiblePlusOne(int) noexcept {}
+  TEST_FUNC constexpr int operator()(int x) const noexcept
   {
     return x + 1;
   }
@@ -94,7 +94,7 @@ struct NotDefaultConstructiblePlusOne
 
 struct TimesTwo
 {
-  __host__ __device__ constexpr int operator()(int x) const noexcept
+  TEST_FUNC constexpr int operator()(int x) const noexcept
   {
     return x * 2;
   }
@@ -102,7 +102,7 @@ struct TimesTwo
 
 struct TimesTwoMayThrow
 {
-  __host__ __device__ constexpr int operator()(int x) const
+  TEST_FUNC constexpr int operator()(int x) const
   {
     return x * 2;
   }
@@ -120,40 +120,39 @@ struct forward_sized_iterator
   using reference         = decltype(*Base{});
 
   forward_sized_iterator() = default;
-  __host__ __device__ constexpr forward_sized_iterator(Base it)
+  TEST_FUNC constexpr forward_sized_iterator(Base it)
       : it_(it)
   {}
 
-  __host__ __device__ constexpr reference operator*() const
+  TEST_FUNC constexpr reference operator*() const
   {
     return *it_;
   }
 
-  __host__ __device__ constexpr forward_sized_iterator& operator++()
+  TEST_FUNC constexpr forward_sized_iterator& operator++()
   {
     ++it_;
     return *this;
   }
-  __host__ __device__ constexpr forward_sized_iterator operator++(int)
+  TEST_FUNC constexpr forward_sized_iterator operator++(int)
   {
     return forward_sized_iterator(it_++);
   }
 
 #if TEST_STD_VER >= 2020
-  __host__ __device__ friend constexpr bool
-  operator==(const forward_sized_iterator&, const forward_sized_iterator&) = default;
+  TEST_FUNC friend constexpr bool operator==(const forward_sized_iterator&, const forward_sized_iterator&) = default;
 #else // ^^^ C++20 ^^^ / vvv C++17 vvv
-  __host__ __device__ friend constexpr bool operator==(const forward_sized_iterator& x, const forward_sized_iterator& y)
+  TEST_FUNC friend constexpr bool operator==(const forward_sized_iterator& x, const forward_sized_iterator& y)
   {
     return x.it_ == y.it_;
   }
-  __host__ __device__ friend constexpr bool operator!=(const forward_sized_iterator& x, const forward_sized_iterator& y)
+  TEST_FUNC friend constexpr bool operator!=(const forward_sized_iterator& x, const forward_sized_iterator& y)
   {
     return x.it_ != y.it_;
   }
 #endif // TEST_STD_VER <= 2017
 
-  __host__ __device__ friend constexpr difference_type
+  TEST_FUNC friend constexpr difference_type
   operator-(const forward_sized_iterator& x, const forward_sized_iterator& y) noexcept
   {
     return x.it_ - y.it_;

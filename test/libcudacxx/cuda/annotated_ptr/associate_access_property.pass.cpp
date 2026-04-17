@@ -31,7 +31,7 @@
 #define ARR_SZ 128
 
 template <typename T, typename P>
-__device__ __host__ __noinline__ void test(P ap)
+TEST_FUNC __noinline__ void test(P ap)
 {
   T* arr = global_alloc<T, ARR_SZ>();
 
@@ -46,7 +46,7 @@ __device__ __host__ __noinline__ void test(P ap)
 }
 
 template <typename T, typename P>
-__device__ __host__ __noinline__ void test_shared(P ap)
+TEST_FUNC __noinline__ void test_shared(P ap)
 {
   T* arr = shared_alloc<T, ARR_SZ>();
 
@@ -58,7 +58,7 @@ __device__ __host__ __noinline__ void test_shared(P ap)
   }
 }
 
-__device__ __host__ __noinline__ void test_all()
+TEST_FUNC __noinline__ void test_all()
 {
   test<int>(cuda::access_property::normal{});
   test<int>(cuda::access_property::persisting{});

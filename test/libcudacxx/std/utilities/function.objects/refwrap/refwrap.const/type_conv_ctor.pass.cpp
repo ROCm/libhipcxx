@@ -40,11 +40,11 @@
 struct convertible_to_int_ref
 {
   int val = 0;
-  __host__ __device__ operator int&()
+  TEST_FUNC operator int&()
   {
     return val;
   }
-  __host__ __device__ operator int const&() const
+  TEST_FUNC operator int const&() const
   {
     return val;
   }
@@ -54,7 +54,7 @@ template <bool IsNothrow>
 struct nothrow_convertible
 {
   int val = 0;
-  __host__ __device__ operator int&() noexcept(IsNothrow)
+  TEST_FUNC operator int&() noexcept(IsNothrow)
   {
     return val;
   }
@@ -62,11 +62,11 @@ struct nothrow_convertible
 
 struct convertible_from_int
 {
-  __host__ __device__ convertible_from_int(int) {}
+  TEST_FUNC convertible_from_int(int) {}
 };
 
-__host__ __device__ void meow(cuda::std::reference_wrapper<int>) {}
-__host__ __device__ void meow(convertible_from_int) {}
+TEST_FUNC void meow(cuda::std::reference_wrapper<int>) {}
+TEST_FUNC void meow(convertible_from_int) {}
 
 int main(int, char**)
 {

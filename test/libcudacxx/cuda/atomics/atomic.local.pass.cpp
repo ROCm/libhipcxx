@@ -42,8 +42,10 @@
 #include <cuda/atomic>
 #include <cuda/std/cassert>
 
+#include "test_macros.h"
+
 template <typename T>
-__device__ T store(T in)
+TEST_DEVICE_FUNC T store(T in)
 {
   cuda::atomic<T> x(in);
   x.store(in + 1, cuda::memory_order_relaxed);
@@ -51,7 +53,7 @@ __device__ T store(T in)
 }
 
 template <typename T>
-__device__ T compare_exchange_weak(T in)
+TEST_DEVICE_FUNC T compare_exchange_weak(T in)
 {
   cuda::atomic<T> x(in);
   T old = T(7);
@@ -60,7 +62,7 @@ __device__ T compare_exchange_weak(T in)
 }
 
 template <typename T>
-__device__ T compare_exchange_strong(T in)
+TEST_DEVICE_FUNC T compare_exchange_strong(T in)
 {
   cuda::atomic<T> x(in);
   T old = T(7);
@@ -69,7 +71,7 @@ __device__ T compare_exchange_strong(T in)
 }
 
 template <typename T>
-__device__ T exchange(T in)
+TEST_DEVICE_FUNC T exchange(T in)
 {
   cuda::atomic<T> x(in);
   T out = x.exchange(T(1), cuda::memory_order_relaxed);
@@ -77,7 +79,7 @@ __device__ T exchange(T in)
 }
 
 template <typename T>
-__device__ T fetch_add(T in)
+TEST_DEVICE_FUNC T fetch_add(T in)
 {
   cuda::atomic<T> x(in);
   x.fetch_add(T(1), cuda::memory_order_relaxed);
@@ -85,7 +87,7 @@ __device__ T fetch_add(T in)
 }
 
 template <typename T>
-__device__ T fetch_sub(T in)
+TEST_DEVICE_FUNC T fetch_sub(T in)
 {
   cuda::atomic<T> x(in);
   x.fetch_sub(T(1), cuda::memory_order_relaxed);
@@ -93,7 +95,7 @@ __device__ T fetch_sub(T in)
 }
 
 template <typename T>
-__device__ T fetch_and(T in)
+TEST_DEVICE_FUNC T fetch_and(T in)
 {
   cuda::atomic<T> x(in);
   x.fetch_and(T(1), cuda::memory_order_relaxed);
@@ -101,7 +103,7 @@ __device__ T fetch_and(T in)
 }
 
 template <typename T>
-__device__ T fetch_or(T in)
+TEST_DEVICE_FUNC T fetch_or(T in)
 {
   cuda::atomic<T> x(in);
   x.fetch_or(T(1), cuda::memory_order_relaxed);
@@ -109,7 +111,7 @@ __device__ T fetch_or(T in)
 }
 
 template <typename T>
-__device__ T fetch_xor(T in)
+TEST_DEVICE_FUNC T fetch_xor(T in)
 {
   cuda::atomic<T> x(in);
   x.fetch_xor(T(1), cuda::memory_order_relaxed);
@@ -117,7 +119,7 @@ __device__ T fetch_xor(T in)
 }
 
 template <typename T>
-__device__ T fetch_min(T in)
+TEST_DEVICE_FUNC T fetch_min(T in)
 {
   cuda::atomic<T> x(in);
   x.fetch_min(T(7), cuda::memory_order_relaxed);
@@ -125,7 +127,7 @@ __device__ T fetch_min(T in)
 }
 
 template <typename T>
-__device__ T fetch_max(T in)
+TEST_DEVICE_FUNC T fetch_max(T in)
 {
   cuda::atomic<T> x(in);
   x.fetch_max(T(7), cuda::memory_order_relaxed);
@@ -133,7 +135,7 @@ __device__ T fetch_max(T in)
 }
 
 template <typename T>
-__device__ inline void tests()
+TEST_DEVICE_FUNC inline void tests()
 {
   const T tid = threadIdx.x;
   assert(tid + T(1) == store(tid));

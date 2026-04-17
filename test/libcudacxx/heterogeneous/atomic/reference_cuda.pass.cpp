@@ -35,7 +35,7 @@ template <int Operand>
 struct store_tester
 {
   template <typename A>
-  __host__ __device__ static void initialize(A& v)
+  TEST_FUNC static void initialize(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T = decltype(a.load());
@@ -43,7 +43,7 @@ struct store_tester
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& v)
+  TEST_FUNC static void validate(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T = decltype(a.load());
@@ -55,7 +55,7 @@ template <int PreviousValue, int Operand>
 struct exchange_tester
 {
   template <typename A>
-  __host__ __device__ static void initialize(A& v)
+  TEST_FUNC static void initialize(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T = decltype(a.load());
@@ -63,7 +63,7 @@ struct exchange_tester
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& v)
+  TEST_FUNC static void validate(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T = decltype(a.load());
@@ -79,7 +79,7 @@ struct strong_cas_tester
     ShouldSucceed = (Expected == PreviousValue)
   };
   template <typename A>
-  __host__ __device__ static void initialize(A& v)
+  TEST_FUNC static void initialize(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T    = decltype(a.load());
@@ -89,7 +89,7 @@ struct strong_cas_tester
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& v)
+  TEST_FUNC static void validate(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T = decltype(a.load());
@@ -105,7 +105,7 @@ struct weak_cas_tester
     ShouldSucceed = (Expected == PreviousValue)
   };
   template <typename A>
-  __host__ __device__ static void initialize(A& v)
+  TEST_FUNC static void initialize(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T    = decltype(a.load());
@@ -123,7 +123,7 @@ struct weak_cas_tester
   }
 
   template <typename A>
-  __host__ __device__ static void validate(A& v)
+  TEST_FUNC static void validate(A& v)
   {
     cuda::atomic_ref<A, cuda::thread_scope_system> a(v);
     using T = decltype(a.load());
@@ -136,7 +136,7 @@ struct weak_cas_tester
   struct operation##_tester                                          \
   {                                                                  \
     template <typename A>                                            \
-    __host__ __device__ static void initialize(A& v)                 \
+    TEST_FUNC static void initialize(A& v)                           \
     {                                                                \
       cuda::atomic_ref<A, cuda::thread_scope_system> a(v);           \
       using T = decltype(a.load());                                  \
@@ -144,7 +144,7 @@ struct weak_cas_tester
     }                                                                \
                                                                      \
     template <typename A>                                            \
-    __host__ __device__ static void validate(A& v)                   \
+    TEST_FUNC static void validate(A& v)                             \
     {                                                                \
       cuda::atomic_ref<A, cuda::thread_scope_system> a(v);           \
       using T = decltype(a.load());                                  \

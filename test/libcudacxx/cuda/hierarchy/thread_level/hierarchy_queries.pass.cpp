@@ -43,8 +43,10 @@
 #include <cuda/std/mdspan>
 #include <cuda/std/type_traits>
 
+#include "test_macros.h"
+
 template <class Hierarchy, class GridExts, class ClusterExts, class BlockExts>
-__device__ void test_thread(
+TEST_DEVICE_FUNC void test_thread(
   const Hierarchy& hier, const GridExts& grid_exts, const ClusterExts& cluster_exts, const BlockExts& block_exts)
 {
   // 1. Test cuda::gpu_thread.dims(x, hier)
@@ -185,7 +187,7 @@ __device__ void test_thread(
   }
 }
 
-__device__ void test_device()
+TEST_DEVICE_FUNC void test_device()
 {
   test_thread(cuda::hierarchy{cuda::gpu_thread, cuda::grid_dims(dim3{gridDim}), cuda::block_dims(dim3{blockDim})},
               cuda::std::dims<3, unsigned>{gridDim.x, gridDim.y, gridDim.z},

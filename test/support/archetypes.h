@@ -65,20 +65,20 @@ struct TestBase
   STATIC_MEMBER_VAR(move_assigned, int)
   STATIC_MEMBER_VAR(destroyed, int)
 
-  __host__ __device__ static void reset()
+  TEST_FUNC static void reset()
   {
     assert(alive() == 0);
     alive() = 0;
     reset_constructors();
   }
 
-  __host__ __device__ static void reset_constructors()
+  TEST_FUNC static void reset_constructors()
   {
     constructed() = value_constructed() = default_constructed() = copy_constructed() = move_constructed() = 0;
     assigned() = value_assigned() = copy_assigned() = move_assigned() = destroyed() = 0;
   }
 
-  __host__ __device__ TestBase() noexcept
+  TEST_FUNC TestBase() noexcept
       : value(0)
   {
     ++alive();
@@ -86,7 +86,7 @@ struct TestBase
     ++default_constructed();
   }
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit TestBase(int x) noexcept
+  TEST_FUNC explicit TestBase(int x) noexcept
       : value(x)
   {
     ++alive();
@@ -94,7 +94,7 @@ struct TestBase
     ++value_constructed();
   }
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ TestBase(int x) noexcept
+  TEST_FUNC TestBase(int x) noexcept
       : value(x)
   {
     ++alive();
@@ -102,7 +102,7 @@ struct TestBase
     ++value_constructed();
   }
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit TestBase(int, int y) noexcept
+  TEST_FUNC explicit TestBase(int, int y) noexcept
       : value(y)
   {
     ++alive();
@@ -110,7 +110,7 @@ struct TestBase
     ++value_constructed();
   }
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ TestBase(int, int y) noexcept
+  TEST_FUNC TestBase(int, int y) noexcept
       : value(y)
   {
     ++alive();
@@ -118,7 +118,7 @@ struct TestBase
     ++value_constructed();
   }
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit TestBase(std::initializer_list<int>& il, int = 0) noexcept
+  TEST_FUNC explicit TestBase(std::initializer_list<int>& il, int = 0) noexcept
       : value(static_cast<int>(il.size()))
   {
     ++alive();
@@ -126,14 +126,14 @@ struct TestBase
     ++value_constructed();
   }
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ explicit TestBase(std::initializer_list<int>& il, int = 0) noexcept
+  TEST_FUNC explicit TestBase(std::initializer_list<int>& il, int = 0) noexcept
       : value(static_cast<int>(il.size()))
   {
     ++alive();
     ++constructed();
     ++value_constructed();
   }
-  __host__ __device__ TestBase& operator=(int xvalue) noexcept
+  TEST_FUNC TestBase& operator=(int xvalue) noexcept
   {
     value = xvalue;
     ++assigned();
@@ -144,7 +144,7 @@ struct TestBase
 
 protected:
 #endif // !TEST_WORKAROUND_C1XX_BROKEN_ZA_CTOR_CHECK
-  __host__ __device__ ~TestBase()
+  TEST_FUNC ~TestBase()
   {
     assert(value != -999);
     assert(alive() > 0);
@@ -152,7 +152,7 @@ protected:
     ++destroyed();
     value = -999;
   }
-  __host__ __device__ explicit TestBase(TestBase const& o) noexcept
+  TEST_FUNC explicit TestBase(TestBase const& o) noexcept
       : value(o.value)
   {
     assert(o.value != -1);
@@ -161,7 +161,7 @@ protected:
     ++constructed();
     ++copy_constructed();
   }
-  __host__ __device__ explicit TestBase(TestBase&& o) noexcept
+  TEST_FUNC explicit TestBase(TestBase&& o) noexcept
       : value(o.value)
   {
     assert(o.value != -1);
@@ -171,7 +171,7 @@ protected:
     ++move_constructed();
     o.value = -1;
   }
-  __host__ __device__ TestBase& operator=(TestBase const& o) noexcept
+  TEST_FUNC TestBase& operator=(TestBase const& o) noexcept
   {
     assert(o.value != -1);
     assert(o.value != -999);
@@ -180,7 +180,7 @@ protected:
     value = o.value;
     return *this;
   }
-  __host__ __device__ TestBase& operator=(TestBase&& o) noexcept
+  TEST_FUNC TestBase& operator=(TestBase&& o) noexcept
   {
     assert(o.value != -1);
     assert(o.value != -999);
@@ -199,30 +199,30 @@ template <bool Explicit = false>
 struct ValueBase
 {
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit constexpr ValueBase(int x)
+  TEST_FUNC explicit constexpr ValueBase(int x)
       : value(x)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ constexpr ValueBase(int x)
+  TEST_FUNC constexpr ValueBase(int x)
       : value(x)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit constexpr ValueBase(int, int y)
+  TEST_FUNC explicit constexpr ValueBase(int, int y)
       : value(y)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ constexpr ValueBase(int, int y)
+  TEST_FUNC constexpr ValueBase(int, int y)
       : value(y)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit constexpr ValueBase(std::initializer_list<int>& il, int = 0)
+  TEST_FUNC explicit constexpr ValueBase(std::initializer_list<int>& il, int = 0)
       : value(static_cast<int>(il.size()))
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ constexpr ValueBase(std::initializer_list<int>& il, int = 0)
+  TEST_FUNC constexpr ValueBase(std::initializer_list<int>& il, int = 0)
       : value(static_cast<int>(il.size()))
   {}
-  __host__ __device__ constexpr ValueBase& operator=(int xvalue) noexcept
+  TEST_FUNC constexpr ValueBase& operator=(int xvalue) noexcept
   {
     value = xvalue;
     return *this;
@@ -233,13 +233,13 @@ struct ValueBase
 
 protected:
 #endif // !TEST_WORKAROUND_C1XX_BROKEN_ZA_CTOR_CHECK
-  __host__ __device__ constexpr static int check_value(int const& val)
+  TEST_FUNC constexpr static int check_value(int const& val)
   {
     assert(val != -1);
     assert(val != 999);
     return val;
   }
-  __host__ __device__ constexpr static int check_value(int& val, int val_cp = 0)
+  TEST_FUNC constexpr static int check_value(int& val, int val_cp = 0)
   {
     assert(val != -1);
     assert(val != 999);
@@ -247,23 +247,23 @@ protected:
     val    = -1;
     return val_cp;
   }
-  __host__ __device__ constexpr ValueBase() noexcept
+  TEST_FUNC constexpr ValueBase() noexcept
       : value(0)
   {}
-  __host__ __device__ constexpr ValueBase(ValueBase const& o) noexcept
+  TEST_FUNC constexpr ValueBase(ValueBase const& o) noexcept
       : value(check_value(o.value))
   {}
-  __host__ __device__ constexpr ValueBase(ValueBase&& o) noexcept
+  TEST_FUNC constexpr ValueBase(ValueBase&& o) noexcept
       : value(check_value(o.value))
   {}
-  __host__ __device__ constexpr ValueBase& operator=(ValueBase const& o) noexcept
+  TEST_FUNC constexpr ValueBase& operator=(ValueBase const& o) noexcept
   {
     assert(o.value != -1);
     assert(o.value != -999);
     value = o.value;
     return *this;
   }
-  __host__ __device__ constexpr ValueBase& operator=(ValueBase&& o) noexcept
+  TEST_FUNC constexpr ValueBase& operator=(ValueBase&& o) noexcept
   {
     assert(o.value != -1);
     assert(o.value != -999);
@@ -277,27 +277,27 @@ template <bool Explicit = false>
 struct TrivialValueBase
 {
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit constexpr TrivialValueBase(int x)
+  TEST_FUNC explicit constexpr TrivialValueBase(int x)
       : value(x)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ constexpr TrivialValueBase(int x)
+  TEST_FUNC constexpr TrivialValueBase(int x)
       : value(x)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit constexpr TrivialValueBase(int, int y)
+  TEST_FUNC explicit constexpr TrivialValueBase(int, int y)
       : value(y)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ constexpr TrivialValueBase(int, int y)
+  TEST_FUNC constexpr TrivialValueBase(int, int y)
       : value(y)
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && Explicit, bool>::type = true>
-  __host__ __device__ explicit constexpr TrivialValueBase(std::initializer_list<int>& il, int = 0)
+  TEST_FUNC explicit constexpr TrivialValueBase(std::initializer_list<int>& il, int = 0)
       : value(static_cast<int>(il.size()))
   {}
   template <bool Dummy = true, typename cuda::std::enable_if<Dummy && !Explicit, bool>::type = true>
-  __host__ __device__ constexpr TrivialValueBase(std::initializer_list<int>& il, int = 0)
+  TEST_FUNC constexpr TrivialValueBase(std::initializer_list<int>& il, int = 0)
       : value(static_cast<int>(il.size()))
   {}
   int value;
@@ -305,7 +305,7 @@ struct TrivialValueBase
 
 protected:
 #endif // !TEST_WORKAROUND_C1XX_BROKEN_ZA_CTOR_CHECK
-  __host__ __device__ constexpr TrivialValueBase() noexcept
+  TEST_FUNC constexpr TrivialValueBase() noexcept
       : value(0)
   {}
 };
@@ -340,7 +340,7 @@ namespace NonLiteralTypes
 {
 #define DEFINE_ASSIGN_CONSTEXPR
 #define DEFINE_DTOR(Name) \
-  __host__ __device__ ~Name() {}
+  TEST_FUNC ~Name() {}
 #include "archetypes.ipp"
 } // namespace NonLiteralTypes
 
@@ -359,12 +359,12 @@ namespace NonTrivialTypes
 #define DEFINE_CTOR \
   {                 \
   }
-#define DEFINE_CTOR_ANNOTATIONS __host__ __device__
+#define DEFINE_CTOR_ANNOTATIONS TEST_FUNC
 #define DEFINE_ASSIGN \
   {                   \
     return *this;     \
   }
-#define DEFINE_ASSIGN_ANNOTATIONS __host__ __device__
+#define DEFINE_ASSIGN_ANNOTATIONS TEST_FUNC
 #include "archetypes.ipp"
 } // namespace NonTrivialTypes
 
@@ -380,13 +380,13 @@ using TestType = AllCtors;
 
 // Add equality operators
 template <class Tp>
-__host__ __device__ constexpr bool operator==(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator==(Tp const& L, Tp const& R) noexcept
 {
   return L.value == R.value;
 }
 
 template <class Tp>
-__host__ __device__ constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
 {
   return L.value != R.value;
 }
@@ -405,13 +405,13 @@ using TestType = AllCtors;
 
 // Add equality operators
 template <class Tp>
-__host__ __device__ constexpr bool operator==(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator==(Tp const& L, Tp const& R) noexcept
 {
   return L.value == R.value;
 }
 
 template <class Tp>
-__host__ __device__ constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
 {
   return L.value != R.value;
 }
@@ -428,13 +428,13 @@ using TestType = AllCtors;
 
 // Add equality operators
 template <class Tp>
-__host__ __device__ constexpr bool operator==(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator==(Tp const& L, Tp const& R) noexcept
 {
   return L.value == R.value;
 }
 
 template <class Tp>
-__host__ __device__ constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
 {
   return L.value != R.value;
 }
@@ -452,13 +452,13 @@ using TestType = AllCtors;
 
 // Add equality operators
 template <class Tp>
-__host__ __device__ constexpr bool operator==(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator==(Tp const& L, Tp const& R) noexcept
 {
   return L.value == R.value;
 }
 
 template <class Tp>
-__host__ __device__ constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
 {
   return L.value != R.value;
 }
@@ -475,13 +475,13 @@ using TestType = AllCtors;
 
 // Add equality operators
 template <class Tp>
-__host__ __device__ constexpr bool operator==(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator==(Tp const& L, Tp const& R) noexcept
 {
   return L.value == R.value;
 }
 
 template <class Tp>
-__host__ __device__ constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
 {
   return L.value != R.value;
 }
@@ -499,13 +499,13 @@ using TestType = AllCtors;
 
 // Add equality operators
 template <class Tp>
-__host__ __device__ constexpr bool operator==(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator==(Tp const& L, Tp const& R) noexcept
 {
   return L.value == R.value;
 }
 
 template <class Tp>
-__host__ __device__ constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
+TEST_FUNC constexpr bool operator!=(Tp const& L, Tp const& R) noexcept
 {
   return L.value != R.value;
 }

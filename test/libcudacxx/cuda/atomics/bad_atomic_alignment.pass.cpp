@@ -47,7 +47,7 @@
 template <template <typename, typename> class Selector>
 struct TestFn
 {
-  __host__ __device__ void operator()() const
+  TEST_FUNC void operator()() const
   {
     {
       struct key

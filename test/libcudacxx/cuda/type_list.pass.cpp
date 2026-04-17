@@ -38,7 +38,13 @@
 #include <cuda/std/__utility/integer_sequence.h>
 #include <cuda/std/__utility/pair.h>
 
-#if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// #if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
+// =======
+#include "test_macros.h"
+
+#if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG)
+// >>>>>>> END NEW CODE (5214850b75)
 // These compilers have trouble making substitution failures during
 // alias template instantiation non-fatal.
 #  define SKIP_SFINAE_TESTS
@@ -136,13 +142,13 @@ static_assert(
 
 // __type_call_indirect
 template <class... Ts, class = ::cuda::std::__type_call_indirect<Fn2, Ts...>>
-_CCCL_HOST_DEVICE constexpr bool test_call_indirect(int)
+TEST_FUNC constexpr bool test_call_indirect(int)
 {
   return true;
 }
 
 template <class... Ts>
-_CCCL_HOST_DEVICE constexpr bool test_call_indirect(long)
+TEST_FUNC constexpr bool test_call_indirect(long)
 {
   return false;
 }

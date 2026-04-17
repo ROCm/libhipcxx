@@ -40,16 +40,20 @@
 #include <cuda/std/mdspan>
 #include <cuda/std/type_traits>
 
-// NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
-// AMD, so the static warp-level extent below must use the wave size.
-#if _CCCL_HIP_COMPILATION()
-#  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
-#else
-#  define TEST_WARP_SIZE 32
-#endif
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// // NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
+// // AMD, so the static warp-level extent below must use the wave size.
+// #if _CCCL_HIP_COMPILATION()
+// #  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
+// #else
+// #  define TEST_WARP_SIZE 32
+// #endif
+// =======
+#include "test_macros.h"
+// >>>>>>> END NEW CODE (5214850b75)
 
 template <class Level>
-__device__ void test_query_signatures(const Level& level)
+TEST_DEVICE_FUNC void test_query_signatures(const Level& level)
 {
   // 1. Test cuda::thread_level::dims(x) signature.
   static_assert(
@@ -87,7 +91,7 @@ __device__ void test_query_signatures(const Level& level)
 }
 
 template <class T, class Level>
-__device__ void test_query_as_signatures(const Level& level)
+TEST_DEVICE_FUNC void test_query_as_signatures(const Level& level)
 {
   // 1. Test cuda::thread_level::dims(x) signature.
   static_assert(cuda::std::is_same_v<cuda::hierarchy_query_result<T>, decltype(cuda::thread_level::dims_as<T>(level))>);
@@ -114,7 +118,7 @@ __device__ void test_query_as_signatures(const Level& level)
 }
 
 template <class InLevel>
-__device__ void test(const InLevel& in_level)
+TEST_DEVICE_FUNC void test(const InLevel& in_level)
 {
   test_query_signatures(in_level);
   test_query_as_signatures<short>(in_level);
@@ -125,7 +129,7 @@ __device__ void test(const InLevel& in_level)
   test_query_as_signatures<unsigned long long>(in_level);
 }
 
-__device__ void test()
+TEST_DEVICE_FUNC void test()
 {
   test(cuda::warp);
   test(cuda::block);

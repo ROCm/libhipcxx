@@ -36,7 +36,7 @@
 #include "test_macros.h"
 
 template <typename Mdspan>
-__host__ __device__ void test_submdspan(int* ptr)
+TEST_FUNC void test_submdspan(int* ptr)
 {
   Mdspan md{ptr, cuda::std::dims<1>{4}};
   auto submd = cuda::std::submdspan(md, cuda::std::pair{1, 3});
@@ -51,16 +51,20 @@ __host__ __device__ void test_submdspan(int* ptr)
   unused(submd);
 }
 
-// NOTE(HIP/AMD): __managed__ globals are not detected as managed by HIP's
-// hipPointerGetAttributes (see WAR-18 in CHANGELOG_v3.1.md). The strict
-// HIP check in cuda::__managed_accessor only accepts hipMallocManaged()
-// allocations, so __managed__ globals can no longer be used with
-// cuda::managed_mdspan on HIP. Skip the managed_mdspan path on HIP.
-#if !defined(__HIP_PLATFORM_AMD__)
-__device__ __managed__ int managed_array[] = {1, 2, 3, 4};
-#endif // !__HIP_PLATFORM_AMD__
+// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
+// // NOTE(HIP/AMD): __managed__ globals are not detected as managed by HIP's
+// // hipPointerGetAttributes (see WAR-18 in CHANGELOG_v3.1.md). The strict
+// // HIP check in cuda::__managed_accessor only accepts hipMallocManaged()
+// // allocations, so __managed__ globals can no longer be used with
+// // cuda::managed_mdspan on HIP. Skip the managed_mdspan path on HIP.
+// #if !defined(__HIP_PLATFORM_AMD__)
+// __device__ __managed__ int managed_array[] = {1, 2, 3, 4};
+// #endif // !__HIP_PLATFORM_AMD__
+// =======
+_CCCL_DEVICE __managed__ int managed_array[] = {1, 2, 3, 4};
+// >>>>>>> END NEW CODE (5214850b75)
 
-__host__ __device__ void test_submdspan()
+TEST_FUNC void test_submdspan()
 {
   int array[] = {1, 2, 3, 4};
   test_submdspan<cuda::host_mdspan<int, cuda::std::dims<1>>>(array);

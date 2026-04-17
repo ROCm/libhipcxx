@@ -41,7 +41,7 @@
 #endif // !TEST_COMPILER(NVRTC)
 
 template <template <class...> class Traits>
-__host__ __device__ void test()
+TEST_FUNC void test()
 {
   {
     using Iter       = cuda::transform_output_iterator<PlusOne, int*>;
@@ -92,7 +92,7 @@ __host__ __device__ void test()
   }
 }
 
-__host__ __device__ void test()
+TEST_FUNC void test()
 {
   test<cuda::std::iterator_traits>();
 #if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
