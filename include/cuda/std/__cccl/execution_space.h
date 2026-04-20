@@ -70,6 +70,12 @@
 #  define _CCCL_CTAD_HOST_DEVICE _CCCL_HOST_DEVICE
 #endif // deduction-guide target attributes required
 
+#if _CCCL_TILE_COMPILATION()
+#  define _CCCL_TILE __tile__
+#else // ^^^ _CCCL_TILE_COMPILATION() ^^^ / vvv !_CCCL_TILE_COMPILATION() vvv
+#  define _CCCL_TILE
+#endif // ^^^ !_CCCL_TILE_COMPILATION() ^^^
+
 // Global variables of non builtin types are only device accessible if they are marked as `__device__`
 #if _CCCL_DEVICE_COMPILATION() && !_CCCL_CUDA_COMPILER(NVHPC)
 #  define _CCCL_GLOBAL_VARIABLE _CCCL_DEVICE
