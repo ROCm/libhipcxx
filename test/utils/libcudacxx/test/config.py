@@ -305,7 +305,6 @@ class Configuration(object):
         self.configure_use_thread_safety()
         self.configure_no_execute()
         self.configure_execute_external()
-        self.configure_ccache()
         self.configure_compile_flags()
         self.configure_filesystem_compile_flags()
         self.configure_link_flags()
@@ -320,16 +319,20 @@ class Configuration(object):
             self.configure_coroutines()
             self.configure_substitutions()
             self.configure_features()
-        elif self.cxx.type == 'hiprtcc':
-            # NOTE(HIP/AMD): the full warning setup is skipped for the RTC
-            # drivers, but FORCE_ALL_WARNINGS tests (e.g.
-            # libcxx/macros/lifetime_bound.compile.fail.cpp) rely on warnings
-            # being escalated to errors. Provide a minimal warning_flags set so
-            # the per-test useWarnings(True) escalation works; the hiprtcc driver
-            # forwards -W* flags to COMGR. These apply only when use_warnings is
-            # enabled (the FORCE_ALL_WARNINGS directive), so normal tests are
-            # unaffected.
-            self.cxx.warning_flags += ['-Werror']
+# <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
+#         elif self.cxx.type == 'hiprtcc':
+#             # NOTE(HIP/AMD): the full warning setup is skipped for the RTC
+#             # drivers, but FORCE_ALL_WARNINGS tests (e.g.
+#             # libcxx/macros/lifetime_bound.compile.fail.cpp) rely on warnings
+#             # being escalated to errors. Provide a minimal warning_flags set so
+#             # the per-test useWarnings(True) escalation works; the hiprtcc driver
+#             # forwards -W* flags to COMGR. These apply only when use_warnings is
+#             # enabled (the FORCE_ALL_WARNINGS directive), so normal tests are
+#             # unaffected.
+#             self.cxx.warning_flags += ['-Werror']
+# =======
+        self.configure_ccache()
+# >>>>>>> END NEW CODE (ba2df44002)
 
     def print_config_info(self):
         # Print the final compile and link flags.
@@ -751,7 +754,13 @@ class Configuration(object):
     def configure_ccache(self):
         use_ccache_default = os.environ.get("CMAKE_CUDA_COMPILER_LAUNCHER") is not None
         use_ccache = self.get_lit_bool("use_ccache", use_ccache_default)
-        if use_ccache and not self.cxx.type == 'nvrtcc' and not self.cxx.type == 'hiprtcc':
+# <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
+#         if use_ccache and not self.cxx.type == 'nvrtcc' and not self.cxx.type == 'hiprtcc':
+# =======
+        if "enable-tile" in self.config.available_features:
+            return
+        if use_ccache and not self.cxx.type == "nvrtcc":
+# >>>>>>> END NEW CODE (ba2df44002)
             self.cxx.use_ccache = True
             self.lit_config.note("enabling ccache")
 
@@ -835,6 +844,9 @@ class Configuration(object):
 
         if self.get_lit_bool("has_libatomic", False):
             self.config.available_features.add("libatomic")
+
+        if self.get_lit_bool("enable_tile", False):
+            self.config.available_features.add("enable-tile")
 
         if "msvc" not in self.config.available_features:
             macros = self._dump_macros_verbose()
