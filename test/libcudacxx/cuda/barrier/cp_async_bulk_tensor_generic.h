@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // <cuda/barrier>
 
 #ifndef TEST_CP_ASYNC_BULK_TENSOR_GENERIC_H_
@@ -253,11 +275,7 @@ test(cuda::std::array<uint32_t, num_dims> smem_coord,
 }
 
 #if !TEST_COMPILER(NVRTC)
-// <<<<<<< OLD CODE from 2d933d5d06 (1fe0198a99) - COMMENTED OUT
-// #  if CUDART_VERSION < 12050
-// =======
 #  if _CCCL_CTK_BELOW(12, 5)
-// >>>>>>> END NEW CODE (1fe0198a99)
 PFN_cuTensorMapEncodeTiled get_cuTensorMapEncodeTiled()
 {
   void* driver_ptr = nullptr;
@@ -266,11 +284,7 @@ PFN_cuTensorMapEncodeTiled get_cuTensorMapEncodeTiled()
   assert(code == cudaSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled>(driver_ptr);
 }
-// <<<<<<< OLD CODE from 2d933d5d06 (1fe0198a99) - COMMENTED OUT
-// #  else // ^^^ CUDART_VERSION < 12050 ^^^ / vvv CUDART_VERSION < 12050 vvv
-// =======
 #  else // ^^^ _CCCL_CTK_BELOW(12, 5) ^^^ / vvv _CCCL_CTK_AT_LEAST(12, 5) vvv
-// >>>>>>> END NEW CODE (1fe0198a99)
 PFN_cuTensorMapEncodeTiled_v12000 get_cuTensorMapEncodeTiled()
 {
   void* driver_ptr = nullptr;
@@ -280,11 +294,7 @@ PFN_cuTensorMapEncodeTiled_v12000 get_cuTensorMapEncodeTiled()
   assert(code == cudaSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled_v12000>(driver_ptr);
 }
-// <<<<<<< OLD CODE from 2d933d5d06 (1fe0198a99) - COMMENTED OUT
-// #  endif // CUDART_VERSION < 12050
-// =======
 #  endif // _CCCL_CTK_AT_LEAST(12, 5)
-// >>>>>>> END NEW CODE (1fe0198a99)
 #endif // !TEST_COMPILER(NVRTC)
 
 #if !TEST_COMPILER(NVRTC)

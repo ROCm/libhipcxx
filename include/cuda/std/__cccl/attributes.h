@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -69,24 +69,6 @@
 #  define _CCCL_DECLSPEC_EMPTY_BASES
 #endif // !_CCCL_COMPILER(MSVC)
 
-// <<<<<<< OLD CODE from ff1ebe1588 (b60ee01d87) - COMMENTED OUT
-// // Use a function like macro to imply that it must be followed by a semicolon
-// #if _CCCL_HAS_CPP_ATTRIBUTE(fallthrough)
-// #  define _CCCL_FALLTHROUGH() [[fallthrough]]
-// #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// #  define _CCCL_FALLTHROUGH() ((void) 0)
-// #elif _CCCL_HAS_CPP_ATTRIBUTE(clang::fallthrough)
-// #  define _CCCL_FALLTHROUGH() [[clang::fallthrough]]
-// #elif _CCCL_COMPILER(NVHPC)
-// #  define _CCCL_FALLTHROUGH()
-// #elif _CCCL_HAS_ATTRIBUTE(fallthrough) || _CCCL_COMPILER(GCC, >=, 7)
-// #  define _CCCL_FALLTHROUGH() __attribute__((__fallthrough__))
-// #else
-// #  define _CCCL_FALLTHROUGH() ((void) 0)
-// #endif
-//
-// =======
-// >>>>>>> END NEW CODE (b60ee01d87)
 #if _CCCL_HAS_ATTRIBUTE(__nodebug__)
 #  define _CCCL_NODEBUG __attribute__((__nodebug__))
 #else // ^^^ _CCCL_HAS_ATTRIBUTE(__nodebug__) ^^^ / vvv !_CCCL_HAS_ATTRIBUTE(__nodebug__) vvv

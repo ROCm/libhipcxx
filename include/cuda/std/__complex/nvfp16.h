@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -101,28 +101,6 @@ struct __cccl_complex_overload_traits<__half, false, false>
   using _ComplexType = complex<__half>;
 };
 
-// <<<<<<< OLD CODE from e769a94eba (b7bcf1df63) - COMMENTED OUT
-// template <class _Tp>
-// _CCCL_API inline __half __convert_to_half(const _Tp& __value) noexcept
-// {
-//   return __value;
-// }
-//
-// _CCCL_API inline __half __convert_to_half(const float& __value) noexcept
-// {
-//   return __float2half(__value);
-// }
-//
-// _CCCL_API inline __half __convert_to_half(const double& __value) noexcept
-// {
-//   // NOTE(HIP/AMD): fp16 currently does not provide a __double2half conversion
-//   // (see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
-//   // corresponding ticket SWDEV-529927
-//   return __float2half(static_cast<float>(__value));
-// }
-//
-// =======
-// >>>>>>> END NEW CODE (b7bcf1df63)
 template <>
 class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__half2)) complex<__half>
 {
@@ -147,7 +125,14 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__half2)) complex<__ha
 
   [[nodiscard]] _CCCL_API inline static __half __convert_to_half(const double& __value) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    // NOTE(HIP/AMD): fp16 currently does not provide a __double2half conversion
+    // (see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
+    // corresponding ticket SWDEV-529927
+    return ::__float2half(static_cast<float>(__value));
+#  else
     return ::__double2half(__value);
+#  endif
   }
 
 public:
@@ -306,39 +291,38 @@ _CCCL_API inline complex<double>& complex<double>::operator=(const complex<__hal
   return *this;
 }
 
-// <<<<<<< OLD CODE from e769a94eba (b7bcf1df63) - COMMENTED OUT
-// [[nodiscard]] _CCCL_API inline __half arg(__half __re)
-// {
-//   // NOTE(HIP/AMD): fp16 currently does not provide __int2half_rn for host code; this is implementated for floating point alternatives
-//   // (device only see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
-//   // corresponding ticket SWDEV-529927
-//   return _CUDA_VSTD::atan2(__float2half_rn(0.0f), __re);
-// }
-//
-// // We have performance issues with some trigonometric functions with __half
-// template <>
-// _CCCL_API inline complex<__half> asinh(const complex<__half>& __x)
-// {
-//   return complex<__half>{_CUDA_VSTD::asinh(complex<float>{__x})};
-// }
-// template <>
-// _CCCL_API inline complex<__half> acosh(const complex<__half>& __x)
-// {
-//   return complex<__half>{_CUDA_VSTD::acosh(complex<float>{__x})};
-// }
-// template <>
-// _CCCL_API inline complex<__half> atanh(const complex<__half>& __x)
-// {
-//   return complex<__half>{_CUDA_VSTD::atanh(complex<float>{__x})};
-// }
-// template <>
-// _CCCL_API inline complex<__half> acos(const complex<__half>& __x)
-// {
-//   return complex<__half>{_CUDA_VSTD::acos(complex<float>{__x})};
-// }
-//
-// =======
-// >>>>>>> END NEW CODE (b7bcf1df63)
+#  if defined(__HIP_PLATFORM_AMD__)
+// NOTE(HIP/AMD): fp16 currently does not provide __int2half_rn for host code; this is implemented for floating point alternatives
+// (device only see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
+// corresponding ticket SWDEV-529927
+[[nodiscard]] _CCCL_API inline __half arg(__half __re)
+{
+  return _CUDA_VSTD::atan2(__float2half_rn(0.0f), __re);
+}
+
+// We have performance issues with some trigonometric functions with __half
+template <>
+_CCCL_API inline complex<__half> asinh(const complex<__half>& __x)
+{
+  return complex<__half>{_CUDA_VSTD::asinh(complex<float>{__x})};
+}
+template <>
+_CCCL_API inline complex<__half> acosh(const complex<__half>& __x)
+{
+  return complex<__half>{_CUDA_VSTD::acosh(complex<float>{__x})};
+}
+template <>
+_CCCL_API inline complex<__half> atanh(const complex<__half>& __x)
+{
+  return complex<__half>{_CUDA_VSTD::atanh(complex<float>{__x})};
+}
+template <>
+_CCCL_API inline complex<__half> acos(const complex<__half>& __x)
+{
+  return complex<__half>{_CUDA_VSTD::acos(complex<float>{__x})};
+}
+#  endif // __HIP_PLATFORM_AMD__
+
 template <>
 struct __get_complex_impl<__half>
 {

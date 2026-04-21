@@ -1,14 +1,31 @@
+# MIT License
+#
+# Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 # Parse version information from version header:
 include("${CMAKE_CURRENT_LIST_DIR}/libcudacxx-header-search.cmake")
 
 set(libcudacxx_VERSION_MAJOR 3)
-# <<<<<<< OLD CODE from 695d0b479a (3cc0056146) - COMMENTED OUT
-# set(libcudacxx_VERSION_MINOR 0)
-# set(libcudacxx_VERSION_PATCH 2)
-# =======
 set(libcudacxx_VERSION_MINOR 1)
 set(libcudacxx_VERSION_PATCH 0)
-# >>>>>>> END NEW CODE (3cc0056146)
 set(libcudacxx_VERSION_TWEAK 0)
 
 set(libcudacxx_VERSION

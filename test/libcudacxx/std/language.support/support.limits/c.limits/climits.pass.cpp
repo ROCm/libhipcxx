@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -105,15 +105,9 @@
 #  error ULLONG_MAX not defined
 #endif
 
-// <<<<<<< OLD CODE from 24e350cd01 (7da4068d41) - COMMENTED OUT
-// // test if __CHAR_UNSIGNED__ detection for NVRTC works correctly
-// // if not, go take a look at cuda/std/climits
-// #if TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC)
-// =======
 // test if _CCCL_CHAR_IS_UNSIGNED() detection for NVRTC works correctly
 // if not, go take a look at cuda::std::is_unsigned_v
-#if TEST_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (7da4068d41)
+#if TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC)
 #  include <cuda/std/type_traits>
 static_assert(_CCCL_CHAR_IS_UNSIGNED() == cuda::std::is_unsigned_v<char>, "");
 #endif

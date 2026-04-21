@@ -56,13 +56,9 @@
 #  include <math.h>
 #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
 
-// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
-// #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #include <cuda/std/__cccl/prologue.h>
 
-#if _CCCL_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (24bb5db96f)
+#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 #  ifndef FP_NAN
 #    define FP_NAN 0
 #  endif // ! FP_NAN

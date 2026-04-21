@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _LIBCUDACXX___TUPLE_SFINAE_HELPERS_H
 #define _LIBCUDACXX___TUPLE_SFINAE_HELPERS_H
 
@@ -229,42 +251,8 @@ inline constexpr bool __must_synthesize_assignment_v =
 // We need to ensure that __tuple_impl_sfinae_helper is unique for every instantiation of __tuple_impl, so its templated
 // on the impl
 template <class _Impl, bool _AllCopyAssignable, bool _AllMoveAssignable>
-// <<<<<<< OLD CODE from 91bb4ab8ba (3c33d4cea7) - COMMENTED OUT
-// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper{};
-//
-// template <class _Impl>
-// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, false, true>
-// {
-//   __tuple_impl_sfinae_helper()                                             = default;
-//   __tuple_impl_sfinae_helper(const __tuple_impl_sfinae_helper&)            = default;
-//   __tuple_impl_sfinae_helper(__tuple_impl_sfinae_helper&&)                 = default;
-//   __tuple_impl_sfinae_helper& operator=(const __tuple_impl_sfinae_helper&) = delete;
-//   __tuple_impl_sfinae_helper& operator=(__tuple_impl_sfinae_helper&&)      = default;
-// };
-//
-// template <class _Impl>
-// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, true, false>
-// {
-//   __tuple_impl_sfinae_helper()                                             = default;
-//   __tuple_impl_sfinae_helper(const __tuple_impl_sfinae_helper&)            = default;
-//   __tuple_impl_sfinae_helper(__tuple_impl_sfinae_helper&&)                 = default;
-//   __tuple_impl_sfinae_helper& operator=(const __tuple_impl_sfinae_helper&) = default;
-//   __tuple_impl_sfinae_helper& operator=(__tuple_impl_sfinae_helper&&)      = delete;
-// };
-//
-// template <class _Impl>
-// struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, false, false>
-// {
-//   __tuple_impl_sfinae_helper()                                             = default;
-//   __tuple_impl_sfinae_helper(const __tuple_impl_sfinae_helper&)            = default;
-//   __tuple_impl_sfinae_helper(__tuple_impl_sfinae_helper&&)                 = default;
-//   __tuple_impl_sfinae_helper& operator=(const __tuple_impl_sfinae_helper&) = delete;
-//   __tuple_impl_sfinae_helper& operator=(__tuple_impl_sfinae_helper&&)      = delete;
-// };
-// =======
 struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper
 {};
-// >>>>>>> END NEW CODE (3c33d4cea7)
 
 template <class _Impl>
 struct _CCCL_DECLSPEC_EMPTY_BASES __tuple_impl_sfinae_helper<_Impl, false, true>

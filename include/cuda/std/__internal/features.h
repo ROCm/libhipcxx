@@ -9,7 +9,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -73,28 +73,15 @@
 #endif // _LIBCUDACXX_HAS_NO_INCOMPLETE_RANGES
 
 // libcu++ requires host device support for its tests. Until then restrict usage to at least 12.2
-// <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #if _CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2) \
-// //   && (_CCCL_HAS_CUDA_COMPILER() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16)) || defined(__HIP_PLATFORM_AMD__)
-// // =======
-// #if _CCCL_HAS_NVFP16() && _CCCL_CUDACC_AT_LEAST(12, 2) \
-// =======
-#if _CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2) \
-// >>>>>>> END NEW CODE (22b068b84b)
-  && (_CCCL_HAS_CUDA_COMPILER() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16))
-// >>>>>>> END NEW CODE (702d3c08ed)
+#if (_CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2) \
+  && (_CCCL_HAS_CUDA_COMPILER() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16))) || defined(__HIP_PLATFORM_AMD__)
 #  define _LIBCUDACXX_HAS_NVFP16() 1
 #else
 #  define _LIBCUDACXX_HAS_NVFP16() 0
 #endif // _CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2)
 
 // libcu++ requires host device support for its tests. Until then restrict usage to at least 12.2
-// <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
-// #if _CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2) || defined(__HIP_PLATFORM_AMD__)
-// =======
-#if _CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2)
-// >>>>>>> END NEW CODE (22b068b84b)
+#if (_CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2)) || defined(__HIP_PLATFORM_AMD__)
 #  define _LIBCUDACXX_HAS_NVBF16() 1
 #else
 #  define _LIBCUDACXX_HAS_NVBF16() 0
