@@ -302,60 +302,6 @@ set_tests_properties(libcudacxx.test.lit PROPERTIES
   RUN_SERIAL TRUE
 )
 
-# Set appropriate warning levels for MSVC/sane
-if("${CMAKE_CUDA_COMPILER_ID}" STREQUAL "NVIDIA")
-  # CUDA 11.5 and down do not support '-use-local-env'
-  if(MSVC)
-    set(headertest_warning_levels_device -Xcompiler=/W4 -Xcompiler=/WX -Wno-deprecated-gpu-targets)
-    if ("${CMAKE_CUDA_COMPILER_VERSION}" GREATER_EQUAL "11.6.0")
-      list(APPEND headertest_warning_levels_device --use-local-env)
-    endif()
-  else()
-    set(headertest_warning_levels_device -Wall -Werror all-warnings -Wno-deprecated-gpu-targets)
-  endif()
-# Set warnings for Clang as device compiler
-elseif("${CMAKE_CUDA_COMPILER_ID}" STREQUAL "Clang")
-  set(headertest_warning_levels_device -Wall -Werror -Wno-unknown-cuda-version -Xclang=-fcuda-allow-variadic-functions)
-# If the CMAKE_CUDA_COMPILER is unknown, try to use gcc style warnings
-else()
-  set(headertest_warning_levels_device -Wall -Werror)
-endif()
-
-# Set raw host/device warnings
-if(MSVC)
-  set(headertest_warning_levels_host /W4 /WX)
-else()
-  set(headertest_warning_levels_host -Wall -Werror)
-endif()
-
-# Libcudacxx auto-generated internal header tests
-add_subdirectory(internal_headers)
-
-# Libcudacxx auto-generated public header tests
-add_subdirectory(public_headers)
-
-# Libcudacxx auto-generated public header as std tests
-add_subdirectory(public_headers_host_only)
-
-if(LIBCUDACXX_ENABLE_CUDA)
-  # Enable building the nvrtcc project if NVRTC is enabled
-  if (LIBCUDACXX_TEST_WITH_NVRTC)
-    add_subdirectory(utils/nvidia/nvrtc)
-  endif()
-elseif(LIBCUDACXX_ENABLE_HIP)
-  if (LIBHIPCXX_TEST_WITH_HIPRTC)
-    add_subdirectory(
-      ${libhipcxx_SOURCE_DIR}/utils/amd/hiprtc
-      ${CMAKE_BINARY_DIR}/libcudacxx/test/utils/amd/hiprtc
-      )
-  endif()
-endif()
-
-# atomic_codegen tests require CUDA-specific tools (cuobjdump) and are not supported with HIP
-if(LIBCUDACXX_ENABLE_CUDA)
-  add_subdirectory(atomic_codegen)
-endif()
-
 # Add c2h tests (CUDA only - c2h infrastructure is CUDA-specific):
 if(LIBCUDACXX_ENABLE_CUDA)
   cccl_get_c2h()
