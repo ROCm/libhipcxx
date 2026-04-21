@@ -186,6 +186,7 @@ int main(int, char**)
     assert(i == 2);
     assert(j == 1);
   }
+#if !_CCCL_TILE_COMPILATION() // dynamic memory allocation with non-placement ::operator new is unsupported in tile code
   {
     cuda::std::unique_ptr<int> i(new int(1));
     cuda::std::unique_ptr<int> j(new int(2));
@@ -193,6 +194,7 @@ int main(int, char**)
     assert(*i == 2);
     assert(*j == 1);
   }
+#endif // !_CCCL_TILE_COMPILATION()
   {
     // test that the swap
     static_assert(can_swap<CopyOnly&>());
