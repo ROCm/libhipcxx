@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp __rotr(_Tp __t, int __cn
   {
     if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
     {
-      NV_IF_TARGET_LIBHIPCXX(NV_IS_DEVICE_LIBHIPCXX, (return ::__funnelshift_r(__t, __t, __cnt);))
+      NV_IF_TARGET(NV_IS_DEVICE, (return ::__funnelshift_r(__t, __t, __cnt);))
     }
   }
   auto __cnt_mod = static_cast<uint32_t>(__cnt) % __digits; // __cnt is always >= 0
@@ -75,7 +75,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp __rotl(_Tp __t, int __cn
   {
     if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
     {
-      NV_IF_TARGET_LIBHIPCXX(NV_IS_DEVICE_LIBHIPCXX, (return ::__funnelshift_l(__t, __t, __cnt);))
+      NV_IF_TARGET(NV_IS_DEVICE, (return ::__funnelshift_l(__t, __t, __cnt);))
     }
   }
   auto __cnt_mod = static_cast<uint32_t>(__cnt) % __digits; // __cnt is always >= 0

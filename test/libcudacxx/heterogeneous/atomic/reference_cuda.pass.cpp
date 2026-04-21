@@ -174,7 +174,7 @@ using basic_testers =
               strong_cas_tester<-12, 31, 17, -12>,
               exchange_tester<-12, 17>>;
 
-// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with hipMallocManaged for certain architectures (like MI200).
+// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with cudaMallocManaged for certain architectures (like MI200).
 // For float and double also fetch_add is not supported. For float fetch_max and fecth_min is supported.
 // This issue is tracked internally in issue SWDEV-390383.
 using arithmetic_atomic_testers_no_atomic_fetch_integer =
@@ -182,7 +182,7 @@ using arithmetic_atomic_testers_no_atomic_fetch_integer =
          fetch_add_tester<17, 13, 30>
          >;
 
-// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with hipMallocManaged for certain architectures (like MI200).
+// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with cudaMallocManaged for certain architectures (like MI200).
 // For float and double also fetch_add is not supported. For float fetch_max and fecth_min is supported.
 // This issue is tracked internally in issue SWDEV-390383.
 using arithmetic_atomic_testers_no_atomic_fetch_float=
@@ -191,7 +191,7 @@ using arithmetic_atomic_testers_no_atomic_fetch_float=
          fetch_max_tester<5, 9, 9>
          >;
 
-// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with hipMallocManaged for certain architectures (like MI200).
+// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with cudaMallocManaged for certain architectures (like MI200).
 // For float and double also fetch_add is not supported. For float fetch_max and fecth_min is supported.
 // This issue is tracked internally in issue SWDEV-390383.
 using bitwise_atomic_testers_no_atomic_fetch =

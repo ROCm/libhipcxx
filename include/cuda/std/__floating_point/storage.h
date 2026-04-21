@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -98,9 +98,9 @@ struct __cccl_nvfp16_manip_helper : __half
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-struct __cccl_nvbf16_manip_helper : __hip_bfloat16
+struct __cccl_nvbf16_manip_helper : __nv_bfloat16
 {
-  using __hip_bfloat16::__x;
+  using __nv_bfloat16::__x;
 };
 #endif // _CCCL_HAS_NVBF16()
 
@@ -120,7 +120,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr _Tp __fp_from_storage(__fp_s
   }
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  else if constexpr (_CCCL_TRAIT(is_same, _Tp, __hip_bfloat16))
+  else if constexpr (_CCCL_TRAIT(is_same, _Tp, __nv_bfloat16))
   {
     __cccl_nvbf16_manip_helper __helper{};
     __helper.__x = __v;
@@ -204,7 +204,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __fp_storage_t<_Tp> __fp_get
   }
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  else if constexpr (_CCCL_TRAIT(is_same, _Tp, __hip_bfloat16))
+  else if constexpr (_CCCL_TRAIT(is_same, _Tp, __nv_bfloat16))
   {
     return __cccl_nvbf16_manip_helper{__v}.__x;
   }

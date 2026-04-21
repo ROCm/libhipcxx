@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -106,15 +106,15 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI long double sqrtl(long double __x) noe
 #if _LIBCUDACXX_HAS_NVFP16()
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half sqrt(__half __x) noexcept
 {
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX, (return ::hsqrt(__x);), (return __float2half(_CUDA_VSTD::sqrt(__half2float(__x)));))
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (return ::hsqrt(__x);), (return __float2half(_CUDA_VSTD::sqrt(__half2float(__x)));))
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 sqrt(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 sqrt(__nv_bfloat16 __x) noexcept
 {
   NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX, (return ::hsqrt(__x);), (return __float2bfloat16(_CUDA_VSTD::sqrt(__bfloat162float(__x)));))
+    NV_IS_DEVICE, (return ::hsqrt(__x);), (return __float2bfloat16(_CUDA_VSTD::sqrt(__bfloat162float(__x)));))
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
@@ -181,7 +181,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half cbrt(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 cbrt(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 cbrt(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::cbrt(__bfloat162float(__x)));
 }

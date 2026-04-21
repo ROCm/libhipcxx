@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -113,7 +113,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half acosh(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 acosh(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 acosh(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::acoshf(__bfloat162float(__x)));
 }
@@ -182,7 +182,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half asinh(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 asinh(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 asinh(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::asinhf(__bfloat162float(__x)));
 }
@@ -251,7 +251,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half atanh(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 atanh(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 atanh(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::atanhf(__bfloat162float(__x)));
 }

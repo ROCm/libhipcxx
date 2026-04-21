@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2025 Advanced Micro Devices, Inc.
+// Copyright (c) 2023-2026 Advanced Micro Devices, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,10 +35,10 @@
 #define nvrtcResult hiprtcResult
 #endif
 #ifndef cudaError_t
-#  define cudaError_t hipError_t
+#  define cudaError_t cudaError_t
 #endif
 #ifndef cudaSuccess
-#  define cudaSuccess hipSuccess
+#  define cudaSuccess cudaSuccess
 #endif
 
 // macros
@@ -46,13 +46,13 @@
 #define NVRTC_SUCCESS HIPRTC_SUCCESS
 #endif
 #ifndef cudaSuccess
-#  define cudaSuccess hipSuccess
+#  define cudaSuccess cudaSuccess
 #endif
 #ifndef CUDA_SUCCESS
-#  define CUDA_SUCCESS hipSuccess
+#  define CUDA_SUCCESS cudaSuccess
 #endif
 #ifndef CUresult
-#  define CUresult hipError_t
+#  define CUresult cudaError_t
 #endif
 #ifndef CUdevice
 #  define CUdevice hipDevice_t
@@ -117,16 +117,16 @@
 #endif
 
 #ifndef cudaGetErrorString
-#  define cudaGetErrorString hipGetErrorString
+#  define cudaGetErrorString cudaGetErrorString
 #endif
 #ifndef cudaGetErrorName
-#  define cudaGetErrorName hipGetErrorName
+#  define cudaGetErrorName cudaGetErrorName
 #endif
 #ifndef cudaGetLastError
-#  define cudaGetLastError hipGetLastError
+#  define cudaGetLastError cudaGetLastError
 #endif
 #ifndef cudaDeviceSynchronize
-#  define cudaDeviceSynchronize hipDeviceSynchronize
+#  define cudaDeviceSynchronize cudaDeviceSynchronize
 #endif
 #ifndef cuGetErrorName
 #  define cuGetErrorName hipDrvGetErrorName
@@ -135,11 +135,11 @@
 #  define cuDeviceGet hipDeviceGet
 #endif
 #ifndef cudaGetDevice
-#  define cudaGetDevice hipGetDevice
+#  define cudaGetDevice cudaGetDevice
 #endif
 #ifndef cudaDeviceProp
-#  define cudaDeviceProp hipDeviceProp_t
+#  define cudaDeviceProp cudaDeviceProp
 #endif
 #ifndef cudaGetDeviceProperties
-#  define cudaGetDeviceProperties hipGetDeviceProperties
+#  define cudaGetDeviceProperties cudaGetDeviceProperties
 #endif

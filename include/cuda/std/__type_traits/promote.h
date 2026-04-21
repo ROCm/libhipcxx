@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -53,7 +53,7 @@ struct __numeric_type
   _LIBCUDACXX_HIDE_FROM_ABI static float __test(__half);
 #endif // _LIBCUDACXX_HAS_NVBF16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  _LIBCUDACXX_HIDE_FROM_ABI static float __test(__hip_bfloat16);
+  _LIBCUDACXX_HIDE_FROM_ABI static float __test(__nv_bfloat16);
 #endif // _LIBCUDACXX_HAS_NVFP16()
   _LIBCUDACXX_HIDE_FROM_ABI static float __test(float);
   _LIBCUDACXX_HIDE_FROM_ABI static double __test(char);
@@ -84,37 +84,37 @@ struct __is_mixed_extended_floating_point
 
 #if _LIBCUDACXX_HAS_NVFP16() && _LIBCUDACXX_HAS_NVBF16()
 template <class _A1>
-struct __is_mixed_extended_floating_point<_A1, __half, __hip_bfloat16>
+struct __is_mixed_extended_floating_point<_A1, __half, __nv_bfloat16>
 {
   static constexpr bool value = true;
 };
 
 template <class _A1>
-struct __is_mixed_extended_floating_point<_A1, __hip_bfloat16, __half>
+struct __is_mixed_extended_floating_point<_A1, __nv_bfloat16, __half>
 {
   static constexpr bool value = true;
 };
 
 template <class _A1>
-struct __is_mixed_extended_floating_point<__half, _A1, __hip_bfloat16>
+struct __is_mixed_extended_floating_point<__half, _A1, __nv_bfloat16>
 {
   static constexpr bool value = true;
 };
 
 template <class _A1>
-struct __is_mixed_extended_floating_point<__hip_bfloat16, _A1, __half>
+struct __is_mixed_extended_floating_point<__nv_bfloat16, _A1, __half>
 {
   static constexpr bool value = true;
 };
 
 template <class _A1>
-struct __is_mixed_extended_floating_point<__half, __hip_bfloat16, _A1>
+struct __is_mixed_extended_floating_point<__half, __nv_bfloat16, _A1>
 {
   static constexpr bool value = true;
 };
 
 template <class _A1>
-struct __is_mixed_extended_floating_point<__hip_bfloat16, __half, _A1>
+struct __is_mixed_extended_floating_point<__nv_bfloat16, __half, _A1>
 {
   static constexpr bool value = true;
 };

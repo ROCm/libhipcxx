@@ -11,7 +11,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -131,10 +131,10 @@ public:
 
 #if _CCCL_HAS_NVBF16()
 template <>
-class __numeric_limits_impl<__hip_bfloat16, __numeric_limits_type::__floating_point>
+class __numeric_limits_impl<__nv_bfloat16, __numeric_limits_type::__floating_point>
 {
 public:
-  using type = __hip_bfloat16;
+  using type = __nv_bfloat16;
 
   static constexpr bool is_specialized = true;
 
@@ -144,15 +144,15 @@ public:
   static constexpr int max_digits10 = 4;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type min() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x0080u);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x0080u);
   }
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type max() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x7f7fu);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x7f7fu);
   }
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type lowest() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0xff7fu);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0xff7fu);
   }
 
   static constexpr bool is_integer = false;
@@ -160,11 +160,11 @@ public:
   static constexpr int radix       = __FLT_RADIX__;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type epsilon() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x3c00u);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x3c00u);
   }
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type round_error() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x3f00u);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x3f00u);
   }
 
   static constexpr int min_exponent   = -125;
@@ -179,19 +179,19 @@ public:
   static constexpr bool has_denorm_loss          = false;
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type infinity() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x7f80u);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x7f80u);
   }
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type quiet_NaN() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x7fc0u);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x7fc0u);
   }
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type signaling_NaN() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x7fa0u);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x7fa0u);
   }
   _LIBCUDACXX_HIDE_FROM_ABI static constexpr type denorm_min() noexcept
   {
-    return _CUDA_VSTD::__fp_from_storage<__hip_bfloat16>(0x0001u);
+    return _CUDA_VSTD::__fp_from_storage<__nv_bfloat16>(0x0001u);
   }
 
   static constexpr bool is_iec559  = true;

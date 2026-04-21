@@ -131,7 +131,7 @@ int main(int, char**)
   test_edges<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-// NOTE(HIP/AMD): for ROCm 7.1+ versions the optimization causes test failures for __hip_bfloat16 (compare internal issue 134 or https://github.com/ROCm/libhipcxx/issues/13)
+// NOTE(HIP/AMD): for ROCm 7.1+ versions the optimization causes test failures for __nv_bfloat16 (compare internal issue 134 or https://github.com/ROCm/libhipcxx/issues/13)
 #if !defined(__OPTIMIZE__) || LIBHIPCXX_ROCM_VERSION_LE(7, 0)
 test_edges<__nv_bfloat16>();
 #endif

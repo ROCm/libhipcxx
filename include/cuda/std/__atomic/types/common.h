@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -92,7 +92,7 @@ __atomic_assign_volatile(_Tp volatile* __a_value, _Tv volatile const& __val)
 _CCCL_HOST_DEVICE inline int __atomic_memcmp(void const* __lhs, void const* __rhs, size_t __count)
 {
   NV_DISPATCH_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX,
+    NV_IS_DEVICE,
     // TODO(HIP/AMD): this is a temporal revert of an asm change made by Nvidia (possibly introducing UB that was fixed by the asm command)
     (auto __lhs_c = reinterpret_cast<unsigned char const*>(__lhs);
      auto __rhs_c = reinterpret_cast<unsigned char const*>(__rhs);
@@ -109,7 +109,7 @@ _CCCL_HOST_DEVICE inline int __atomic_memcmp(void const* __lhs, void const* __rh
          return 1;
        }
      } return 0;),
-    NV_IS_HOST_LIBHIPCXX,
+    NV_IS_HOST,
     (return _CUDA_VSTD::memcmp(__lhs, __rhs, __count);))
 }
 

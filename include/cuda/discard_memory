@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -50,7 +50,7 @@ inline _CCCL_HOST_DEVICE void discard_memory(volatile void* __ptr, _CUDA_VSTD::s
   (void) (__ptr);
   (void) (__nbytes);
 #else
-  NV_IF_TARGET_LIBHIPCXX(
+  NV_IF_TARGET(
     NV_PROVIDES_SM_80,
     (if (!__isGlobal((void*) __ptr)) return;
 

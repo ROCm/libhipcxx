@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -31,13 +31,13 @@
 // This should be only in the test_macros.h. Unfortunately many tests do not
 // include this header.
 #ifndef NV_IF_TARGET
-#define NV_IF_TARGET NV_IF_TARGET_LIBHIPCXX
+#define NV_IF_TARGET NV_IF_TARGET
 #endif
 #ifndef NV_IS_HOST
-#define NV_IS_HOST NV_IS_HOST_LIBHIPCXX
+#define NV_IS_HOST NV_IS_HOST
 #endif
 #ifndef NV_IS_DEVICE
-#define NV_IS_DEVICE NV_IS_DEVICE_LIBHIPCXX
+#define NV_IS_DEVICE NV_IS_DEVICE
 #endif
 
 // We use <stdio.h> instead of <iostream> to avoid relying on the host system's

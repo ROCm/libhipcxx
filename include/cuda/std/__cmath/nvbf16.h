@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,17 +54,17 @@
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 // floating point helper
-_LIBCUDACXX_HIDE_FROM_ABI constexpr __hip_bfloat16 __constexpr_copysign(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
+_LIBCUDACXX_HIDE_FROM_ABI constexpr __nv_bfloat16 __constexpr_copysign(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
 {
   return _CUDA_VSTD::copysign(__x, __y);
 }
 
-_LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 __constexpr_fabs(__hip_bfloat16 __x) noexcept
+_LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 __constexpr_fabs(__nv_bfloat16 __x) noexcept
 {
   return ::__habs(__x);
 }
 
-_LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 __constexpr_fmax(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
+_LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 __constexpr_fmax(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
 {
   return ::__hmax(__x, __y);
 }
