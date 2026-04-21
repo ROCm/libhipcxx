@@ -59,21 +59,8 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 using ::free;
 using ::malloc;
 
-// <<<<<<< OLD CODE from 51e5a1601d (61c56ec958) - COMMENTED OUT
-// // We need to ensure that we not only compile with a cuda compiler but also compile cuda source files
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #if _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA) || defined(__HIPCC__))
-// // =======
-// #if _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA))
-// // <<<<<<< OLD CODE from 74f3bae2ac (3eee69cda4) - COMMENTED OUT
-// // // >>>>>>> END NEW CODE (702d3c08ed)
-// // _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
-// // =======
-// =======
 #if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (61c56ec958)
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
-// >>>>>>> END NEW CODE (3eee69cda4)
 {
   void* __ptr{};
 

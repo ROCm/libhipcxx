@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,18 +33,11 @@
 #ifndef _CUDA_STD_LATCH
 #define _CUDA_STD_LATCH
 
-# <<<<<<< OLD CODE from 079adf5db1 (cdb17a5a84) - COMMENTED OUT
-# // NOTE(HIP/AMD): latch is not supported on AMD hardware
-# #ifdef __HIP_PLATFORM_AMD__
-# #error latch is not supported on AMD hardware and should not be included
-# #endif
-#
-# #if defined(__CUDA_ARCH__) && __CUDA_ARCH__ < 700
-# #  error "CUDA synchronization primitives are only supported for sm_70 and up."
-# #endif
-#
-# =======
-# >>>>>>> END NEW CODE (cdb17a5a84)
+// NOTE(HIP/AMD): latch is not supported on AMD hardware
+#ifdef __HIP_PLATFORM_AMD__
+#error latch is not supported on AMD hardware and should not be included
+#endif
+
 #include <cuda/std/detail/__config>
 
 #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)

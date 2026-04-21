@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -83,15 +83,7 @@
 #endif
 
 // Enable us to selectively silence cuda compiler warnings
-// <<<<<<< OLD CODE from 5a2a2d5bdc (10d4c795f3) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
-// // #if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC)
-// // =======
-// #if _CCCL_CUDA_COMPILER(NVCC)
-// // >>>>>>> END NEW CODE (0de6f3b24e)
-// =======
 #if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (10d4c795f3)
 #  if defined(__NVCC_DIAG_PRAGMA_SUPPORT__)
 #    define _CCCL_NV_DIAG_PUSH()               _CCCL_PRAGMA(nv_diagnostic push)
 #    define _CCCL_NV_DIAG_POP()                _CCCL_PRAGMA(nv_diagnostic pop)
@@ -143,22 +135,6 @@
     _CCCL_DIAG_SUPPRESS_MSVC(4996)       \
     _CCCL_BEGIN_NV_DIAG_SUPPRESS(1444)
 #  define _CCCL_SUPPRESS_DEPRECATED_POP _CCCL_NV_DIAG_POP() _CCCL_DIAG_POP
-// <<<<<<< OLD CODE from 5a2a2d5bdc (10d4c795f3) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
-// // #elif _CCCL_COMPILER(NVRTC)
-// // #  define _CCCL_SUPPRESS_DEPRECATED_PUSH _CCCL_BEGIN_NV_DIAG_SUPPRESS(1444, 20199)
-// // #  define _CCCL_SUPPRESS_DEPRECATED_POP  _CCCL_NV_DIAG_POP()
-// // #else // unknown compiler
-// // =======
-// #else // !_CCCL_COMPILER(CLANG) && !_CCCL_COMPILER(GCC) && !_CCCL_COMPILER(NVHPC) && !_CCCL_COMPILER(MSVC)
-// // >>>>>>> END NEW CODE (0de6f3b24e)
-// #  define _CCCL_SUPPRESS_DEPRECATED_PUSH
-// #  define _CCCL_SUPPRESS_DEPRECATED_POP
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #endif // unknown compiler
-// // =======
-// #endif // !_CCCL_COMPILER(CLANG) && !_CCCL_COMPILER(GCC) && !_CCCL_COMPILER(NVHPC) && !_CCCL_COMPILER(MSVC)
-// =======
 #elif _CCCL_COMPILER(NVRTC)
 #  define _CCCL_SUPPRESS_DEPRECATED_PUSH _CCCL_BEGIN_NV_DIAG_SUPPRESS(1444, 20199)
 #  define _CCCL_SUPPRESS_DEPRECATED_POP  _CCCL_NV_DIAG_POP()
@@ -166,46 +142,7 @@
 #  define _CCCL_SUPPRESS_DEPRECATED_PUSH
 #  define _CCCL_SUPPRESS_DEPRECATED_POP
 #endif // unknown compiler
-// >>>>>>> END NEW CODE (10d4c795f3)
 
-// <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
-// // Enable us to selectively silence cuda compiler warnings
-// #if _CCCL_HAS_CUDA_COMPILER()
-// #  if _CCCL_CUDA_COMPILER(CLANG)
-// #    define _CCCL_NV_DIAG_SUPPRESS(_WARNING)
-// #    define _CCCL_NV_DIAG_DEFAULT(_WARNING)
-// #  elif defined(__NVCC_DIAG_PRAGMA_SUPPORT__)
-// #    if _CCCL_COMPILER(MSVC)
-// #      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(nv_diag_suppress _WARNING)
-// #      define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(nv_diag_default _WARNING)
-// #    else // ^^^ _CCCL_COMPILER_{MSVC}^^^ / vvv !_CCCL_COMPILER_{MSVC} vvv
-// #      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(nv_diagnostic push) _CCCL_PRAGMA(nv_diag_suppress _WARNING)
-// #      define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(nv_diagnostic pop)
-// #    endif // !_CCCL_COMPILER(MSVC)
-// #  elif _CCCL_COMPILER(NVHPC)
-// #    define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(diagnostic push) _CCCL_PRAGMA(diag_suppress _WARNING)
-// #    define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(diagnostic pop)
-// #  else // ^^^ __NVCC_DIAG_PRAGMA_SUPPORT__ ^^^ / vvv !__NVCC_DIAG_PRAGMA_SUPPORT__ vvv
-// #    if _CCCL_COMPILER(GCC) // these compilers have issues with restoring the warning
-// #      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(diag_suppress _WARNING)
-// #      define _CCCL_NV_DIAG_DEFAULT(_WARNING)
-// #    else // ^^^ _CCCL_COMPILER(GCC) ^^^ / vvv !_CCCL_COMPILER(GCC) vvv
-// #      define _CCCL_NV_DIAG_SUPPRESS(_WARNING) _CCCL_PRAGMA(diag_suppress _WARNING)
-// #      define _CCCL_NV_DIAG_DEFAULT(_WARNING)  _CCCL_PRAGMA(diag_default _WARNING)
-// #    endif // !_CCCL_COMPILER(GCC)
-// #  endif // !__NVCC_DIAG_PRAGMA_SUPPORT__
-// #else // ^^^ _CCCL_HAS_CUDA_COMPILER() ^^^ / vvv !_CCCL_HAS_CUDA_COMPILER() vvv
-// #  define _CCCL_NV_DIAG_SUPPRESS(_WARNING)
-// #  define _CCCL_NV_DIAG_DEFAULT(_WARNING)
-// // <<<<<<< OLD CODE from 732986f474 (1252e35dda) - COMMENTED OUT
-// // #endif // other compilers
-// // // >>>>>>> END NEW CODE (702d3c08ed)
-// // =======
-// #endif // ^^^ !_CCCL_HAS_CUDA_COMPILER() ^^^
-// // >>>>>>> END NEW CODE (1252e35dda)
-//
-// =======
-// >>>>>>> END NEW CODE (0de6f3b24e)
 #if _CCCL_COMPILER(MSVC)
 #  define _CCCL_HAS_PRAGMA_MSVC_WARNING
 #  if !defined(_LIBCUDACXX_DISABLE_PRAGMA_MSVC_WARNING)
@@ -213,29 +150,4 @@
 #  endif // !_LIBCUDACXX_DISABLE_PRAGMA_MSVC_WARNING
 #endif // !_CCCL_COMPILER(MSVC)
 
-// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
-// // <<<<<<< OLD CODE from ae7327d30e (d47d2b9c79) - COMMENTED OUT
-// // #ifndef _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
-// // #  if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// // #    define _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
-// // #  endif
-// // #endif // _CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO
-// //
-// // #if defined(_CCCL_HAS_NO_PRAGMA_PUSH_POP_MACRO)
-// // =======
-// #if _CCCL_COMPILER(NVRTC)
-// // >>>>>>> END NEW CODE (d47d2b9c79)
-// #  define _CCCL_PUSH_MACROS _CCCL_MSVC_WARNINGS_PUSH
-// #  define _CCCL_POP_MACROS  _CCCL_MSVC_WARNINGS_POP
-// #else // ^^^ _CCCL_COMPILER(NVRTC) ^^^ / vvv !_CCCL_COMPILER(NVRTC) vvv
-// #  define _CCCL_PUSH_MACROS         \
-//     _CCCL_PRAGMA(push_macro("min")) \
-//     _CCCL_PRAGMA(push_macro("max")) _CCCL_PRAGMA(push_macro("interface")) _CCCL_MSVC_WARNINGS_PUSH
-// #  define _CCCL_POP_MACROS         \
-//     _CCCL_PRAGMA(pop_macro("min")) \
-//     _CCCL_PRAGMA(pop_macro("max")) _CCCL_PRAGMA(pop_macro("interface")) _CCCL_MSVC_WARNINGS_POP
-// #endif // !_CCCL_COMPILER(NVRTC)
-//
-// =======
-// >>>>>>> END NEW CODE (24bb5db96f)
 #endif // __CCCL_DIAGNOSTIC_H

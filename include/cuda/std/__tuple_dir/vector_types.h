@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -37,15 +37,7 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #if _CCCL_HAS_CTK()
-// // =======
-// #if _CCCL_HAS_CUDA_COMPILER()
-// // >>>>>>> END NEW CODE (702d3c08ed)
-// =======
 #if _CCCL_HAS_CTK()
-// >>>>>>> END NEW CODE (22b068b84b)
 
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
@@ -60,38 +52,10 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 #  include <cuda/std/__utility/forward.h>
 #  include <cuda/std/__utility/move.h>
 
-// <<<<<<< OLD CODE from 26ad6b2377 (d06d2a1139) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 40c5b56c00 (f69d5ba4be) - COMMENTED OUT
-// // #  if !_CCCL_CUDA_COMPILATION()
-// // #    include <cuda_runtime_api.h>
-// // #  endif // !_CCCL_CUDA_COMPILATION()
-// //
-// // // <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
-// // // #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size, ...)                      \
-// // //     template <>                                                                                    \
-// // //     struct tuple_size<__name##__size##__VA_ARGS__> : _CUDA_VSTD::integral_constant<size_t, __size> \
-// // //     {};                                                                                            \
-// // //                                                                                                    \
-// // //     template <size_t _Ip>                                                                          \
-// // //     struct tuple_element<_Ip, __name##__size##__VA_ARGS__>                                         \
-// // //     {                                                                                              \
-// // //       static_assert(_Ip < __size, "tuple_element index out of range");                             \
-// // //       using type = __type;                                                                         \
-// // // =======
-// // =======
-// // >>>>>>> END NEW CODE (f69d5ba4be)
-// #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size)              \
-//     template <>                                                                       \
-//     struct tuple_size<__name##__size> : _CUDA_VSTD::integral_constant<size_t, __size> \
-//     {};                                                                               \
-//                                                                                       \
-//     template <size_t _Ip>                                                             \
-//     struct tuple_element<_Ip, __name##__size>                                         \
-//     {                                                                                 \
-//       static_assert(_Ip < __size, "tuple_element index out of range");                \
-//       using type = __type;                                                            \
-// // >>>>>>> END NEW CODE (22b068b84b)
-// =======
+#  if !_CCCL_CUDA_COMPILATION() && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
+#    include <cuda_runtime_api.h>
+#  endif // !_CCCL_CUDA_COMPILATION()
+
 #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size, ...)                      \
     template <>                                                                                    \
     struct tuple_size<__name##__size##__VA_ARGS__> : _CUDA_VSTD::integral_constant<size_t, __size> \
@@ -102,7 +66,6 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
     {                                                                                              \
       static_assert(_Ip < __size, "tuple_element index out of range");                             \
       using type = __type;                                                                         \
-// >>>>>>> END NEW CODE (d06d2a1139)
     };
 
 #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE_VECTOR(__name, __type) \
@@ -160,26 +123,12 @@ _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE_VECTOR(longlong, long long)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE_VECTOR(ulonglong, unsigned long long)
 _CCCL_SUPPRESS_DEPRECATED_POP
 #  if _CCCL_CTK_AT_LEAST(13, 0)
-// <<<<<<< OLD CODE from 71caa2af63 (6bcfd39214) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 26ad6b2377 (d06d2a1139) - COMMENTED OUT
-// // _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(long, long, 4, _16a)
-// // _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(long, long, 4, _32a)
-// // _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulong, unsigned long, 4, _16a)
-// // _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulong, unsigned long, 4, _32a)
-// // _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(longlong, long long, 4, _16a)
-// // _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(longlong, long long, 4, _32a)
-// // =======
-// _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulong, unsigned long, 4, _16a)
-// _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulong, unsigned long, 4, _32a)
-// // >>>>>>> END NEW CODE (d06d2a1139)
-// =======
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(long, long, 4, _16a)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(long, long, 4, _32a)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulong, unsigned long, 4, _16a)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulong, unsigned long, 4, _32a)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(longlong, long long, 4, _16a)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(longlong, long long, 4, _32a)
-// >>>>>>> END NEW CODE (6bcfd39214)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulonglong, unsigned long long, 4, _16a)
 _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(ulonglong, unsigned long long, 4, _32a)
 #  endif // _CCCL_CTK_AT_LEAST(13, 0)
@@ -328,21 +277,6 @@ _LIBCUDACXX_SPECIALIZE_GET_VECTOR(ulong, unsigned long)
 _LIBCUDACXX_SPECIALIZE_GET_VECTOR(longlong, long long)
 _LIBCUDACXX_SPECIALIZE_GET_VECTOR(ulonglong, unsigned long long)
 _CCCL_SUPPRESS_DEPRECATED_POP
-// <<<<<<< OLD CODE from 71caa2af63 (6bcfd39214) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 26ad6b2377 (d06d2a1139) - COMMENTED OUT
-// // #  if _CCCL_CTK_AT_LEAST(13, 0)
-// // _LIBCUDACXX_SPECIALIZE_GET(long4_16a, long)
-// // _LIBCUDACXX_SPECIALIZE_GET(long4_32a, long)
-// // _LIBCUDACXX_SPECIALIZE_GET(ulong4_16a, unsigned long)
-// // _LIBCUDACXX_SPECIALIZE_GET(ulong4_32a, unsigned long)
-// // _LIBCUDACXX_SPECIALIZE_GET(longlong4_16a, long long)
-// // _LIBCUDACXX_SPECIALIZE_GET(longlong4_32a, long long)
-// // _LIBCUDACXX_SPECIALIZE_GET(ulonglong4_16a, unsigned long long)
-// // _LIBCUDACXX_SPECIALIZE_GET(ulonglong4_32a, unsigned long long)
-// // #  endif // _CCCL_CTK_AT_LEAST(13, 0)
-// // =======
-// // >>>>>>> END NEW CODE (d06d2a1139)
-// =======
 #  if _CCCL_CTK_AT_LEAST(13, 0)
 _LIBCUDACXX_SPECIALIZE_GET(long4_16a, long)
 _LIBCUDACXX_SPECIALIZE_GET(long4_32a, long)
@@ -353,7 +287,6 @@ _LIBCUDACXX_SPECIALIZE_GET(longlong4_32a, long long)
 _LIBCUDACXX_SPECIALIZE_GET(ulonglong4_16a, unsigned long long)
 _LIBCUDACXX_SPECIALIZE_GET(ulonglong4_32a, unsigned long long)
 #  endif // _CCCL_CTK_AT_LEAST(13, 0)
-// >>>>>>> END NEW CODE (6bcfd39214)
 _LIBCUDACXX_SPECIALIZE_GET_VECTOR(float, float)
 _CCCL_SUPPRESS_DEPRECATED_PUSH
 _LIBCUDACXX_SPECIALIZE_GET_VECTOR(double, double)

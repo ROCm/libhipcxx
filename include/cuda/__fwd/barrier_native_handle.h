@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___FWD_BARRIER_NATIVE_HANDLE_H
 #define _CUDA___FWD_BARRIER_NATIVE_HANDLE_H
 
@@ -25,17 +47,9 @@
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/cstdint>
 
-// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
-// _CCCL_BEGIN_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
-// =======
 #include <cuda/std/__cccl/prologue.h>
 
-// <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
-// _CCCL_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
-// // >>>>>>> END NEW CODE (24bb5db96f)
-// =======
 _CCCL_BEGIN_NV_DIAG_SUPPRESS(821) // extern inline function was referenced but not defined
-// >>>>>>> END NEW CODE (0de6f3b24e)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE
 

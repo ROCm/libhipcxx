@@ -1668,11 +1668,7 @@ private:
 
 public:
   _CCCL_HIDE_FROM_ABI day() = default;
-# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-#   _CCCL_HOST _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr day(unsigned __val) noexcept
-# =======
   _CCCL_API explicit constexpr day(unsigned __val) noexcept
-# >>>>>>> END NEW CODE (d2673f2d96)
       : __d(static_cast<unsigned char>(__val))
   {}
   _CCCL_API constexpr day& operator++() noexcept
@@ -1778,11 +1774,7 @@ private:
 
 public:
   _CCCL_HIDE_FROM_ABI month() = default;
-# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-#   _CCCL_HOST _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr month(unsigned __val) noexcept
-# =======
   _CCCL_API explicit constexpr month(unsigned __val) noexcept
-# >>>>>>> END NEW CODE (d2673f2d96)
       : __m(static_cast<unsigned char>(__val))
   {}
   _CCCL_API constexpr month& operator++() noexcept
@@ -1891,11 +1883,7 @@ private:
 
 public:
   _CCCL_HIDE_FROM_ABI year() = default;
-# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-#   _CCCL_HOST _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr year(int __val) noexcept
-# =======
   _CCCL_API explicit constexpr year(int __val) noexcept
-# >>>>>>> END NEW CODE (d2673f2d96)
       : __y(static_cast<short>(__val))
   {}
 
@@ -2028,15 +2016,6 @@ private:
 
 public:
   _CCCL_HIDE_FROM_ABI weekday() = default;
-# <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-#   _CCCL_HOST _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr weekday(unsigned __val) noexcept
-#       : __wd(static_cast<unsigned char>(__val == 7 ? 0 : __val))
-#   {}
-#   _CCCL_HOST _LIBCUDACXX_HIDE_FROM_ABI constexpr weekday(const sys_days& __sysd) noexcept
-#       : __wd(__weekday_from_days(__sysd.time_since_epoch().count()))
-#   {}
-#   _CCCL_HOST _LIBCUDACXX_HIDE_FROM_ABI explicit constexpr weekday(const local_days& __locd) noexcept
-# =======
   _CCCL_API explicit constexpr weekday(unsigned __val) noexcept
       : __wd(static_cast<unsigned char>(__val == 7 ? 0 : __val))
   {}
@@ -2044,7 +2023,6 @@ public:
       : __wd(__weekday_from_days(__sysd.time_since_epoch().count()))
   {}
   _CCCL_API explicit constexpr weekday(const local_days& __locd) noexcept
-# >>>>>>> END NEW CODE (d2673f2d96)
       : __wd(__weekday_from_days(__locd.time_since_epoch().count()))
   {}
 
@@ -3533,15 +3511,7 @@ _CCCL_DIAG_SUPPRESS_GCC("-Wliteral-suffix")
 _CCCL_DIAG_SUPPRESS_CLANG("-Wuser-defined-literals")
 _CCCL_DIAG_SUPPRESS_NVHPC(lit_suffix_no_underscore)
 _CCCL_DIAG_SUPPRESS_MSVC(4455) // literal suffix identifiers that do not start with an underscore are reserved
-# <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
-# # <<<<<<< OLD CODE from 41fd3bc237 (0981b7fc23) - COMMENTED OUT
-# # _CCCL_BEGIN_NV_DIAG_SUPPRESS(2506) // a user-provided literal suffix must begin with "_"
-# # =======
-# _CCCL_NV_DIAG_SUPPRESS(2506) // a user-provided literal suffix must begin with "_"
-# # >>>>>>> END NEW CODE (0981b7fc23)
-# =======
 _CCCL_BEGIN_NV_DIAG_SUPPRESS(2506) // a user-provided literal suffix must begin with "_"
-# >>>>>>> END NEW CODE (0de6f3b24e)
 
 // Suffixes for duration literals [time.duration.literals]
 inline namespace literals
@@ -3623,15 +3593,7 @@ _CCCL_API constexpr chrono::year operator""y(unsigned long long __y) noexcept
 } // namespace chrono_literals
 } // namespace literals
 
-# <<<<<<< OLD CODE from 4209437d65 (0de6f3b24e) - COMMENTED OUT
-# # <<<<<<< OLD CODE from 41fd3bc237 (0981b7fc23) - COMMENTED OUT
-# # _CCCL_END_NV_DIAG_SUPPRESS()
-# # =======
-# _CCCL_NV_DIAG_DEFAULT(2506)
-# # >>>>>>> END NEW CODE (0981b7fc23)
-# =======
 _CCCL_END_NV_DIAG_SUPPRESS()
-# >>>>>>> END NEW CODE (0de6f3b24e)
 _CCCL_DIAG_POP
 
 namespace chrono

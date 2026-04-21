@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _LIBCUDACXX___ATOMIC_TYPES_SMALL_H
 #define _LIBCUDACXX___ATOMIC_TYPES_SMALL_H
 
@@ -30,16 +52,14 @@
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/cstring>
 
-// <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
-// #if defined(_CCCL_COMPILER_HIPRTC)
-// // NOTE(AMD/HIP): We need to define these types here because 
-// // they are not defined in hiprtc. libhipcxx issue #104.
-// typedef __hip_internal::uint32_t uint32_t;
-// typedef __hip_internal::int32_t int32_t;
-// #endif
-// =======
+#if defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(AMD/HIP): We need to define these types here because
+// they are not defined in hiprtc. libhipcxx issue #104.
+typedef __hip_internal::uint32_t uint32_t;
+typedef __hip_internal::int32_t int32_t;
+#endif
+
 #include <cuda/std/__cccl/prologue.h>
-// >>>>>>> END NEW CODE (24bb5db96f)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 

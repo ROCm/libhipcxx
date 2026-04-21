@@ -43,44 +43,12 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 40c5b56c00 (f69d5ba4be) - COMMENTED OUT
-// // CUDA headers might not be present when using NVRTC, see NVIDIA/cccl#2095 for detail
-// #if !_CCCL_COMPILER(NVRTC) && not defined(__HIP_PLATFORM_AMD__)
-// #  include <cuda_runtime_api.h>
-// #endif // !_CCCL_COMPILER(NVRTC)
-// =======
 #include <cuda/std/__cccl/cuda_toolkit.h>
-// >>>>>>> END NEW CODE (f69d5ba4be)
 
 #include <nv/target>
 
-// <<<<<<< OLD CODE from 2e495c965e (3aeb8c29e5) - COMMENTED OUT
-// #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
-// #  pragma GCC system_header
-// #elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
-// #  pragma clang system_header
-// #elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
-// #  pragma system_header
-// #endif // no system header
-//
-// #ifdef _CCCL_DOXYGEN_INVOKED // Only parse this during doxygen passes:
-// //! When this macro is defined, Programmatic Dependent Launch (PDL) is disabled across CCCL
-// #  define CCCL_DISABLE_PDL
-// #endif // _CCCL_DOXYGEN_INVOKED
-//
-// #ifdef CCCL_DISABLE_PDL
-// #  define _CCCL_HAS_PDL() 0
-// #else // CCCL_DISABLE_PDL
-// #  define _CCCL_HAS_PDL() _CCCL_CTK_AT_LEAST(12, 0)
-// #endif // CCCL_DISABLE_PDL
-// =======
 // True, when programmatic dependent launch is available, otherwise false.
-// <<<<<<< OLD CODE from ffb4cb5cea (22b068b84b) - COMMENTED OUT
-// #define _CCCL_HAS_PDL _CCCL_CUDACC_AT_LEAST(12, 0)
-// // >>>>>>> END NEW CODE (3aeb8c29e5)
-// =======
 #define _CCCL_HAS_PDL _CCCL_CTK_AT_LEAST(12, 0)
-// >>>>>>> END NEW CODE (22b068b84b)
 
 #if _CCCL_HAS_PDL()
 // Waits for the previous kernel to complete (when it reaches its final membar). Should be put before the first global

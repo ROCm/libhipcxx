@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,13 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-# <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
-# _CCCL_PUSH_MACROS
-#
-# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-# =======
-#if !_CCCL_COMPILER(NVRTC)
-# >>>>>>> END NEW CODE (24bb5db96f)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <cfloat>
 #else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
 #  define FLT_RADIX       2
