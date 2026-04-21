@@ -9,7 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -96,7 +96,7 @@ static inline _CCCL_DEVICE void __atomic_thread_fence_cuda(int __memorder, _Sco)
         default: assert(0);
       }
     ),
-    NV_IS_DEVICE_LIBHIPCXX, (
+    NV_IS_DEVICE, (
       switch (__memorder) {
         case __ATOMIC_SEQ_CST: _CCCL_FALLTHROUGH();
         case __ATOMIC_CONSUME: _CCCL_FALLTHROUGH();
@@ -122,7 +122,7 @@ static inline _CCCL_DEVICE void __cuda_atomic_load_memory_order_dispatch(_Fn &__
         default: assert(0);
       }
     ),
-    NV_IS_DEVICE_LIBHIPCXX, (
+    NV_IS_DEVICE, (
       switch (__memorder) {
         case __ATOMIC_SEQ_CST: __cuda_atomic_membar(_Sco{}); _CCCL_FALLTHROUGH();
         case __ATOMIC_CONSUME: _CCCL_FALLTHROUGH();
@@ -881,7 +881,7 @@ static inline _CCCL_DEVICE void __cuda_atomic_store_memory_order_dispatch(_Fn &_
         default: assert(0);
       }
     ),
-    NV_IS_DEVICE_LIBHIPCXX, (
+    NV_IS_DEVICE, (
       switch (__memorder) {
         case __ATOMIC_RELEASE: _CCCL_FALLTHROUGH();
         case __ATOMIC_SEQ_CST: __cuda_atomic_membar(_Sco{}); _CCCL_FALLTHROUGH();
@@ -1227,7 +1227,7 @@ static inline _CCCL_DEVICE bool __cuda_atomic_compare_swap_memory_order_dispatch
         default: assert(0);
       }
     ),
-    NV_IS_DEVICE_LIBHIPCXX, (
+    NV_IS_DEVICE, (
       switch (__stronger_order_cuda(__success_memorder, __failure_memorder)) {
         case __ATOMIC_SEQ_CST: _CCCL_FALLTHROUGH();
         case __ATOMIC_ACQ_REL: __cuda_atomic_membar(_Sco{}); _CCCL_FALLTHROUGH();
@@ -1695,7 +1695,7 @@ static inline _CCCL_DEVICE void __cuda_atomic_exchange_memory_order_dispatch(_Fn
         default: assert(0);
       }
     ),
-    NV_IS_DEVICE_LIBHIPCXX, (
+    NV_IS_DEVICE, (
       switch (__memorder) {
         case __ATOMIC_SEQ_CST: _CCCL_FALLTHROUGH();
         case __ATOMIC_ACQ_REL: __cuda_atomic_membar(_Sco{}); _CCCL_FALLTHROUGH();
@@ -2160,7 +2160,7 @@ static inline _CCCL_DEVICE void __cuda_atomic_fetch_memory_order_dispatch(_Fn& _
         default: assert(0);
       }
     ),
-    NV_IS_DEVICE_LIBHIPCXX, (
+    NV_IS_DEVICE, (
       switch (__memorder) {
         case __ATOMIC_SEQ_CST: _CCCL_FALLTHROUGH();
         case __ATOMIC_ACQ_REL: __cuda_atomic_membar(_Sco{}); _CCCL_FALLTHROUGH();

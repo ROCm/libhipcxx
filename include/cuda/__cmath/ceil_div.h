@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -83,7 +83,7 @@ ceil_div(const _Tp __a, const _Up __b) noexcept
   else
   {
     // the ::min method is faster even if __b is a compile-time constant
-    NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX,
+    NV_IF_ELSE_TARGET(NV_IS_DEVICE,
                       (return static_cast<_Common>(_CUDA_VSTD::min(__a1, 1 + ((__a1 - 1) / __b1)));),
                       (const auto __res = __a1 / __b1; //
                        return static_cast<_Common>(__res + (__res * __b1 != __a1));))

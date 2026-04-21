@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -55,21 +55,21 @@ __atomic_try_wait_slow(_Tp const volatile* __a, __atomic_underlying_remove_cv_t<
   __atomic_try_wait_slow_fallback(__a, __val, __order, _Sco{});
   #else
   NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, __atomic_try_wait_slow_fallback(__a, __val, __order, _Sco{});
-                     , NV_IS_HOST_LIBHIPCXX, __atomic_try_wait_slow_fallback(__a, __val, __order, _Sco{});
-                     , NV_ANY_TARGET_LIBHIPCXX, __atomic_try_wait_unsupported_before_SM_70__(););
+                     , NV_IS_HOST, __atomic_try_wait_slow_fallback(__a, __val, __order, _Sco{});
+                     , NV_ANY_TARGET, __atomic_try_wait_unsupported_before_SM_70__(););
   #endif
 }
 
 template <typename _Tp, typename _Sco>
 _LIBCUDACXX_HIDE_FROM_ABI void __atomic_notify_one(_Tp const volatile*, _Sco)
 {
-  NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST_LIBHIPCXX, , NV_ANY_TARGET_LIBHIPCXX, __atomic_try_wait_unsupported_before_SM_70__(););
+  NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST, , NV_ANY_TARGET, __atomic_try_wait_unsupported_before_SM_70__(););
 }
 
 template <typename _Tp, typename _Sco>
 _LIBCUDACXX_HIDE_FROM_ABI void __atomic_notify_all(_Tp const volatile*, _Sco)
 {
-  NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST_LIBHIPCXX, , NV_ANY_TARGET_LIBHIPCXX, __atomic_try_wait_unsupported_before_SM_70__(););
+  NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST, , NV_ANY_TARGET, __atomic_try_wait_unsupported_before_SM_70__(););
 }
 
 template <typename _Tp>

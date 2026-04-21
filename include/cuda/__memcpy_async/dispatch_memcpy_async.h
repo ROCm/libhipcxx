@@ -11,7 +11,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ _CCCL_NODISCARD _CCCL_DEVICE inline __completion_mechanism __dispatch_memcpy_asy
   _CUDA_VSTD::uint64_t* __bar_handle)
 {
 #if __cccl_ptx_isa >= 800
-  NV_IF_TARGET_LIBHIPCXX(
+  NV_IF_TARGET(
     NV_PROVIDES_SM_90,
     (const bool __can_use_complete_tx = __allowed_completions & uint32_t(__completion_mechanism::__mbarrier_complete_tx);
      (void) __can_use_complete_tx;
@@ -108,7 +108,7 @@ _CCCL_NODISCARD _CCCL_DEVICE inline __completion_mechanism __dispatch_memcpy_asy
      ));
 #endif // __cccl_ptx_isa >= 800
 
-  NV_IF_TARGET_LIBHIPCXX(
+  NV_IF_TARGET(
     NV_PROVIDES_SM_80,
     (if constexpr (_Align >= 4) {
       const bool __can_use_async_group = __allowed_completions & uint32_t(__completion_mechanism::__async_group);
@@ -136,7 +136,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __completion_mechanism __dispatch_memc
   _CUDA_VSTD::uint64_t* __bar_handle)
 {
   NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX,
+    NV_IS_DEVICE,
     (
       // Dispatch based on direction of the copy: global to shared, shared to
       // global, etc.

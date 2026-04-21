@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -249,7 +249,7 @@ _CCCL_DEVICE _CCCL_HIDE_FROM_ABI void __for_each_canceled_block(bool __is_leader
 
   NV_DISPATCH_TARGET(NV_PROVIDES_SM_100,
                      (::cuda::__for_each_canceled_block_sm100(__block_idx, __is_leader, _CUDA_VSTD::move(__uf));),
-                     NV_ANY_TARGET_LIBHIPCXX,
+                     NV_ANY_TARGET,
                      (_CUDA_VSTD::invoke(_CUDA_VSTD::move(__uf), __block_idx);))
 }
 

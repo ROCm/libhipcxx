@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -59,25 +59,25 @@
 namespace __cccl_internal
 {
 template <>
-struct __is_non_narrowing_convertible<__hip_bfloat16, float>
+struct __is_non_narrowing_convertible<__nv_bfloat16, float>
 {
   static constexpr bool value = true;
 };
 
 template <>
-struct __is_non_narrowing_convertible<__hip_bfloat16, double>
+struct __is_non_narrowing_convertible<__nv_bfloat16, double>
 {
   static constexpr bool value = true;
 };
 
 template <>
-struct __is_non_narrowing_convertible<float, __hip_bfloat16>
+struct __is_non_narrowing_convertible<float, __nv_bfloat16>
 {
   static constexpr bool value = true;
 };
 
 template <>
-struct __is_non_narrowing_convertible<double, __hip_bfloat16>
+struct __is_non_narrowing_convertible<double, __nv_bfloat16>
 {
   static constexpr bool value = true;
 };
@@ -86,42 +86,42 @@ struct __is_non_narrowing_convertible<double, __hip_bfloat16>
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 template <>
-struct __complex_alignment<__hip_bfloat16> : integral_constant<size_t, alignof(__hip_bfloat162)>
+struct __complex_alignment<__nv_bfloat16> : integral_constant<size_t, alignof(__nv_bfloat162)>
 {};
 
 template <>
-struct __type_to_vector<__hip_bfloat16>
+struct __type_to_vector<__nv_bfloat16>
 {
-  using __type = __hip_bfloat162;
+  using __type = __nv_bfloat162;
 };
 
 template <>
-struct __cccl_complex_overload_traits<__hip_bfloat16, false, false>
+struct __cccl_complex_overload_traits<__nv_bfloat16, false, false>
 {
-  using _ValueType   = __hip_bfloat16;
-  using _ComplexType = complex<__hip_bfloat16>;
+  using _ValueType   = __nv_bfloat16;
+  using _ComplexType = complex<__nv_bfloat16>;
 };
 
 template <class _Tp>
-_LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 __convert_to_bfloat16(const _Tp& __value) noexcept
+_LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 __convert_to_bfloat16(const _Tp& __value) noexcept
 {
   return __value;
 }
 
-_LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 __convert_to_bfloat16(const float& __value) noexcept
+_LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 __convert_to_bfloat16(const float& __value) noexcept
 {
   return __float2bfloat16(__value);
 }
 
-_LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 __convert_to_bfloat16(const double& __value) noexcept
+_LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 __convert_to_bfloat16(const double& __value) noexcept
 {
   return __double2bfloat16(__value);
 }
 
 template <>
-class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__hip_bfloat162)) complex<__hip_bfloat16>
+class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) complex<__nv_bfloat16>
 {
-  __hip_bfloat162 __repr_;
+  __nv_bfloat162 __repr_;
 
   template <class _Up>
   friend class complex;
@@ -130,7 +130,7 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__hip_bfloat162)) comp
   friend struct __get_complex_impl;
 
 public:
-  using value_type = __hip_bfloat16;
+  using value_type = __nv_bfloat16;
 
   _LIBCUDACXX_HIDE_FROM_ABI complex(const value_type& __re = value_type(), const value_type& __im = value_type())
       : __repr_(__re, __im)
@@ -255,21 +255,21 @@ public:
 
 template <> // complex<float>
 template <> // complex<__half>
-_LIBCUDACXX_HIDE_FROM_ABI complex<float>::complex(const complex<__hip_bfloat16>& __c)
+_LIBCUDACXX_HIDE_FROM_ABI complex<float>::complex(const complex<__nv_bfloat16>& __c)
     : __re_(__bfloat162float(__c.real()))
     , __im_(__bfloat162float(__c.imag()))
 {}
 
 template <> // complex<double>
 template <> // complex<__half>
-_LIBCUDACXX_HIDE_FROM_ABI complex<double>::complex(const complex<__hip_bfloat16>& __c)
+_LIBCUDACXX_HIDE_FROM_ABI complex<double>::complex(const complex<__nv_bfloat16>& __c)
     : __re_(__bfloat162float(__c.real()))
     , __im_(__bfloat162float(__c.imag()))
 {}
 
 template <> // complex<float>
-template <> // complex<__hip_bfloat16>
-_LIBCUDACXX_HIDE_FROM_ABI complex<float>& complex<float>::operator=(const complex<__hip_bfloat16>& __c)
+template <> // complex<__nv_bfloat16>
+_LIBCUDACXX_HIDE_FROM_ABI complex<float>& complex<float>::operator=(const complex<__nv_bfloat16>& __c)
 {
   __re_ = __bfloat162float(__c.real());
   __im_ = __bfloat162float(__c.imag());
@@ -277,15 +277,15 @@ _LIBCUDACXX_HIDE_FROM_ABI complex<float>& complex<float>::operator=(const comple
 }
 
 template <> // complex<double>
-template <> // complex<__hip_bfloat16>
-_LIBCUDACXX_HIDE_FROM_ABI complex<double>& complex<double>::operator=(const complex<__hip_bfloat16>& __c)
+template <> // complex<__nv_bfloat16>
+_LIBCUDACXX_HIDE_FROM_ABI complex<double>& complex<double>::operator=(const complex<__nv_bfloat16>& __c)
 {
   __re_ = __bfloat162float(__c.real());
   __im_ = __bfloat162float(__c.imag());
   return *this;
 }
 
-_LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 arg(__hip_bfloat16 __re)
+_LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 arg(__nv_bfloat16 __re)
 {
   // NOTE(HIP/AMD): bfloat16 currently does not provide __int2bfloat16_rn for; this is only implementated for floating point types
   // (see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_bf16.h)
@@ -293,51 +293,51 @@ _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 arg(__hip_bfloat16 __re)
   return _CUDA_VSTD::atan2(__float2bfloat16(0.0f), __re);
 }
 
-// We have performance issues with some trigonometric functions with __hip_bfloat16
+// We have performance issues with some trigonometric functions with __nv_bfloat16
 template <>
-_LIBCUDACXX_HIDE_FROM_ABI complex<__hip_bfloat16> asinh(const complex<__hip_bfloat16>& __x)
+_LIBCUDACXX_HIDE_FROM_ABI complex<__nv_bfloat16> asinh(const complex<__nv_bfloat16>& __x)
 {
-  return complex<__hip_bfloat16>{_CUDA_VSTD::asinh(complex<float>{__x})};
+  return complex<__nv_bfloat16>{_CUDA_VSTD::asinh(complex<float>{__x})};
 }
 template <>
-_LIBCUDACXX_HIDE_FROM_ABI complex<__hip_bfloat16> acosh(const complex<__hip_bfloat16>& __x)
+_LIBCUDACXX_HIDE_FROM_ABI complex<__nv_bfloat16> acosh(const complex<__nv_bfloat16>& __x)
 {
-  return complex<__hip_bfloat16>{_CUDA_VSTD::acosh(complex<float>{__x})};
+  return complex<__nv_bfloat16>{_CUDA_VSTD::acosh(complex<float>{__x})};
 }
 template <>
-_LIBCUDACXX_HIDE_FROM_ABI complex<__hip_bfloat16> atanh(const complex<__hip_bfloat16>& __x)
+_LIBCUDACXX_HIDE_FROM_ABI complex<__nv_bfloat16> atanh(const complex<__nv_bfloat16>& __x)
 {
-  return complex<__hip_bfloat16>{_CUDA_VSTD::atanh(complex<float>{__x})};
+  return complex<__nv_bfloat16>{_CUDA_VSTD::atanh(complex<float>{__x})};
 }
 template <>
-_LIBCUDACXX_HIDE_FROM_ABI complex<__hip_bfloat16> acos(const complex<__hip_bfloat16>& __x)
+_LIBCUDACXX_HIDE_FROM_ABI complex<__nv_bfloat16> acos(const complex<__nv_bfloat16>& __x)
 {
-  return complex<__hip_bfloat16>{_CUDA_VSTD::acos(complex<float>{__x})};
+  return complex<__nv_bfloat16>{_CUDA_VSTD::acos(complex<float>{__x})};
 }
 
 template <>
-struct __get_complex_impl<__hip_bfloat16>
+struct __get_complex_impl<__nv_bfloat16>
 {
   template <size_t _Index>
-  static _LIBCUDACXX_HIDE_FROM_ABI constexpr __hip_bfloat16& get(complex<__hip_bfloat16>& __z) noexcept
+  static _LIBCUDACXX_HIDE_FROM_ABI constexpr __nv_bfloat16& get(complex<__nv_bfloat16>& __z) noexcept
   {
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
   }
 
   template <size_t _Index>
-  static _LIBCUDACXX_HIDE_FROM_ABI constexpr __hip_bfloat16&& get(complex<__hip_bfloat16>&& __z) noexcept
+  static _LIBCUDACXX_HIDE_FROM_ABI constexpr __nv_bfloat16&& get(complex<__nv_bfloat16>&& __z) noexcept
   {
     return _CUDA_VSTD::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
   }
 
   template <size_t _Index>
-  static _LIBCUDACXX_HIDE_FROM_ABI constexpr const __hip_bfloat16& get(const complex<__hip_bfloat16>& __z) noexcept
+  static _LIBCUDACXX_HIDE_FROM_ABI constexpr const __nv_bfloat16& get(const complex<__nv_bfloat16>& __z) noexcept
   {
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
   }
 
   template <size_t _Index>
-  static _LIBCUDACXX_HIDE_FROM_ABI constexpr const __hip_bfloat16&& get(const complex<__hip_bfloat16>&& __z) noexcept
+  static _LIBCUDACXX_HIDE_FROM_ABI constexpr const __nv_bfloat16&& get(const complex<__nv_bfloat16>&& __z) noexcept
   {
     return _CUDA_VSTD::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
   }
@@ -346,7 +346,7 @@ struct __get_complex_impl<__hip_bfloat16>
 #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 template <class _CharT, class _Traits>
 ::std::basic_istream<_CharT, _Traits>&
-operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<__hip_bfloat16>& __x)
+operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<__nv_bfloat16>& __x)
 {
   ::std::complex<float> __temp;
   __is >> __temp;
@@ -356,7 +356,7 @@ operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<__hip_bfloat16>&
 
 template <class _CharT, class _Traits>
 ::std::basic_ostream<_CharT, _Traits>&
-operator<<(::std::basic_ostream<_CharT, _Traits>& __os, const complex<__hip_bfloat16>& __x)
+operator<<(::std::basic_ostream<_CharT, _Traits>& __os, const complex<__nv_bfloat16>& __x)
 {
   return __os << complex<float>{__x};
 }

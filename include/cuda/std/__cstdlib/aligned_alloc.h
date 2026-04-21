@@ -79,7 +79,7 @@ _CCCL_NODISCARD _CCCL_HIDE_FROM_ABI _CCCL_HOST void* __aligned_alloc_host(size_t
 #if !defined(__HIP_DEVICE_COMPILE__)
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI void* aligned_alloc(size_t __nbytes, size_t __align) noexcept
 {
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return _CUDA_VSTD::__aligned_alloc_host(__nbytes, __align);),
                     (return ::__cuda_syscall_aligned_malloc(__nbytes, __align);))
 }

@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -129,7 +129,7 @@ inline _CCCL_HOST_DEVICE void
 atomic_thread_fence(memory_order __m, thread_scope _Scope = thread_scope::thread_scope_system)
 {
   NV_DISPATCH_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX,
+    NV_IS_DEVICE,
     (switch (_Scope) {
       case thread_scope::thread_scope_system:
         _CUDA_VSTD::__atomic_thread_fence_cuda((int) __m, __thread_scope_system_tag{});
@@ -144,7 +144,7 @@ atomic_thread_fence(memory_order __m, thread_scope _Scope = thread_scope::thread
       case thread_scope::thread_scope_thread:
         break;
     }),
-    NV_IS_HOST_LIBHIPCXX,
+    NV_IS_HOST,
     ((void) _Scope; _CUDA_VSTD::atomic_thread_fence(__m);))
 }
 

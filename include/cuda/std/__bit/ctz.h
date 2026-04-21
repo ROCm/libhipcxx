@@ -134,7 +134,7 @@ template <typename _Tp>
 _LIBCUDACXX_HIDE_FROM_ABI int __runtime_ctz(_Tp __x) noexcept
 {
   // TODO(HIP/AMD): On Windows, __clz/__brev intrinsics produce wrong results, use constexpr path until fixed (see #167)
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE,
                     (
 #if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
                      return _CUDA_VSTD::__constexpr_ctz(__x);
@@ -154,7 +154,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr int __cccl_ctz(_Tp __x) noex
 #if defined(_CCCL_BUILTIN_IS_CONSTANT_EVALUATED)
   return is_constant_evaluated() ? _CUDA_VSTD::__constexpr_ctz(__x) : _CUDA_VSTD::__runtime_ctz(__x);
 #else
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX, //
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, //
                     (return _CUDA_VSTD::__constexpr_ctz(__x);),
                     (return _CUDA_VSTD::__host_constexpr_ctz(__x);))
 #endif

@@ -9,7 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -50,7 +50,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_alloc()
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::bad_alloc();), (_CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::bad_alloc();), (_CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   _CUDA_VSTD_NOVERSION::terminate();
 #endif // _CCCL_NO_EXCEPTIONS
@@ -59,7 +59,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_alloc()
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_array_new_length()
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::bad_array_new_length();), (_CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::bad_array_new_length();), (_CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   _CUDA_VSTD_NOVERSION::terminate();
 #endif // _CCCL_NO_EXCEPTIONS

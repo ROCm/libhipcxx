@@ -9,7 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -76,7 +76,7 @@ public:
 
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_cuda_error(const int __status, const char* __msg)
 {
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (throw ::cuda::cuda_error(__status, __msg);),
                     ((void) __status; (void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 }

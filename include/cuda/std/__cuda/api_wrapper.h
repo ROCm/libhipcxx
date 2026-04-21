@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -47,20 +47,20 @@
 #if _CCCL_HAS_CUDA_COMPILER()
 #  define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)           \
     {                                                    \
-      const ::hipError_t __status = _NAME(__VA_ARGS__); \
+      const ::cudaError_t __status = _NAME(__VA_ARGS__); \
       switch (__status)                                  \
       {                                                  \
-        case ::hipSuccess:                              \
+        case ::cudaSuccess:                              \
           break;                                         \
         default:                                         \
-          ::hipGetLastError();                          \
+          ::cudaGetLastError();                          \
           ::hip::__throw_cuda_error(__status, _MSG);    \
       }                                                  \
     }
 
 #  define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)        \
     {                                                    \
-      const ::hipError_t __status = _NAME(__VA_ARGS__); \
+      const ::cudaError_t __status = _NAME(__VA_ARGS__); \
       _CCCL_ASSERT(__status == cudaSuccess, _MSG);       \
       (void) __status;                                   \
     }

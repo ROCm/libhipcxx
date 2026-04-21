@@ -9,7 +9,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,8 +63,8 @@ _LIBCUDACXX_HIDE_FROM_ABI void __cccl_thread_sleep_for(_CUDA_VSTD::chrono::nanos
 // We will need to find a way to make this information available either at compile time or query it at runtime.
 // The default way to query hipDeviceAttributeWallClockRate does not work on NVIDIA devices (ROCm 5.4, tested on A100).
 // The default way to query hipDeviceAttributeWallClockRate() does not work on NVIDIA devices (ROCm 5.4, tested on A100).
-NV_IF_TARGET_LIBHIPCXX(
-  NV_IS_DEVICE_LIBHIPCXX, (
+NV_IF_TARGET(
+  NV_IS_DEVICE, (
       auto const __step = __ns.count();
       long long  __now, __start;
       __now = wall_clock64();
@@ -117,7 +117,7 @@ NV_IF_TARGET_LIBHIPCXX(
     )
   )
 #else
-  NV_IF_TARGET_LIBHIPCXX(NV_IS_DEVICE_LIBHIPCXX,
+  NV_IF_TARGET(NV_IS_DEVICE,
                (auto const __step = __ns.count(); assert(__step < numeric_limits<unsigned>::max());
                 asm volatile("nanosleep.u32 %0;" ::"r"((unsigned) __step) :);))
 #endif

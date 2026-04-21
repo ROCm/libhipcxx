@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -128,7 +128,7 @@ template <class _Err, class _Arg>
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_bad_expected_access(_Arg&& __arg)
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (throw _CUDA_VSTD::bad_expected_access<_Err>(_CUDA_VSTD::forward<_Arg>(__arg));),
                     ((void) __arg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv

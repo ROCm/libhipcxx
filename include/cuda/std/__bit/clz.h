@@ -118,7 +118,7 @@ _CCCL_HIDE_FROM_ABI int __host_runtime_clz(_Tp __x) noexcept
 template <typename _Tp>
 _LIBCUDACXX_HIDE_FROM_ABI int __runtime_clz(_Tp __x) noexcept
 {
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE,
                     (if constexpr (sizeof(_Tp) == sizeof(uint32_t)) {
                        return __clz(static_cast<uint32_t>(__x));
                      } else {

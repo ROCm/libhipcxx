@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -158,7 +158,7 @@ _LIBCUDACXX_HIDE_FROM_ABI __half atan2(__half __x, __half __y)
 
 _LIBCUDACXX_HIDE_FROM_ABI __half sqrt(__half __x)
 {
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX, (return hsqrt(__x);), (return __float2half(::sqrtf(__half2float(__x)));))
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (return hsqrt(__x);), (return __float2half(::sqrtf(__half2float(__x)));))
 }
 
 // floating point helper

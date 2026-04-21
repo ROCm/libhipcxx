@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -123,7 +123,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr int fpclassify(float __x) no
 #else // ^^^ _CCCL_BUILTIN_FPCLASSIFY ^^^ / vvv !_CCCL_BUILTIN_FPCLASSIFY vvv
   if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
   {
-    NV_IF_TARGET_LIBHIPCXX(NV_IS_HOST_LIBHIPCXX, (return ::fpclassify(__x);))
+    NV_IF_TARGET(NV_IS_HOST, (return ::fpclassify(__x);))
   }
   return _CUDA_VSTD::__fpclassify_impl(__x);
 #endif // !_CCCL_BUILTIN_FPCLASSIFY
@@ -136,7 +136,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr int fpclassify(double __x) n
 #else // ^^^ _CCCL_BUILTIN_FPCLASSIFY ^^^ / vvv !_CCCL_BUILTIN_FPCLASSIFY vvv
   if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
   {
-    NV_IF_TARGET_LIBHIPCXX(NV_IS_HOST_LIBHIPCXX, (return ::fpclassify(__x);))
+    NV_IF_TARGET(NV_IS_HOST, (return ::fpclassify(__x);))
   }
   return _CUDA_VSTD::__fpclassify_impl(__x);
 #endif // !_CCCL_BUILTIN_FPCLASSIFY
@@ -150,7 +150,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr int fpclassify(long double _
 #  else // ^^^ _CCCL_BUILTIN_SIGNBIT ^^^ / vvv !_CCCL_BUILTIN_SIGNBIT vvv
   if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
   {
-    NV_IF_TARGET_LIBHIPCXX(NV_IS_HOST_LIBHIPCXX, (return ::fpclassify(__x);))
+    NV_IF_TARGET(NV_IS_HOST, (return ::fpclassify(__x);))
   }
   return _CUDA_VSTD::__fpclassify_impl(__x);
 #  endif // !_CCCL_BUILTIN_SIGNBIT
@@ -165,7 +165,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr int fpclassify(__half __x) n
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr int fpclassify(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr int fpclassify(__nv_bfloat16 __x) noexcept
 {
   return _CUDA_VSTD::__fpclassify_impl(__x);
 }
