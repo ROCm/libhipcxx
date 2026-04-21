@@ -31,6 +31,9 @@
 // UNSUPPORTED: nvrtc, hiprtc
 // UNSUPPORTED: nvhpc
 
+// XFAIL: enable-tile
+// error: dynamic memory allocation is unsupported in tile code
+
 // Test the fix for https://llvm.org/PR54100
 
 #include <cuda/std/__memory_>
