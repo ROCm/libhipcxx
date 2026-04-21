@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -100,7 +100,7 @@ __cuda_atomic_compare_exchange(_Type* __ptr, _Type& __dst, _Type __cmp, _Type __
   // __old = __window[0:32] where [__cmp] resides within some offset.
   uint32_t __old;
   // Start by loading __old with the current value, this optimizes for early return when __cmp is wrong
-  NV_IF_TARGET_LIBHIPCXX(
+  NV_IF_TARGET(
     NV_PROVIDES_SM_70,
     (__cuda_atomic_load(
        __aligned, __old, __atomic_cuda_relaxed{}, __atomic_cuda_operand_b32{}, _Sco{}, __atomic_cuda_mmio_disable{});),
@@ -142,7 +142,7 @@ _CCCL_DEVICE _Type __cuda_atomic_fetch_update(_Type* __ptr, const _Fn& __op, _Or
   // 8/16b fetch update is similar to CAS implementation, but compresses the logic for recalculating the operand
   // __old = __window[0:32] where [__cmp] resides within some offset.
   uint32_t __old;
-  NV_IF_TARGET_LIBHIPCXX(
+  NV_IF_TARGET(
     NV_PROVIDES_SM_70,
     (__cuda_atomic_load(
        __aligned, __old, __atomic_cuda_relaxed{}, __atomic_cuda_operand_b32{}, _Sco{}, __atomic_cuda_mmio_disable{});),
@@ -177,7 +177,7 @@ template <class _Type,
 _CCCL_DEVICE _Type __cuda_atomic_fetch_update(_Type* __ptr, const _Fn& __op, _Order, _Operand, _Sco)
 {
   _Type __expected = 0;
-  NV_IF_TARGET_LIBHIPCXX(
+  NV_IF_TARGET(
     NV_PROVIDES_SM_70,
     (__cuda_atomic_load(
        __ptr, __expected, __atomic_cuda_relaxed{}, __atomic_cuda_operand_b32{}, _Sco{}, __atomic_cuda_mmio_disable{});),

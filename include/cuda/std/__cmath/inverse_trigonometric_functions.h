@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -115,7 +115,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half acos(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 acos(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 acos(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::acosf(__bfloat162float(__x)));
 }
@@ -184,7 +184,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half asin(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 asin(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 asin(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::asinf(__bfloat162float(__x)));
 }
@@ -253,7 +253,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half atan(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 atan(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 atan(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::atanf(__bfloat162float(__x)));
 }
@@ -322,7 +322,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half atan2(__half __x, __half __y) n
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 atan2(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 atan2(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::atan2f(__bfloat162float(__x), __bfloat162float(__y)));
 }

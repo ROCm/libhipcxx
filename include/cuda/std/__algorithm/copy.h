@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -101,7 +101,7 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr bool __constexpr_tail_overlap(_Tp* __first, 
 {
   _LIBCUDACXX_UNUSED_VAR(__last);
 #if defined(_CCCL_BUILTIN_CONSTANT_P)
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return _CCCL_BUILTIN_CONSTANT_P(__first < __needle) && __first < __needle;),
                     (return __constexpr_tail_overlap_fallback(__first, __needle, __last);))
 #else // ^^^ _CCCL_BUILTIN_CONSTANT_P ^^^ / vvv !_CCCL_BUILTIN_CONSTANT_P vvv

@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI _Tp* get_device_address(_Tp& __device_
 {
 #if _CCCL_HAS_CUDA_COMPILER()
   NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX,
+    NV_IS_DEVICE,
     (return _CUDA_VSTD::addressof(__device_object);),
     (void* __device_ptr = nullptr; _CCCL_TRY_CUDA_API(
        ::hipGetSymbolAddress,

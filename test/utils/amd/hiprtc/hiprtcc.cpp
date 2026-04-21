@@ -245,10 +245,10 @@ int main(int argc, char** argv)
   }
 
   hipDevice_t device;
-  hipDeviceProp_t device_prop;
+  cudaDeviceProp device_prop;
 
-  (void)hipGetDevice(&device);
-  (void)hipGetDeviceProperties(&device_prop, device);
+  (void)cudaGetDevice(&device);
+  (void)cudaGetDeviceProperties(&device_prop, device);
 
   const std::regex gfx_arch_pattern("(gfx[0-9a-fA-F]+)(:[-+:\\w]+)?");
 

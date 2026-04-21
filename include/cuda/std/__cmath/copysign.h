@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -130,7 +130,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __half copysign(__half __x, 
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __hip_bfloat16 copysign(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __nv_bfloat16 copysign(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
 {
   return _CUDA_VSTD::__copysign_impl(__x, __y);
 }

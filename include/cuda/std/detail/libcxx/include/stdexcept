@@ -9,7 +9,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -50,7 +50,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_runtime_error(const char* __msg)
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::runtime_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::runtime_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -60,7 +60,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_runtime_error(const char* 
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_logic_error(const char* __msg)
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::logic_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::logic_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -70,7 +70,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_logic_error(const char* __
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_domain_error(const char* __msg)
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::domain_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::domain_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -81,7 +81,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_invalid_argument(const cha
 {
 #ifndef _CCCL_NO_EXCEPTIONS
   NV_IF_ELSE_TARGET(
-    NV_IS_HOST_LIBHIPCXX, (throw ::std::invalid_argument(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+    NV_IS_HOST, (throw ::std::invalid_argument(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -91,7 +91,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_invalid_argument(const cha
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_length_error(const char* __msg)
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::length_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::length_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -101,7 +101,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_length_error(const char* _
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_out_of_range(const char* __msg)
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::out_of_range(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::out_of_range(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -111,7 +111,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_out_of_range(const char* _
 _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_range_error(const char* __msg)
 {
 #ifndef _CCCL_NO_EXCEPTIONS
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX, (throw ::std::range_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::std::range_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -122,7 +122,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_overflow_error(const char*
 {
 #ifndef _CCCL_NO_EXCEPTIONS
   NV_IF_ELSE_TARGET(
-    NV_IS_HOST_LIBHIPCXX, (throw ::std::overflow_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+    NV_IS_HOST, (throw ::std::overflow_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();
@@ -133,7 +133,7 @@ _CCCL_NORETURN _LIBCUDACXX_HIDE_FROM_ABI void __throw_underflow_error(const char
 {
 #ifndef _CCCL_NO_EXCEPTIONS
   NV_IF_ELSE_TARGET(
-    NV_IS_HOST_LIBHIPCXX, (throw ::std::underflow_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
+    NV_IS_HOST, (throw ::std::underflow_error(__msg);), ((void) __msg; _CUDA_VSTD_NOVERSION::terminate();))
 #else // ^^^ !_CCCL_NO_EXCEPTIONS ^^^ / vvv _CCCL_NO_EXCEPTIONS vvv
   (void) __msg;
   _CUDA_VSTD_NOVERSION::terminate();

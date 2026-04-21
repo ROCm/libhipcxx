@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -107,7 +107,7 @@ _CCCL_HIDE_FROM_ABI int __host_runtime_popc(_Tp __x) noexcept
 template <typename _Tp>
 _LIBCUDACXX_HIDE_FROM_ABI int __runtime_popc(_Tp __x) noexcept
 {
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE,
                     (return sizeof(_Tp) == sizeof(uint32_t) ? __popc(static_cast<uint32_t>(__x)) //
                                                             : __popcll(static_cast<uint64_t>(__x));),
                     (return _CUDA_VSTD::__host_runtime_popc(__x);))

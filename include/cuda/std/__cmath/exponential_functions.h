@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -134,10 +134,10 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half exp(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 exp(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 exp(__nv_bfloat16 __x) noexcept
 {
   NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX, (return ::hexp(__x);), (return __float2bfloat16(_CUDA_VSTD::expf(__bfloat162float(__x)));))
+    NV_IS_DEVICE, (return ::hexp(__x);), (return __float2bfloat16(_CUDA_VSTD::expf(__bfloat162float(__x)));))
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
@@ -204,7 +204,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half frexp(__half __x, int* __e) noe
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 frexp(__hip_bfloat16 __x, int* __e) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 frexp(__nv_bfloat16 __x, int* __e) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::frexpf(__bfloat162float(__x), __e));
 }
@@ -273,7 +273,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half ldexp(__half __x, int __e) noex
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 ldexp(__hip_bfloat16 __x, int __e) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 ldexp(__nv_bfloat16 __x, int __e) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::ldexpf(__bfloat162float(__x), __e));
 }
@@ -337,15 +337,15 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI long double exp2l(long double __x) noe
 #if _LIBCUDACXX_HAS_NVFP16()
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half exp2(__half __x) noexcept
 {
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX, (return ::hexp2(__x);), (return __float2half(_CUDA_VSTD::exp2f(__half2float(__x)));))
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (return ::hexp2(__x);), (return __float2half(_CUDA_VSTD::exp2f(__half2float(__x)));))
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 exp2(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 exp2(__nv_bfloat16 __x) noexcept
 {
   NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX, (return ::hexp2(__x);), (return __float2bfloat16(_CUDA_VSTD::exp2f(__bfloat162float(__x)));))
+    NV_IS_DEVICE, (return ::hexp2(__x);), (return __float2bfloat16(_CUDA_VSTD::exp2f(__bfloat162float(__x)));))
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
@@ -412,7 +412,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half expm1(__half __x) noexcept
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 expm1(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 expm1(__nv_bfloat16 __x) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::expm1f(__bfloat162float(__x)));
 }
@@ -481,7 +481,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half scalbln(__half __x, long __y) n
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 scalbln(__hip_bfloat16 __x, long __y) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 scalbln(__nv_bfloat16 __x, long __y) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::scalblnf(__bfloat162float(__x), __y));
 }
@@ -550,7 +550,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half scalbn(__half __x, int __y) noe
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 scalbn(__hip_bfloat16 __x, int __y) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 scalbn(__nv_bfloat16 __x, int __y) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::scalbnf(__bfloat162float(__x), __y));
 }
@@ -619,7 +619,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __half pow(__half __x, __half __y) noe
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __hip_bfloat16 pow(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 pow(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
 {
   return __float2bfloat16(_CUDA_VSTD::powf(__bfloat162float(__x), __bfloat162float(__y)));
 }

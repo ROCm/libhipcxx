@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -69,12 +69,12 @@ _CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__half> = true;
 
 #if _CCCL_HAS_NVBF16()
 template <>
-struct __is_extended_floating_point<__hip_bfloat16> : true_type
+struct __is_extended_floating_point<__nv_bfloat16> : true_type
 {};
 
 #  ifndef _CCCL_NO_INLINE_VARIABLES
 template <>
-_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__hip_bfloat16> = true;
+_CCCL_INLINE_VAR constexpr bool __is_extended_floating_point_v<__nv_bfloat16> = true;
 #  endif // !_CCCL_NO_INLINE_VARIABLES
 #endif // _CCCL_HAS_NVBF16
 

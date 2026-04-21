@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -70,10 +70,10 @@ _LIBCUDACXX_HIDE_FROM_ABI system_clock::time_point system_clock::now() noexcept
 // FIXME(HIP): simplify logic and use NV_DISPATCH_TARGET macros
 #ifdef __CUDA_ARCH__
   NV_DISPATCH_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX,
+    NV_IS_DEVICE,
     (uint64_t __time; asm volatile("mov.u64 %0, %%globaltimer;" : "=l"(__time)::);
      return time_point(duration_cast<duration>(nanoseconds(__time)));),
-    NV_IS_HOST_LIBHIPCXX,
+    NV_IS_HOST,
     (return time_point(duration_cast<duration>(nanoseconds(
       ::std::chrono::duration_cast<::std::chrono::nanoseconds>(::std::chrono::system_clock::now().time_since_epoch())
         .count())));));

@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,7 @@ template <class _A1,
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool isgreater(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return ::isgreater((type) __x, (type) __y);),
                     (return _CUDA_VSTD::__device_isgreater((type) __x, (type) __y);))
 }
@@ -98,7 +98,7 @@ template <class _A1,
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool isgreaterequal(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return ::isgreaterequal((type) __x, (type) __y);),
                     (return _CUDA_VSTD::__device_isgreaterequal((type) __x, (type) __y);))
 }
@@ -121,7 +121,7 @@ template <class _A1,
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool isless(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return ::isless((type) __x, (type) __y);),
                     (return _CUDA_VSTD::__device_isless((type) __x, (type) __y);))
 }
@@ -144,7 +144,7 @@ template <class _A1,
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool islessequal(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return ::islessequal((type) __x, (type) __y);),
                     (return _CUDA_VSTD::__device_islessequal((type) __x, (type) __y);))
 }
@@ -167,7 +167,7 @@ template <class _A1,
 _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool islessgreater(_A1 __x, _A2 __y) noexcept
 {
   using type = __promote_t<_A1, _A2>;
-  NV_IF_ELSE_TARGET(NV_IS_HOST_LIBHIPCXX,
+  NV_IF_ELSE_TARGET(NV_IS_HOST,
                     (return ::islessgreater((type) __x, (type) __y);),
                     (return _CUDA_VSTD::__device_islessgreater((type) __x, (type) __y);))
 }

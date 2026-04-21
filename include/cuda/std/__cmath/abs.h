@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -122,7 +122,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __half fabs(__half __x) noex
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __hip_bfloat16 fabs(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __nv_bfloat16 fabs(__nv_bfloat16 __x) noexcept
 {
   // We cannot use `abs.bf16` because it is not IEEE 754 compliant, see docs
   return _CUDA_VSTD::__fabs_impl(__x);
@@ -205,7 +205,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __half abs(__half __x) noexc
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __hip_bfloat16 abs(__hip_bfloat16 __x) noexcept
+_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI constexpr __nv_bfloat16 abs(__nv_bfloat16 __x) noexcept
 {
   return _CUDA_VSTD::fabs(__x);
 }

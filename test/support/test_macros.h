@@ -62,13 +62,13 @@
 
 // NOTE(HIP/AMD): temporary WAR due to incompatibility with rocThrust for some macros
 #ifndef NV_IF_TARGET
-#define NV_IF_TARGET NV_IF_TARGET_LIBHIPCXX
+#define NV_IF_TARGET NV_IF_TARGET
 #endif
 #ifndef NV_IS_HOST
-#define NV_IS_HOST NV_IS_HOST_LIBHIPCXX
+#define NV_IS_HOST NV_IS_HOST
 #endif
 #ifndef NV_IS_DEVICE
-#define NV_IS_DEVICE NV_IS_DEVICE_LIBHIPCXX
+#define NV_IS_DEVICE NV_IS_DEVICE
 #endif
 
 // Use the CCCL global variable hack

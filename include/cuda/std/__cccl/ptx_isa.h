@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -125,7 +125,7 @@
 #  if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 900) && defined(__CUDA_ARCH_FEAT_SM90_ALL))
 #    define NV_HAS_FEATURE_SM_90a NV_PROVIDES_SM_90
 #  else // ^^^ SM90a ^^^ / vvv !SM90a vvv
-#    define NV_HAS_FEATURE_SM_90a NV_NO_TARGET_LIBHIPCXX
+#    define NV_HAS_FEATURE_SM_90a NV_NO_TARGET
 #  endif //
 #endif // _CCCL_COMPILER(NVRTC) && !NV_HAS_FEATURE_SM_90a
 
