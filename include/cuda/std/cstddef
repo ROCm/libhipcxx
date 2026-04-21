@@ -47,13 +47,8 @@
 #include <cuda/std/__cstddef/types.h>
 #include <cuda/std/version>
 
-# <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
-# #if defined(_CCCL_COMPILER_HIPRTC)
-# #define NULL __null
-# #endif // _CCCL_COMPILER_HIPRTC
-#
-# _CCCL_POP_MACROS
-#
-# =======
-# >>>>>>> END NEW CODE (24bb5db96f)
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  define NULL __null
+#endif // _CCCL_COMPILER_HIPRTC
+
 #endif // _CUDA_STD_CSTDDEF

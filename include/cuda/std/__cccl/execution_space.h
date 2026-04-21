@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -39,16 +39,7 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 1bdef2f937 (9c2d7ed65d) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #if _CCCL_CUDA_COMPILATION() || defined(__HIP_PLATFORM_AMD__) || defined(__HIPCC_RTC__)
-// // =======
-// // We need to ensure that we not only compile with a cuda compiler but also compile cuda source files
-// #if _CCCL_HAS_CUDA_COMPILER() && (defined(__CUDACC__) || defined(_NVHPC_CUDA))
-// // >>>>>>> END NEW CODE (702d3c08ed)
-// =======
-#if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (9c2d7ed65d)
+#if _CCCL_CUDA_COMPILATION() || defined(__HIP_PLATFORM_AMD__) || defined(__HIPCC_RTC__)
 #  define _CCCL_HOST        __host__
 #  define _CCCL_DEVICE      __device__
 #  define _CCCL_HOST_DEVICE __host__ __device__

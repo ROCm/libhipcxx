@@ -293,11 +293,7 @@ int main(int, char**)
 
 #if TEST_HAS_EXCEPTIONS()
   NV_IF_TARGET(NV_IS_HOST, (test_exceptions();))
-// <<<<<<< OLD CODE from 47809d752f (bbc676aed3) - COMMENTED OUT
-// #endif // !TEST_HAS_NO_EXCEPTIONS
-// #endif
-// =======
 #endif // TEST_HAS_EXCEPTIONS()
-// >>>>>>> END NEW CODE (bbc676aed3)
+#endif
   return 0;
 }

@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -454,13 +454,8 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     return *this;
   }
 
-// <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-//   _LIBCUDACXX_HIDE_FROM_ABI _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2> const& __p) const
-// =======
-#  if !_CCCL_COMPILER(NVRTC)
+#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
   _CCCL_API inline _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2> const& __p) const
-// >>>>>>> END NEW CODE (d2673f2d96)
     noexcept(_CCCL_TRAIT(is_nothrow_copy_assignable, const _T1) && _CCCL_TRAIT(is_nothrow_copy_assignable, const _T2))
     requires(is_copy_assignable_v<const _T1> && is_copy_assignable_v<const _T2>)
   {
@@ -479,13 +474,8 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     return *this;
   }
 
-// <<<<<<< OLD CODE from f8464653bf (d2673f2d96) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-//   _LIBCUDACXX_HIDE_FROM_ABI _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2>&& __p) const
-// =======
-#  if !_CCCL_COMPILER(NVRTC)
+#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
   _CCCL_API inline _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2>&& __p) const
-// >>>>>>> END NEW CODE (d2673f2d96)
     noexcept(_CCCL_TRAIT(is_nothrow_assignable, const _T1&, _T1) && _CCCL_TRAIT(is_nothrow_assignable, const _T2&, _T2))
     requires(is_assignable_v<const _T1&, _T1> && is_assignable_v<const _T2&, _T2>)
   {

@@ -69,11 +69,7 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/nvidia/nvrtc/nvrtcc")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "True")
-# <<<<<<< OLD CODE from 24e350cd01 (7da4068d41) - COMMENTED OUT
-#   set(LIBCUDACXX_FORCE_INCLUDE "-include '${libhipcxx_SOURCE_DIR}/test/support/nvrtc_limit_macros.h'")
-# =======
   set(LIBCUDACXX_FORCE_INCLUDE "")
-# >>>>>>> END NEW CODE (7da4068d41)
   set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${CUDA_INCLUDE_DIR}'")
   # Use the NVRTCC utility to run the built test outputs
   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
@@ -306,94 +302,94 @@ set_tests_properties(libcudacxx.test.lit PROPERTIES
   RUN_SERIAL TRUE
 )
 
-# <<<<<<< OLD CODE from dbfe180590 (4aca8e68e8) - COMMENTED OUT
-# # Set appropriate warning levels for MSVC/sane
-# if("${CMAKE_CUDA_COMPILER_ID}" STREQUAL "NVIDIA")
-#   # CUDA 11.5 and down do not support '-use-local-env'
-#   if(MSVC)
-#     set(headertest_warning_levels_device -Xcompiler=/W4 -Xcompiler=/WX -Wno-deprecated-gpu-targets)
-#     if ("${CMAKE_CUDA_COMPILER_VERSION}" GREATER_EQUAL "11.6.0")
-#       list(APPEND headertest_warning_levels_device --use-local-env)
-#     endif()
-#   else()
-#     set(headertest_warning_levels_device -Wall -Werror all-warnings -Wno-deprecated-gpu-targets)
-#   endif()
-# # Set warnings for Clang as device compiler
-# elseif("${CMAKE_CUDA_COMPILER_ID}" STREQUAL "Clang")
-#   set(headertest_warning_levels_device -Wall -Werror -Wno-unknown-cuda-version -Xclang=-fcuda-allow-variadic-functions)
-# # If the CMAKE_CUDA_COMPILER is unknown, try to use gcc style warnings
-# else()
-#   set(headertest_warning_levels_device -Wall -Werror)
-# endif()
-#
-# # Set raw host/device warnings
-# if(MSVC)
-#   set(headertest_warning_levels_host /W4 /WX)
-# else()
-#   set(headertest_warning_levels_host -Wall -Werror)
-# endif()
-#
-# # Libcudacxx auto-generated internal header tests
-# add_subdirectory(internal_headers)
-#
-# # Libcudacxx auto-generated public header tests
-# add_subdirectory(public_headers)
-#
-# # Libcudacxx auto-generated public header as std tests
-# add_subdirectory(public_headers_host_only)
-#
-# if(LIBCUDACXX_ENABLE_CUDA)
-#   # Enable building the nvrtcc project if NVRTC is enabled
-#   if (LIBCUDACXX_TEST_WITH_NVRTC)
-#     add_subdirectory(utils/nvidia/nvrtc)
-#   endif()
-# elseif(LIBCUDACXX_ENABLE_HIP)
-#   if (LIBHIPCXX_TEST_WITH_HIPRTC)
-#     add_subdirectory(
-#       ${libhipcxx_SOURCE_DIR}/utils/amd/hiprtc
-#       ${CMAKE_BINARY_DIR}/libcudacxx/test/utils/amd/hiprtc
-#       )
-#   endif()
-# endif()
-#
-# # atomic_codegen tests require CUDA-specific tools (cuobjdump) and are not supported with HIP
-# if(LIBCUDACXX_ENABLE_CUDA)
-#   add_subdirectory(atomic_codegen)
-# endif()
-# =======
-# Add c2h tests:
-cccl_get_c2h()
+# Set appropriate warning levels for MSVC/sane
+if("${CMAKE_CUDA_COMPILER_ID}" STREQUAL "NVIDIA")
+  # CUDA 11.5 and down do not support '-use-local-env'
+  if(MSVC)
+    set(headertest_warning_levels_device -Xcompiler=/W4 -Xcompiler=/WX -Wno-deprecated-gpu-targets)
+    if ("${CMAKE_CUDA_COMPILER_VERSION}" GREATER_EQUAL "11.6.0")
+      list(APPEND headertest_warning_levels_device --use-local-env)
+    endif()
+  else()
+    set(headertest_warning_levels_device -Wall -Werror all-warnings -Wno-deprecated-gpu-targets)
+  endif()
+# Set warnings for Clang as device compiler
+elseif("${CMAKE_CUDA_COMPILER_ID}" STREQUAL "Clang")
+  set(headertest_warning_levels_device -Wall -Werror -Wno-unknown-cuda-version -Xclang=-fcuda-allow-variadic-functions)
+# If the CMAKE_CUDA_COMPILER is unknown, try to use gcc style warnings
+else()
+  set(headertest_warning_levels_device -Wall -Werror)
+endif()
 
-file(GLOB_RECURSE test_srcs
-  RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-  CONFIGURE_DEPENDS
-  *.cu
-)
+# Set raw host/device warnings
+if(MSVC)
+  set(headertest_warning_levels_host /W4 /WX)
+else()
+  set(headertest_warning_levels_host -Wall -Werror)
+endif()
 
-set(c2h_all_target "libcudacxx.test.c2h_all")
-add_custom_target(${c2h_all_target})
+# Libcudacxx auto-generated internal header tests
+add_subdirectory(internal_headers)
 
-function(libcudacxx_add_test target_name_var source)
-  string(REPLACE "/" "." target_name "${source}")
-  string(PREPEND target_name "libcudacxx.test.")
-  string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
-  set(${target_name_var} ${target_name} PARENT_SCOPE)
+# Libcudacxx auto-generated public header tests
+add_subdirectory(public_headers)
 
-  add_executable(${target_name} "${source}")
-  cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-  target_include_directories(${target_name} PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common")
-  target_link_libraries(${target_name} PRIVATE
-    libcudacxx::libcudacxx
-    cccl.c2h.main
-    cccl.compiler_interface_cpp${CMAKE_CUDA_STANDARD}
+# Libcudacxx auto-generated public header as std tests
+add_subdirectory(public_headers_host_only)
+
+if(LIBCUDACXX_ENABLE_CUDA)
+  # Enable building the nvrtcc project if NVRTC is enabled
+  if (LIBCUDACXX_TEST_WITH_NVRTC)
+    add_subdirectory(utils/nvidia/nvrtc)
+  endif()
+elseif(LIBCUDACXX_ENABLE_HIP)
+  if (LIBHIPCXX_TEST_WITH_HIPRTC)
+    add_subdirectory(
+      ${libhipcxx_SOURCE_DIR}/utils/amd/hiprtc
+      ${CMAKE_BINARY_DIR}/libcudacxx/test/utils/amd/hiprtc
+      )
+  endif()
+endif()
+
+# atomic_codegen tests require CUDA-specific tools (cuobjdump) and are not supported with HIP
+if(LIBCUDACXX_ENABLE_CUDA)
+  add_subdirectory(atomic_codegen)
+endif()
+
+# Add c2h tests (CUDA only - c2h infrastructure is CUDA-specific):
+if(LIBCUDACXX_ENABLE_CUDA)
+  cccl_get_c2h()
+
+  file(GLOB_RECURSE test_srcs
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+    CONFIGURE_DEPENDS
+    *.cu
   )
 
-  add_dependencies(${c2h_all_target} ${target_name})
+  set(c2h_all_target "libcudacxx.test.c2h_all")
+  add_custom_target(${c2h_all_target})
 
-  add_test(NAME ${target_name} COMMAND ${target_name})
-endfunction()
+  function(libcudacxx_add_test target_name_var source)
+    string(REPLACE "/" "." target_name "${source}")
+    string(PREPEND target_name "libcudacxx.test.")
+    string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
+    set(${target_name_var} ${target_name} PARENT_SCOPE)
 
-foreach (test_src IN LISTS test_srcs)
-  libcudacxx_add_test(test_target "${test_src}")
-endforeach()
-# >>>>>>> END NEW CODE (4aca8e68e8)
+    add_executable(${target_name} "${source}")
+    cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
+    target_include_directories(${target_name} PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common")
+    target_link_libraries(${target_name} PRIVATE
+      libcudacxx::libcudacxx
+      cccl.c2h.main
+      cccl.compiler_interface_cpp${CMAKE_CUDA_STANDARD}
+    )
+
+    add_dependencies(${c2h_all_target} ${target_name})
+
+    add_test(NAME ${target_name} COMMAND ${target_name})
+  endfunction()
+
+  foreach (test_src IN LISTS test_srcs)
+    libcudacxx_add_test(test_target "${test_src}")
+  endforeach()
+endif()

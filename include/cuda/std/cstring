@@ -43,20 +43,11 @@
 #  pragma system_header
 #endif // no system header
 
-# <<<<<<< OLD CODE from 6d8dca397a (24bb5db96f) - COMMENTED OUT
-# # <<<<<<< OLD CODE from 1e8a9af4ba (9dd72e45bb) - COMMENTED OUT
-# # #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-# # =======
-# _CCCL_PUSH_MACROS
-#
-# =======
-# >>>>>>> END NEW CODE (24bb5db96f)
 #include <cuda/std/__string/constexpr_c_functions.h>
 
-#if !_CCCL_COMPILER(NVRTC)
-# >>>>>>> END NEW CODE (9dd72e45bb)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <cstring>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 

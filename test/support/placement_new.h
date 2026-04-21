@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -29,11 +29,7 @@
 #include "test_macros.h"
 
 // CUDA always defines placement new/delete for device code.
-// <<<<<<< OLD CODE from 51e5a1601d (61c56ec958) - COMMENTED OUT
-// #if !(defined(__CUDACC__) || defined(__HIPCC__))
-// =======
 #if !_CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (61c56ec958)
 
 #  include <stddef.h> // Avoid depending on the C++ standard library.
 

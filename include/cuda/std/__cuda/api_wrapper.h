@@ -38,68 +38,12 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 40c5b56c00 (f69d5ba4be) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILER(CLANG) && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
-// #  include <cuda_runtime_api.h>
-// #endif // _CCCL_CUDA_COMPILER(CLANG)
-//
-// =======
-// >>>>>>> END NEW CODE (f69d5ba4be)
+#if _CCCL_CUDA_COMPILER(CLANG) && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
+#  include <cuda_runtime_api.h>
+#endif // _CCCL_CUDA_COMPILER(CLANG)
+
 #include <cuda/std/__exception/cuda_error.h>
 
-// <<<<<<< OLD CODE from 71a851d3b5 (e2df38ca36) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 9de450753d (ecc4210681) - COMMENTED OUT
-// // // <<<<<<< OLD CODE from 6a706b2d84 (178551348f) - COMMENTED OUT
-// // // #if _CCCL_HAS_CUDA_COMPILER()
-// // // #  define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)           \
-// // //     {                                                    \
-// // //       const ::cudaError_t __status = _NAME(__VA_ARGS__); \
-// // //       switch (__status)                                  \
-// // //       {                                                  \
-// // //         case ::cudaSuccess:                              \
-// // //           break;                                         \
-// // //         default:                                         \
-// // //           ::cudaGetLastError();                          \
-// // //           ::hip::__throw_cuda_error(__status, _MSG);    \
-// // //       }                                                  \
-// // //     }
-// // //
-// // // #  define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)                         \
-// // //     {                                                                     \
-// // //       [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__); \
-// // //       _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
-// // //     }
-// // // #else // ^^^ _CCCL_HAS_CUDA_COMPILER() ^^^ / vvv !_CCCL_HAS_CUDA_COMPILER() vvv
-// // // #  define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)
-// // // #  define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)
-// // // #endif // !_CCCL_HAS_CUDA_COMPILER()
-// // // =======
-// // #define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)           \
-// //   {                                                    \
-// //     const ::cudaError_t __status = _NAME(__VA_ARGS__); \
-// //     switch (__status)                                  \
-// //     {                                                  \
-// //       case ::cudaSuccess:                              \
-// //         break;                                         \
-// //       default:                                         \
-// //         ::cudaGetLastError();                          \
-// //         ::cuda::__throw_cuda_error(__status, _MSG);    \
-// //     }                                                  \
-// // =======
-// #define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)                \
-//   {                                                         \
-//     const ::cudaError_t __status = _NAME(__VA_ARGS__);      \
-//     switch (__status)                                       \
-//     {                                                       \
-//       case ::cudaSuccess:                                   \
-//         break;                                              \
-//       default:                                              \
-//         ::cudaGetLastError();                               \
-//         ::cuda::__throw_cuda_error(__status, _MSG, #_NAME); \
-//     }                                                       \
-// // >>>>>>> END NEW CODE (ecc4210681)
-//   }
-// =======
 #define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)                        \
   do                                                                \
   {                                                                 \
@@ -113,7 +57,6 @@
         ::cuda::__throw_cuda_error(__status, _MSG, #_NAME);         \
     }                                                               \
   } while (0)
-// >>>>>>> END NEW CODE (e2df38ca36)
 
 #define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)                         \
   do                                                                    \
@@ -121,12 +64,7 @@
     [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__); \
     ::cudaGetLastError(); /* clear CUDA error state */                  \
     _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
-// <<<<<<< OLD CODE from 71a851d3b5 (e2df38ca36) - COMMENTED OUT
-//   }
-// // >>>>>>> END NEW CODE (178551348f)
-// =======
   } while (0)
-// >>>>>>> END NEW CODE (e2df38ca36)
 
 #define _CCCL_LOG_CUDA_API(_NAME, _MSG, ...)                                       \
   [&]() {                                                                          \

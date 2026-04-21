@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -48,15 +48,9 @@
 #include "test_macros.h"
 #include "unique_ptr_test_helper.h"
 
-// <<<<<<< OLD CODE from 19af4bcc8f (87fc615d5a) - COMMENTED OUT
-// #if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC) // no dynamic initialization
-// _LIBCUDACXX_SAFE_STATIC cuda::std::unique_ptr<int> global_static_unique_ptr_single;
-// _LIBCUDACXX_SAFE_STATIC cuda::std::unique_ptr<int[]> global_static_unique_ptr_runtime;
-// =======
-#if !TEST_COMPILER(NVRTC) // no dynamic initialization
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC) // no dynamic initialization
 _CCCL_CONSTINIT cuda::std::unique_ptr<int> global_static_unique_ptr_single;
 _CCCL_CONSTINIT cuda::std::unique_ptr<int[]> global_static_unique_ptr_runtime;
-// >>>>>>> END NEW CODE (87fc615d5a)
 #endif // TEST_COMPILER(NVRTC)
 
 struct NonDefaultDeleter

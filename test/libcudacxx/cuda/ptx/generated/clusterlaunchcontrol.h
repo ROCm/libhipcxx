@@ -1,3 +1,25 @@
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // This file was automatically generated. Do not edit.
 
 // We use a special strategy to force the generation of the PTX. This is mainly
@@ -48,17 +70,8 @@ __global__ void test_clusterlaunchcontrol(void** fn_ptr)
                (
                    // clusterlaunchcontrol.query_cancel.is_canceled.pred.b128 pred_is_canceled, try_cancel_response;
                    * fn_ptr++ = reinterpret_cast<void*>(
-// <<<<<<< OLD CODE from 9ca5ab7c57 (930a8c5834) - COMMENTED OUT
-// // <<<<<<< OLD CODE from f057d49ff7 (6c3a480fb1) - COMMENTED OUT
-// //                      static_cast<bool (*)(longlong2)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
-// // #endif // __cccl_ptx_isa >= 860
-// // =======
-//                      static_cast<bool (*)(__int128)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
-// =======
                      static_cast<bool (*)(longlong2)>(cuda::ptx::clusterlaunchcontrol_query_cancel_is_canceled));));
-// >>>>>>> END NEW CODE (930a8c5834)
 #  endif // __cccl_ptx_isa >= 860
-// >>>>>>> END NEW CODE (6c3a480fb1)
 
 #  if __cccl_ptx_isa >= 860
   NV_IF_TARGET(NV_PROVIDES_SM_100,

@@ -131,20 +131,14 @@ class CXXCompiler(object):
 
             if "__NVCC__" in macros.keys():
                 compiler_type = "nvcc"
-# <<<<<<< OLD CODE from 589487ab71 (b6739086a0) - COMMENTED OUT
-#                 major_ver = macros["__CUDACC_VER_MAJOR__"]
-#                 minor_ver = macros["__CUDACC_VER_MINOR__"]
-#                 patchlevel = macros["__CUDACC_VER_BUILD__"]
-#             elif '__HIPCC__' in macros_for_hip.keys():
-#               compiler_type = 'hipcc'
-#               major_ver = macros['__clang_major__']
-#               minor_ver = macros['__clang_minor__']
-#               patchlevel = macros['__clang_patchlevel__']
-# =======
                 major_ver = int(macros["__CUDACC_VER_MAJOR__"])
                 minor_ver = int(macros["__CUDACC_VER_MINOR__"])
                 patchlevel = int(macros["__CUDACC_VER_BUILD__"])
-# >>>>>>> END NEW CODE (b6739086a0)
+            elif '__HIPCC__' in macros_for_hip.keys():
+                compiler_type = 'hipcc'
+                major_ver = int(macros_for_hip['__clang_major__'])
+                minor_ver = int(macros_for_hip['__clang_minor__'])
+                patchlevel = int(macros_for_hip['__clang_patchlevel__'])
             elif "__NVCOMPILER" in macros.keys():
                 compiler_type = "nvhpc"
                 # NVHPC, unfortunately, adds an extra space between the macro name

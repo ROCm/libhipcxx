@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -93,14 +93,8 @@ __host__ __device__ void test_aligned()
 #if !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPCC) && !defined(TEST_COMPILER_HIPRTC)
     DoNotOptimize(ap);
 #else
-// <<<<<<< OLD CODE from db57088edc (c90beab8ec) - COMMENTED OUT
-//     const auto meow = reinterpret_cast<uintptr_t>(ap) + 2;
-//     (void) meow;
-// #endif // !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPCC) && !defined(TEST_COMPILER_HIPRTC)
-// =======
     [[maybe_unused]] const auto meow = reinterpret_cast<uintptr_t>(ap) + 2;
-#endif // !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (c90beab8ec)
+#endif // !TEST_CUDA_COMPILER(NVCC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPCC) && !defined(TEST_COMPILER_HIPRTC)
     // assert(globalMemCounter.checkOutstandingNewEq(1));
     assert(globalMemCounter.checkNewCalledEq(1));
     assert(globalMemCounter.checkAlignedNewCalledEq(ExpectAligned));

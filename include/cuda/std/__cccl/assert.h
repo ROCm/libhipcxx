@@ -86,11 +86,7 @@
 //! _CCCL_ASSERT_IMPL_HOST should never be used directly
 #if _CCCL_OS(QNX)
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
-// <<<<<<< OLD CODE from 3de80f3e26 (c788cb9d47) - COMMENTED OUT
-// #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) // There is no host standard library in nvrtc
-// =======
-#elif _CCCL_COMPILER(NVRTC) // There is no host standard library in nvrtc
-// >>>>>>> END NEW CODE (c788cb9d47)
+#elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) // There is no host standard library in nvrtc/hiprtc
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
 #elif _CCCL_HAS_INCLUDE(<yvals.h>) && (_CCCL_COMPILER(MSVC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32))) // MSVC uses _STL_VERIFY from <yvals.h>
 #  include <yvals.h>
@@ -116,22 +112,18 @@ _CCCL_HOST_DEVICE
 //! _CCCL_ASSERT_IMPL_DEVICE should never be used directly
 #if _CCCL_OS(QNX)
 #  define _CCCL_ASSERT_IMPL_DEVICE(expression, message) ((void) 0)
-// <<<<<<< OLD CODE from 3de80f3e26 (c788cb9d47) - COMMENTED OUT
-// #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// // NOTE(HIP/AMD): Use _wassert on Windows, __assertfail on Linux
-// #  if defined(_WIN32)
-// =======
-#elif _CCCL_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (c788cb9d47)
-#  define _CCCL_ASSERT_IMPL_DEVICE(expression, message)    \
-    _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
-    ? (void) 0 : _wassert(_CRT_WIDE(message), __FILEW__, __LINE__)
+#elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): Use _wassert on Windows, __assertfail on Linux
+#  if defined(_WIN32)
+#    define _CCCL_ASSERT_IMPL_DEVICE(expression, message)  \
+      _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
+      ? (void) 0 : _wassert(_CRT_WIDE(message), __FILEW__, __LINE__)
 #  else
 // NOTE(HIP/AMD): We need to use __assertfail which is defined in hiprtc_runtime, otherwise we get error:
 // note: candidate function not viable: requires 0 arguments, but 5 were provided
-#  define _CCCL_ASSERT_IMPL_DEVICE(expression, message)    \
-    _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
-    ? (void) 0 : __assertfail()
+#    define _CCCL_ASSERT_IMPL_DEVICE(expression, message)  \
+      _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
+      ? (void) 0 : __assertfail()
     // ? (void) 0 : __assertfail(message, __FILE__, __LINE__, __func__, sizeof(char))
 #  endif
 #elif _CCCL_CUDA_COMPILER(NVCC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32)) //! Use __assert_fail to implement device side asserts
@@ -174,17 +166,8 @@ _CCCL_HOST_DEVICE
 #  else
 #    define _CCCL_ASSERT(expression, message) ((void) 0)
 #  endif
-// <<<<<<< OLD CODE from 079adf5db1 (cdb17a5a84) - COMMENTED OUT
-// #elif _CCCL_HAS_CUDA_COMPILER()
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #  if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
-// // =======
-// #  ifdef __CUDA_ARCH__
-// // >>>>>>> END NEW CODE (702d3c08ed)
-// =======
 #elif _CCCL_CUDA_COMPILATION()
 #  if _CCCL_DEVICE_COMPILATION()
-// >>>>>>> END NEW CODE (cdb17a5a84)
 #    define _CCCL_VERIFY(expression, message) _CCCL_ASSERT_IMPL_DEVICE(expression, message)
 #    define _CCCL_ASSERT(expression, message) _CCCL_ASSERT_DEVICE(expression, message)
 #  else // ^^^ _CCCL_DEVICE_COMPILATION() ^^^ / vvv !_CCCL_DEVICE_COMPILATION() vvv

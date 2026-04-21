@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -679,11 +679,7 @@ __host__ __device__ void call_operator_noexcept_test()
     static_assert(noexcept(!_CUDA_VSTD::__invoke(value)), "");
     static_assert(noexcept(!cuda::std::invoke(value)), "");
 // TODO: nvcc gets this wrong, investigate
-// <<<<<<< OLD CODE from 51e5a1601d (61c56ec958) - COMMENTED OUT
-// #if !(defined(__CUDACC__) || defined(__HIPCC__))
-// =======
 #if !_CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (61c56ec958)
     static_assert(noexcept(ret()), "call should be noexcept");
 #endif // !_CCCL_CUDA_COMPILATION()
     auto const& cret = ret;
@@ -697,11 +693,7 @@ __host__ __device__ void call_operator_noexcept_test()
     T value(true);
     [[maybe_unused]] auto ret = cuda::std::not_fn(value);
 // TODO: nvcc gets this wrong, investigate
-// <<<<<<< OLD CODE from 51e5a1601d (61c56ec958) - COMMENTED OUT
-// #if !(defined(__CUDACC__) || defined(__HIPCC__))
-// =======
 #if !_CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (61c56ec958)
     static_assert(noexcept(ret()), "call should not be noexcept");
 #endif // !_CCCL_CUDA_COMPILATION()
     auto const& cret = ret;

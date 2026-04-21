@@ -136,27 +136,6 @@
 #  define TEST_HAS_NO_RTTI
 #endif
 
-// <<<<<<< OLD CODE from 47809d752f (bbc676aed3) - COMMENTED OUT
-// #ifndef TEST_HAS_NO_EXCEPTIONS
-// #  if (_CCCL_COMPILER(MSVC) && _HAS_EXCEPTIONS == 0) || (!_CCCL_COMPILER(MSVC) && !__EXCEPTIONS) // Catches all non
-//                                                                                                  // msvc based
-//                                                                                                  // compilers
-// #    define TEST_HAS_NO_EXCEPTIONS
-// #  endif
-// #endif // !TEST_HAS_NO_EXCEPTIONS
-//
-// #if TEST_CUDA_COMPILER(NVCC) || TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPCC) || defined(TEST_COMPILER_HIPRTC)
-// #  define TEST_HAS_NO_EXCEPTIONS
-// #endif
-//
-// #ifndef TEST_HAS_NO_EXCEPTIONS
-// #  define TEST_THROW(...) throw __VA_ARGS__
-// #else
-// #  define TEST_THROW(...) assert(#__VA_ARGS__)
-// #endif
-//
-// =======
-// >>>>>>> END NEW CODE (bbc676aed3)
 #if _CCCL_HAS_FEATURE(address_sanitizer) || _CCCL_HAS_FEATURE(memory_sanitizer) || _CCCL_HAS_FEATURE(thread_sanitizer)
 #  define TEST_HAS_SANITIZERS
 #endif

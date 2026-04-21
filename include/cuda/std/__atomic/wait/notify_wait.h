@@ -77,15 +77,7 @@ _CCCL_API inline void __atomic_notify_all(_Tp const volatile*, _Sco)
 template <typename _Tp>
 _CCCL_API inline bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp const& __rhs)
 {
-// <<<<<<< OLD CODE from 732986f474 (1252e35dda) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 072425cffa (702d3c08ed) - COMMENTED OUT
-// // #if _CCCL_HAS_CUDA_COMPILER() || defined(__HIP_PLATFORM_AMD__) || defined(__HIPCC_RTC__)
-// // =======
-// #if _CCCL_HAS_CUDA_COMPILER()
-// // >>>>>>> END NEW CODE (702d3c08ed)
-// =======
-#if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (1252e35dda)
+#if _CCCL_CUDA_COMPILATION() || defined(__HIP_PLATFORM_AMD__) || defined(__HIPCC_RTC__)
   return __lhs == __rhs;
 #else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
   return _CUDA_VSTD::memcmp(&__lhs, &__rhs, sizeof(_Tp)) == 0;
