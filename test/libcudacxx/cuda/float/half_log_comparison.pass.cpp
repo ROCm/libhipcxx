@@ -28,6 +28,9 @@
 // NOTE(HIP/AMD): Currently we do not guarantee bitwise equivalence for fp16
 // UNSUPPORTED: nvrtc, hiprtc, hipcc, nvcc-11, nvcc-12.0, nvcc-12.1
 
+// XFAIL: enable-tile
+// tile does not support access to members of `__half` or `__nv_bfloat16`
+
 #include <cuda/std/cmath>
 
 #include "host_device_comparison.h"
