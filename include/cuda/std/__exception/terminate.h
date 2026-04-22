@@ -40,12 +40,20 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): Under hipRTC __cccl_terminate() takes the device branch
-// (libhipcxx::__trap()), so host <stdlib.h> (for ::exit) is unused. Including it
-// here would pull in host <stddef.h>/<bits/stdint-intn.h> on the JIT include
-// path and cause max_align_t / byte / int64_t redefinition conflicts. Skip it
-// under hipRTC, like NVRTC.
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from 7c099f6aec (10e65aca2b) - COMMENTED OUT
+// // NOTE(HIP/AMD): Under hipRTC __cccl_terminate() takes the device branch
+// // (libhipcxx::__trap()), so host <stdlib.h> (for ::exit) is unused. Including it
+// // here would pull in host <stddef.h>/<bits/stdint-intn.h> on the JIT include
+// // path and cause max_align_t / byte / int64_t redefinition conflicts. Skip it
+// // under hipRTC, like NVRTC.
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_TILE_COMPILATION()
+#  include <cuda/std/cassert>
+#endif // !_CCCL_TILE_COMPILATION()
+
+#if !_CCCL_COMPILER(NVRTC)
+// >>>>>>> END NEW CODE (10e65aca2b)
 #  include <stdlib.h>
 #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
@@ -58,8 +66,16 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION // purposefully not using versioning na
 
 [[noreturn]] _CCCL_API inline void __cccl_terminate() noexcept
 {
-  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
+// <<<<<<< OLD CODE from 7c099f6aec (10e65aca2b) - COMMENTED OUT
+//   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
+// =======
+#if _CCCL_TILE_COMPILATION()
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (assert(false);))
+#else // ^^^ _CCCL_TILE_COMPILATION() ^^^ / vvv !_CCCL_TILE_COMPILATION()
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (::__trap();))
+// >>>>>>> END NEW CODE (10e65aca2b)
   _CCCL_UNREACHABLE();
+#endif // !_CCCL_TILE_COMPILATION()
 }
 
 #if 0 // Expose once atomic is universally available
