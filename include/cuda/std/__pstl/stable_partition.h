@@ -8,8 +8,8 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef _CUDA_STD___PSTL_PARTITION_H
-#define _CUDA_STD___PSTL_PARTITION_H
+#ifndef _CUDA_STD___PSTL_STABLE_PARTITION_H
+#define _CUDA_STD___PSTL_STABLE_PARTITION_H
 
 #include <cuda/std/detail/__config>
 
@@ -24,7 +24,7 @@
 #if !_CCCL_COMPILER(NVRTC)
 
 #  include <cuda/__nvtx/nvtx.h>
-#  include <cuda/std/__algorithm/partition.h>
+#  include <cuda/std/__algorithm/stable_partition.h>
 #  include <cuda/std/__concepts/concept_macros.h>
 #  include <cuda/std/__execution/policy.h>
 #  include <cuda/std/__iterator/concepts.h>
@@ -37,7 +37,7 @@
 #  include <cuda/std/__utility/move.h>
 
 #  if _CCCL_HAS_BACKEND_CUDA()
-#    include <cuda/std/__pstl/cuda/partition.h>
+#    include <cuda/std/__pstl/cuda/stable_partition.h>
 #  endif // _CCCL_HAS_BACKEND_CUDA()
 
 #  include <cuda/std/__cccl/prologue.h>
@@ -48,17 +48,18 @@ _CCCL_BEGIN_NAMESPACE_ARCH_DEPENDENT
 
 _CCCL_TEMPLATE(class _Policy, class _InputIterator, class _UnaryPred)
 _CCCL_REQUIRES(__has_forward_traversal<_InputIterator> _CCCL_AND is_execution_policy_v<_Policy>)
-_CCCL_HOST_API _InputIterator
-partition([[maybe_unused]] const _Policy& __policy, _InputIterator __first, _InputIterator __last, _UnaryPred __pred)
+_CCCL_HOST_API _InputIterator stable_partition(
+  [[maybe_unused]] const _Policy& __policy, _InputIterator __first, _InputIterator __last, _UnaryPred __pred)
 {
   static_assert(indirect_unary_predicate<_UnaryPred, _InputIterator>,
-                "cuda::std::partition: UnaryPred must satisfy indirect_unary_predicate<InputIterator>");
+                "cuda::std::stable_partition: UnaryPred must satisfy indirect_unary_predicate<InputIterator>");
 
   [[maybe_unused]] auto __dispatch =
-    ::cuda::std::execution::__pstl_select_dispatch<::cuda::std::execution::__pstl_algorithm::__partition, _Policy>();
+    ::cuda::std::execution::__pstl_select_dispatch<::cuda::std::execution::__pstl_algorithm::__stable_partition,
+                                                   _Policy>();
   if constexpr (::cuda::std::execution::__pstl_can_dispatch<decltype(__dispatch)>)
   {
-    _CCCL_NVTX_RANGE_SCOPE("cuda::std::partition");
+    _CCCL_NVTX_RANGE_SCOPE("cuda::std::stable_partition");
 
     if (__first == __last)
     {
@@ -69,8 +70,10 @@ partition([[maybe_unused]] const _Policy& __policy, _InputIterator __first, _Inp
   }
   else
   {
-    static_assert(__always_false_v<_Policy>, "Parallel cuda::std::partition requires at least one selected backend");
-    return ::cuda::std::partition(::cuda::std::move(__first), ::cuda::std::move(__last), ::cuda::std::move(__pred));
+    static_assert(__always_false_v<_Policy>,
+                  "Parallel cuda::std::stable_partition requires at least one selected backend");
+    return ::cuda::std::stable_partition(
+      ::cuda::std::move(__first), ::cuda::std::move(__last), ::cuda::std::move(__pred));
   }
 }
 
@@ -82,4 +85,4 @@ _CCCL_END_NAMESPACE_CUDA_STD
 
 #endif // !_CCCL_COMPILER(NVRTC)
 
-#endif // _CUDA_STD___PSTL_PARTITION_H
+#endif // _CUDA_STD___PSTL_STABLE_PARTITION_H
