@@ -52,10 +52,16 @@
 #  include <cuda/std/cassert>
 #endif // !_CCCL_TILE_COMPILATION()
 
-#if !_CCCL_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (10e65aca2b)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC)
+// // >>>>>>> END NEW CODE (10e65aca2b)
+// #  include <stdlib.h>
+// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+// =======
+#if _CCCL_HOSTED()
 #  include <stdlib.h>
-#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 

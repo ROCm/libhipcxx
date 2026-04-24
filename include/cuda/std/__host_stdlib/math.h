@@ -43,12 +43,16 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): hipRTC has no host C++ standard library; the only <math.h> on
-// the include path is the C header (which defines the math functions as macros).
-// Pulling it in here would both fail the C++-compatibility check below and clash
-// with cuda::std's own device math. Treat hipRTC like NVRTC and skip the host
-// <math.h> include and the macro check entirely.
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// // NOTE(HIP/AMD): hipRTC has no host C++ standard library; the only <math.h> on
+// // the include path is the C header (which defines the math functions as macros).
+// // Pulling it in here would both fail the C++-compatibility check below and clash
+// // with cuda::std's own device math. Treat hipRTC like NVRTC and skip the host
+// // <math.h> include and the macro check entirely.
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <math.h>
 
 // Standard C++ library comes with it's own <math.h> C++ compatible header. However, if the include paths are jumbled,
@@ -71,31 +75,35 @@
       "libcu++ requires the C++ compatibility <math.h> header, not the C <math.h> header. Please, check your include paths."
 #  endif // math functions defined as macros
 
-#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-
-// NOTE(HIP/AMD): Under hipRTC we do not pull in a host C++ <math.h> (only the C
-// <math.h> is reachable). Worse, the HIP runtime headers transitively include
-// glibc's C <math.h>, which defines the floating-point classification helpers
-// (fpclassify/isnan/isinf/...) and other math functions as function-like
-// macros. Those macros corrupt cuda::std's own constexpr math function
-// definitions in <cuda/std/__cmath/*> (e.g. `int fpclassify(float)` expands to
-// `int __builtin_fpclassify(0,1,4,3,2, float)`). Since this header is included
-// by every __cmath/* header before they define their functions, undefine the
-// offending C macros here so cuda::std's definitions are used instead. The
-// numeric FP_* classification constants from <math.h> are left intact.
-#if defined(_CCCL_COMPILER_HIPRTC)
-#  undef fpclassify
-#  undef isfinite
-#  undef isinf
-#  undef isnan
-#  undef isnormal
-#  undef signbit
-#  undef isgreater
-#  undef isgreaterequal
-#  undef isless
-#  undef islessequal
-#  undef islessgreater
-#  undef isunordered
-#endif // _CCCL_COMPILER_HIPRTC
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+//
+// // NOTE(HIP/AMD): Under hipRTC we do not pull in a host C++ <math.h> (only the C
+// // <math.h> is reachable). Worse, the HIP runtime headers transitively include
+// // glibc's C <math.h>, which defines the floating-point classification helpers
+// // (fpclassify/isnan/isinf/...) and other math functions as function-like
+// // macros. Those macros corrupt cuda::std's own constexpr math function
+// // definitions in <cuda/std/__cmath/*> (e.g. `int fpclassify(float)` expands to
+// // `int __builtin_fpclassify(0,1,4,3,2, float)`). Since this header is included
+// // by every __cmath/* header before they define their functions, undefine the
+// // offending C macros here so cuda::std's definitions are used instead. The
+// // numeric FP_* classification constants from <math.h> are left intact.
+// #if defined(_CCCL_COMPILER_HIPRTC)
+// #  undef fpclassify
+// #  undef isfinite
+// #  undef isinf
+// #  undef isnan
+// #  undef isnormal
+// #  undef signbit
+// #  undef isgreater
+// #  undef isgreaterequal
+// #  undef isless
+// #  undef islessequal
+// #  undef islessgreater
+// #  undef isunordered
+// #endif // _CCCL_COMPILER_HIPRTC
+// =======
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #endif // _CUDA_STD___HOST_STDLIB_MATH_H

@@ -337,7 +337,11 @@ public:
     return !(__x == __y);
   }
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   template <typename _CharT, typename _Traits>
   _CCCL_API friend ::std::basic_ostream<_CharT, _Traits>&
   operator<<(::std::basic_ostream<_CharT, _Traits>& __os, const linear_congruential_engine& __e)
@@ -365,7 +369,11 @@ public:
     __is.flags(__flags);
     return __is;
   }
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 private:
   _CCCL_API constexpr void seed(true_type, true_type, result_type __s) noexcept

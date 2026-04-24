@@ -43,11 +43,17 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): under HIPRTC the host <stdexcept> is unavailable; the RTC sandbox
-// resolves it to a stub that conflicts with libhipcxx's own <string>/basic_string.
-// Skip the host include for the RTC path, mirroring the __cstdlib headers.
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# // NOTE(HIP/AMD): under HIPRTC the host <stdexcept> is unavailable; the RTC sandbox
+# // resolves it to a stub that conflicts with libhipcxx's own <string>/basic_string.
+# // Skip the host include for the RTC path, mirroring the __cstdlib headers.
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# #  include <stdexcept>
+# #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if _CCCL_HOSTED()
 #  include <stdexcept>
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+#endif // _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 
 #endif // _CUDA_STD___HOST_STDLIB_STDEXCEPT

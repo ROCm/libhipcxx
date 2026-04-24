@@ -83,16 +83,24 @@
 #include <cuda/std/version>
 
 // todo: find a way to get rid of these includes
-// NOTE(HIP/AMD): exclude HIPRTC as well as NVRTC -- these host-only <string>/
-// <string_view> includes (for ostream operator<<) are not usable in device RTC and
-// dragging system libstdc++ into a HIPRTC TU pulls <initializer_list>/<stdint.h>,
-// which clash with our HIPRTC-local std definitions. Keep HIPRTC self-contained.
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# // NOTE(HIP/AMD): exclude HIPRTC as well as NVRTC -- these host-only <string>/
+# // <string_view> includes (for ostream operator<<) are not usable in device RTC and
+# // dragging system libstdc++ into a HIPRTC TU pulls <initializer_list>/<stdint.h>,
+# // which clash with our HIPRTC-local std definitions. Keep HIPRTC self-contained.
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <string> // for std::basic_string operator<<
 #  if __cpp_lib_string_view >= 201606L
 #    include <string_view> // for std::basic_string_view operator<<
 #  endif // __cpp_lib_string_view >= 201606L
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#endif // _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -112,16 +120,20 @@ _CCCL_CONCEPT __cccl_basic_sv_compatible_range_check_traits = _CCCL_REQUIRES_EXP
 
 template <class _Range, class _CharT, class _Traits>
 _CCCL_CONCEPT __cccl_basic_sv_compatible_range_check_traits_std_ext =
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
   _CCCL_REQUIRES_EXPR((_Range, _CharT, _Traits)) //
   ( //
     typename(typename _Range::traits_type), //
     requires(is_same_v<typename _Range::traits_type, ::std::char_traits<_CharT>>), //
     requires(is_same_v<_Traits, ::cuda::std::char_traits<_CharT>>) //
   );
-#else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
+#else // ^^^ _CCCL_HOSTED() ^^^ / vvv _CCCL_FREESTANDING() vvv
   true;
-#endif // ^^^ _CCCL_COMPILER(NVRTC) ^^^
+#endif // ^^^ _CCCL_FREESTANDING() ^^^
 
 template <class _Range, class _CharT, class _Traits>
 _CCCL_CONCEPT __cccl_basic_sv_compatible_range = _CCCL_REQUIRES_EXPR((_Range, _CharT, _Traits)) //
@@ -214,7 +226,11 @@ public:
     _CCCL_ASSERT((__end - __begin) >= 0, "string_view::string_view(iterator, sentinel) received invalid range");
   }
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
   _CCCL_TEMPLATE(class _Traits2, class _Alloc)
   _CCCL_REQUIRES(__cccl_basic_sv_is_std_to_cuda_std_char_traits<_Traits, _Traits2>)
   _CCCL_HOST_API constexpr basic_string_view(const ::std::basic_string<_CharT, _Traits2, _Alloc>& __sv) noexcept
@@ -228,7 +244,7 @@ public:
       : __data_{__sv.data()}
       , __size_{__sv.size()}
   {}
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HOSTED()
 
 #if __cpp_lib_string_view >= 201606L
   _CCCL_TEMPLATE(class _Traits2)
@@ -846,7 +862,11 @@ _CCCL_TEMPLATE(class _Range)
 _CCCL_REQUIRES(::cuda::std::ranges::contiguous_range<_Range>)
 _CCCL_CTAD_HOST_DEVICE basic_string_view(_Range&&) -> basic_string_view<::cuda::std::ranges::range_value_t<_Range>>;
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 template <class _CharT, class _Alloc>
 # <<<<<<< OLD CODE from a21032c8e3 (f36c9c936b) - COMMENTED OUT
 # _CCCL_CTAD_HOST_DEVICE basic_string_view(::std::basic_string<_CharT, ::std::char_traits<_CharT>, _Alloc>)
@@ -859,8 +879,12 @@ basic_string_view(::std::basic_string<_CharT, ::std::char_traits<_CharT>, _Alloc
 
 template <class _CharT, class _Traits, class _Alloc>
 basic_string_view(::std::basic_string<_CharT, _Traits, _Alloc>) -> basic_string_view<_CharT, _Traits>;
-# >>>>>>> END NEW CODE (f36c9c936b)
-#endif // !_CCCL_COMPILER(NVRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# # >>>>>>> END NEW CODE (f36c9c936b)
+# #endif // !_CCCL_COMPILER(NVRTC)
+# =======
+#endif // _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 
 #if __cpp_lib_string_view >= 201606L
 template <class _CharT>
@@ -879,7 +903,11 @@ basic_string_view(::std::basic_string_view<_CharT, _Traits>) -> basic_string_vie
 
 // operator <<
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 template <class _CharT>
 _CCCL_HOST_API ::std::basic_ostream<_CharT>&
 operator<<(::std::basic_ostream<_CharT>& __os, basic_string_view<_CharT> __str)
@@ -902,7 +930,7 @@ operator<<(::std::basic_ostream<_CharT, _Traits>& __os, basic_string_view<_CharT
   return __os << ::std::basic_string<_CharT, _Traits, ::std::allocator<_CharT>>{__str.data(), __str.size()};
 #  endif // ^^^ __cpp_lib_string_view < 201606L ^^^
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HOSTED()
 
 // literals
 

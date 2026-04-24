@@ -49,12 +49,20 @@
 // is defined only when CCCL is including an algorithms-related header, giving
 // the compiler a chance to detect and break the cycle of includes.
 
-// NOTE(HIP/AMD): the host <numeric> is unavailable under HIPRTC; skip it for the
-// RTC path, mirroring the NVRTC handling.
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# // NOTE(HIP/AMD): the host <numeric> is unavailable under HIPRTC; skip it for the
+# // RTC path, mirroring the NVRTC handling.
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# #  define THRUST_INCLUDING_ALGORITHMS_HEADER
+# #  include <numeric>
+# #  undef THRUST_INCLUDING_ALGORITHMS_HEADER
+# #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if _CCCL_HOSTED()
 #  define THRUST_INCLUDING_ALGORITHMS_HEADER
 #  include <numeric>
 #  undef THRUST_INCLUDING_ALGORITHMS_HEADER
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+#endif // _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 
 #endif // _CUDA_STD___HOST_STDLIB_NUMERIC

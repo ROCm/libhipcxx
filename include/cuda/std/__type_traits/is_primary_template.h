@@ -51,9 +51,13 @@
 #include <cuda/std/__type_traits/is_valid_expansion.h>
 #include <cuda/std/__type_traits/void_t.h>
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <iterator>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HOSTED()
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -79,9 +83,13 @@ using __is_primary_cccl_template = _IsValidExpansion<__test_for_primary_template
 
 #endif // !_CCCL_COMPILER(MSVC)
 
-#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_FREESTANDING()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
-// No ::std::traits with NVRTC
+// No ::std::traits with freestanding implementations
 template <class _Iter>
 struct __is_primary_std_template : true_type
 {};
@@ -89,7 +97,7 @@ struct __is_primary_std_template : true_type
 template <class _Iter, class _OtherTraits>
 using __select_traits = conditional_t<__is_primary_cccl_template<_Iter>::value, _OtherTraits, iterator_traits<_Iter>>;
 
-#else // ^^^ _CCCL_COMPILER(NVRTC) ^^^ / vvv !_CCCL_COMPILER(NVRTC) vvv
+#else // ^^^ _CCCL_FREESTANDING() ^^^ / vvv _CCCL_HOSTED() vvv
 
 // We also need to respect what the user is defining to std::iterator_traits
 #  if _CCCL_HOST_STD_LIB(LIBSTDCXX)
@@ -134,7 +142,7 @@ using __select_traits =
                 conditional_t<__is_primary_cccl_template<_Iter>::value, _OtherTraits, iterator_traits<_Iter>>,
                 ::std::iterator_traits<_Iter>>;
 
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HOSTED()
 
 _CCCL_END_NAMESPACE_CUDA_STD
 

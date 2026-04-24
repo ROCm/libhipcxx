@@ -40,17 +40,25 @@
 
 // We need to define our own macros to not conflict with the host stl.
 // At the same time we want bring in all feature test macros from host
-// NOTE(HIP/AMD): treat HIPRTC like NVRTC -- do NOT pull the host <version>/<ciso646>
-// here. Otherwise host __cpp_lib_* feature-test macros (e.g. __cpp_lib_string_view)
-// get defined without the corresponding host headers (<string_view>), which turns on
-// std-interop code paths that reference ::std types that don't exist under HIPRTC.
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  if __has_include(<version>) // <version> should be the smallest include possible
-#    include <version>
-#  else
-#    include <ciso646> // otherwise go for the smallest possible header
-#  endif
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+# // NOTE(HIP/AMD): treat HIPRTC like NVRTC -- do NOT pull the host <version>/<ciso646>
+# // here. Otherwise host __cpp_lib_* feature-test macros (e.g. __cpp_lib_string_view)
+# // get defined without the corresponding host headers (<string_view>), which turns on
+# // std-interop code paths that reference ::std types that don't exist under HIPRTC.
+# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# #  if __has_include(<version>) // <version> should be the smallest include possible
+# #    include <version>
+# #  else
+# #    include <ciso646> // otherwise go for the smallest possible header
+# #  endif
+# #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+# =======
+#if __has_include(<version>) // <version> should be the smallest include possible
+#  include <version>
+#elif _CCCL_HOSTED()
+#  include <ciso646> // otherwise go for the smallest possible header
+#endif // _CCCL_HOSTED()
+# >>>>>>> END NEW CODE (e5037ea8b4)
 
 #define __cccl_lib_bitops                       201907L
 #define __cccl_lib_bool_constant                201505L
