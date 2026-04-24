@@ -59,6 +59,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 template <typename _Tp>
 [[nodiscard]] _CCCL_API constexpr _Tp __shl(const _Tp __value, int __shift) noexcept
 {
+#if !_CCCL_TILE_COMPILATION() // error: asm statement is unsupported in tile code
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
   {
     if constexpr (sizeof(_Tp) <= sizeof(uint64_t))
@@ -68,12 +69,14 @@ template <typename _Tp>
                           return ::cuda::ptx::shl(static_cast<_Up>(__value), __shift);))
     }
   }
+#endif // !_CCCL_TILE_COMPILATION()
   return (__shift >= ::cuda::std::numeric_limits<_Tp>::digits) ? _Tp{0} : __value << __shift;
 }
 
 template <typename _Tp>
 [[nodiscard]] _CCCL_API constexpr _Tp __shr(const _Tp __value, int __shift) noexcept
 {
+#if !_CCCL_TILE_COMPILATION() // error: asm statement is unsupported in tile code
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
   {
     if constexpr (sizeof(_Tp) <= sizeof(uint64_t))
@@ -83,6 +86,7 @@ template <typename _Tp>
                           return ::cuda::ptx::shr(static_cast<_Up>(__value), __shift);))
     }
   }
+#endif // !_CCCL_TILE_COMPILATION()
   return (__shift >= ::cuda::std::numeric_limits<_Tp>::digits) ? _Tp{0} : __value >> __shift;
 }
 
@@ -94,6 +98,7 @@ template <typename _Tp = uint32_t>
   _CCCL_ASSERT(__width >= 0 && __width <= __digits, "width out of range");
   _CCCL_ASSERT(__start >= 0 && __start <= __digits, "start position out of range");
   _CCCL_ASSERT(__start + __width <= __digits, "start position + width out of range");
+#if !_CCCL_TILE_COMPILATION() // error: asm statement is unsupported in tile code
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
   {
     if constexpr (sizeof(_Tp) <= sizeof(uint32_t))
@@ -101,6 +106,7 @@ template <typename _Tp = uint32_t>
       NV_IF_TARGET(NV_PROVIDES_SM_70, (return ::cuda::ptx::bmsk_clamp(__start, __width);))
     }
   }
+#endif // !_CCCL_TILE_COMPILATION()
   return ::cuda::__shl(static_cast<_Tp>(::cuda::__shl(_Tp{1}, __width) - 1), __start);
 }
 
