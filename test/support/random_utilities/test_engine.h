@@ -7,37 +7,43 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
-
-// MIT License
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
 //
-// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// // MIT License
+// //
+// // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// //
+// // Permission is hereby granted, free of charge, to any person obtaining a copy
+// // of this software and associated documentation files (the "Software"), to deal
+// // in the Software without restriction, including without limitation the rights
+// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// // copies of the Software, and to permit persons to whom the Software is
+// // furnished to do so, subject to the following conditions:
+// //
+// // The above copyright notice and this permission notice shall be included in all
+// // copies or substantial portions of the Software.
+// //
+// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// // SOFTWARE.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <sstream>
+// #endif // !_CCCL_COMPILER(NVRTC)
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  include <sstream>
-#endif // !_CCCL_COMPILER(NVRTC)
+// #include <cuda/std/random>
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
 
 #include <cuda/std/random>
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <sstream>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HOSTED()
 
 #include "test_macros.h"
 
@@ -175,8 +181,12 @@ TEST_FUNC TEST_CONSTEXPR_CXX20 bool test_min_max()
   return true;
 }
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-#  include <sstream>
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <sstream>
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 template <typename Engine>
 void test_save_restore()
 {
@@ -191,7 +201,7 @@ void test_save_restore()
   e1.discard(10000);
   assert(e0() == e1());
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HOSTED()
 
 template <typename Engine, typename Engine::result_type value_10000>
 TEST_FUNC TEST_CONSTEXPR_CXX20 bool test_engine()

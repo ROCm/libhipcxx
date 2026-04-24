@@ -47,22 +47,28 @@
 #include <cuda/std/__chrono/time_point.h>
 #include <cuda/std/ctime>
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <chrono> under hipRTC
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <chrono> under hipRTC
+// #  include <chrono>
+// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+//
+// // NOTE(HIP/AMD): C++20 UNIX-timestamp opt-in workaround for system_clock on
+// // AMD GPUs. The extension header declares cuda::std::chrono::hip_gpu_ext::
+// // __unix_sysclock0_host_ticks / __offset_devclock0 plus the macro
+// // LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS and the host-side
+// // initialize_amdgpu_sysclock_on_{current_,}device() helpers used by
+// // system_clock::now() below. See the header itself for the full opt-in
+// // protocol.
+// #if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
+// #  if _CCCL_STD_VER > 2017 && defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
+// #    include <libhipcxx/__amd/hip_chrono_extension.h>
+// #  endif // _CCCL_STD_VER > 2017 && _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP
+// #endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
+// =======
+#if _CCCL_HOSTED()
 #  include <chrono>
-#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-
-// NOTE(HIP/AMD): C++20 UNIX-timestamp opt-in workaround for system_clock on
-// AMD GPUs. The extension header declares cuda::std::chrono::hip_gpu_ext::
-// __unix_sysclock0_host_ticks / __offset_devclock0 plus the macro
-// LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS and the host-side
-// initialize_amdgpu_sysclock_on_{current_,}device() helpers used by
-// system_clock::now() below. See the header itself for the full opt-in
-// protocol.
-#if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
-#  if _CCCL_STD_VER > 2017 && defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
-#    include <libhipcxx/__amd/hip_chrono_extension.h>
-#  endif // _CCCL_STD_VER > 2017 && _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP
-#endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 

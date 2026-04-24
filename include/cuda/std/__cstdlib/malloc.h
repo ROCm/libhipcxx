@@ -47,9 +47,13 @@
 #include <cuda/std/__cstddef/types.h>
 #include <cuda/std/__cstring/memset.h>
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <cstdlib>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // _CCCL_HOSTED()
 
 #include <nv/target>
 

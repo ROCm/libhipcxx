@@ -43,9 +43,15 @@
 #include <cuda/std/__host_stdlib/stdexcept>
 #include <cuda/std/source_location>
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <cstdio>
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
 #  include <cstdio>
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -59,7 +65,11 @@ using __cuda_error_t = ::cudaError_t;
 using __cuda_error_t = int;
 #endif
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 namespace __detail
 {
 static char* __format_cuda_error(
@@ -111,7 +121,11 @@ public:
 private:
   __cuda_error_t __status_;
 };
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 _CCCL_END_NAMESPACE_CUDA
 
