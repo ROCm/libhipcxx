@@ -70,7 +70,7 @@
 #  ifndef FP_NORMAL
 #    define FP_NORMAL 4
 #  endif // ! FP_NORMAL
-#endif // _CCCL_COMPILER(NVRTC)
+#endif // _CCCL_FREESTANDING()
 
 #ifndef FP_ILOGB0
 #  define FP_ILOGB0 (-INT_MAX - 1)

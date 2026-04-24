@@ -60,14 +60,23 @@
 #  define _CCCL_HAS_BUILTIN_STD_FORWARD() 1
 #endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION()
 
-// NOTE(HIP/AMD): hipRTC has no host C++ standard library, so the clang>=15
-// branch above must not bring in `::std::forward` (there is no host `<utility>`
-// to include). Treat hipRTC like NVRTC and fall back to the manual template
-// `forward` implementation below.
-#if defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// // NOTE(HIP/AMD): hipRTC has no host C++ standard library, so the clang>=15
+// // branch above must not bring in `::std::forward` (there is no host `<utility>`
+// // to include). Treat hipRTC like NVRTC and fall back to the manual template
+// // `forward` implementation below.
+// #if defined(_CCCL_COMPILER_HIPRTC)
+// #  undef _CCCL_HAS_BUILTIN_STD_FORWARD
+// #  define _CCCL_HAS_BUILTIN_STD_FORWARD() 0
+// #endif // _CCCL_COMPILER_HIPRTC
+// =======
+// We cannot use host features if we are building in freestanding
+// However, NVRTC handles it specially
+#if _CCCL_FREESTANDING() && !_CCCL_COMPILER(NVRTC)
 #  undef _CCCL_HAS_BUILTIN_STD_FORWARD
 #  define _CCCL_HAS_BUILTIN_STD_FORWARD() 0
-#endif // _CCCL_COMPILER_HIPRTC
+#endif // _CCCL_ENABLE_FREESTANDING
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 // include minimal std:: headers, nvcc in device mode doesn't need the std:: header
 #if _CCCL_HAS_BUILTIN_STD_FORWARD() && !(_CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION())
@@ -75,9 +84,13 @@
 #    include <bits/move.h>
 #  elif _CCCL_HOST_STD_LIB(LIBCXX) && __has_include(<__utility/forward.h>)
 #    include <__utility/forward.h>
-#  elif !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <utility> under hipRTC
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  elif !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <utility> under hipRTC
+// =======
+#  elif _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 #    include <utility>
-#  endif
+#  endif // _CCCL_HOSTED()
 #endif // _CCCL_HAS_BUILTIN_STD_FORWARD() && !(_CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION())
 
 #include <cuda/std/__cccl/prologue.h>

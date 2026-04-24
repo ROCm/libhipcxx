@@ -43,17 +43,29 @@
 #  pragma system_header
 #endif // no system header
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <system_error>
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
 #  include <system_error>
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// using ::std::errc;
+// #else // ^^^ host ^^^ / vvv NVRTC or HIPRTC (self-contained) vvv
+// =======
+#if _CCCL_HOSTED()
 using ::std::errc;
-#else // ^^^ host ^^^ / vvv NVRTC or HIPRTC (self-contained) vvv
+#else // ^^^ _CCCL_HOSTED() ^^^ / vvv _CCCL_FREESTANDING() vvv
+// >>>>>>> END NEW CODE (e5037ea8b4)
 enum class errc
 {
   invalid_argument    = 22,
@@ -64,7 +76,7 @@ enum class errc
   value_too_large = 75,
 #  endif // ^^^ !_CCCL_OS(WINDOWS) ^^^
 };
-#endif // _CCCL_COMPILER(NVRTC)
+#endif // _CCCL_FREESTANDING()
 
 _CCCL_END_NAMESPACE_CUDA_STD
 

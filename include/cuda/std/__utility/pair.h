@@ -347,7 +347,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
   {}
 
   // std compatibility
-#if !_CCCL_COMPILER(NVRTC)  && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC)  && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   template <class _U1,
             class _U2,
             class _Constraints                                       = __pair_constructible<const _U1&, const _U2&>,
@@ -383,7 +387,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     is_nothrow_constructible_v<_T1, _U1> && is_nothrow_constructible_v<_T2, _U2>)
       : __base(::cuda::std::forward<_U1>(__p.first), ::cuda::std::forward<_U2>(__p.second))
   {}
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
   // assignments
   _CCCL_HIDE_FROM_ABI pair& operator=(const pair&) = default;
@@ -414,7 +422,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
   }
 
   // std assignments
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   template <class _UT1 = _T1, enable_if_t<is_copy_assignable_v<_UT1> && is_copy_assignable_v<_T2>, int> = 0>
   _CCCL_HOST_API constexpr pair& operator=(::std::pair<_T1, _T2> const& __p) noexcept(
     is_nothrow_copy_assignable_v<_T1> && is_nothrow_copy_assignable_v<_T2>)
@@ -432,7 +444,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     this->second = ::cuda::std::forward<_T2>(__p.second);
     return *this;
   }
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #if _CCCL_STD_VER >= 2023
   _CCCL_API constexpr const pair& operator=(pair const& __p) const
@@ -444,11 +460,15 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     return *this;
   }
 
-// <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-//   _CCCL_API inline _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2> const& __p) const
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
+// // #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// //   _CCCL_API inline _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2> const& __p) const
+// // =======
+// #  if !_CCCL_COMPILER(NVRTC)
 // =======
-#  if !_CCCL_COMPILER(NVRTC)
+#  if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   _CCCL_HOST_API inline constexpr const pair& operator=(::std::pair<_T1, _T2> const& __p) const
 // >>>>>>> END NEW CODE (215dc6e187)
     noexcept(is_nothrow_copy_assignable_v<const _T1> && is_nothrow_copy_assignable_v<const _T2>)
@@ -458,7 +478,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     this->second = __p.second;
     return *this;
   }
-#  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#  endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
   _CCCL_API constexpr const pair& operator=(pair&& __p) const
     noexcept(is_nothrow_assignable_v<const _T1&, _T1> && is_nothrow_assignable_v<const _T2&, _T2>)
@@ -469,11 +493,15 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     return *this;
   }
 
-// <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-//   _CCCL_API inline _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2>&& __p) const
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
+// // #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// //   _CCCL_API inline _CCCL_HOST constexpr const pair& operator=(::std::pair<_T1, _T2>&& __p) const
+// // =======
+// #  if !_CCCL_COMPILER(NVRTC)
 // =======
-#  if !_CCCL_COMPILER(NVRTC)
+#  if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   _CCCL_HOST_API inline constexpr const pair& operator=(::std::pair<_T1, _T2>&& __p) const
 // >>>>>>> END NEW CODE (215dc6e187)
     noexcept(is_nothrow_assignable_v<const _T1&, _T1> && is_nothrow_assignable_v<const _T2&, _T2>)
@@ -483,7 +511,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     this->second = ::cuda::std::forward<_T2>(__p.second);
     return *this;
   }
-#  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#  endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
   template <class _U1, class _U2>
   _CCCL_API constexpr const pair& operator=(const pair<_U1, _U2>& __p) const
@@ -494,7 +526,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     return *this;
   }
 
-#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#  if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   template <class _U1, class _U2>
   _CCCL_HOST_API inline constexpr const pair& operator=(const ::std::pair<_U1, _U2>& __p) const
     requires(is_assignable_v<const _T1&, const _U1&> && is_assignable_v<const _T2&, const _U2&>)
@@ -503,7 +539,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     this->second = __p.second;
     return *this;
   }
-#  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#  endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
   template <class _U1, class _U2>
   _CCCL_API constexpr const pair& operator=(pair<_U1, _U2>&& __p) const
@@ -514,7 +554,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     return *this;
   }
 
-#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#  if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   template <class _U1, class _U2>
   _CCCL_HOST_API inline constexpr const pair& operator=(::std::pair<_U1, _U2>&& __p) const
     requires(is_assignable_v<const _T1&, _U1> && is_assignable_v<const _T2&, _U2>)
@@ -523,7 +567,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
     this->second = ::cuda::std::forward<_U2>(__p.second);
     return *this;
   }
-#  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#  endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 #endif // _CCCL_STD_VER >= 2023
 
   _CCCL_API inline _CCCL_CONSTEXPR_CXX20 void
@@ -544,17 +592,25 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
   }
 #endif // _CCCL_STD_VER >= 2023
 
-// <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC)  && !defined(_CCCL_COMPILER_HIPRTC)
-//   _CCCL_HOST constexpr operator ::std::pair<_T1, _T2>() const
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
+// // #if !_CCCL_COMPILER(NVRTC)  && !defined(_CCCL_COMPILER_HIPRTC)
+// //   _CCCL_HOST constexpr operator ::std::pair<_T1, _T2>() const
+// // =======
+// #if !_CCCL_COMPILER(NVRTC)
 // =======
-#if !_CCCL_COMPILER(NVRTC)
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
   _CCCL_HOST_API constexpr operator ::std::pair<_T1, _T2>() const
 // >>>>>>> END NEW CODE (215dc6e187)
   {
     return {this->first, this->second};
   }
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 };
 
 template <class _T1, class _T2>

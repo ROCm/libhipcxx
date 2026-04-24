@@ -36,10 +36,17 @@
 // >>>>>>> END NEW CODE (b4f59b00b3)
 
 #include <cuda/std/random>
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// #  include <cstdint>
+// #  include <random>
+// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+// =======
+#if _CCCL_HOSTED()
 #  include <cstdint>
 #  include <random>
-#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include "test_macros.h"
 
@@ -53,7 +60,11 @@ TEST_FUNC TEST_CONSTEXPR_CXX20 bool test()
   return true;
 }
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// =======
+#if _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 void test_against_std()
 {
   cuda::std::size_t n                                     = 100;
@@ -76,7 +87,11 @@ void test_against_std()
     assert(cuda_output == std_output);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
+// =======
+#endif // _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 int main(int, char**)
 {

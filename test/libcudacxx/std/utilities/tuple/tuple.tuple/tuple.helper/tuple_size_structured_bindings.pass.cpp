@@ -169,7 +169,7 @@ TEST_FUNC void test_after_tuple_size_specialization()
   // NOTE(HIP/AMD): Windows fails here as it seems that it doesn't use custom get() with structured bindings.
 #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) && !_CCCL_OS(WINDOWS) // nvbug4053842
   assert(p == -1);
-#endif
+#endif // !_CCCL_COMPILER(NVRTC)
 }
 
 int main(int, char**)

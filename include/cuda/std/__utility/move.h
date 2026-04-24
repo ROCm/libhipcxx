@@ -85,9 +85,13 @@
 #    include <bits/move.h>
 #  elif _CCCL_HOST_STD_LIB(LIBCXX) && __has_include(<__utility/move.h>)
 #    include <__utility/move.h> // includes std::move_if_noexcept, too
-#  elif !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <utility> under hipRTC
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// #  elif !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <utility> under hipRTC
+// =======
+#  elif _CCCL_HOSTED()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 #    include <utility>
-#  endif
+#  endif // _CCCL_HOSTED()
 #endif // _CCCL_HAS_BUILTIN_STD_MOVE() || _CCCL_HAS_BUILTIN_STD_MOVE_IF_NOEXCEPT()
 
 // _CCCL_MOVE macro always expands to std::move builtin, if available, and fallbacks to cuda::std::move otherwise.
