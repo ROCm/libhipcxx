@@ -7,29 +7,34 @@
 //
 //===----------------------------------------------------------------------===//
 
-// MIT License
+// <<<<<<< OLD CODE from e46ae1ed13 (0a2929ae18) - COMMENTED OUT
+// // MIT License
+// //
+// // Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// //
+// // Permission is hereby granted, free of charge, to any person obtaining a copy
+// // of this software and associated documentation files (the "Software"), to deal
+// // in the Software without restriction, including without limitation the rights
+// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// // copies of the Software, and to permit persons to whom the Software is
+// // furnished to do so, subject to the following conditions:
+// //
+// // The above copyright notice and this permission notice shall be included in all
+// // copies or substantial portions of the Software.
+// //
+// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// // SOFTWARE.
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-// XFAIL: c++98, c++03
+// // XFAIL: c++98, c++03
+// =======
+// XFAIL: enable-tile
+// error: a non-__tile__ variable cannot be used in tile code
+// >>>>>>> END NEW CODE (0a2929ae18)
 
 // <cuda/std/iterator>
 // template <class C> constexpr auto begin(C& c) -> decltype(c.begin());
@@ -147,8 +152,8 @@ TEST_FUNC void test_const_array(const T (&array)[Sz])
   assert(cuda::std::cend(array) == array + Sz);
 }
 
-TEST_GLOBAL_VARIABLE constexpr int global_array[]{1, 2, 3};
-TEST_GLOBAL_VARIABLE constexpr int global_const_array[] = {0, 1, 2, 3, 4};
+[[maybe_unused]] TEST_GLOBAL_VARIABLE constexpr int global_array[]{1, 2, 3};
+[[maybe_unused]] TEST_GLOBAL_VARIABLE constexpr int global_const_array[] = {0, 1, 2, 3, 4};
 
 TEST_FUNC void test_ambiguous_std()
 {
@@ -221,10 +226,12 @@ int main(int, char**)
   test_const_container(a, 3);
   test_const_container(il, 4);
 
+#if !_CCCL_TILE_COMPILATION() // error: a non-__tile__ variable ("arrA") cannot be used in tile code
   test_const_array(global_array);
   constexpr const int* b = cuda::std::cbegin(global_array);
   constexpr const int* e = cuda::std::cend(global_array);
   static_assert(e - b == 3);
+#endif // !_CCCL_TILE_COMPILATION()
 
   {
     using C = cuda::std::array<int, 5>;
@@ -254,12 +261,14 @@ int main(int, char**)
     static_assert(*cuda::std::crbegin(local_const_array) == 4);
   }
 
+#if !_CCCL_TILE_COMPILATION() // error: a non-__tile__ variable ("arrA") cannot be used in tile code
   {
     static_assert(*cuda::std::begin(global_const_array) == 0);
     static_assert(*cuda::std::cbegin(global_const_array) == 0);
     static_assert(*cuda::std::rbegin(global_const_array) == 4);
     static_assert(*cuda::std::crbegin(global_const_array) == 4);
   }
+#endif // !_CCCL_TILE_COMPILATION()
 
   test_ambiguous_std();
 
