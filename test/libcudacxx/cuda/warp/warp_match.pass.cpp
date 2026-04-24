@@ -33,6 +33,9 @@
 // NOTE(HIP/AMD): warp_match_all/warp_match_any rely on the match.{any,all}.sync
 // PTX instructions which have no equivalent on AMD/HIP hardware.
 
+// UNSUPPORTED: enable-tile
+// error: asm statement is unsupported in tile code
+
 #include <cuda/std/array>
 #include <cuda/std/cassert>
 #include <cuda/std/cstdint>
