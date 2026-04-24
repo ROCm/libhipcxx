@@ -44,6 +44,7 @@
 #include <cuda/std/__type_traits/is_same.h>
 #include <cuda/std/__type_traits/is_trivially_copyable.h>
 #include <cuda/std/__type_traits/remove_const.h>
+#include <cuda/std/__utility/pair.h>
 #include <cuda/std/cstdint>
 #include <cuda/std/cstdlib>
 #include <cuda/std/cstring> // memmove
@@ -124,7 +125,7 @@ _CCCL_API constexpr pair<_Tp*, _Up*> __copy(_Tp* __first, _Tp* __last, _Up* __re
   {
     if (__dispatch_memmove(__result, __first, __n))
     {
-      return {__last, __result + __n};
+      return pair{__last, __result + __n};
     }
     if ((!::cuda::std::is_constant_evaluated() && __first < __result)
         || __constexpr_tail_overlap(__first, __result, __last))
@@ -142,7 +143,7 @@ _CCCL_API constexpr pair<_Tp*, _Up*> __copy(_Tp* __first, _Tp* __last, _Up* __re
       }
     }
   }
-  return {__last, __result + __n};
+  return pair{__last, __result + __n};
 }
 
 template <class _InputIterator, class _OutputIterator>
