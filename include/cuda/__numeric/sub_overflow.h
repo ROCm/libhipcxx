@@ -268,6 +268,7 @@ template <class _Tp>
 template <typename _Tp>
 [[nodiscard]] _CCCL_API constexpr overflow_result<_Tp> __sub_overflow_uniform_type(_Tp __lhs, _Tp __rhs) noexcept
 {
+#if !_CCCL_TILE_COMPILATION() // error: asm statement is unsupported in tile code
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
   {
 #if _CCCL_CUDA_COMPILATION()
@@ -289,6 +290,7 @@ template <typename _Tp>
     NV_IF_TARGET(NV_IS_HOST, (return ::cuda::__sub_overflow_host(__lhs, __rhs);))
 #endif // !_CCCL_CUDA_COMPILATION()
   }
+#endif // !_CCCL_TILE_COMPILATION()
   return ::cuda::__sub_overflow_generic_impl(__lhs, __rhs);
 }
 
