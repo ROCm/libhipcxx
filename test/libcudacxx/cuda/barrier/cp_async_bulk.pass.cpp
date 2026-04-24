@@ -30,8 +30,13 @@
 // UNSUPPORTED: pre-sm-90
 // ADDITIONAL_COMPILE_DEFINITIONS: CCCL_IGNORE_DEPRECATED_API
 
-// NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
-// UNSUPPORTED: hipcc, hiprtc
+// <<<<<<< OLD CODE from 7011c55229 (9e9eeeb439) - COMMENTED OUT
+// // NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
+// // UNSUPPORTED: hipcc, hiprtc
+// =======
+// UNSUPPORTED: enable-tile
+// error: asm statement is unsupported in tile code
+// >>>>>>> END NEW CODE (9e9eeeb439)
 
 // <cuda/barrier>
 

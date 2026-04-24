@@ -27,8 +27,13 @@
 
 // UNSUPPORTED: pre-sm-70
 
-// NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
-// UNSUPPORTED: hipcc, hiprtc
+// <<<<<<< OLD CODE from 7011c55229 (9e9eeeb439) - COMMENTED OUT
+// // NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
+// // UNSUPPORTED: hipcc, hiprtc
+// =======
+// UNSUPPORTED: enable-tile
+// error: asm statement is unsupported in tile code
+// >>>>>>> END NEW CODE (9e9eeeb439)
 
 #include <cuda/barrier>
 
