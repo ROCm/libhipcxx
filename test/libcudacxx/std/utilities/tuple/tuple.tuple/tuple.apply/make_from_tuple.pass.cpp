@@ -26,6 +26,9 @@
 // UNSUPPORTED: nvrtc, hiprtc
 // UNSUPPORTED: gcc-6
 
+// UNSUPPORTED: enable-tile
+// TypeID is unsupported un tile mode
+
 // <cuda/std/tuple>
 
 // template <class T, class Tuple> constexpr T make_from_tuple(Tuple&&);
