@@ -44,13 +44,19 @@ TEST_DEVICE_FUNC void basic_mdspan_access_test()
   __shared__ int smem[4];
   [[maybe_unused]] cuda::shared_memory_mdspan<int, ext_t> md{smem, ext_t{}};
   unused(md[0]);
-  // NOTE(HIP/AMD): "l" is an NVPTX 64-bit register constraint; on amdgcn use a
-  // vector-register ("v") constraint to keep the shared-memory pointer live.
-#if defined(__HIP_PLATFORM_AMD__)
-  asm volatile("" : : "v"((size_t) smem) : "memory");
-#else
+// <<<<<<< OLD CODE from 410f64f7c5 (f0740c4fb3) - COMMENTED OUT
+//   // NOTE(HIP/AMD): "l" is an NVPTX 64-bit register constraint; on amdgcn use a
+//   // vector-register ("v") constraint to keep the shared-memory pointer live.
+// #if defined(__HIP_PLATFORM_AMD__)
+//   asm volatile("" : : "v"((size_t) smem) : "memory");
+// #else
+//   asm volatile("" : : "l"((size_t) smem) : "memory");
+// #endif
+// =======
+#if !_CCCL_TILE_COMPILATION()
   asm volatile("" : : "l"((size_t) smem) : "memory");
-#endif
+#endif // !_CCCL_TILE_COMPILATION()
+// >>>>>>> END NEW CODE (f0740c4fb3)
 }
 
 int main(int, char**)
