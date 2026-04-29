@@ -51,7 +51,7 @@
 #if _CCCL_HOSTED()
 # >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <cstdint>
-#else // ^^^ _CCCL_HOSTED() ^^^ / vvv _CCCL_FREESTANDING() vvv
+#elif _CCCL_COMPILER(NVRTC)
 #  include <cuda/std/climits>
 
 // NOTE(HIP/AMD): Under HIPRTC with -nostdinc++, the host C++
@@ -226,7 +226,7 @@ using uintptr_t = uint64_t;
 
 #  define INTMAX_C(X)  ((::intmax_t) (X))
 #  define UINTMAX_C(X) ((::uintmax_t) (X))
-#endif // ^^^ _CCCL_FREESTANDING()
+#endif // ^^^ _CCCL_COMPILER(NVRTC)
 
 #include <cuda/std/__cccl/prologue.h>
 
