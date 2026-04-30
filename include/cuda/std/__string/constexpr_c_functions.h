@@ -55,8 +55,14 @@
 // =======
 #if _CCCL_HOSTED()
 #  include <cstring>
-#endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+// <<<<<<< OLD CODE from 3b82c5de98 (89b5a1e51d) - COMMENTED OUT
+// #endif // _CCCL_HOSTED()
+// // >>>>>>> END NEW CODE (e5037ea8b4)
+// =======
+#elif _CCCL_HOSTJIT()
+#  include <string.h>
+#endif // _CCCL_HOSTJIT()
+// >>>>>>> END NEW CODE (89b5a1e51d)
 
 #include <cuda/std/__cccl/prologue.h>
 
