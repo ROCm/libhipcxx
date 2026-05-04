@@ -45,7 +45,6 @@ This page covers the utility library headers available in libhipcxx, including b
    utility_library/type_traits
    utility_library/utility
    utility_library/variant
-   utility_library/version
 
 Any Standard C++ header not listed below is omitted. Some of the Standard C++ facilities in this header are omitted, see
 the information about the individual features for details.
@@ -83,7 +82,4 @@ the information about the individual features for details.
      - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-variant`
      - Type safe union type
-     - libhipcxx 2.7
-   * - :ref:`libcudacxx-standard-api-utility-version`
-     - Compile-time version information and feature test macros
      - libhipcxx 2.7
