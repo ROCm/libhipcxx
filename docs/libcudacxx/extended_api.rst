@@ -35,6 +35,7 @@ This section documents the extended API provided by libhipcxx, covering bit mani
 .. toctree::
    :maxdepth: 2
 
+   extended_api/macros
    extended_api/bit
    extended_api/execution_model
    extended_api/exceptions
