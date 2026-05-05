@@ -45,9 +45,11 @@
 
 #if _CCCL_CUDA_COMPILATION()
 #  include <cuda/__ptx/instructions/bfind.h>
+#endif // _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #  include <cuda/__ptx/instructions/shl.h>
 #  include <cuda/__ptx/instructions/shr.h>
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #include <cuda/std/__algorithm/max.h>
 #include <cuda/std/__bit/countl.h>
 #include <cuda/std/__concepts/concept_macros.h>
