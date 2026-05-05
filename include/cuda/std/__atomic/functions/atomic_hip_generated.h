@@ -42,7 +42,7 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __thread_scope_block_tag) {
     __threadfence_block();
@@ -247,6 +247,6 @@ __device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __va
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #include <cuda/std/__cccl/epilogue.h>
