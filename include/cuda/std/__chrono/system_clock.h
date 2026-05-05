@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___CHRONO_SYSTEM_CLOCK_H
 #define _CUDA_STD___CHRONO_SYSTEM_CLOCK_H
 
@@ -29,6 +51,19 @@
 #  include <chrono>
 #endif // !_CCCL_COMPILER(NVRTC)
 
+// NOTE(HIP/AMD): C++20 UNIX-timestamp opt-in workaround for system_clock on
+// AMD GPUs. The extension header declares cuda::std::chrono::hip_gpu_ext::
+// __unix_sysclock0_host_ticks / __offset_devclock0 plus the macro
+// LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS and the host-side
+// initialize_amdgpu_sysclock_on_{current_,}device() helpers used by
+// system_clock::now() below. See the header itself for the full opt-in
+// protocol.
+#if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
+#  if _CCCL_STD_VER > 2017 && defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
+#    include <cuda/std/detail/libcxx/include/support/hip/chrono_hip_extension.h>
+#  endif // _CCCL_STD_VER > 2017 && _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP
+#endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
+
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
@@ -46,12 +81,65 @@ public:
 
   [[nodiscard]] _CCCL_API inline static time_point now() noexcept
   {
+#if _CCCL_CUDA_COMPILATION()
     NV_IF_ELSE_TARGET(
       NV_IS_HOST,
       (return time_point(duration_cast<duration>(nanoseconds(
         ::std::chrono::duration_cast<::std::chrono::nanoseconds>(::std::chrono::system_clock::now().time_since_epoch())
           .count())));),
       (return time_point(duration_cast<duration>(nanoseconds(::cuda::ptx::get_sreg_globaltimer())));))
+#else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
+    // NOTE(HIP/AMD): cuda::ptx::get_sreg_globaltimer() is a CUDA PTX intrinsic
+    // with no direct HIP analogue. AMD GPUs do not expose a UNIX timestamp
+    // counter directly. Two HIP device-side paths exist, ported verbatim
+    // from upgrade/3.1_base:
+    //
+    //  - Default (-D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP NOT set):
+    //    Convert wall_clock64() (TSC cycles) using the arch-dependent
+    //    _LIBCUDACXX_HIP_TSC_CLOCKRATE supplied via
+    //    <amd/hip_tsc_clockrate.h>. The resulting time_point is NOT a
+    //    UNIX timestamp.
+    //
+    //  - Experimental opt-in (-D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP set):
+    //    Use the host-initialised offsets in
+    //    cuda::std::chrono::hip_gpu_ext (defined by the user via
+    //    LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS at file scope, populated by
+    //    initialize_amdgpu_sysclock_on_current_device() at runtime) so
+    //    the device-side time_point IS a UNIX timestamp.
+    //    See <cuda/std/detail/libcxx/include/support/hip/chrono_hip_extension.h>
+    //    for the full opt-in protocol.
+    NV_IF_ELSE_TARGET(
+      NV_IS_HOST,
+      (return time_point(duration_cast<duration>(nanoseconds(
+        ::std::chrono::duration_cast<::std::chrono::nanoseconds>(::std::chrono::system_clock::now().time_since_epoch())
+          .count())));),
+#  if _CCCL_STD_VER > 2017 && defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
+      // FIXME(HIP/AMD): UNIX-timestamp workaround. Requires user-side
+      // initialisation -- see chrono_hip_extension.h for the protocol.
+      (if (!(::cuda::std::chrono::hip_gpu_ext::__unix_sysclock0_host_ticks >= 0))
+       {
+         // FIXME(HIP/AMD): now() is noexcept, so we cannot throw here.
+         printf("ERROR: Using sysclock on AMD GPUs requires a prior initialization call on the host side "
+                "(cuda::std::chrono::hip_gpu_ext::initialize_amdgpu_sysclock_on_current_device()). "
+                "The returned time point will not be a UNIX timestamp.\n");
+       }
+       assert(::cuda::std::chrono::hip_gpu_ext::__unix_sysclock0_host_ticks >= 0);
+       // Convert host ticks to device ticks via the arch TSC rate, then add
+       // the device-side delta since the host-side initialisation moment.
+       const long long __unix_sysclock0_device_ticks =
+         ::cuda::std::chrono::hip_gpu_ext::__unix_sysclock0_host_ticks
+         / _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE;
+       const long long __time =
+         __unix_sysclock0_device_ticks
+         + (wall_clock64() - ::cuda::std::chrono::hip_gpu_ext::__offset_devclock0);
+       return time_point(duration_cast<duration>(
+         ::cuda::std::chrono::duration<long long, ratio<1, _LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__time)));))
+#  else // ^^^ _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP ^^^ / vvv default vvv
+      (const long long __cycles = wall_clock64();
+       return time_point(duration_cast<duration>(
+         ::cuda::std::chrono::duration<long long, ratio<1, _LIBCUDACXX_HIP_TSC_CLOCKRATE>>(__cycles)));))
+#  endif // !_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP
+#endif // !_CCCL_CUDA_COMPILATION()
   }
 
   [[nodiscard]] _CCCL_API inline static time_t to_time_t(const time_point& __t) noexcept
