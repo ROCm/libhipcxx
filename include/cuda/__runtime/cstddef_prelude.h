@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -43,13 +43,13 @@
 
 #  include <stddef.h>
 #else
-#  define offsetof(type, member) (_CUDA_VSTD::size_t)((char*) &(((type*) 0)->member) - (char*) 0)
+#  define offsetof(type, member) (::cuda::std::size_t)((char*) &(((type*) 0)->member) - (char*) 0)
 #endif // _CCCL_COMPILER_NVRTC
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 typedef decltype(nullptr) nullptr_t;
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #endif // _LIBCUDACXX___CUDA_CSTDDEF_PRELUDE_H
