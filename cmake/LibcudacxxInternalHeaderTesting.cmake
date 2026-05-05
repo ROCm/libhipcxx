@@ -67,12 +67,11 @@ list(FILTER internal_headers EXCLUDE REGEX "__ptx/instructions/generated")
 
 function(libcudacxx_create_internal_header_test header_name headertest_src)
   # NOTE(HIP/AMD): Skip headers without HIP support as of 2026 when
-  # building under HIP. Adds __memory_resource (driver-API symbols) on
-  # top of the public-helper blocklist.
+  # building under HIP.
   if (LIBCUDACXX_ENABLE_HIP)
     string(
       REGEX MATCH
-      "ptx|barrier|latch|semaphore|annotated_ptr|pipeline|memcpy_async|__memory_resource"
+      "ptx|barrier|latch|semaphore|annotated_ptr|pipeline|memcpy_async"
       match
       "${header_name}"
     )
