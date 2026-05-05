@@ -70,7 +70,7 @@ foreach (test_path IN LISTS libcudacxx_atomic_codegen_tests)
   ## Important for testing the local headers
   target_include_directories(
     atomic_codegen_${test_name}
-    PRIVATE "${libhipcxx_SOURCE_DIR}/include"
+    PRIVATE "${libcudacxx_SOURCE_DIR}/include"
   )
   add_dependencies(libcudacxx.test.atomics.ptx atomic_codegen_${test_name})
 

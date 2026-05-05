@@ -37,6 +37,11 @@ set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
 project(libhipcxx LANGUAGES CXX VERSION 3.0.2)
 
+# Expose libcudacxx_SOURCE_DIR for parity with the upstream libcudacxx
+# project name; lets all libhipcxx CMake code use the upstream variable
+# name so vendored cmake/Libcudacxx*.cmake helpers stay byte-identical.
+set(libcudacxx_SOURCE_DIR "${libhipcxx_SOURCE_DIR}")
+
 # rocm-cmake contains common cmake code for rocm projects to help
 # setup and install
 include(cmake/FindROCMCmake.cmake)
@@ -79,8 +84,8 @@ if (libhipcxx_ENABLE_CMAKE_TESTS)
   add_subdirectory(cmake/test)
 endif()
 
-set(CMAKE_MODULE_PATH "${libhipcxx_SOURCE_DIR}/cmake")
-set(LLVM_PATH "${libhipcxx_SOURCE_DIR}" CACHE STRING "" FORCE)
+set(CMAKE_MODULE_PATH "${libcudacxx_SOURCE_DIR}/cmake")
+set(LLVM_PATH "${libcudacxx_SOURCE_DIR}" CACHE STRING "" FORCE)
 
 # Configuration options.
 option(LIBCUDACXX_ENABLE_CUDA "Enable the CUDA language support." OFF)
@@ -210,13 +215,28 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   include(cmake/CCCLGetDependencies.cmake)
   cccl_build_compiler_targets()
 
+  # libcudacxx_build_compiler_targets() links libcudacxx.compiler_interface
+  # against cccl.compiler_interface_cpp${CMAKE_CUDA_STANDARD}. When CUDA is
+  # not enabled (HIP-only build) CMAKE_CUDA_STANDARD is empty and the link
+  # resolves to a non-existent target. Default to 17 to mirror the upstream
+  # libcudacxx CMakePresets baseline.
+  if (NOT CMAKE_CUDA_STANDARD)
+    set(CMAKE_CUDA_STANDARD 17)
+  endif()
+
   # Create the compiler targets with the common compile flags
   include(cmake/LibcudacxxBuildCompilerTargets.cmake)
   libcudacxx_build_compiler_targets()
 
-  # Test all public and internal headers
-  include(cmake/LibcudacxxInternalHeaderTesting.cmake)
-  include(cmake/LibcudacxxPublicHeaderTesting.cmake)
+  # Test all public and internal headers.
+  # The Internal/PublicHeaderTesting helpers create per-header .cu library
+  # targets that require enable_language(CUDA); only include them when CUDA
+  # is enabled. The PublicHeaderTestingHost helper creates .cpp library
+  # targets and works under both CUDA and HIP.
+  if (LIBCUDACXX_ENABLE_CUDA)
+    include(cmake/LibcudacxxInternalHeaderTesting.cmake)
+    include(cmake/LibcudacxxPublicHeaderTesting.cmake)
+  endif()
   include(cmake/LibcudacxxPublicHeaderTestingHost.cmake)
 
   add_subdirectory(test)

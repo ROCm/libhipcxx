@@ -58,20 +58,20 @@ else()
 endif()
 
 # Libhipcxx headers
-rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/cuda"
-  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
-  FILES_MATCHING
+rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/cuda"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING  
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
-rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/nv"
-  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
-  FILES_MATCHING
+rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/nv"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING  
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
-rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/amd"
-  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
+rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/amd"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
@@ -83,15 +83,15 @@ rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/amd"
 # Note: we can't use symlinks here, as this would
 # break builds of packages like hipDF which
 # create a Python wheel with setuptools.
-rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/cuda/"
-  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}/hip"
+rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/cuda/"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/libhipcxx/hip"
   FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
 
 # Libcudacxx cmake package
-rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/lib/cmake/libhipcxx"
+rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx"
   DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake"
   FILES_MATCHING
   PATTERN *
@@ -108,7 +108,7 @@ list(JOIN from_install_prefix "" from_install_prefix)
 # Need to configure a file to store CMAKE_INSTALL_INCLUDEDIR
 # since it can be defined by the user. This is common to work around collisions
 # with the CTK installed headers.
-configure_file("${libhipcxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-header-search.cmake.in"
+configure_file("${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-header-search.cmake.in"
   "${libhipcxx_BINARY_DIR}/lib/cmake/libhipcxx/libhipcxx-header-search.cmake"
   @ONLY
 )

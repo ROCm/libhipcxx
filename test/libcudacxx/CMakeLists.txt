@@ -179,7 +179,7 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "Clang")
     " -Xclang -Wno-unused-parameter"
     " -Wno-unknown-cuda-version"
     " ${LIBCUDACXX_FORCE_INCLUDE}"
-    " -I${libhipcxx_SOURCE_DIR}/include"
+    " -I${libcudacxx_SOURCE_DIR}/include"
     " ${LIBCUDACXX_WARNING_LEVEL}"
   )
 
@@ -202,15 +202,14 @@ elseif (${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVHPC")
   string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS " -stdpar")
 endif()
 
-if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
-  message(STATUS "libhipcxx_SOURCE_DIR: ${libhipcxx_SOURCE_DIR}" )
+if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "HIPCC")
+  message(STATUS "libcudacxx_SOURCE_DIR: ${libcudacxx_SOURCE_DIR}" )
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
 #    "${LIBCUDACXX_TEST_COMPILER_FLAGS} \
     " ${LIBCUDACXX_FORCE_INCLUDE}"
     " -I${CMAKE_SOURCE_DIR}/include"
-    " -I${libhipcxx_SOURCE_DIR}/include"
-    " -I${libhipcxx_SOURCE_DIR}/include/libhipcxx"
-    " -O3"  # hipcc defaults to -O3; amdclang++ invoked directly does not
+    " -I${libcudacxx_SOURCE_DIR}/include"
+    " -I${libcudacxx_SOURCE_DIR}/include/libhipcxx"
 #    " CACHE INTERNAL "Flags for libcxx testing."
   )
   if (WIN32)
@@ -344,7 +343,7 @@ add_test(
         -vv --no-progress-bar --time-tests
         ${libcudacxx_LIT_FLAGS}
         -j "${libcudacxx_LIT_PARALLEL_LEVEL}"
-        "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
+        "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
   # gersemi: on
 )
 
@@ -380,7 +379,7 @@ if(LIBCUDACXX_ENABLE_CUDA)
     cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
     target_include_directories(
       ${target_name}
-      PRIVATE "${libhipcxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
+      PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
     )
     target_link_libraries(
       ${target_name}
