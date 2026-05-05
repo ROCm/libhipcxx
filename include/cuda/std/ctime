@@ -47,6 +47,12 @@
 #  include <cuda/__ptx/instructions/get_sreg.h>
 #endif // _CCCL_CUDA_COMPILATION()
 
+// NOTE(HIP/AMD): _LIBCUDACXX_HIP_TSC_CLOCKRATE /
+// _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE used by
+// __cccl_time_impl_device() / __cccl_timespec_get_impl_device() are
+// supplied transitively by <cuda/std/detail/__config> ->
+// <amd/hip_tsc_clockrate.h> on HIP.
+
 #if !_CCCL_COMPILER(NVRTC)
 #  include <time.h>
 #else
