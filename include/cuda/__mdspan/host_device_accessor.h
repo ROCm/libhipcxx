@@ -137,10 +137,32 @@ class __host_accessor : public _Accessor
       if (!cuda::std::__cccl_default_is_constant_evaluated())
       {
         auto __p1 = ::cuda::std::to_address(__p);
+#    if _CCCL_HIP_COMPILATION()
+        // NOTE(HIP/AMD): use the cudaPointerGetAttributes runtime API
+        // (shimmed to hipPointerGetAttributes via include/amd/cuda_runtime.h)
+        // since the cuPointerGetAttribute driver API is not exposed by HIP
+        // through cuda::__driver::__pointerGetAttributeNoThrow. Mirrors the
+        // pattern used in __is_managed_pointer below.
+        //
+        // The Unregistered case is included because cudaPointerGetAttributes
+        // returns 'cudaMemoryTypeUnregistered' for any pointer the runtime
+        // does not know about (stack pointers, statically-allocated globals,
+        // anything from regular new / malloc, ...) -- ALL of which ARE
+        // host-accessible. The CUDA-side path on the right achieves the same
+        // effect via 'status != cudaSuccess' (when the driver does not
+        // recognise the pointer, fall through to "host"); we get there
+        // explicitly via the type enum instead. Managed memory is also
+        // host-accessible (unified addressing), hence the third clause.
+        ::cudaPointerAttributes __ptr_attrib{};
+        _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
+        return __ptr_attrib.type == ::cudaMemoryTypeUnregistered || __ptr_attrib.type == ::cudaMemoryTypeHost
+            || __ptr_attrib.type == ::cudaMemoryTypeManaged;
+#    else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
         ::CUmemorytype __type{};
         const auto __status =
           ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __p1);
         return (__status != ::cudaSuccess) || __type == ::CU_MEMORYTYPE_HOST;
+#    endif // !_CCCL_HIP_COMPILATION()
       }
       return true;
     }
@@ -272,10 +294,19 @@ class __device_accessor : public _Accessor
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
     {
       auto __p1 = ::cuda::std::to_address(__p);
+#  if _CCCL_HIP_COMPILATION()
+      // NOTE(HIP/AMD): see __is_host_accessible_pointer above for rationale
+      // -- HIP doesn't expose cuPointerGetAttribute through cuda::__driver,
+      // so use the cudaPointerGetAttributes runtime API shim instead.
+      ::cudaPointerAttributes __ptr_attrib{};
+      _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
+      return __ptr_attrib.type == ::cudaMemoryTypeDevice || __ptr_attrib.type == ::cudaMemoryTypeManaged;
+#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
       ::CUmemorytype __type{};
       const auto __status =
         ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __p1);
       return (__status != ::cudaSuccess) || __type == ::CU_MEMORYTYPE_DEVICE;
+#  endif // !_CCCL_HIP_COMPILATION()
     }
     else
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
