@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___FLOATING_POINT_NVFP_TYPES_H
 #define _CUDA_STD___FLOATING_POINT_NVFP_TYPES_H
 
@@ -24,14 +46,27 @@
 // Prevent resetting of the diagnostic state by guarding the push/pop with a macro
 #if _CCCL_HAS_NVFP16()
 _CCCL_DIAG_PUSH
-#  include <cuda_fp16.h>
+// NOTE(HIP/AMD): _CCCL_HAS_NVFP16() is forced ON under HIP by
+// include/cuda/std/__cccl/extended_data_types.h, but the upstream-named
+// <cuda_fp16.h> does not exist on a HIP-only system. Pull in the HIP
+// equivalent that defines __half / __half2.
+#  if _CCCL_HIP_COMPILATION()
+#    include <hip/hip_fp16.h>
+#  else
+#    include <cuda_fp16.h>
+#  endif
 _CCCL_DIAG_POP
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wunused-function")
-#  include <cuda_bf16.h>
+// NOTE(HIP/AMD): see __nv_fp16 above; same rationale for __nv_bfloat16{,2}.
+#  if _CCCL_HIP_COMPILATION()
+#    include <hip/hip_bf16.h>
+#  else
+#    include <cuda_bf16.h>
+#  endif
 _CCCL_DIAG_POP
 #endif // _CCCL_HAS_NVBF16()
 
