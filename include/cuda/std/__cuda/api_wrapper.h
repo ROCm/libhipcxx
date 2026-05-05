@@ -38,7 +38,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_CUDA_COMPILER(CLANG) && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
+#if _CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
 #  include <cuda_runtime_api.h>
 #endif // _CCCL_CUDA_COMPILER(CLANG)
 

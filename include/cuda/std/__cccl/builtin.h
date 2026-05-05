@@ -355,7 +355,7 @@
 #  endif // _CCCL_CUDA_COMPILER(NVCC)
 #endif // _CCCL_HAS_FLOAT128()
 
-#if (_CCCL_CHECK_BUILTIN(builtin_memcmp) || _CCCL_COMPILER(GCC) || _CCCL_COMPILER(MSVC, >=, 19, 28)) && !defined(__HIP_PLATFORM_AMD__)
+#if (_CCCL_CHECK_BUILTIN(builtin_memcmp) || _CCCL_COMPILER(GCC) || _CCCL_COMPILER(MSVC, >=, 19, 28)) && !_CCCL_HIP_COMPILATION()
 #  define _CCCL_BUILTIN_MEMCMP(...) __builtin_memcmp(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_memcmp) || _CCCL_COMPILER(GCC) || _CCCL_COMPILER(MSVC, >=, 19, 28)
 

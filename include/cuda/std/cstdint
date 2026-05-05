@@ -50,6 +50,27 @@
 #else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
 #  include <cuda/std/climits>
 
+// NOTE(HIP/AMD): Prefer the compiler-provided __INT*_TYPE__ / __UINT*_TYPE__
+// builtins for the fixed-width integer types. These expand to exactly the
+// underlying types the host C library uses for int{8,16,32,64}_t and
+// uint{8,16,32,64}_t (e.g. on Linux/glibc x86_64, __INT64_TYPE__ is
+// "long int", not "long long").  Using the builtins avoids "type alias
+// redefinition with different types" errors when system stdint headers
+// (e.g. <bits/stdint-intn.h>) are pulled in transitively from libstdc++
+// wrappers under HIPRTC.  See libhipcxx issue #104 and commit 49afdcfeb5
+// for a related __hip_internal-based workaround in the atomic code.
+#  if defined(__INT8_TYPE__) && defined(__INT16_TYPE__) && defined(__INT32_TYPE__) \
+   && defined(__INT64_TYPE__) && defined(__UINT8_TYPE__) && defined(__UINT16_TYPE__) \
+   && defined(__UINT32_TYPE__) && defined(__UINT64_TYPE__)
+using int8_t   = __INT8_TYPE__;
+using int16_t  = __INT16_TYPE__;
+using int32_t  = __INT32_TYPE__;
+using int64_t  = __INT64_TYPE__;
+using uint8_t  = __UINT8_TYPE__;
+using uint16_t = __UINT16_TYPE__;
+using uint32_t = __UINT32_TYPE__;
+using uint64_t = __UINT64_TYPE__;
+#  else
 using int8_t   = signed char;
 using int16_t  = signed short;
 using int32_t  = signed int;
@@ -58,23 +79,32 @@ using uint8_t  = unsigned char;
 using uint16_t = unsigned short;
 using uint32_t = unsigned int;
 using uint64_t = unsigned long long;
+#  endif
 
+// NOTE(HIP/AMD): Only define _fast and _least types if system <stdint.h>
+// hasn't been included (checked via _STDINT_H guard). This allows system
+// headers pulled in transitively (e.g., via libstdc++ wrappers) to define
+// these types first with their preferred underlying types, avoiding
+// "type alias redefinition" conflicts. The compiler's __INT_FAST*_TYPE__
+// builtins don't always match what glibc actually uses (e.g., builtin says
+// short for int_fast16_t, but glibc uses long), so we can't rely on them.
+#  if !defined(_STDINT_H)
 using int_fast8_t = int8_t;
-#  if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
+#    if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
 // NOTE(HIP/AMD): Windows defines int_fast16_t as int, not int16_t (short)
 using int_fast16_t = int32_t;
-#  else
+#    else
 using int_fast16_t = int16_t;
-#  endif
+#    endif
 using int_fast32_t = int32_t;
 using int_fast64_t = int64_t;
 using uint_fast8_t = uint8_t;
-#  if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
+#    if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
 // NOTE(HIP/AMD): Windows defines uint_fast16_t as unsigned int, not uint16_t (unsigned short)
 using uint_fast16_t = uint32_t;
-#  else
+#    else
 using uint_fast16_t = uint16_t;
-#  endif
+#    endif
 using uint_fast32_t = uint32_t;
 using uint_fast64_t = uint64_t;
 
@@ -87,11 +117,21 @@ using uint_least16_t = uint16_t;
 using uint_least32_t = uint32_t;
 using uint_least64_t = uint64_t;
 
-using intptr_t  = int64_t;
-using uintptr_t = uint64_t;
-
 using intmax_t  = int64_t;
 using uintmax_t = uint64_t;
+#  endif // !defined(_STDINT_H)
+
+// NOTE(HIP/AMD): Use the compiler-provided pointer-sized integer type
+// builtins (matches the host C library, e.g. "long int" on Linux x86_64
+// glibc) to avoid type-alias redefinition conflicts with <stdint.h>'s
+// intptr_t/uintptr_t when system headers are pulled in transitively.
+#  if defined(__INTPTR_TYPE__) && defined(__UINTPTR_TYPE__)
+using intptr_t  = __INTPTR_TYPE__;
+using uintptr_t = __UINTPTR_TYPE__;
+#  else
+using intptr_t  = int64_t;
+using uintptr_t = uint64_t;
+#  endif
 
 #  define INT8_MIN   SCHAR_MIN
 #  define INT16_MIN  SHRT_MIN

@@ -51,9 +51,9 @@
 #include <cuda/std/__type_traits/promote.h>
 
 // MSVC and clang cuda need the host side functions included
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -219,11 +219,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_llrint)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "llrint"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LLRINTF
 #  undef _CCCL_BUILTIN_LLRINT
 #  undef _CCCL_BUILTIN_LLRINTL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 _CCCL_API inline long long llrint(float __x) noexcept
 {
@@ -301,11 +301,11 @@ _CCCL_API inline long long llrint(_Integer __x) noexcept
 #endif // _CCCL_CHECK_BUILTIN(builtin_llround)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "llround"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LLROUNDF
 #  undef _CCCL_BUILTIN_LLROUND
 #  undef _CCCL_BUILTIN_LLROUNDL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 _CCCL_API inline long long llround(float __x) noexcept
 {
@@ -383,11 +383,11 @@ _CCCL_API inline long long llround(_Integer __x) noexcept
 #endif // _CCCL_CHECK_BUILTIN(builtin_lrint)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "lrint"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LRINTF
 #  undef _CCCL_BUILTIN_LRINT
 #  undef _CCCL_BUILTIN_LRINTL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 _CCCL_API inline long lrint(float __x) noexcept
 {
@@ -465,11 +465,11 @@ _CCCL_API inline long lrint(_Integer __x) noexcept
 #endif // _CCCL_CHECK_BUILTIN(builtin_lround)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "lround"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LROUNDF
 #  undef _CCCL_BUILTIN_LROUND
 #  undef _CCCL_BUILTIN_LROUNDL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 _CCCL_API inline long lround(float __x) noexcept
 {
@@ -622,11 +622,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_nextafter)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "nextafter"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_NEXTAFTERF
 #  undef _CCCL_BUILTIN_NEXTAFTER
 #  undef _CCCL_BUILTIN_NEXTAFTERL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 _CCCL_API inline float nextafter(float __x, float __y) noexcept
 {

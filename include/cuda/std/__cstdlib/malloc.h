@@ -59,7 +59,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 using ::free;
 using ::malloc;
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
 {
   void* __ptr{};
@@ -77,7 +77,7 @@ using ::malloc;
 
   return __ptr;
 }
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 [[nodiscard]] _CCCL_API inline void* calloc(size_t __n, size_t __size) noexcept
 {

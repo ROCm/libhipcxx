@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___ANNOTATED_PTR_ACCESS_PROPERTY
 #define _CUDA___ANNOTATED_PTR_ACCESS_PROPERTY
 
@@ -51,30 +73,30 @@ public:
   {};
   struct persisting
   {
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     [[nodiscard]] _CCCL_API constexpr operator ::cudaAccessProperty() const noexcept
     {
       return ::cudaAccessProperty::cudaAccessPropertyPersisting;
     }
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   };
   struct streaming
   {
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     [[nodiscard]] _CCCL_API constexpr operator ::cudaAccessProperty() const noexcept
     {
       return ::cudaAccessProperty::cudaAccessPropertyStreaming;
     }
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   };
   struct normal
   {
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     [[nodiscard]] _CCCL_API constexpr operator ::cudaAccessProperty() const noexcept
     {
       return ::cudaAccessProperty::cudaAccessPropertyNormal;
     }
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   };
 
   _CCCL_HIDE_FROM_ABI access_property() noexcept = default;

@@ -39,6 +39,9 @@
 //#include <cuda/std/__atomic/order.h>
 //#include <cuda/std/__atomic/functions/common.h>
 //#include <cuda/std/__atomic/functions/cuda_ptx_generated_helper.h>
+
+#include <cuda/std/__cccl/prologue.h>
+
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 
 static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __thread_scope_block_tag) {
@@ -245,3 +248,5 @@ __device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __va
 }
 
 _LIBCUDACXX_END_NAMESPACE_STD
+
+#include <cuda/std/__cccl/epilogue.h>

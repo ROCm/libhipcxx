@@ -28,8 +28,8 @@
 
 #include "test_macros.h"
 
-// CUDA always defines placement new/delete for device code.
-#if !_CCCL_CUDA_COMPILATION()
+// CUDA/HIP always defines placement new/delete for device code.
+#if !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION()
 
 #  include <stddef.h> // Avoid depending on the C++ standard library.
 
@@ -44,6 +44,6 @@ void* operator new[](size_t, void* p)
 void operator delete(void*, void*) {}
 void operator delete[](void*, void*) {}
 
-#endif // !_CCCL_CUDA_COMPILATION()
+#endif // !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION()
 
 #endif // PLACEMENT_NEW_HPP

@@ -57,9 +57,9 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 extern "C" _CCCL_DEVICE void* __cuda_syscall_aligned_malloc(size_t, size_t);
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 

@@ -69,7 +69,7 @@ __global__ void ptr_timing(int* in, int* out)
 
 __device__ __host__ __noinline__ void bench()
 {
-#ifndef __CUDA_ARCH__
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   static const size_t ARR_SZ     = 1 << 22;
   static const size_t THREAD_CNT = 128;
   static const size_t BLOCK_CNT  = ARR_SZ / THREAD_CNT;
@@ -82,7 +82,7 @@ __device__ __host__ __noinline__ void bench()
   int* arr1            = nullptr;
   float annotated_time = 0.f, pointer_time = 0.f;
 
-#ifdef __CUDA_ARCH__
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
   arr0 = (int*) malloc(ARR_SZ * sizeof(int));
   arr1 = (int*) malloc(ARR_SZ * sizeof(int));
 #else
@@ -91,7 +91,7 @@ __device__ __host__ __noinline__ void bench()
   assert_rt(cudaDeviceSynchronize());
 #endif
 
-#ifdef __CUDA_ARCH__
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
   ptr_timing_dev(arr0, arr1);
 #else
   ptr_timing<<<blocks, threads>>>(arr0, arr1);
@@ -104,7 +104,7 @@ __device__ __host__ __noinline__ void bench()
     arr1[i] = 0;
   }
 
-#ifdef __CUDA_ARCH__
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
   ptr_timing_dev(arr0, arr1);
 #else
   assert_rt(cudaDeviceSynchronize());

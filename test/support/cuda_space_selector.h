@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -30,6 +30,7 @@
 
 #include <cuda/std/cassert>
 #include <cuda/std/cstddef>
+#include <cuda/std/utility>
 
 // NOTE(HIP/AMD): We need to include new header to get the correct device definitions.
 #if defined(__HIPCC_RTC__)

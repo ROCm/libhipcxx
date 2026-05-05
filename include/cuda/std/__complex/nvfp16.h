@@ -291,38 +291,6 @@ _CCCL_API inline complex<double>& complex<double>::operator=(const complex<__hal
   return *this;
 }
 
-#  if defined(__HIP_PLATFORM_AMD__)
-// NOTE(HIP/AMD): fp16 currently does not provide __int2half_rn for host code; this is implemented for floating point alternatives
-// (device only see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_fp16.h)
-// corresponding ticket SWDEV-529927
-[[nodiscard]] _CCCL_API inline __half arg(__half __re)
-{
-  return _CUDA_VSTD::atan2(__float2half_rn(0.0f), __re);
-}
-
-// We have performance issues with some trigonometric functions with __half
-template <>
-_CCCL_API inline complex<__half> asinh(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::asinh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__half> acosh(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::acosh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__half> atanh(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::atanh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__half> acos(const complex<__half>& __x)
-{
-  return complex<__half>{_CUDA_VSTD::acos(complex<float>{__x})};
-}
-#  endif // __HIP_PLATFORM_AMD__
-
 template <>
 struct __get_complex_impl<__half>
 {

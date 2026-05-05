@@ -1,4 +1,4 @@
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -19,9 +19,10 @@ project(hiprtcc)
 
 enable_language(HIP)
 find_package(HIP REQUIRED)
+find_package(hiprtc REQUIRED)
 
 add_executable(libcudacxx.nvrtcc hiprtcc.cpp)
 
 set_target_properties(libcudacxx.nvrtcc PROPERTIES OUTPUT_NAME hiprtcc)
-target_link_libraries(libcudacxx.nvrtcc hiprtc hip::host)
+target_link_libraries(libcudacxx.nvrtcc hiprtc::hiprtc hip::host)
 target_compile_features(libcudacxx.nvrtcc PRIVATE cxx_std_17)

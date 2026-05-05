@@ -35,21 +35,18 @@
 #define nvrtcResult hiprtcResult
 #endif
 #ifndef cudaError_t
-#  define cudaError_t cudaError_t
+#  define cudaError_t hipError_t
 #endif
 #ifndef cudaSuccess
-#  define cudaSuccess cudaSuccess
+#  define cudaSuccess hipSuccess
 #endif
 
 // macros
 #ifndef NVRTC_SUCCESS
 #define NVRTC_SUCCESS HIPRTC_SUCCESS
 #endif
-#ifndef cudaSuccess
-#  define cudaSuccess cudaSuccess
-#endif
 #ifndef CUDA_SUCCESS
-#  define CUDA_SUCCESS cudaSuccess
+#  define CUDA_SUCCESS hipSuccess
 #endif
 #ifndef CUresult
 #  define CUresult cudaError_t
@@ -117,16 +114,16 @@
 #endif
 
 #ifndef cudaGetErrorString
-#  define cudaGetErrorString cudaGetErrorString
+#  define cudaGetErrorString hipGetErrorString
 #endif
 #ifndef cudaGetErrorName
-#  define cudaGetErrorName cudaGetErrorName
+#  define cudaGetErrorName hipGetErrorName
 #endif
 #ifndef cudaGetLastError
-#  define cudaGetLastError cudaGetLastError
+#  define cudaGetLastError hipGetLastError
 #endif
 #ifndef cudaDeviceSynchronize
-#  define cudaDeviceSynchronize cudaDeviceSynchronize
+#  define cudaDeviceSynchronize hipDeviceSynchronize
 #endif
 #ifndef cuGetErrorName
 #  define cuGetErrorName hipDrvGetErrorName
@@ -135,11 +132,11 @@
 #  define cuDeviceGet hipDeviceGet
 #endif
 #ifndef cudaGetDevice
-#  define cudaGetDevice cudaGetDevice
+#  define cudaGetDevice hipGetDevice
 #endif
 #ifndef cudaDeviceProp
-#  define cudaDeviceProp cudaDeviceProp
+#  define cudaDeviceProp hipDeviceProp_t
 #endif
 #ifndef cudaGetDeviceProperties
-#  define cudaGetDeviceProperties cudaGetDeviceProperties
+#  define cudaGetDeviceProperties hipGetDeviceProperties
 #endif

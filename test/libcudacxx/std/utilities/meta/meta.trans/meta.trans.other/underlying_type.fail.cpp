@@ -28,7 +28,7 @@
 // underlying_type
 // Mandates: enum must not be an incomplete enumeration type.
 
-// NOTE(AMD/HIP): On Windows with HIPCC, the incomplete enum error (E1) only appears
+// NOTE(HIP/AMD): On Windows with HIPCC, the incomplete enum error (E1) only appears
 // during the device compilation pass, not the host compilation pass. The clang
 // -verify mode only checks host compilation diagnostics, causing this test to fail
 // because the expected error is not found during the host pass.

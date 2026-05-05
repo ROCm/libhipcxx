@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef __CCCL_CUDA_TOOLKIT_H
 #define __CCCL_CUDA_TOOLKIT_H
 
@@ -22,7 +44,12 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_CUDA_COMPILATION() || _CCCL_HAS_INCLUDE(<cuda_runtime_api.h>)
+// NOTE(HIP/AMD): _CCCL_HAS_CTK() must be false under HIP. _CCCL_CUDA_COMPILATION()
+// already excludes hipcc/hiprtc (see compiler.h), but a stray cuda_runtime_api.h on
+// the include path could still flip _CCCL_HAS_INCLUDE on a HIP host, so guard
+// explicitly here. HIP support for CTK-gated APIs is opted in at each consumer site
+// via "_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()".
+#if (_CCCL_CUDA_COMPILATION() || _CCCL_HAS_INCLUDE(<cuda_runtime_api.h>)) && !_CCCL_HIP_COMPILATION()
 #  define _CCCL_HAS_CTK() 1
 #else // ^^^ has cuda toolkit ^^^ / vvv no cuda toolkit vvv
 #  define _CCCL_HAS_CTK() 0

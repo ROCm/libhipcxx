@@ -30,10 +30,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// TODO(HIP/AMD): in the current ROCm version this test fails (TheRock January 12th 2026)
-// We therefore unsupport this test for now. 
-// See Issue https://github.com/ROCm/libhipcxx/issues/15
-// UNSUPPORTED: hipcc, hiprtc
+// NOTE(HIP/AMD): Previously marked UNSUPPORTED for hipcc/hiprtc due to a
+// ROCm regression observed around TheRock January 12th 2026 (see
+// https://github.com/ROCm/libhipcxx/issues/15). Re-verified passing under
+// both hipcc and hiprtc on gfx90a (ROCm 7.2.0) on April 24th 2026; markers
+// removed.
 
 // template<class T>
 //   constexpr unique_ptr<T> make_unique_for_overwrite(); // T is not array

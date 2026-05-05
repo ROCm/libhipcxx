@@ -21,7 +21,13 @@
 // SOFTWARE.
 #pragma once
 
-#include <hip/hip_runtime.h>
+#if !defined(__HIPCC_RTC__)
+#  include <hip/hip_runtime.h>
+#endif // !__HIPCC_RTC__
+// NOTE(HIP/AMD): Under HIPRTC, the HIPRTC-specific runtime stub definitions
+// (hipPointerAttribute_t, hipMemoryType, hipError_t, etc.) are provided by the
+// test infrastructure header (test/utils/amd/hiprtc/hiprtcc_common.h) which
+// prepends them to every compiled source.
 #include <amd/amd_utils.h>
 
 #define CUDART_VERSION 0
@@ -32,6 +38,24 @@
 #endif
 #ifndef cudaError_t
 #  define cudaError_t hipError_t
+#endif
+#ifndef cudaDeviceAttr
+#  define cudaDeviceAttr hipDeviceAttribute_t
+#endif
+#ifndef cudaComputeMode
+#  define cudaComputeMode hipComputeMode
+#endif
+#ifndef cudaComputeModeDefault
+#  define cudaComputeModeDefault hipComputeModeDefault
+#endif
+#ifndef cudaComputeModeExclusive
+#  define cudaComputeModeExclusive hipComputeModeExclusive
+#endif
+#ifndef cudaComputeModeProhibited
+#  define cudaComputeModeProhibited hipComputeModeProhibited
+#endif
+#ifndef cudaComputeModeExclusiveProcess
+#  define cudaComputeModeExclusiveProcess hipComputeModeExclusiveProcess
 #endif
 #ifndef cudaEvent_t
 #  define cudaEvent_t hipEvent_t
@@ -53,6 +77,18 @@
 #endif
 #ifndef cudaPointerAttributes
 #  define cudaPointerAttributes hipPointerAttribute_t
+#endif
+#ifndef cudaAccessProperty
+#  define cudaAccessProperty hipAccessProperty
+#endif
+#ifndef cudaAccessPropertyNormal
+#  define cudaAccessPropertyNormal hipAccessPropertyNormal
+#endif
+#ifndef cudaAccessPropertyStreaming
+#  define cudaAccessPropertyStreaming hipAccessPropertyStreaming
+#endif
+#ifndef cudaAccessPropertyPersisting
+#  define cudaAccessPropertyPersisting hipAccessPropertyPersisting
 #endif
 // macros, enum constant definitions
 // NOTE: C++ `constexpr` might cause redefinition errors while #define only results in a warning in this case.
@@ -91,8 +127,305 @@
 #ifndef cudaDevAttrConcurrentManagedAccess
 #define cudaDevAttrConcurrentManagedAccess hipDeviceAttributeConcurrentManagedAccess
 #endif
+#ifndef cudaDevAttrClockRate
+#  define cudaDevAttrClockRate hipDeviceAttributeClockRate
+#endif
+#ifndef cudaDevAttrGpuOverlap
+#  define cudaDevAttrGpuOverlap hipDeviceAttributeAsyncEngineCount
+#endif
+#ifndef cudaDevAttrCanMapHostMemory
+#  define cudaDevAttrCanMapHostMemory hipDeviceAttributeCanMapHostMemory
+#endif
+#ifndef cudaDevAttrComputeMode
+#  define cudaDevAttrComputeMode hipDeviceAttributeComputeMode
+#endif
+#ifndef cudaDevAttrConcurrentKernels
+#  define cudaDevAttrConcurrentKernels hipDeviceAttributeConcurrentKernels
+#endif
+#ifndef cudaDevAttrEccEnabled
+#  define cudaDevAttrEccEnabled hipDeviceAttributeEccEnabled
+#endif
+#ifndef cudaDevAttrGlobalMemoryBusWidth
+#  define cudaDevAttrGlobalMemoryBusWidth hipDeviceAttributeMemoryBusWidth
+#endif
+#ifndef cudaDevAttrIntegrated
+#  define cudaDevAttrIntegrated hipDeviceAttributeIntegrated
+#endif
+#ifndef cudaDevAttrKernelExecTimeout
+#  define cudaDevAttrKernelExecTimeout hipDeviceAttributeKernelExecTimeout
+#endif
+#ifndef cudaDevAttrMemoryClockRate
+#  define cudaDevAttrMemoryClockRate hipDeviceAttributeMemoryClockRate
+#endif
+#ifndef cudaDevAttrTccDriver
+#  define cudaDevAttrTccDriver hipDeviceAttributeTccDriver
+#endif
+#ifndef cudaDevAttrUnifiedAddressing
+#  define cudaDevAttrUnifiedAddressing hipDeviceAttributeUnifiedAddressing
+#endif
+#ifndef cudaDevAttrStreamPrioritiesSupported
+#  define cudaDevAttrStreamPrioritiesSupported hipDeviceAttributeStreamPrioritiesSupported
+#endif
+#ifndef cudaDevAttrGlobalL1CacheSupported
+#  define cudaDevAttrGlobalL1CacheSupported hipDeviceAttributeGlobalL1CacheSupported
+#endif
+#ifndef cudaDevAttrLocalL1CacheSupported
+#  define cudaDevAttrLocalL1CacheSupported hipDeviceAttributeLocalL1CacheSupported
+#endif
+#ifndef cudaDevAttrIsMultiGpuBoard
+#  define cudaDevAttrIsMultiGpuBoard hipDeviceAttributeIsMultiGpuBoard
+#endif
+#ifndef cudaDevAttrCanFlushRemoteWrites
+#  define cudaDevAttrCanFlushRemoteWrites hipDeviceAttributeHdpMemFlushCntl
+#endif
+#ifndef cudaDevAttrCanUseHostPointerForRegisteredMem
+#  define cudaDevAttrCanUseHostPointerForRegisteredMem hipDeviceAttributeCanUseHostPointerForRegisteredMem
+#endif
+#ifndef cudaDevAttrComputePreemptionSupported
+#  define cudaDevAttrComputePreemptionSupported hipDeviceAttributeComputePreemptionSupported
+#endif
+#ifndef cudaDevAttrCooperativeLaunch
+#  define cudaDevAttrCooperativeLaunch hipDeviceAttributeCooperativeLaunch
+#endif
+#ifndef cudaDevAttrDirectManagedMemAccessFromHost
+#  define cudaDevAttrDirectManagedMemAccessFromHost hipDeviceAttributeDirectManagedMemAccessFromHost
+#endif
+#ifndef cudaDevAttrHostNativeAtomicSupported
+#  define cudaDevAttrHostNativeAtomicSupported hipDeviceAttributeHostNativeAtomicSupported
+#endif
+#ifndef cudaDevAttrHostRegisterSupported
+#  define cudaDevAttrHostRegisterSupported hipDeviceAttributeHostRegisterSupported
+#endif
+#ifndef cudaDevAttrPageableMemoryAccess
+#  define cudaDevAttrPageableMemoryAccess hipDeviceAttributePageableMemoryAccess
+#endif
+#ifndef cudaDevAttrDeferredMappingCudaArraySupported
+#  define cudaDevAttrDeferredMappingCudaArraySupported hipDeviceAttributeImageSupport
+#endif
+#ifndef cudaDevAttrGPUDirectRDMAFlushWritesOptions
+#  define cudaDevAttrGPUDirectRDMAFlushWritesOptions hipDeviceAttributeCooperativeMultiDeviceUnmatchedFunc
+#endif
+#ifndef cudaDevAttrGPUDirectRDMASupported
+#  define cudaDevAttrGPUDirectRDMASupported hipDeviceAttributeIsLargeBar
+#endif
+#ifndef cudaDevAttrHostRegisterReadOnlySupported
+#  define cudaDevAttrHostRegisterReadOnlySupported hipDeviceAttributeAsicRevision
+#endif
+#ifndef cudaDevAttrIpcEventSupport
+#  define cudaDevAttrIpcEventSupport hipDeviceAttributeFineGrainSupport
+#endif
+#ifndef cudaDevAttrPageableMemoryAccessUsesHostPageTables
+#  define cudaDevAttrPageableMemoryAccessUsesHostPageTables hipDeviceAttributeCanUseStreamWaitValue
+#endif
+#ifndef cudaDevAttrSparseCudaArraySupported
+#  define cudaDevAttrSparseCudaArraySupported hipDeviceAttributeVirtualMemoryManagementSupported
+#endif
 #ifndef cudaDevAttrManagedMemory
 #define cudaDevAttrManagedMemory hipDeviceAttributeManagedMemory
+#endif
+#ifndef cudaDevAttrGPUDirectRDMAWritesOrdering
+#  define cudaDevAttrGPUDirectRDMAWritesOrdering hipDeviceAttributeHdpRegFlushCntl
+#endif
+#ifndef cudaDevAttrMaxThreadsPerBlock
+#  define cudaDevAttrMaxThreadsPerBlock hipDeviceAttributeMaxThreadsPerBlock
+#endif
+#ifndef cudaDevAttrMaxBlockDimX
+#  define cudaDevAttrMaxBlockDimX hipDeviceAttributeMaxBlockDimX
+#endif
+#ifndef cudaDevAttrMaxBlockDimY
+#  define cudaDevAttrMaxBlockDimY hipDeviceAttributeMaxBlockDimY
+#endif
+#ifndef cudaDevAttrMaxBlockDimZ
+#  define cudaDevAttrMaxBlockDimZ hipDeviceAttributeMaxBlockDimZ
+#endif
+#ifndef cudaDevAttrMaxGridDimX
+#  define cudaDevAttrMaxGridDimX hipDeviceAttributeMaxGridDimX
+#endif
+#ifndef cudaDevAttrMaxGridDimY
+#  define cudaDevAttrMaxGridDimY hipDeviceAttributeMaxGridDimY
+#endif
+#ifndef cudaDevAttrMaxGridDimZ
+#  define cudaDevAttrMaxGridDimZ hipDeviceAttributeMaxGridDimZ
+#endif
+#ifndef cudaDevAttrMaxSharedMemoryPerBlock
+#  define cudaDevAttrMaxSharedMemoryPerBlock hipDeviceAttributeMaxSharedMemoryPerBlock
+#endif
+#ifndef cudaDevAttrTotalConstantMemory
+#  define cudaDevAttrTotalConstantMemory hipDeviceAttributeTotalConstantMemory
+#endif
+#ifndef cudaDevAttrWarpSize
+#  define cudaDevAttrWarpSize hipDeviceAttributeWarpSize
+#endif
+#ifndef cudaDevAttrMaxPitch
+#  define cudaDevAttrMaxPitch hipDeviceAttributeMaxPitch
+#endif
+#ifndef cudaDevAttrMaxTexture1DWidth
+#  define cudaDevAttrMaxTexture1DWidth hipDeviceAttributeMaxTexture1DWidth
+#endif
+#ifndef cudaDevAttrMaxTexture1DLinearWidth
+#  define cudaDevAttrMaxTexture1DLinearWidth hipDeviceAttributeMaxTexture1DLinear
+#endif
+#ifndef cudaDevAttrMaxTexture1DMipmappedWidth
+#  define cudaDevAttrMaxTexture1DMipmappedWidth hipDeviceAttributeMaxTexture1DMipmap
+#endif
+#ifndef cudaDevAttrMaxTexture2DWidth
+#  define cudaDevAttrMaxTexture2DWidth hipDeviceAttributeMaxTexture2DWidth
+#endif
+#ifndef cudaDevAttrMaxTexture2DHeight
+#  define cudaDevAttrMaxTexture2DHeight hipDeviceAttributeMaxTexture2DHeight
+#endif
+#ifndef cudaDevAttrMaxTexture2DLinearWidth
+#  define cudaDevAttrMaxTexture2DLinearWidth hipDeviceAttributeMaxTexture2DLinear
+#endif
+#ifndef cudaDevAttrMaxTexture2DLinearHeight
+#  define cudaDevAttrMaxTexture2DLinearHeight hipDeviceAttributeMaxTexture2DLinear
+#endif
+#ifndef cudaDevAttrMaxTexture2DLinearPitch
+#  define cudaDevAttrMaxTexture2DLinearPitch hipDeviceAttributeMaxTexture2DLinear
+#endif
+#ifndef cudaDevAttrMaxTexture2DMipmappedWidth
+#  define cudaDevAttrMaxTexture2DMipmappedWidth hipDeviceAttributeMaxTexture2DMipmap
+#endif
+#ifndef cudaDevAttrMaxTexture2DMipmappedHeight
+#  define cudaDevAttrMaxTexture2DMipmappedHeight hipDeviceAttributeMaxTexture2DMipmap
+#endif
+#ifndef cudaDevAttrMaxTexture3DWidth
+#  define cudaDevAttrMaxTexture3DWidth hipDeviceAttributeMaxTexture3DWidth
+#endif
+#ifndef cudaDevAttrMaxTexture3DHeight
+#  define cudaDevAttrMaxTexture3DHeight hipDeviceAttributeMaxTexture3DHeight
+#endif
+#ifndef cudaDevAttrMaxTexture3DDepth
+#  define cudaDevAttrMaxTexture3DDepth hipDeviceAttributeMaxTexture3DDepth
+#endif
+#ifndef cudaDevAttrMaxTexture3DWidthAlt
+#  define cudaDevAttrMaxTexture3DWidthAlt hipDeviceAttributeMaxTexture3DAlt
+#endif
+#ifndef cudaDevAttrMaxTexture3DHeightAlt
+#  define cudaDevAttrMaxTexture3DHeightAlt hipDeviceAttributeMaxTexture3DAlt
+#endif
+#ifndef cudaDevAttrMaxTexture3DDepthAlt
+#  define cudaDevAttrMaxTexture3DDepthAlt hipDeviceAttributeMaxTexture3DAlt
+#endif
+#ifndef cudaDevAttrMaxTextureCubemapWidth
+#  define cudaDevAttrMaxTextureCubemapWidth hipDeviceAttributeMaxTextureCubemap
+#endif
+#ifndef cudaDevAttrMaxTexture1DLayeredWidth
+#  define cudaDevAttrMaxTexture1DLayeredWidth hipDeviceAttributeMaxTexture1DLayered
+#endif
+#ifndef cudaDevAttrMaxTexture1DLayeredLayers
+#  define cudaDevAttrMaxTexture1DLayeredLayers hipDeviceAttributeMaxTexture1DLayered
+#endif
+#ifndef cudaDevAttrMaxTexture2DLayeredWidth
+#  define cudaDevAttrMaxTexture2DLayeredWidth hipDeviceAttributeMaxTexture2DLayered
+#endif
+#ifndef cudaDevAttrMaxTexture2DLayeredHeight
+#  define cudaDevAttrMaxTexture2DLayeredHeight hipDeviceAttributeMaxTexture2DLayered
+#endif
+#ifndef cudaDevAttrMaxTexture2DLayeredLayers
+#  define cudaDevAttrMaxTexture2DLayeredLayers hipDeviceAttributeMaxTexture2DLayered
+#endif
+#ifndef cudaDevAttrMaxTextureCubemapLayeredWidth
+#  define cudaDevAttrMaxTextureCubemapLayeredWidth hipDeviceAttributeMaxTextureCubemapLayered
+#endif
+#ifndef cudaDevAttrMaxTextureCubemapLayeredLayers
+#  define cudaDevAttrMaxTextureCubemapLayeredLayers hipDeviceAttributeMaxTextureCubemapLayered
+#endif
+#ifndef cudaDevAttrMaxSurface1DWidth
+#  define cudaDevAttrMaxSurface1DWidth hipDeviceAttributeMaxSurface1D
+#endif
+#ifndef cudaDevAttrMaxSurface2DWidth
+#  define cudaDevAttrMaxSurface2DWidth hipDeviceAttributeMaxSurface2D
+#endif
+#ifndef cudaDevAttrMaxSurface2DHeight
+#  define cudaDevAttrMaxSurface2DHeight hipDeviceAttributeMaxSurface2D
+#endif
+#ifndef cudaDevAttrMaxSurface3DWidth
+#  define cudaDevAttrMaxSurface3DWidth hipDeviceAttributeMaxSurface3D
+#endif
+#ifndef cudaDevAttrMaxSurface3DHeight
+#  define cudaDevAttrMaxSurface3DHeight hipDeviceAttributeMaxSurface3D
+#endif
+#ifndef cudaDevAttrMaxSurface3DDepth
+#  define cudaDevAttrMaxSurface3DDepth hipDeviceAttributeMaxSurface3D
+#endif
+#ifndef cudaDevAttrMaxSurface1DLayeredWidth
+#  define cudaDevAttrMaxSurface1DLayeredWidth hipDeviceAttributeMaxSurface1DLayered
+#endif
+#ifndef cudaDevAttrMaxSurface1DLayeredLayers
+#  define cudaDevAttrMaxSurface1DLayeredLayers hipDeviceAttributeMaxSurface1DLayered
+#endif
+#ifndef cudaDevAttrMaxSurface2DLayeredWidth
+#  define cudaDevAttrMaxSurface2DLayeredWidth hipDeviceAttributeMaxSurface2DLayered
+#endif
+#ifndef cudaDevAttrMaxSurface2DLayeredHeight
+#  define cudaDevAttrMaxSurface2DLayeredHeight hipDeviceAttributeMaxSurface2DLayered
+#endif
+#ifndef cudaDevAttrMaxSurface2DLayeredLayers
+#  define cudaDevAttrMaxSurface2DLayeredLayers hipDeviceAttributeMaxSurface2DLayered
+#endif
+#ifndef cudaDevAttrMaxSurfaceCubemapWidth
+#  define cudaDevAttrMaxSurfaceCubemapWidth hipDeviceAttributeMaxSurfaceCubemap
+#endif
+#ifndef cudaDevAttrMaxSurfaceCubemapLayeredWidth
+#  define cudaDevAttrMaxSurfaceCubemapLayeredWidth hipDeviceAttributeMaxSurfaceCubemapLayered
+#endif
+#ifndef cudaDevAttrMaxSurfaceCubemapLayeredLayers
+#  define cudaDevAttrMaxSurfaceCubemapLayeredLayers hipDeviceAttributeMaxSurfaceCubemapLayered
+#endif
+#ifndef cudaDevAttrMaxRegistersPerBlock
+#  define cudaDevAttrMaxRegistersPerBlock hipDeviceAttributeMaxRegistersPerBlock
+#endif
+#ifndef cudaDevAttrMaxRegistersPerMultiprocessor
+#  define cudaDevAttrMaxRegistersPerMultiprocessor hipDeviceAttributeMaxRegistersPerMultiprocessor
+#endif
+#ifndef cudaDevAttrTextureAlignment
+#  define cudaDevAttrTextureAlignment hipDeviceAttributeTextureAlignment
+#endif
+#ifndef cudaDevAttrTexturePitchAlignment
+#  define cudaDevAttrTexturePitchAlignment hipDeviceAttributeTexturePitchAlignment
+#endif
+#ifndef cudaDevAttrMultiProcessorCount
+#  define cudaDevAttrMultiProcessorCount hipDeviceAttributeMultiprocessorCount
+#endif
+#ifndef cudaDevAttrPciBusId
+#  define cudaDevAttrPciBusId hipDeviceAttributePciBusId
+#endif
+#ifndef cudaDevAttrPciDeviceId
+#  define cudaDevAttrPciDeviceId hipDeviceAttributePciDeviceId
+#endif
+#ifndef cudaDevAttrComputeCapabilityMajor
+#  define cudaDevAttrComputeCapabilityMajor hipDeviceAttributeComputeCapabilityMajor
+#endif
+#ifndef cudaDevAttrComputeCapabilityMinor
+#  define cudaDevAttrComputeCapabilityMinor hipDeviceAttributeComputeCapabilityMinor
+#endif
+#ifndef cudaDevAttrMaxThreadsPerMultiProcessor
+#  define cudaDevAttrMaxThreadsPerMultiProcessor hipDeviceAttributeMaxThreadsPerMultiProcessor
+#endif
+#ifndef cudaDevAttrMultiGpuBoardGroupID
+#  define cudaDevAttrMultiGpuBoardGroupID hipDeviceAttributeMultiGpuBoardGroupID
+#endif
+#ifndef cudaDevAttrSingleToDoublePrecisionPerfRatio
+#  define cudaDevAttrSingleToDoublePrecisionPerfRatio hipDeviceAttributeSingleToDoublePrecisionPerfRatio
+#endif
+#ifndef cudaDevAttrMaxSharedMemoryPerBlockOptin
+#  define cudaDevAttrMaxSharedMemoryPerBlockOptin hipDeviceAttributeMaxSharedMemoryPerBlock
+#endif
+#ifndef cudaDevAttrMaxSharedMemoryPerMultiprocessor
+#  define cudaDevAttrMaxSharedMemoryPerMultiprocessor hipDeviceAttributeMaxSharedMemoryPerMultiprocessor
+#endif
+#ifndef cudaDevAttrMaxAccessPolicyWindowSize
+#  define cudaDevAttrMaxAccessPolicyWindowSize hipDeviceAttributeAccessPolicyMaxWindowSize
+#endif
+#ifndef cudaDevAttrMaxBlocksPerMultiprocessor
+#  define cudaDevAttrMaxBlocksPerMultiprocessor hipDeviceAttributeMaxBlocksPerMultiProcessor
+#endif
+#ifndef cudaDevAttrMaxPersistingL2CacheSize
+#  define cudaDevAttrMaxPersistingL2CacheSize hipDeviceAttributePersistingL2CacheMaxSize
+#endif
+#ifndef cudaDevAttrReservedSharedMemoryPerBlock
+#  define cudaDevAttrReservedSharedMemoryPerBlock hipDeviceAttributeMaxSharedMemoryPerBlock
 #endif
 #ifndef cudaErrorInvalidValue
 #  define cudaErrorInvalidValue hipErrorInvalidValue
@@ -103,6 +436,9 @@
 #ifndef cudaSuccess
 #  define cudaSuccess hipSuccess
 #endif
+#ifndef cudaErrorNotReady
+#  define cudaErrorNotReady hipErrorNotReady
+#endif
 #ifndef cudaMemAllocationTypePinned
 #  define cudaMemAllocationTypePinned hipMemAllocationTypePinned
 #endif
@@ -111,6 +447,15 @@
 #endif
 #ifndef cudaMemHandleTypeNone
 #  define cudaMemHandleTypeNone hipMemHandleTypeNone
+#endif
+#ifndef cudaMemHandleTypePosixFileDescriptor
+#  define cudaMemHandleTypePosixFileDescriptor hipMemHandleTypePosixFileDescriptor
+#endif
+#ifndef cudaMemHandleTypeWin32
+#  define cudaMemHandleTypeWin32 hipMemHandleTypeWin32
+#endif
+#ifndef cudaMemHandleTypeWin32Kmt
+#  define cudaMemHandleTypeWin32Kmt hipMemHandleTypeWin32Kmt
 #endif
 #ifndef cudaMemLocationTypeDevice
 #  define cudaMemLocationTypeDevice hipMemLocationTypeDevice
@@ -129,6 +474,9 @@
 #endif
 #ifndef cudaMemoryTypeManaged
 #  define cudaMemoryTypeManaged hipMemoryTypeManaged
+#endif
+#ifndef cudaMemoryTypeUnregistered
+#  define cudaMemoryTypeUnregistered hipMemoryTypeUnregistered
 #endif
 // functions
 #ifndef cudaDeviceGetAttribute
@@ -257,6 +605,10 @@
 #  define cudaStreamQuery hipStreamQuery
 #endif
 
+#ifndef cudaStreamGetPriority
+#  define cudaStreamGetPriority hipStreamGetPriority
+#endif
+
 #ifndef cudaHostAllocDefault
 #  define cudaHostAllocDefault hipHostAllocDefault
 #endif
@@ -274,6 +626,33 @@
 #endif
 #ifndef cudaMemAttachHost
 #  define cudaMemAttachHost hipMemAttachHost
+#endif
+
+#ifndef cudaFlushGPUDirectRDMAWritesOptions
+#  define cudaFlushGPUDirectRDMAWritesOptions hipFlushGPUDirectRDMAWritesOptions
+#endif
+#ifndef cudaFlushGPUDirectRDMAWritesOptionHost
+#  define cudaFlushGPUDirectRDMAWritesOptionHost hipFlushGPUDirectRDMAWritesOptionHost
+#endif
+#ifndef cudaFlushGPUDirectRDMAWritesOptionMemOps
+#  define cudaFlushGPUDirectRDMAWritesOptionMemOps hipFlushGPUDirectRDMAWritesOptionMemOps
+#endif
+
+#ifndef cudaGPUDirectRDMAWritesOrdering
+#  define cudaGPUDirectRDMAWritesOrdering hipGPUDirectRDMAWritesOrdering
+#endif
+#ifndef cudaGPUDirectRDMAWritesOrderingNone
+#  define cudaGPUDirectRDMAWritesOrderingNone hipGPUDirectRDMAWritesOrderingNone
+#endif
+#ifndef cudaGPUDirectRDMAWritesOrderingOwner
+#  define cudaGPUDirectRDMAWritesOrderingOwner hipGPUDirectRDMAWritesOrderingOwner
+#endif
+#ifndef cudaGPUDirectRDMAWritesOrderingAllDevices
+#  define cudaGPUDirectRDMAWritesOrderingAllDevices hipGPUDirectRDMAWritesOrderingAllDevices
+#endif
+
+#ifndef cudaDeviceCanAccessPeer
+#  define cudaDeviceCanAccessPeer hipDeviceCanAccessPeer
 #endif
 
 #ifndef HIPRT_CB
@@ -296,8 +675,10 @@
 #  define __nv_bfloat162 __hip_bfloat162
 #endif
 
+#include <hip/hip_bf16.h>
 #include <hip/hip_fp16.h>
 __host__ __device__ __half __double2half(const double& __value) noexcept
 {
   return __float2half(static_cast<float>(__value));
 }
+

@@ -23,11 +23,16 @@
 
 #pragma once
 #if defined(__HIP__)
+// NOTE(HIP/AMD): hip/hip_runtime.h is not available under HIPRTC, but
+// rocm-core/rocm_version.h only contains version macros and extern "C"
+// declarations and is safe to include under HIPRTC.
+#if !defined(__HIPCC_RTC__)
 #include <hip/hip_runtime.h>
+#endif
 #include <rocm-core/rocm_version.h>
 #endif
 #ifndef __HIP_DEVICE_COMPILE__
-#ifndef __host__ 
+#ifndef __host__
 #define __host__
 #endif
 #ifndef __device__
@@ -45,54 +50,180 @@ namespace libhipcxx
       __builtin_trap();
     #endif
   }
+  //===----------------------------------------------------------------------===//
+  // Address Space Query Functions
+  // Provides CUDA-compatible __isShared and __isGlobal for HIP
+  //===----------------------------------------------------------------------===//
   #ifdef __HIP_DEVICE_COMPILE__
   /**
-   * \brief Find First Set
-   * \return index of first set bit of lowest significance.
-   * \note Return value type matches that of the underlying device builtin.
-   * \note While `uint64_t` is defined as `unsigned long int` on x86_64,
-   *       the HIP `__ffsll` device function provides `__ffsll` with `unsigned long long int`
-   *       argument, which is also an 64-bit integer type on x86_64.
-   *       However, the compilers typically see both as different types.
-   *       We work with `uint64t` and `uint32t` here, so explicit instantiations
-   *       for both are added here.
+   * @brief Check if a pointer points to shared memory (LDS - Local Data Share)
+   * @param ptr Pointer to check (can be any type)
+   * @return true if pointer is in shared memory address space
+   *
+   * This function uses AMD GCN built-in __builtin_amdgcn_is_shared when available
+   * (gfx90a and newer). On older architectures, it returns false as a safe fallback.
    */
-  template <typename T>
-  __device__ inline int __FFS(T v);
-  
-  template <>
-  __device__ inline int __FFS<int32_t>(int32_t v) {
-    return __ffs(v);
-  }
-  // NOTE(HIP/AMD): hiprtc defines long long as int64_t, 
-  // therefore, this specialization is not needed.
-  #if !defined(_CCCL_COMPILER_HIPRTC)
-  template <>
-  __device__ inline int __FFS<int64_t>(int64_t v) {
-    return __ffsll(static_cast<unsigned long long int>(v));
-  }
-  #endif
-  template <>
-  __device__ inline int __FFS<uint32_t>(uint32_t v) {
-    return __ffs(v);
-  }
-  
-  template <>
-  __device__ inline int __FFS<unsigned long long>(unsigned long long v) {
-    return __ffsll(static_cast<unsigned long long int>(v));
+  template<typename T>
+  __device__ inline bool __isShared(const T* ptr) {
+#if __has_builtin(__builtin_amdgcn_is_shared)
+    // Cast to address space 0 (generic/flat) as required by the builtin
+    return __builtin_amdgcn_is_shared(
+        (const __attribute__((address_space(0))) void*)ptr);
+#else
+    // Fallback for older architectures without the builtin
+    (void)ptr;
+    return false;
+#endif
   }
 
-  #if !defined(_CCCL_COMPILER_HIPRTC)
-  // Only define if uint64_t and unsigned long long are different types (for Windows they are identical)
-  #if !defined(_WIN32)
-  template <>
-  __device__ inline int __FFS<unsigned long>(unsigned long v) {
-    return __ffsll(static_cast<unsigned long long int>(v));
+  /**
+   * @brief Check if a pointer points to global memory
+   * @param ptr Pointer to check (can be any type)
+   * @return true if pointer is in global memory address space
+   *
+   * In AMD terminology, "global" memory excludes shared (LDS) and private
+   * (register/stack) memory. This function checks that the pointer is neither
+   * in shared nor private address space.
+   */
+  template<typename T>
+  __device__ inline bool __isGlobal(const T* ptr) {
+#if __has_builtin(__builtin_amdgcn_is_shared) && __has_builtin(__builtin_amdgcn_is_private)
+    // Cast to address space 0 (generic/flat) as required by the builtin
+    const __attribute__((address_space(0))) void* flat_ptr =
+        (const __attribute__((address_space(0))) void*)ptr;
+
+    // Global memory is neither shared nor private
+    return !__builtin_amdgcn_is_shared(flat_ptr) &&
+           !__builtin_amdgcn_is_private(flat_ptr);
+#else
+    // Fallback: assume it's global if not shared
+    // This is a reasonable assumption for pointers allocated on device
+    return !__isShared(ptr);
+#endif
   }
-  #endif
-  #endif
-  #endif
+
+  /**
+   * @brief Check if a pointer points to private memory (registers/stack)
+   * @param ptr Pointer to check (can be any type)
+   * @return true if pointer is in private memory address space
+   *
+   * Private memory includes local variables and register-allocated data.
+   * This is typically used internally and rarely needed in user code.
+   */
+  template<typename T>
+  __device__ inline bool __isPrivate(const T* ptr) {
+#if __has_builtin(__builtin_amdgcn_is_private)
+    return __builtin_amdgcn_is_private(
+        (const __attribute__((address_space(0))) void*)ptr);
+#else
+    (void)ptr;
+    return false;
+#endif
+  }
+
+  /**
+   * @brief Check if a pointer points to local memory (private/stack)
+   * @param ptr Pointer to check (can be any type)
+   * @return true if pointer is in local memory address space
+   *
+   * In AMD/HIP terminology, "local" memory is the same as "private" memory.
+   * This is an alias for __isPrivate to match CUDA's __isLocal intrinsic.
+   */
+  template<typename T>
+  __device__ inline bool __isLocal(const T* ptr) {
+    return __isPrivate(ptr);
+  }
+
+  /**
+   * @brief Check if a pointer points to constant memory
+   * @param ptr Pointer to check (can be any type)
+   * @return true if pointer is in constant memory address space
+   *
+   * AMD doesn't have a direct builtin for constant memory detection.
+   * We use a heuristic: if it's not shared, not private, and not global, it's likely constant.
+   * This isn't perfect but works for typical use cases.
+   */
+  template<typename T>
+  __device__ inline bool __isConstant(const T* ptr) {
+#if __has_builtin(__builtin_amdgcn_is_shared) && __has_builtin(__builtin_amdgcn_is_private)
+    const __attribute__((address_space(0))) void* flat_ptr =
+        (const __attribute__((address_space(0))) void*)ptr;
+
+    // Constant memory is not shared, not private, and not global
+    // This is a heuristic approach since AMD doesn't provide __builtin_amdgcn_is_constant
+    bool is_shared = __builtin_amdgcn_is_shared(flat_ptr);
+    bool is_private = __builtin_amdgcn_is_private(flat_ptr);
+    bool is_global = !is_shared && !is_private && (flat_ptr != nullptr);
+
+    // If it's none of the above and not null, it's likely constant
+    // NOTE(HIP/AMD): This may have false positives in some cases
+    return flat_ptr != nullptr && !is_shared && !is_private && !is_global;
+#else
+    (void)ptr;
+    return false;
+#endif
+  }
+
+  /**
+   * @brief Check if a pointer points to grid constant memory
+   * @param ptr Pointer to check (can be any type)
+   * @return false (grid constant not supported on AMD)
+   *
+   * Grid constant memory is a CUDA-specific feature not available on AMD GPUs.
+   */
+  template<typename T>
+  __device__ inline bool __isGridConstant(const T* ptr) {
+    (void)ptr;
+    return false;
+  }
+
+  /**
+   * @brief Check if a pointer points to cluster shared memory
+   * @param ptr Pointer to check (can be any type)
+   * @return false (cluster shared not supported on AMD)
+   *
+   * Cluster shared memory is a CUDA compute capability 9.0+ feature not available on AMD GPUs.
+   */
+  template<typename T>
+  __device__ inline bool __isClusterShared(const T* ptr) {
+    (void)ptr;
+    return false;
+  }
+  #endif // __HIP_DEVICE_COMPILE__
 }
+
+//===----------------------------------------------------------------------===//
+// Make address space query functions available in global namespace
+// to match CUDA's behavior where __isShared/__isGlobal are global
+//===----------------------------------------------------------------------===//
+#if defined(__HIP__)
+  #ifdef __HIP_DEVICE_COMPILE__
+  using libhipcxx::__isShared;
+  using libhipcxx::__isGlobal;
+  using libhipcxx::__isPrivate;
+  using libhipcxx::__isLocal;
+  using libhipcxx::__isConstant;
+  using libhipcxx::__isGridConstant;
+  using libhipcxx::__isClusterShared;
+  #else
+  // Host-side stubs (always return false, since host doesn't have these address spaces)
+  // Marked as __host__ __device__ to allow calling from __global__ functions during host compilation
+  template<typename T>
+  __host__ __device__ inline bool __isShared(const T*) { return false; }
+  template<typename T>
+  __host__ __device__ inline bool __isGlobal(const T*) { return false; }
+  template<typename T>
+  __host__ __device__ inline bool __isPrivate(const T*) { return false; }
+  template<typename T>
+  __host__ __device__ inline bool __isLocal(const T*) { return false; }
+  template<typename T>
+  __host__ __device__ inline bool __isConstant(const T*) { return false; }
+  template<typename T>
+  __host__ __device__ inline bool __isGridConstant(const T*) { return false; }
+  template<typename T>
+  __host__ __device__ inline bool __isClusterShared(const T*) { return false; }
+  #endif
+#endif
 
 // Returns true if the current ROCm version is at least major.minor.patch
 #define LIBHIPCXX_ROCM_VERSION_GE3(major, minor, patch) \

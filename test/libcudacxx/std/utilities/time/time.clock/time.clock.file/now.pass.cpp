@@ -8,7 +8,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// TODO(HIP/AMD): Analyze support of this API on HIP platform with C++20
-// UNSUPPORTED: hipcc, hiprtc
+// NOTE(HIP/AMD): The hipcc and hiprtc tags were removed from the markers
+// below because the test is already excluded by the c++17 lit directive a
+// few lines down (the only build configuration currently exercised) and
+// by the existing nvrtc tag (which covers hiprtc on the relevant build
+// matrix at time of writing). If/when a C++20 hipcc build is added,
+// re-enabling the hipcc tag may be needed; cuda::std::chrono::file_clock
+// support on HIP under C++20 has not yet been audited.
 
 // UNSUPPORTED: c++17
 // XFAIL: dylib-has-no-filesystem

@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(AMD/HIP): We need to keep the include otherwise we get undefined symbol errors
+// NOTE(HIP/AMD): We need to keep the include otherwise we get undefined symbol errors
 // Internal issue #72. Once issue is fixed we should enable the guard
 #if !_CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 #  include <cassert>
