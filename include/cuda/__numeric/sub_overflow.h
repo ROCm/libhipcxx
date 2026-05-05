@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___NUMERIC_SUB_OVERFLOW_H
 #define _CUDA___NUMERIC_SUB_OVERFLOW_H
 
@@ -83,7 +105,9 @@ template <typename _Tp>
   }
 }
 
-#if _CCCL_DEVICE_COMPILATION()
+// NOTE(HIP/AMD): see add_overflow.h for rationale -- NVPTX inline asm with
+// '=l' / '=r' constraints is not parseable on AMDGPU. Restrict to CUDA-device.
+#if _CCCL_DEVICE_COMPILATION() && _CCCL_CUDA_COMPILATION()
 
 template <class _Tp>
 [[nodiscard]] _CCCL_DEVICE_API overflow_result<_Tp> __sub_overflow_device(_Tp __lhs, _Tp __rhs) noexcept
@@ -115,7 +139,7 @@ template <class _Tp>
   }
 }
 
-#endif // _CCCL_DEVICE_COMPILATION()
+#endif // _CCCL_DEVICE_COMPILATION() && _CCCL_CUDA_COMPILATION()
 
 #if _CCCL_HOST_COMPILATION()
 
@@ -189,9 +213,20 @@ template <typename _Tp>
 {
   if (!::cuda::std::__cccl_default_is_constant_evaluated())
   {
+#if _CCCL_CUDA_COMPILATION()
     NV_IF_TARGET(NV_IS_DEVICE,
                  (return ::cuda::__sub_overflow_device(__lhs, __rhs);),
                  (return ::cuda::__sub_overflow_host(__lhs, __rhs);))
+#else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
+    // NOTE(HIP/AMD): __sub_overflow_device is only defined under
+    // _CCCL_CUDA_COMPILATION() (NVPTX inline asm: sub.cc.u32 + subc.u32
+    // with the NVPTX-specific output constraints '=r' / '=l' which AMDGPU
+    // rejects). Under HIP, use the host implementation when on host, and
+    // fall through to ::cuda::__sub_overflow_generic_impl(__lhs, __rhs)
+    // (the outer 'return' below) when on device. Same rationale as the
+    // sibling block in add_overflow.h.
+    NV_IF_TARGET(NV_IS_HOST, (return ::cuda::__sub_overflow_host(__lhs, __rhs);))
+#endif // !_CCCL_CUDA_COMPILATION()
   }
   return ::cuda::__sub_overflow_generic_impl(__lhs, __rhs);
 }
