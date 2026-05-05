@@ -43,20 +43,10 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 9bb8cd22fb (c96016f693) - COMMENTED OUT
-// // <<<<<<< OLD CODE from b8a67f8512 (9fde2572bb) - COMMENTED OUT
-// // #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
-// // =======
-// #if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
-//
-// // >>>>>>> END NEW CODE (9fde2572bb)
-// #  include <cuda/__device/attributes.h>
-// =======
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/__device/arch_id.h>
 #  include <cuda/__device/compute_capability.h>
-// >>>>>>> END NEW CODE (c96016f693)
 #  include <cuda/__fwd/devices.h>
 #  include <cuda/std/__exception/cuda_error.h>
 #  include <cuda/std/__type_traits/always_false.h>
@@ -564,10 +554,6 @@ _CCCL_END_NAMESPACE_CUDA_DEVICE
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-// <<<<<<< OLD CODE from 9bb8cd22fb (c96016f693) - COMMENTED OUT
-// #endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
-// =======
-#endif // _CCCL_HAS_CTK()
-// >>>>>>> END NEW CODE (c96016f693)
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #endif // _CUDA___DEVICE_ARCH_TRAITS_H

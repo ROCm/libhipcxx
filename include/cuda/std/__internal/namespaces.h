@@ -7,35 +7,30 @@
 //
 //===---------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
+// MIT License
 //
-// #ifndef _LIBCUDACXX___INTERNAL_NAMESPACES_H
-// #define _LIBCUDACXX___INTERNAL_NAMESPACES_H
-// =======
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___INTERNAL_NAMESPACES_H
 #define _CUDA_STD___INTERNAL_NAMESPACES_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/__cccl_config>
 
@@ -67,92 +62,45 @@
 // clang-format off
 
 // Standard namespaces with or without versioning
-// <<<<<<< OLD CODE from ba8f6d689a (ec71ee891a) - COMMENTED OUT
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std {
-// #  define _LIBCUDACXX_END_NAMESPACE_STD_NOVERSION } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_STD _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_STD } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// // cuda specific namespaces
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_CUDA } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_MR _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::mr { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_CUDA_MR } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::device { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_PTX _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::ptx { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_CUDA_PTX } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::device::experimental { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DRIVER _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::__driver { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_CUDA_DRIVER } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// // Namespaces related to <ranges>
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_RANGES _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_RANGES } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_VIEWS _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges::views { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_VIEWS } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// =======
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std {
-#  define _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_STD } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_STD } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 
 // cuda specific namespaces
 #  define _CCCL_BEGIN_NAMESPACE_CUDA _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_MR _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::mr { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_MR } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_MR } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::device { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_DEVICE } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_DEVICE } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_PTX _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::ptx { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_PTX } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_PTX } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::device::experimental { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_DRIVER _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::__driver { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_DRIVER } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_DRIVER } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 
 // Namespaces related to <ranges>
-// <<<<<<< OLD CODE from 5733e24d7d (804f51f1e7) - COMMENTED OUT
-// #  define _CCCL_BEGIN_NAMESPACE_RANGES _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_RANGES } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
-// #  define _CCCL_BEGIN_NAMESPACE_VIEWS _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges::views { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_VIEWS } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
-// // >>>>>>> END NEW CODE (ec71ee891a)
-// =======
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_RANGES _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_STD_RANGES } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_STD_RANGES } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_VIEWS _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges::views { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_STD_VIEWS } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
-// >>>>>>> END NEW CODE (804f51f1e7)
+#  define _CCCL_END_NAMESPACE_CUDA_STD_VIEWS } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 
 #  define _CCCL_BEGIN_NAMESPACE_CPO(_CPO) namespace _CPO {
 #  define _CCCL_END_NAMESPACE_CPO }
 
 // Namespaces related to chrono / filesystem
-// <<<<<<< OLD CODE from ba8f6d689a (ec71ee891a) - COMMENTED OUT
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_FILESYSTEM _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std { inline namespace __fs { namespace filesystem { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_FILESYSTEM } } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// // Shorthands for different qualifiers
-//   // Namespaces related to execution
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_EXECUTION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::execution { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_EXECUTION } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// #  define _LIBCUDACXX_BEGIN_NAMESPACE_CUDA_EXECUTION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda { namespace execution { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _LIBCUDACXX_END_NAMESPACE_CUDA_EXECUTION } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// =======
 #  define _CCCL_BEGIN_NAMESPACE_FILESYSTEM _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std { inline namespace __fs { namespace filesystem { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_FILESYSTEM } } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_FILESYSTEM } } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 
 // Shorthands for different qualifiers
 // Namespaces related to execution
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_EXECUTION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::execution { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
+#  define _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 
 #  define _CCCL_BEGIN_NAMESPACE_CUDA_EXECUTION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda { namespace execution { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-#  define _CCCL_END_NAMESPACE_CUDA_EXECUTION } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK()
-// >>>>>>> END NEW CODE (ec71ee891a)
+#  define _CCCL_END_NAMESPACE_CUDA_EXECUTION } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
 
 // Namespace to avoid name collisions with CPOs on clang-16 (see https://godbolt.org/z/9TadonrdM for example)
 #if _CCCL_COMPILER(CLANG, <=, 16)

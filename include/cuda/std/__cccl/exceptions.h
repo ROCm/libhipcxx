@@ -50,13 +50,9 @@
 #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) // NVRTC/HIPRTC have no exceptions
 #  define _CCCL_HAS_EXCEPTIONS() 0
 #elif _CCCL_COMPILER(MSVC) // MSVC needs special checks for `_HAS_EXCEPTIONS` and `_CPPUNWIND`
-// <<<<<<< OLD CODE from a3cfc082ba (866ab6399e) - COMMENTED OUT
-// #  define _CCCL_HAS_EXCEPTIONS() (_HAS_EXCEPTIONS != 0) && (_CPPUNWIND != 0)
-// #elif defined(__HIP_PLATFORM_AMD__) // WAR: HIP host platform assumed to have exceptions enabled
-// #  define _CCCL_HAS_EXCEPTIONS() 1
-// =======
 #  define _CCCL_HAS_EXCEPTIONS() ((_HAS_EXCEPTIONS != 0) && (_CPPUNWIND != 0))
-// >>>>>>> END NEW CODE (866ab6399e)
+#elif defined(__HIP_PLATFORM_AMD__) // HIP host platform assumed to have exceptions enabled
+#  define _CCCL_HAS_EXCEPTIONS() 1
 #else // other compilers use `__EXCEPTIONS`
 #  define _CCCL_HAS_EXCEPTIONS() (__EXCEPTIONS)
 #endif // has exceptions

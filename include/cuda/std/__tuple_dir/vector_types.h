@@ -7,30 +7,25 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// // The above copyright notice and this permission notice shall be included in
-// // all copies or substantial portions of the Software.
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// // THE SOFTWARE.
-//
-// #ifndef _LIBCUDACXX___TUPLE_VECTOR_TYPES_H
-// #define _LIBCUDACXX___TUPLE_VECTOR_TYPES_H
-// =======
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #ifndef _CUDA_STD___TUPLE_VECTOR_TYPES_H
 #define _CUDA_STD___TUPLE_VECTOR_TYPES_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -56,22 +51,10 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 #  include <cuda/std/__utility/forward.h>
 #  include <cuda/std/__utility/move.h>
 
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-// #  if !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
-// #    include <cuda_runtime_api.h>
-// #  endif // !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
-//
-// #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size, ...)                      \
-//     template <>                                                                                    \
-//     struct tuple_size<__name##__size##__VA_ARGS__> : _CUDA_VSTD::integral_constant<size_t, __size> \
-//     {};                                                                                            \
-//                                                                                                    \
-//     template <size_t _Ip>                                                                          \
-//     struct tuple_element<_Ip, __name##__size##__VA_ARGS__>                                         \
-//     {                                                                                              \
-//       static_assert(_Ip < __size, "tuple_element index out of range");                             \
-//       using type = __type;                                                                         \
-// =======
+#  if !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
+#    include <cuda_runtime_api.h>
+#  endif // !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
+
 #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size, ...)                       \
     template <>                                                                                     \
     struct tuple_size<__name##__size##__VA_ARGS__> : ::cuda::std::integral_constant<size_t, __size> \
@@ -82,7 +65,6 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
     {                                                                                               \
       static_assert(_Ip < __size, "tuple_element index out of range");                              \
       using type = __type;                                                                          \
-// >>>>>>> END NEW CODE (752febcc68)
     };
 
 #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE_VECTOR(__name, __type) \

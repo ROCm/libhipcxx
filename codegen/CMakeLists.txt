@@ -1,4 +1,4 @@
-# Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -29,19 +29,14 @@ target_link_libraries(codegen PRIVATE fmt)
 
 set_property(TARGET codegen PROPERTY CXX_STANDARD 17)
 
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-# set(atomic_generated_output "${libcudacxx_BINARY_DIR}/codegen/cuda_ptx_generated.h")
-# set(atomic_install_location "${libhipcxx_SOURCE_DIR}/include/cuda/std/__atomic/functions")
-# =======
 set(
   atomic_generated_output
   "${libcudacxx_BINARY_DIR}/codegen/cuda_ptx_generated.h"
 )
 set(
   atomic_install_location
-  "${libcudacxx_SOURCE_DIR}/include/cuda/std/__atomic/functions"
+  "${libhipcxx_SOURCE_DIR}/include/cuda/std/__atomic/functions"
 )
-# >>>>>>> END NEW CODE (75d398a0e0)
 
 add_custom_target(
   libcudacxx.atomics.codegen

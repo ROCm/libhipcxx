@@ -1,6 +1,6 @@
 # MIT License
 #
-# Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -67,18 +67,12 @@ foreach (test_path IN LISTS libcudacxx_atomic_codegen_tests)
 
   target_compile_options(atomic_codegen_${test_name} PRIVATE "-Wno-comment")
 
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-#     ## Important for testing the local headers
-#     target_include_directories(atomic_codegen_${test_name} PRIVATE "${libhipcxx_SOURCE_DIR}/include")
-#     add_dependencies(libcudacxx.test.atomics.ptx atomic_codegen_${test_name})
-# =======
   ## Important for testing the local headers
   target_include_directories(
     atomic_codegen_${test_name}
-    PRIVATE "${libcudacxx_SOURCE_DIR}/include"
+    PRIVATE "${libhipcxx_SOURCE_DIR}/include"
   )
   add_dependencies(libcudacxx.test.atomics.ptx atomic_codegen_${test_name})
-# >>>>>>> END NEW CODE (75d398a0e0)
 
   # Add output path to object directory
   add_custom_command(

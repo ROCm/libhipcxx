@@ -7,35 +7,30 @@
 //
 //===---------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
+// MIT License
 //
-// #ifndef _LIBCUDACXX___INTERNAL_FEATURES_H
-// #define _LIBCUDACXX___INTERNAL_FEATURES_H
-// =======
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___INTERNAL_FEATURES_H
 #define _CUDA_STD___INTERNAL_FEATURES_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/__cccl_config>
 
@@ -97,34 +92,12 @@
 #  define _LIBCUDACXX_HAS_NVBF16() 0
 #endif // _CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2)
 
-// <<<<<<< OLD CODE from 1cf4554850 (b2f9714a85) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 6efaca82a9 (cfe657d109) - COMMENTED OUT
-// // // <<<<<<< OLD CODE from befceb921c (2a2be284cb) - COMMENTED OUT
-// // // // NVCC does not have a way of silencing non '_' prefixed UDLs
-// // // #if !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPCC) && !defined(_CCCL_COMPILER_HIPRTC)
-// // // #  define _LIBCUDACXX_HAS_STL_LITERALS
-// // // #endif // !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_COMPILER(NVRTC)
-// // //
-// // // =======
-// // // >>>>>>> END NEW CODE (2a2be284cb)
-// // =======
-// // Clang provides 128b atomics as a builtin
-// #if defined(CCCL_ENABLE_EXPERIMENTAL_HOST_ATOMICS_128B)
-// #  define _CCCL_HOST_128_ATOMICS_ENABLED() 1
-// #  define _CCCL_HOST_128_ATOMICS_MAYBE()   0
-// // GCC does not provide 128b atomics, but they may be available as a library, this requires opt-in usage.
-// // See: https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html "-mcx16" for more
-// #elif _CCCL_COMPILER(CLANG) || _CCCL_COMPILER(GCC)
-// #  define _CCCL_HOST_128_ATOMICS_ENABLED() 0
-// #  define _CCCL_HOST_128_ATOMICS_MAYBE()   1
-// =======
 #if _CCCL_COMPILER(MSVC)
 #  define _CCCL_ALIGNAS_TYPE(x) alignas(x)
 #  define _CCCL_ALIGNAS(x)      __declspec(align(x))
 #elif _CCCL_HAS_FEATURE(cxx_alignas)
 #  define _CCCL_ALIGNAS_TYPE(x) alignas(x)
 #  define _CCCL_ALIGNAS(x)      alignas(x)
-// >>>>>>> END NEW CODE (b2f9714a85)
 #else
 #  define _CCCL_ALIGNAS_TYPE(x) __attribute__((__aligned__(alignof(x))))
 #  define _CCCL_ALIGNAS(x)      __attribute__((__aligned__(x)))
@@ -153,5 +126,4 @@
 #  define _CCCL_DIAGNOSE_ERROR(_COND, _MSG)
 #endif
 
-// >>>>>>> END NEW CODE (cfe657d109)
 #endif // _CUDA_STD___INTERNAL_FEATURES_H

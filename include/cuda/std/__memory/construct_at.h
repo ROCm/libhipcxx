@@ -8,30 +8,25 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// // The above copyright notice and this permission notice shall be included in
-// // all copies or substantial portions of the Software.
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// // THE SOFTWARE.
-//
-// #ifndef _LIBCUDACXX___MEMORY_CONSTRUCT_AT_H
-// #define _LIBCUDACXX___MEMORY_CONSTRUCT_AT_H
-// =======
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #ifndef _CUDA_STD___MEMORY_CONSTRUCT_AT_H
 #define _CUDA_STD___MEMORY_CONSTRUCT_AT_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -61,33 +56,19 @@
 #include <cuda/std/__utility/forward.h>
 #include <cuda/std/__utility/move.h>
 
-// <<<<<<< OLD CODE from 1ca38c53a1 (ca306fd297) - COMMENTED OUT
-// // NOTE(HIP/AMD): We need to include new header to get the correct device definitions.
-// #if defined(__HIPCC_RTC__)
-//   #if __has_include("new")
-//     #include <new>
-//   #endif
-// #endif
-//
-// #if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_COMPILER_HIPCC)
-// #  include <new>
-// #endif // _CCCL_CUDA_COMPILER(CLANG)
-//
-// =======
-// >>>>>>> END NEW CODE (ca306fd297)
+// NOTE(HIP/AMD): We need to include new header to get the correct device definitions.
+#if defined(__HIPCC_RTC__)
+  #if __has_include("new")
+    #include <new>
+  #endif
+#endif
+
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_COMPILER_HIPCC)
+#  include <new>
+#endif // _CCCL_CUDA_COMPILER(CLANG)
+
 #if _CCCL_STD_VER >= 2020 // need to backfill ::std::construct_at
-// <<<<<<< OLD CODE from 9dd87113c9 (c52e23b41f) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 49a0439bc0 (32b9595a12) - COMMENTED OUT
-// // #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// // #    include <memory>
-// // =======
-// #  if !_CCCL_COMPILER(NVRTC)
-// #    include <cuda/std/__cccl/memory_wrapper.h>
-// // >>>>>>> END NEW CODE (32b9595a12)
-// #  endif // _CCCL_COMPILER(NVRTC)
-// =======
 #  include <cuda/std/__cccl/memory_wrapper.h>
-// >>>>>>> END NEW CODE (c52e23b41f)
 
 // NOTE(HIP/AMD): HIPRTC requires explicit std::construct_at fallback definition.
 // The __cpp_lib_constexpr_dynamic_alloc macro may be defined by system headers

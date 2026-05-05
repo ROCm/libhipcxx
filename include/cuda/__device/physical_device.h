@@ -43,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__device/device_ref.h>
 #  include <cuda/__driver/driver_api.h>
@@ -99,47 +99,14 @@ public:
   //! @brief Retrieve the primary context for this device.
   //!
   //! @return A reference to the primary context for this device.
-// <<<<<<< OLD CODE from b8a67f8512 (9fde2572bb) - COMMENTED OUT
-// #ifndef _CCCL_HIP_COMPILER
-//   ::CUcontext primary_context() const
-// =======
   [[nodiscard]] _CCCL_HOST_API ::CUcontext __primary_context()
-// >>>>>>> END NEW CODE (9fde2572bb)
   {
     ::std::call_once(__primary_ctx_once_flag_, [this]() {
       __primary_ctx_ = ::cuda::__driver::__primaryCtxRetain(__device_);
     });
     return __primary_ctx_;
   }
-#endif
 
-// <<<<<<< OLD CODE from 9bb8cd22fb (c96016f693) - COMMENTED OUT
-//   //! @brief Retrieve architecture traits of this device.
-//   //!
-//   //! Architecture traits object contains information about certain traits
-//   //! that are shared by all devices belonging to given architecture.
-//   //!
-//   //! @return A reference to `arch_traits_t` object containing architecture traits of this device
-//   [[nodiscard]] _CCCL_HOST_API const arch::traits_t& __arch_traits()
-//   {
-// // <<<<<<< OLD CODE from b8a67f8512 (9fde2572bb) - COMMENTED OUT
-// // #ifndef _CCCL_HIP_COMPILER
-// //     if (__primary_ctx)
-// //     {
-// //       [[maybe_unused]] const auto __ignore = ::cuda::__driver::__primaryCtxReleaseNoThrow(__device);
-// //     }
-// // #endif
-// // =======
-//     ::std::call_once(__traits_once_flag_, [this]() {
-//       const auto __id = ::cuda::__driver::__cudevice_to_ordinal(__device_);
-//       __traits_       = ::cuda::arch::__arch_traits_might_be_unknown(__id, device_attributes::compute_capability(__id));
-//     });
-//     return __traits_;
-// // >>>>>>> END NEW CODE (9fde2572bb)
-//   }
-//
-// =======
-// >>>>>>> END NEW CODE (c96016f693)
   [[nodiscard]] _CCCL_HOST_API ::cuda::std::string_view __name()
   {
     ::std::call_once(__name_once_flag_, [this]() {
@@ -207,15 +174,7 @@ __make_physical_devices(::cuda::std::size_t __device_count)
   return ::cuda::std::span<__physical_device>{__devices.get(), __device_count};
 }
 
-// <<<<<<< OLD CODE from b8a67f8512 (9fde2572bb) - COMMENTED OUT
-// #ifndef _CCCL_HIP_COMPILER
-//   mutable ::CUcontext __primary_ctx = nullptr;
-//   mutable ::CUdevice __device{};
-//   mutable ::std::once_flag __init_once;
-// #endif
-// =======
 // device_ref methods dependent on __physical_device
-// >>>>>>> END NEW CODE (9fde2572bb)
 
 _CCCL_HOST_API inline void device_ref::init() const
 {
@@ -236,6 +195,6 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #endif // _CUDA___DEVICE_PHYSICAL_DEVICE_H
