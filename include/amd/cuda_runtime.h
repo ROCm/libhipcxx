@@ -773,6 +773,41 @@
 #ifndef cudaErrorNotSupported
 #  define cudaErrorNotSupported hipErrorNotSupported
 #endif
+#ifndef CUdeviceptr
+#  define CUdeviceptr hipDeviceptr_t
+#endif
+#ifndef CUmemAllocationHandleType
+#  define CUmemAllocationHandleType hipMemAllocationHandleType
+#endif
+#ifndef CUmemAllocationType
+#  define CUmemAllocationType hipMemAllocationType
+#endif
+// NOTE(HIP/AMD): managed memory pools are not supported by HIP. Map
+// CU_MEM_ALLOCATION_TYPE_MANAGED to hipMemAllocationTypeMax (sentinel)
+// so the corresponding upstream conditional checks (e.g. in
+// memory_resource_base.h __get_pool_properties) compile but never
+// match an actually-supported allocation type at runtime.
+#ifndef CU_MEM_ALLOCATION_TYPE_MANAGED
+#  define CU_MEM_ALLOCATION_TYPE_MANAGED hipMemAllocationTypeMax
+#endif
+#ifndef CU_MEM_LOCATION_TYPE_HOST_NUMA
+#  define CU_MEM_LOCATION_TYPE_HOST_NUMA hipMemLocationTypeHostNuma
+#endif
+#ifndef CUmemAccessDesc
+#  define CUmemAccessDesc hipMemAccessDesc
+#endif
+#ifndef CUmemPoolProps
+#  define CUmemPoolProps hipMemPoolProps
+#endif
+#ifndef CU_MEMPOOL_ATTR_RELEASE_THRESHOLD
+#  define CU_MEMPOOL_ATTR_RELEASE_THRESHOLD hipMemPoolAttrReleaseThreshold
+#endif
+#ifndef CU_MEM_ALLOCATION_TYPE_PINNED
+#  define CU_MEM_ALLOCATION_TYPE_PINNED hipMemAllocationTypePinned
+#endif
+#ifndef CU_MEM_ACCESS_FLAGS_PROT_NONE
+#  define CU_MEM_ACCESS_FLAGS_PROT_NONE hipMemAccessFlagsProtNone
+#endif
 #ifndef CUstreamCallback
 #  define CUstreamCallback hipStreamCallback_t
 #endif
