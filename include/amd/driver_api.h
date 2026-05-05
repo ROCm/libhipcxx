@@ -378,6 +378,98 @@ __mempoolSetAttribute(::hipMemPool_t __pool, ::hipMemPoolAttr __attr, void* __va
     ::hipMemPoolSetAttribute, "Failed to set attribute for a memory pool", __pool, __attr, __value);
 }
 
+// NOTE(HIP/AMD): memory-pool create / access wrappers used by
+// <cuda/__memory_resource/memory_resource_base.h>. The CUDA driver API
+// uses CUmemoryPool/CUmemPoolProps/CUmemAccessDesc/CUmemAccess_flags
+// which we alias to hipMemPool_t/hipMemPoolProps/hipMemAccessDesc/
+// hipMemAccessFlags in <amd/cuda_runtime.h>. The HIP runtime API
+// signature matches the upstream cuda::__driver shape exactly for
+// these four entry points.
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+__mempoolCreateNoThrow(::hipMemPool_t* __pool, ::hipMemPoolProps* __props)
+{
+  return static_cast<::cudaError_t>(::hipMemPoolCreate(__pool, __props));
+}
+
+_CCCL_HOST_API inline void
+__mempoolSetAccess(::hipMemPool_t __pool, ::hipMemAccessDesc* __descs, ::size_t __count)
+{
+  _CCCL_TRY_CUDA_API(::hipMemPoolSetAccess, "Failed to set access of a memory pool", __pool, __descs, __count);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipMemAccessFlags
+__mempoolGetAccess(::hipMemPool_t __pool, ::hipMemLocation* __location)
+{
+  ::hipMemAccessFlags __flags{};
+  _CCCL_TRY_CUDA_API(::hipMemPoolGetAccess, "Failed to get access of a memory pool", &__flags, __pool, __location);
+  return __flags;
+}
+
+// NOTE(HIP/AMD): allocation-from-pool wrappers used by the upstream
+// __memory_resource_base. The CUDA driver API
+//   ::cuda::__driver::__mallocFromPoolAsync(size, pool, stream)
+//     -> ::CUdeviceptr
+// returns the device pointer. HIP's hipMallocFromPoolAsync writes the
+// pointer through an out-parameter and returns hipError_t -- adapt the
+// signature here. The upstream consumer code keeps using the
+// CUdeviceptr-returning shape.
+[[nodiscard]] _CCCL_HOST_API inline ::hipDeviceptr_t
+__mallocFromPoolAsync(::size_t __bytes, ::hipMemPool_t __pool, ::hipStream_t __stream)
+{
+  void* __result = nullptr;
+  _CCCL_TRY_CUDA_API(
+    ::hipMallocFromPoolAsync, "Failed to allocate memory from a memory pool", &__result, __bytes, __pool, __stream);
+  return static_cast<::hipDeviceptr_t>(__result);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+__freeAsyncNoThrow(::hipDeviceptr_t __dptr, ::hipStream_t __stream)
+{
+  return static_cast<::cudaError_t>(::hipFreeAsync(__dptr, __stream));
+}
+
+_CCCL_HOST_API inline void __mempoolDestroy(::hipMemPool_t __pool)
+{
+  _CCCL_TRY_CUDA_API(::hipMemPoolDestroy, "Failed to destroy a memory pool", __pool);
+}
+
+_CCCL_HOST_API inline void __mempoolTrimTo(::hipMemPool_t __pool, ::size_t __min_bytes_to_keep)
+{
+  _CCCL_TRY_CUDA_API(::hipMemPoolTrimTo, "Failed to trim a memory pool", __pool, __min_bytes_to_keep);
+}
+
+// NOTE(HIP/AMD): managed/host allocator wrappers used by the legacy
+// memory_resource implementations. The HIP runtime API
+// (hipMallocManaged / hipHostMalloc / hipFree / hipFreeHost) writes
+// the pointer through an out-parameter and returns hipError_t; adapt
+// to match the upstream cuda::__driver shape (returns the pointer).
+[[nodiscard]] _CCCL_HOST_API inline ::hipDeviceptr_t __mallocManaged(::size_t __bytes, unsigned int __flags)
+{
+  void* __result = nullptr;
+  _CCCL_TRY_CUDA_API(::hipMallocManaged, "Failed to allocate managed memory", &__result, __bytes, __flags);
+  return static_cast<::hipDeviceptr_t>(__result);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __freeNoThrow(::hipDeviceptr_t __dptr)
+{
+  return static_cast<::cudaError_t>(::hipFree(__dptr));
+}
+
+[[nodiscard]] _CCCL_HOST_API inline void* __mallocHost(::size_t __bytes)
+{
+  void* __result = nullptr;
+  // NOTE(HIP/AMD): hipHostMalloc takes a flags parameter (defaulting to
+  // hipHostMallocDefault). Match the upstream zero-flags semantics by
+  // explicitly passing 0u.
+  _CCCL_TRY_CUDA_API(::hipHostMalloc, "Failed to allocate host memory", &__result, __bytes, 0u);
+  return __result;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __freeHostNoThrow(void* __dptr)
+{
+  return static_cast<::cudaError_t>(::hipHostFree(__dptr));
+}
+
 _CCCL_END_NAMESPACE_CUDA_DRIVER
 
 #  include <cuda/std/__cccl/epilogue.h>
