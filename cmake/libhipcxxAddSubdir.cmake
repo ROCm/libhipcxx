@@ -1,4 +1,4 @@
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -21,5 +21,5 @@
 #
 # More details are in the discussion at
 # https://github.com/NVIDIA/libcudacxx/pull/242#discussion_r794003857
-include(${libhipcxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config-version.cmake)
-include(${libhipcxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config.cmake)
+include(${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config-version.cmake)
+include(${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config.cmake)
