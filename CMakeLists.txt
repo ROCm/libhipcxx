@@ -194,6 +194,22 @@ option(LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS "Enable libcu++ tests." ON)
 if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   enable_testing()
 
+  # Pull in the CCCL infrastructure that our Libcudacxx*.cmake helpers
+  # depend on. In the upstream CCCL workflow these are loaded by the parent
+  # CCCL CMakeLists.txt before libcudacxx is added as a subdirectory; since
+  # libhipcxx is a standalone project we load them here directly.
+  # - AppendOptionIfAvailable.cmake provides append_option_if_available()
+  # - CCCLBuildCompilerTargets.cmake provides cccl_build_compiler_interface()
+  #   and cccl_build_compiler_targets() which creates the
+  #   cccl.compiler_interface_cppXX targets that libcudacxx links against.
+  # - CCCLConfigureTarget.cmake provides cccl_configure_target() used by the
+  #   header-testing helpers below.
+  include(cmake/AppendOptionIfAvailable.cmake)
+  include(cmake/CCCLBuildCompilerTargets.cmake)
+  include(cmake/CCCLConfigureTarget.cmake)
+  include(cmake/CCCLGetDependencies.cmake)
+  cccl_build_compiler_targets()
+
   # Create the compiler targets with the common compile flags
   include(cmake/LibcudacxxBuildCompilerTargets.cmake)
   libcudacxx_build_compiler_targets()
