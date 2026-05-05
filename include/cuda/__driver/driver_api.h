@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___DRIVER_DRIVER_API_H
 #define _CUDA___DRIVER_DRIVER_API_H
 
@@ -20,6 +42,16 @@
 #elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
 #  pragma system_header
 #endif // no system header
+
+// NOTE(HIP/AMD): On HIP, route consumers of cuda::__driver::* to the
+// libhipcxx HIP-side shim in <amd/driver_api.h>, which re-implements the
+// subset of wrappers that upstream libcudacxx code uses (deviceGet,
+// deviceCanAccessPeer, ctxPush/Pop, streamCreateWithPriority, etc.) on
+// top of the HIP runtime/driver API. The CUDA-only body below is then
+// skipped on HIP.
+#if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
+#  include <amd/driver_api.h>
+#endif // _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 
 #if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
 

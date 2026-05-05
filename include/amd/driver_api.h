@@ -1,0 +1,351 @@
+// MIT License
+//
+// Copyright (c) 2026 Advanced Micro Devices, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// NOTE(HIP/AMD): HIP-side replacement for the libhipcxx CUDA driver-API
+// helpers in `<cuda/__driver/driver_api.h>`. Provides the subset of
+// `::cuda::__driver::__xxx` wrappers that the upstream code consumes,
+// implemented directly on top of the HIP runtime / driver API.
+//
+// Each wrapper below picks the HIP API that best matches the *semantics*
+// the CUDA-side wrapper provides, NOT necessarily the closest function
+// name. In particular, the pointer-attribute helpers route through
+// `hipPointerGetAttributes` (plural runtime API) rather than
+// `hipPointerGetAttribute` (singular driver API), because the plural
+// variant matches the original CUDA-runtime semantics expected by the
+// upstream callers (e.g., it gracefully reports unregistered host memory
+// instead of returning `hipErrorInvalidValue`).
+
+#ifndef _AMD_DRIVER_API_H
+#define _AMD_DRIVER_API_H
+
+#include <cuda/std/detail/__config>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
+#if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
+
+#  include <cuda/__runtime/api_wrapper.h>
+#  include <cuda/std/__exception/cuda_error.h>
+#  include <cuda/std/__internal/namespaces.h>
+#  include <cuda/std/__type_traits/always_false.h>
+#  include <cuda/std/__type_traits/is_same.h>
+
+#  include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA_DRIVER
+
+// Device management
+
+[[nodiscard]] _CCCL_HOST_API inline int __cudevice_to_ordinal(::hipDevice_t __dev) noexcept
+{
+  // hipDevice_t is a plain int representing the ordinal.
+  return static_cast<int>(__dev);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipDevice_t __deviceGet(int __ordinal)
+{
+  ::hipDevice_t __result{};
+  _CCCL_TRY_CUDA_API(::hipDeviceGet, "Failed to get device", &__result, __ordinal);
+  return __result;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipDevice_t
+__deviceGetAttribute(::hipDeviceAttribute_t __attr, ::hipDevice_t __device)
+{
+  int __result = 0;
+  _CCCL_TRY_CUDA_API(::hipDeviceGetAttribute, "Failed to get device attribute", &__result, __attr, __device);
+  return static_cast<::hipDevice_t>(__result);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline int __deviceGetCount()
+{
+  int __result = 0;
+  _CCCL_TRY_CUDA_API(::hipGetDeviceCount, "Failed to get device count", &__result);
+  return __result;
+}
+
+_CCCL_HOST_API inline void __deviceGetName(char* __name_out, int __len, int __ordinal)
+{
+  ::hipDevice_t __dev = __deviceGet(__ordinal);
+  _CCCL_TRY_CUDA_API(::hipDeviceGetName, "Failed to query the name of a device", __name_out, __len, __dev);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline bool __deviceCanAccessPeer(::hipDevice_t __dev, ::hipDevice_t __peer_dev)
+{
+  int __result = 0;
+  _CCCL_TRY_CUDA_API(::hipDeviceCanAccessPeer, "Failed to query peer access", &__result, __dev, __peer_dev);
+  return __result != 0;
+}
+
+// Primary context management
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipCtx_t __primaryCtxRetain(::hipDevice_t __dev)
+{
+  ::hipCtx_t __result{};
+  _CCCL_TRY_CUDA_API(::hipDevicePrimaryCtxRetain, "Failed to retain context for a device", &__result, __dev);
+  return __result;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __primaryCtxReleaseNoThrow(::hipDevice_t __dev)
+{
+  return static_cast<::cudaError_t>(::hipDevicePrimaryCtxRelease(__dev));
+}
+
+// Context management
+
+_CCCL_HOST_API inline void __ctxPush(::hipCtx_t __ctx)
+{
+  _CCCL_TRY_CUDA_API(::hipCtxPushCurrent, "Failed to push context", __ctx);
+}
+
+_CCCL_HOST_API inline ::hipCtx_t __ctxPop()
+{
+  ::hipCtx_t __result{};
+  _CCCL_TRY_CUDA_API(::hipCtxPopCurrent, "Failed to pop context", &__result);
+  return __result;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipDevice_t __ctxGetDevice()
+{
+  ::hipDevice_t __result{};
+  _CCCL_TRY_CUDA_API(::hipCtxGetDevice, "Failed to get context's device", &__result);
+  return __result;
+}
+
+// Pointer attributes
+//
+// Routed through `hipPointerGetAttributes` (plural runtime API) so that
+// unregistered host pointers (stack/heap arrays) are reported gracefully
+// instead of returning `hipErrorInvalidValue` like the singular driver-API
+// `hipPointerGetAttribute` would. The translation below maps the HIP
+// runtime types onto the CUmemorytype values the upstream callers expect
+// (the AMD shim aliases `CUmemorytype` to `hipMemoryType`, so the values
+// coincide modulo the `Unregistered` case which we collapse to `Host`).
+
+template <::hipPointer_attribute _Attr>
+[[nodiscard]] _CCCL_API _CCCL_CONSTEVAL auto __pointer_attribute_value_type_t_impl() noexcept
+{
+  if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_CONTEXT)
+  {
+    return ::hipCtx_t{};
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_MEMORY_TYPE)
+  {
+    return ::hipMemoryType{};
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_DEVICE_POINTER || _Attr == ::HIP_POINTER_ATTRIBUTE_HOST_POINTER)
+  {
+    return static_cast<void*>(nullptr);
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_IS_MANAGED || _Attr == ::HIP_POINTER_ATTRIBUTE_MAPPED)
+  {
+    return bool{};
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL)
+  {
+    return int{};
+  }
+  else
+  {
+    static_assert(::cuda::std::__always_false_v<decltype(_Attr)>, "not implemented attribute");
+  }
+}
+
+template <::hipPointer_attribute _Attr>
+using __pointer_attribute_value_type_t = decltype(::cuda::__driver::__pointer_attribute_value_type_t_impl<_Attr>());
+
+template <::hipPointer_attribute _Attr>
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+__pointerGetAttributeNoThrow(__pointer_attribute_value_type_t<_Attr>& __result, const void* __ptr)
+{
+  ::hipPointerAttribute_t __ptr_attrib{};
+  const auto __status = ::hipPointerGetAttributes(&__ptr_attrib, __ptr);
+  if (__status != ::hipSuccess)
+  {
+    return static_cast<::cudaError_t>(__status);
+  }
+  if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_MEMORY_TYPE)
+  {
+    // Treat unregistered host memory as host so callers get the same
+    // semantics as `cuPointerGetAttribute(MEMORY_TYPE)` on CUDA.
+    __result =
+      (__ptr_attrib.type == ::hipMemoryTypeUnregistered) ? ::hipMemoryTypeHost : __ptr_attrib.type;
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_IS_MANAGED)
+  {
+    // NOTE(HIP/AMD): WAR-18 (CHANGELOG_v3.1.md). The HIP runtime does not
+    // currently report `__managed__` global variables as managed. Use the
+    // "devicePointer == hostPointer" heuristic that works for explicitly
+    // `hipMallocManaged()`-allocated memory.
+    __result = (__ptr_attrib.devicePointer != nullptr)
+            && (__ptr_attrib.hostPointer == __ptr_attrib.devicePointer);
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_DEVICE_POINTER)
+  {
+    __result = __ptr_attrib.devicePointer;
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_HOST_POINTER)
+  {
+    __result = __ptr_attrib.hostPointer;
+  }
+  else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL)
+  {
+    __result = __ptr_attrib.device;
+  }
+  else
+  {
+    static_assert(::cuda::std::__always_false_v<decltype(_Attr)>, "not implemented attribute");
+  }
+  return ::hipSuccess;
+}
+
+// Stream management
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipStream_t __streamCreateWithPriority(unsigned __flags, int __priority)
+{
+  ::hipStream_t __stream{};
+  _CCCL_TRY_CUDA_API(::hipStreamCreateWithPriority, "Failed to create a stream", &__stream, __flags, __priority);
+  return __stream;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __streamDestroyNoThrow(::hipStream_t __stream)
+{
+  return static_cast<::cudaError_t>(::hipStreamDestroy(__stream));
+}
+
+_CCCL_HOST_API inline void __streamSynchronize(::hipStream_t __stream)
+{
+  _CCCL_TRY_CUDA_API(::hipStreamSynchronize, "Failed to synchronize a stream", __stream);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipDevice_t __streamGetDevice(::hipStream_t __stream)
+{
+  ::hipDevice_t __result{};
+  _CCCL_TRY_CUDA_API(::hipStreamGetDevice, "Failed to get the device of a stream", __stream, &__result);
+  return __result;
+}
+
+_CCCL_HOST_API inline void __streamWaitEvent(::hipStream_t __stream, ::hipEvent_t __evnt)
+{
+  _CCCL_TRY_CUDA_API(::hipStreamWaitEvent, "Failed to make a stream wait for an event", __stream, __evnt, 0u);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __streamQueryNoThrow(::hipStream_t __stream)
+{
+  return static_cast<::cudaError_t>(::hipStreamQuery(__stream));
+}
+
+[[nodiscard]] _CCCL_HOST_API inline int __streamGetPriority(::hipStream_t __stream)
+{
+  int __result = 0;
+  _CCCL_TRY_CUDA_API(::hipStreamGetPriority, "Failed to get priority of a stream", __stream, &__result);
+  return __result;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline unsigned long long __streamGetId(::hipStream_t __stream)
+{
+  unsigned long long __result = 0;
+  _CCCL_TRY_CUDA_API(::hipStreamGetId, "Failed to get ID of a stream", __stream, &__result);
+  return __result;
+}
+
+// NOTE(HIP/AMD): `__streamGetCtx` is intentionally not provided -
+// `hipStreamGetCtx` is not in the HIP runtime API. Consumers (currently
+// `cuda::stream_ref::device()` and `__ensure_current_context(stream_ref)`)
+// route through `__streamGetDevice` under HIP instead.
+
+// Memory management
+//
+// NOTE(HIP/AMD): the upstream wrappers call `cuMemcpyAsync` /
+// `cuMemsetD8Async` (driver-API). The HIP runtime equivalents are
+// `hipMemcpyAsync` (which requires an explicit `hipMemcpyKind` - we
+// pass `hipMemcpyDefault` to match the upstream UVA-based semantics)
+// and `hipMemsetD8Async` (which takes a `hipDeviceptr_t`, an alias of
+// `void*` on HIP).
+
+_CCCL_HOST_API inline void __memcpyAsync(void* __dst, const void* __src, size_t __count, ::hipStream_t __stream)
+{
+  _CCCL_TRY_CUDA_API(
+    ::hipMemcpyAsync, "Failed to perform a memcpy", __dst, __src, __count, ::hipMemcpyDefault, __stream);
+}
+
+_CCCL_HOST_API inline void __memsetAsync(void* __dst, ::uint8_t __value, size_t __count, ::hipStream_t __stream)
+{
+  _CCCL_TRY_CUDA_API(
+    ::hipMemsetD8Async,
+    "Failed to perform a memset",
+    reinterpret_cast<::hipDeviceptr_t>(__dst),
+    __value,
+    __count,
+    __stream);
+}
+
+// Event management
+
+_CCCL_HOST_API inline void __eventRecord(::hipEvent_t __evnt, ::hipStream_t __stream)
+{
+  _CCCL_TRY_CUDA_API(::hipEventRecord, "Failed to record CUDA event", __evnt, __stream);
+}
+
+_CCCL_HOST_API inline void __eventSynchronize(::hipEvent_t __evnt)
+{
+  _CCCL_TRY_CUDA_API(::hipEventSynchronize, "Failed to synchronize CUDA event", __evnt);
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __eventQueryNoThrow(::hipEvent_t __evnt)
+{
+  return static_cast<::cudaError_t>(::hipEventQuery(__evnt));
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __eventDestroyNoThrow(::hipEvent_t __evnt)
+{
+  return static_cast<::cudaError_t>(::hipEventDestroy(__evnt));
+}
+
+[[nodiscard]] _CCCL_HOST_API inline ::hipEvent_t __eventCreate(unsigned __flags)
+{
+  ::hipEvent_t __result{};
+  _CCCL_TRY_CUDA_API(::hipEventCreateWithFlags, "Failed to create CUDA event", &__result, __flags);
+  return __result;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline float __eventElapsedTime(::hipEvent_t __start, ::hipEvent_t __end)
+{
+  float __result = 0.0f;
+  _CCCL_TRY_CUDA_API(
+    ::hipEventElapsedTime, "Failed to get elapsed time between CUDA events", &__result, __start, __end);
+  return __result;
+}
+
+_CCCL_END_NAMESPACE_CUDA_DRIVER
+
+#  include <cuda/std/__cccl/epilogue.h>
+
+#endif // _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
+
+#endif // _AMD_DRIVER_API_H
