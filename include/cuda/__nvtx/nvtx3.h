@@ -40,8 +40,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// NVTX is NVIDIA-specific and not available for HIP/AMD builds
-#ifndef _CCCL_HIP_COMPILER
+// NVTX is NVIDIA-specific and not available for HIP/AMD builds.
+// Use __HIP_PLATFORM_AMD__ (defined by clang-hip preprocessor before any
+// header is included) rather than _CCCL_HIP_COMPILER, which is only
+// defined after <cuda/std/detail/__config> is pulled in. This file is
+// consumed standalone by e.g. the libcudacxx.test.internal_headers
+// suite which #includes the header directly without the libhipcxx
+// config being seen first.
+#ifndef __HIP_PLATFORM_AMD__
 
 /* Temporary helper #defines, #undef'ed at end of header */
 #define NVTX3_CPP_VERSION_MAJOR 1
@@ -3001,4 +3007,4 @@ NVTX3_INLINE_IF_REQUESTED namespace NVTX3_VERSION_NAMESPACE
 #  undef NVTX3_STATIC_ASSERT
 #endif
 
-#endif // !defined(_CCCL_HIP_COMPILER)
+#endif // !defined(__HIP_PLATFORM_AMD__)

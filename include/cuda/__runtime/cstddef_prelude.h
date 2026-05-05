@@ -38,18 +38,28 @@
 #  pragma system_header
 #endif // no system header
 
-#if  !defined(_CCCL_COMPILER_NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+// NOTE: '_CCCL_COMPILER_NVRTC' is a *function-like* macro that is always
+// defined (it expands to _CCCL_VERSION_INVALID() outside NVRTC), so
+// 'defined(_CCCL_COMPILER_NVRTC)' is always true and would silently
+// take the '#else' fallback on every non-RTC build, redefining
+// 'offsetof' on top of the one from <stddef.h>. Use the function-style
+// '_CCCL_COMPILER(NVRTC)' invocation that returns 0 outside NVRTC.
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <cstddef>
 
 #  include <stddef.h>
 #else
 #  define offsetof(type, member) (::cuda::std::size_t)((char*) &(((type*) 0)->member) - (char*) 0)
-#endif // _CCCL_COMPILER_NVRTC
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+
+#include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 typedef decltype(nullptr) nullptr_t;
 
 _CCCL_END_NAMESPACE_CUDA_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _LIBCUDACXX___CUDA_CSTDDEF_PRELUDE_H

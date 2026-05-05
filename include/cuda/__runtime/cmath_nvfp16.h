@@ -50,6 +50,8 @@
 
 #  include <nv/target>
 
+#  include <cuda/std/__cccl/prologue.h>
+
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // trigonometric functions
@@ -193,6 +195,8 @@ _LIBCUDACXX_HIDE_FROM_ABI __half __constexpr_fmax(__half __x, __half __y) noexce
 }
 
 _CCCL_END_NAMESPACE_CUDA_STD
+
+#  include <cuda/std/__cccl/epilogue.h>
 
 #endif /// _LIBCUDACXX_HAS_NVFP16
 

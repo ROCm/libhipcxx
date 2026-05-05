@@ -342,6 +342,42 @@ _CCCL_HOST_API inline void __eventSynchronize(::hipEvent_t __evnt)
   return __result;
 }
 
+// NOTE(HIP/AMD): stream-callback / host-launch wrappers used by
+// <cuda/__launch/host_launch.h>. The CUDA driver-API form takes
+// ::CUstreamCallback / ::CUhostFn; HIP equivalents are
+// ::hipStreamCallback_t / ::hipHostFn_t.
+_CCCL_HOST_API inline void
+__streamAddCallback(::hipStream_t __stream, ::hipStreamCallback_t __cb, void* __data, unsigned __flags = 0)
+{
+  _CCCL_TRY_CUDA_API(
+    ::hipStreamAddCallback, "Failed to add a stream callback", __stream, __cb, __data, __flags);
+}
+
+_CCCL_HOST_API inline void __launchHostFunc(::hipStream_t __stream, ::hipHostFn_t __fn, void* __data)
+{
+  _CCCL_TRY_CUDA_API(::hipLaunchHostFunc, "Failed to launch host function", __stream, __fn, __data);
+}
+
+// NOTE(HIP/AMD): memory-pool attribute getter/setter used by
+// <cuda/__memory_resource/memory_resource_base.h>. The CUDA form
+// takes ::CUmemPool_attribute which we alias to ::hipMemPoolAttr in
+// <amd/cuda_runtime.h>.
+[[nodiscard]] _CCCL_HOST_API inline size_t
+__mempoolGetAttribute(::hipMemPool_t __pool, ::hipMemPoolAttr __attr)
+{
+  size_t __value = 0;
+  _CCCL_TRY_CUDA_API(
+    ::hipMemPoolGetAttribute, "Failed to get attribute for a memory pool", __pool, __attr, &__value);
+  return __value;
+}
+
+_CCCL_HOST_API inline void
+__mempoolSetAttribute(::hipMemPool_t __pool, ::hipMemPoolAttr __attr, void* __value)
+{
+  _CCCL_TRY_CUDA_API(
+    ::hipMemPoolSetAttribute, "Failed to set attribute for a memory pool", __pool, __attr, __value);
+}
+
 _CCCL_END_NAMESPACE_CUDA_DRIVER
 
 #  include <cuda/std/__cccl/epilogue.h>
