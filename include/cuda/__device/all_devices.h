@@ -43,16 +43,9 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from cf89579d84 (d4218e3403) - COMMENTED OUT
-// #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
-// =======
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
-// <<<<<<< OLD CODE from b8a67f8512 (9fde2572bb) - COMMENTED OUT
-// // >>>>>>> END NEW CODE (d4218e3403)
-// =======
 #  include <cuda/__device/device_ref.h>
-// >>>>>>> END NEW CODE (9fde2572bb)
 #  include <cuda/__device/physical_device.h>
 #  include <cuda/__driver/driver_api.h>
 #  include <cuda/__fwd/devices.h>
@@ -164,6 +157,6 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #endif // _CUDA___DEVICE_ALL_DEVICES_H

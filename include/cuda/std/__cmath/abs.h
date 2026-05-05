@@ -8,35 +8,30 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
+// MIT License
 //
-// #ifndef _LIBCUDACXX___CMATH_ABS_H
-// #define _LIBCUDACXX___CMATH_ABS_H
-// =======
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___CMATH_ABS_H
 #define _CUDA_STD___CMATH_ABS_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -52,16 +47,11 @@
 #include <cuda/std/__floating_point/fp.h>
 #include <cuda/std/__type_traits/is_extended_arithmetic.h>
 #include <cuda/std/__type_traits/is_integral.h>
-// <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
-// #include <cuda/std/cstdint>
-//
-// // MSVC and clang cuda need the host side functions included
-// #if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-// #  include <math.h>
-// #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-// =======
 #include <cuda/std/limits>
-// >>>>>>> END NEW CODE (e2c8bf22d1)
+
+#if defined(_CCCL_HIP_COMPILER)
+#  include <math.h>
+#endif // defined(_CCCL_HIP_COMPILER)
 
 #include <cuda/std/__cccl/prologue.h>
 

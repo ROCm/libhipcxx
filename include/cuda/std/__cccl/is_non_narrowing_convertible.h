@@ -45,12 +45,7 @@
 
 namespace __cccl_internal
 {
-// <<<<<<< OLD CODE from b6ca799822 (8ca4c7d17d) - COMMENTED OUT
-//
-// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-// =======
-#if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (8ca4c7d17d)
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 template <class _Tp>
 __host__ __device__ _Tp&& __cccl_declval(int);
 template <class _Tp>

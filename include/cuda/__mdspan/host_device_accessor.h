@@ -8,35 +8,30 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
+// MIT License
 //
-// #ifndef _CUDA___MDSPAN_HOST_DEVICE_ACCESSOR
-// #define _CUDA___MDSPAN_HOST_DEVICE_ACCESSOR
-// =======
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___MDSPAN_HOST_DEVICE_ACCESSOR_H
 #define _CUDA___MDSPAN_HOST_DEVICE_ACCESSOR_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -136,17 +131,8 @@ class __host_accessor : public _Accessor
   [[nodiscard]] _CCCL_HOST_API static constexpr bool
   __is_host_accessible_pointer([[maybe_unused]] __data_handle_type __p) noexcept
   {
-// <<<<<<< OLD CODE from 5787c7856c (a90f2d6460) - COMMENTED OUT
-// // <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-// // #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-// //     if constexpr (_CUDA_VSTD::contiguous_iterator<__data_handle_type>)
-// // =======
-// #if _CCCL_HAS_CTK()
-// =======
-#  if _CCCL_HAS_CTK()
-// >>>>>>> END NEW CODE (a90f2d6460)
+#  if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
-// >>>>>>> END NEW CODE (752febcc68)
     {
       if (!cuda::std::__cccl_default_is_constant_evaluated())
       {
@@ -159,11 +145,7 @@ class __host_accessor : public _Accessor
       return true;
     }
     else
-// <<<<<<< OLD CODE from 5787c7856c (a90f2d6460) - COMMENTED OUT
-// #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-// =======
-#  endif // _CCCL_HAS_CTK()
-// >>>>>>> END NEW CODE (a90f2d6460)
+#  endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     {
       return true; // cannot be verified
     }
@@ -286,13 +268,8 @@ class __device_accessor : public _Accessor
   [[nodiscard]] _CCCL_API static constexpr bool
   __is_device_accessible_pointer_from_host([[maybe_unused]] __data_handle_type __p) noexcept
   {
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//     if constexpr (_CUDA_VSTD::contiguous_iterator<__data_handle_type>)
-// =======
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
-// >>>>>>> END NEW CODE (752febcc68)
     {
       auto __p1 = ::cuda::std::to_address(__p);
       ::CUmemorytype __type{};
@@ -442,35 +419,29 @@ class __managed_accessor : public _Accessor
 
   [[nodiscard]] _CCCL_API static constexpr bool __is_managed_pointer([[maybe_unused]] __data_handle_type __p) noexcept
   {
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//     if constexpr (_CUDA_VSTD::contiguous_iterator<__data_handle_type>)
-// =======
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
-// >>>>>>> END NEW CODE (752febcc68)
     {
-// <<<<<<< OLD CODE from f041471af3 (70d9c084ec) - COMMENTED OUT
-//       ::cudaPointerAttributes __ptr_attrib{};
-//       auto __p1 = ::cuda::std::to_address(__p);
-//       _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
-//       // NOTE(HIP/AMD): the upstream "devicePointer == hostPointer" heuristic
-//       // works on HIP too — hipMallocManaged() populates both pointers to the
-//       // same address, plain hipMalloc() leaves hostPointer null, and
-//       // unregistered host memory leaves both null. The only HIP-specific gap
-//       // is that __managed__ global variables are currently never reported as
-//       // managed by HIP's hipPointerGetAttributes() (they show up with both
-//       // pointers null), so they can't be used with cuda::managed_mdspan on
-//       // HIP until that is fixed in the HIP runtime. See WAR-18 in
-//       // CHANGELOG_v3.1.md.
-//       return __ptr_attrib.devicePointer != nullptr && __ptr_attrib.hostPointer == __ptr_attrib.devicePointer;
-// =======
+#if _CCCL_HIP_COMPILATION()
+      // NOTE(HIP/AMD): the upstream "devicePointer == hostPointer" heuristic
+      // works on HIP too — hipMallocManaged() populates both pointers to the
+      // same address, plain hipMalloc() leaves hostPointer null, and
+      // unregistered host memory leaves both null. The only HIP-specific gap
+      // is that __managed__ global variables are currently never reported as
+      // managed by HIP's hipPointerGetAttributes() (they show up with both
+      // pointers null), so they can't be used with cuda::managed_mdspan on
+      // HIP until that is fixed in the HIP runtime.
+      ::cudaPointerAttributes __ptr_attrib{};
+      auto __p1 = ::cuda::std::to_address(__p);
+      _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
+      return __ptr_attrib.devicePointer != nullptr && __ptr_attrib.hostPointer == __ptr_attrib.devicePointer;
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
       const auto __p1 = ::cuda::std::to_address(__p);
       bool __is_managed{};
       const auto __status =
         ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_IS_MANAGED>(__is_managed, __p1);
       return (__status != ::cudaSuccess) || __is_managed;
-// >>>>>>> END NEW CODE (70d9c084ec)
+#endif // !_CCCL_HIP_COMPILATION()
     }
     else
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()

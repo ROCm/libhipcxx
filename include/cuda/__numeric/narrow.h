@@ -137,13 +137,8 @@ template <class _To, class _From>
 template <class _To, class _From>
 [[nodiscard]] _CCCL_API constexpr _To narrow(_From __from)
 {
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-//   static_assert(__narrow_is_constructible_v<_From, _To>);
-//   static_assert(__narrow_is_constructible_v<_To, _From>);
-// =======
-  static_assert(::cuda::std::is_constructible_v<_From, _To>);
-  static_assert(::cuda::std::is_constructible_v<_To, _From>);
-// >>>>>>> END NEW CODE (752febcc68)
+  static_assert(__narrow_is_constructible_v<_From, _To>);
+  static_assert(__narrow_is_constructible_v<_To, _From>);
 
   const auto __converted = ::cuda::__narrow_construct<_To>(__from);
   if (::cuda::__narrow_construct<_From>(__converted) != __from)

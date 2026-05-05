@@ -8,30 +8,25 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// // The above copyright notice and this permission notice shall be included in
-// // all copies or substantial portions of the Software.
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// // THE SOFTWARE.
-//
-// #ifndef _LIBCUDACXX___COMPLEX_NVBF16_H
-// #define _LIBCUDACXX___COMPLEX_NVBF16_H
-// =======
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #ifndef _CUDA_STD___COMPLEX_NVBF16_H
 #define _CUDA_STD___COMPLEX_NVBF16_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -53,15 +48,10 @@
 #  include <cuda/std/__type_traits/enable_if.h>
 #  include <cuda/std/__type_traits/is_constructible.h>
 
-// <<<<<<< OLD CODE from 2160484d68 (36f786f792) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #    include <sstream> // for std::basic_ostringstream
-// =======
 // todo: find a way to get rid of this include
-#  if !_CCCL_COMPILER(NVRTC)
+#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #    include <complex> // for std::complex stream operators
-// >>>>>>> END NEW CODE (36f786f792)
-#  endif // !_CCCL_COMPILER(NVRTC)
+#  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/std/__cccl/prologue.h>
 

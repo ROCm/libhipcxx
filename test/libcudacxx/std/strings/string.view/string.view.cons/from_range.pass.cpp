@@ -79,19 +79,16 @@ struct TestBase
   {
     return range_data() + range_size();
   }
-// <<<<<<< OLD CODE from 2c7f7d1f77 (9b7ead5f69) - COMMENTED OUT
-//   // NOTE(HIP/AMD): see file-level comment. Member `size()` keeps
-//   // `ranges::size` off the iterator-subtraction fallback that fails
-//   // constexpr under HIP's clang.
-//   __host__ __device__ constexpr cuda::std::size_t size() const
-//   {
-//     return range_size();
-//   }
-// =======
+  // NOTE(HIP/AMD): see file-level comment. Member `size()` keeps
+  // `ranges::size` off the iterator-subtraction fallback that fails
+  // constexpr under HIP's clang.
+  __host__ __device__ constexpr cuda::std::size_t size() const
+  {
+    return range_size();
+  }
 
   const CharT* range_data_;
   const CharT* conv_data_;
-// >>>>>>> END NEW CODE (9b7ead5f69)
 };
 
 template <class CharT>

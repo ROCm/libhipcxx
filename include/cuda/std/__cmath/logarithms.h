@@ -8,35 +8,30 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
+// MIT License
 //
-// #ifndef _LIBCUDACXX___CMATH_LOGARITHMS_H
-// #define _LIBCUDACXX___CMATH_LOGARITHMS_H
-// =======
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___CMATH_LOGARITHMS_H
 #define _CUDA_STD___CMATH_LOGARITHMS_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -61,16 +56,9 @@
 
 #include <nv/target>
 
-// <<<<<<< OLD CODE from d1959e54ce (23a3ad0f1d) - COMMENTED OUT
-// // MSVC and clang cuda need the host side functions included
-// #if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-// #  include <math.h>
-// #endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-// =======
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <math.h>
-#endif // !_CCCL_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (23a3ad0f1d)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -269,26 +257,8 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 
 // ilogb
 
-// <<<<<<< OLD CODE from 355da405b0 (3daaa344db) - COMMENTED OUT
-// #if _CCCL_CHECK_BUILTIN(builtin_ilogb) || _CCCL_COMPILER(GCC)
-// #  define _CCCL_BUILTIN_ILOGBF(...) __builtin_ilogbf(__VA_ARGS__)
-// #  define _CCCL_BUILTIN_ILOGB(...)  __builtin_ilogb(__VA_ARGS__)
-// #  define _CCCL_BUILTIN_ILOGBL(...) __builtin_ilogbl(__VA_ARGS__)
-// #endif // _CCCL_CHECK_BUILTIN(builtin_log10)
-//
-// // Below 11.7 nvcc treats the builtin as a host only function
-// // clang-cuda fails with fatal error: error in backend: Undefined external symbol "ilogb"
-// #if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-// #  undef _CCCL_BUILTIN_ILOGBF
-// #  undef _CCCL_BUILTIN_ILOGB
-// #  undef _CCCL_BUILTIN_ILOGBL
-// #endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-//
-// [[nodiscard]] _CCCL_API inline int ilogb(float __x) noexcept
-// =======
 template <class _Tp>
 [[nodiscard]] _CCCL_API inline constexpr int __ilogb_impl(_Tp __x) noexcept
-// >>>>>>> END NEW CODE (3daaa344db)
 {
   switch (::cuda::std::fpclassify(__x))
   {
@@ -517,34 +487,8 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 
 // logb
 
-// <<<<<<< OLD CODE from 355da405b0 (3daaa344db) - COMMENTED OUT
-// #if _CCCL_CHECK_BUILTIN(builtin_logb) || _CCCL_COMPILER(GCC)
-// #  define _CCCL_BUILTIN_LOGBF(...) __builtin_logbf(__VA_ARGS__)
-// #  define _CCCL_BUILTIN_LOGB(...)  __builtin_logb(__VA_ARGS__)
-// #  define _CCCL_BUILTIN_LOGBL(...) __builtin_logbl(__VA_ARGS__)
-// #endif // _CCCL_CHECK_BUILTIN(builtin_log1)
-//
-// // clang-cuda fails with fatal error: error in backend: Undefined external symbol "logb"
-// #if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-// #  undef _CCCL_BUILTIN_LOGBF
-// #  undef _CCCL_BUILTIN_LOGB
-// #  undef _CCCL_BUILTIN_LOGBL
-// #endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-//
-// [[nodiscard]] _CCCL_API inline float logb(float __x) noexcept
-// {
-// #if defined(_CCCL_BUILTIN_LOGBF)
-//   return _CCCL_BUILTIN_LOGBF(__x);
-// #else // ^^^ _CCCL_BUILTIN_LOGBF ^^^ / vvv !_CCCL_BUILTIN_LOGBF vvv
-//   return ::logbf(__x);
-// #endif // !_CCCL_BUILTIN_LOGBF
-// }
-//
-// [[nodiscard]] _CCCL_API inline float logbf(float __x) noexcept
-// =======
 template <class _Tp>
 [[nodiscard]] _CCCL_API inline constexpr _Tp __logb_impl(_Tp __x) noexcept
-// >>>>>>> END NEW CODE (3daaa344db)
 {
   switch (::cuda::std::fpclassify(__x))
   {

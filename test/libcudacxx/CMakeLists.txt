@@ -28,50 +28,32 @@ macro(pythonize_bool var)
   endif()
 endmacro()
 
-# <<<<<<< OLD CODE from 25946f69f5 (3d984d016c) - COMMENTED OUT
-# if (LIBCUDACXX_ENABLE_CUDA)
-#
-#   find_package(CUDAToolkit REQUIRED)
-#   get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
-#
-#   set(LIBCUDACXX_HIGHEST_COMPUTE_ARCH 90)
-#
-# # <<<<<<< OLD CODE from 6def8aee26 (1789a7554e) - COMMENTED OUT
-# #   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
-# #     set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
-# #     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
-# #   endforeach ()
-# #
-# #   message(STATUS "Enabled CUDA architectures:${_compute_message}")
-# #
-# # elseif(LIBCUDACXX_ENABLE_HIP)
-# #
-# #   # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
-# #   if (NOT LIBCUDACXX_COMPUTE_ARCHS)
-# #     set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
-# #   endif()
-# # =======
-# =======
 #add dlpack
 cccl_get_dlpack()
 
-find_package(CUDAToolkit REQUIRED)
-get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
+if (LIBCUDACXX_ENABLE_CUDA)
 
-# >>>>>>> END NEW CODE (3d984d016c)
-foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
-  set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-#   set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
-# endforeach ()
-# # >>>>>>> END NEW CODE (1789a7554e)
-# =======
-  set(
-    LIBCUDACXX_COMPUTE_ARCHS_STRING
-    "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}"
-  )
-endforeach()
-# >>>>>>> END NEW CODE (75d398a0e0)
+  find_package(CUDAToolkit REQUIRED)
+  get_target_property(CUDA_INCLUDE_DIR CUDA::cudart INTERFACE_INCLUDE_DIRECTORIES)
+
+  set(LIBCUDACXX_HIGHEST_COMPUTE_ARCH 90)
+
+  foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
+    set(_compute_message "${_compute_message} sm_${COMPUTE_ARCH}")
+    set(
+      LIBCUDACXX_COMPUTE_ARCHS_STRING
+      "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}"
+    )
+  endforeach()
+
+  message(STATUS "Enabled CUDA architectures:${_compute_message}")
+
+elseif(LIBCUDACXX_ENABLE_HIP)
+
+  # If LIBCUDACXX_COMPUTE_ARCHS is not set, use the HIP architectures
+  if (NOT LIBCUDACXX_COMPUTE_ARCHS)
+    set(LIBCUDACXX_COMPUTE_ARCHS ${CMAKE_HIP_ARCHITECTURES})
+  endif()
 
   # Separate the architectures with a space
   foreach (COMPUTE_ARCH ${LIBCUDACXX_COMPUTE_ARCHS})
@@ -79,20 +61,18 @@ endforeach()
     set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBCUDACXX_COMPUTE_ARCHS_STRING} ${COMPUTE_ARCH}")
   endforeach ()
 
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-#   message(STATUS "Enabled HIP architectures:${_compute_message}")
-#
-#   option(LIBHIPCXX_TEST_WITH_HIPRTC
-#   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
-#   OFF)
-# endif()
-# =======
+  message(STATUS "Enabled HIP architectures:${_compute_message}")
+
+  option(LIBHIPCXX_TEST_WITH_HIPRTC
+  "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
+  OFF)
+endif()
+
 option(
   LIBCUDACXX_TEST_WITH_NVRTC
   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
   OFF
 )
-# >>>>>>> END NEW CODE (75d398a0e0)
 
 if (LIBCUDACXX_TEST_WITH_NVRTC)
   # TODO: Use project properties to get path to binary.
@@ -107,27 +87,21 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "True")
   # Use the NVRTCC utility to run the built test outputs
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-#   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
-# # <<<<<<< OLD CODE from f1c3a9dfff (6ea2021a22) - COMMENTED OUT
-# # elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
-# #   # TODO: Use project properties to get path to binary.
-# #   # Should also set up dependency on the project when NVRTC is enabled
-# #   set(CMAKE_CUDA_COMPILER_ID "HIPCC")
-# #   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
-# #   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
-# #   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
-# #   set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
-# # =======
-# =======
   set(
     LIBCUDACXX_EXECUTOR
     "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())"
   )
-# >>>>>>> END NEW CODE (75d398a0e0)
   # Enable 128-bit types for NVRTC
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-int128")
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -device-float128")
+elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
+  # TODO: Use project properties to get path to binary.
+  # Should also set up dependency on the project when NVRTC is enabled
+  set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
+  message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
+  set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
+  set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
 else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
   string(
     APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
@@ -138,47 +112,18 @@ else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
     "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include.h"
   )
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CUDA_COMPILER}")
-# >>>>>>> END NEW CODE (6ea2021a22)
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
-# <<<<<<< OLD CODE from 6efaca82a9 (cfe657d109) - COMMENTED OUT
-#   set(LIBCUDACXX_FORCE_INCLUDE "")
-#   set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${HIP_INCLUDE_DIR}'")
-#   # NOTE(HIP/AMD): We need to identify clang version to find from the path to clang new header.
-#   # The header is used in libhipcxx/include/cuda/std/__memory/construct_at.h.
-#   execute_process(
-#     COMMAND "${HIP_HIPCC_EXECUTABLE}" --print-resource-dir
-#     OUTPUT_VARIABLE _clang_abs_resource_dir
-#     OUTPUT_STRIP_TRAILING_WHITESPACE
-#     COMMAND_ERROR_IS_FATAL ANY
-#   )
-#   cmake_path(GET _clang_abs_resource_dir FILENAME _clang_version)
-#   set(_clang_include_dir "lib/llvm/lib/clang/${_clang_version}/include")
-#   set(_clang_cuda_wrappers_dir "${_clang_include_dir}/cuda_wrappers")
-#   string(JOIN " " LIBCUDACXX_TEST_COMPILER_FLAGS
-#     -I${HIP_INCLUDE_DIR}
-#     -I${HIP_INCLUDE_DIR}/../${_clang_include_dir}
-#     -I${HIP_INCLUDE_DIR}/../${_clang_cuda_wrappers_dir}
-#   )
-#   # Use the NVRTCC utility to run the built test outputs
-#   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
-# else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
-#   if (LIBCUDACXX_ENABLE_CUDA)
-#     set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/libcudacxx/force_include.h")
-#     set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CUDA_COMPILER}")
-#     set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
-#     set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
-#   elseif(LIBCUDACXX_ENABLE_HIP)
-#     set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/libcudacxx/force_include_hip.h")
-#     #temporary workaround until we've found a way to make cmake find hipcc
-#     set(LIBCUDACXX_CUDA_COMPILER "${HIP_HIPCC_EXECUTABLE}")
-#     set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
-#     set(CMAKE_CUDA_COMPILER_ID "HIPCC")
-#     set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
-#     set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
-#     set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
-#   endif()
-# =======
-# >>>>>>> END NEW CODE (cfe657d109)
+  if (LIBCUDACXX_ENABLE_HIP)
+    set(
+      LIBCUDACXX_FORCE_INCLUDE
+      "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include_hip.h"
+    )
+    #temporary workaround until we've found a way to make cmake find hipcc
+    set(LIBCUDACXX_CUDA_COMPILER "${HIP_HIPCC_EXECUTABLE}")
+    set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
+    set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+    set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
+  endif()
 endif()
 
 # enable exceptions and assertions in tests
@@ -234,14 +179,9 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "Clang")
     " -Xclang -Wno-unused-parameter"
     " -Wno-unknown-cuda-version"
     " ${LIBCUDACXX_FORCE_INCLUDE}"
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-#     " -I${libhipcxx_SOURCE_DIR}/include"
-#     " ${LIBCUDACXX_WARNING_LEVEL}")
-# =======
-    " -I${libcudacxx_SOURCE_DIR}/include"
+    " -I${libhipcxx_SOURCE_DIR}/include"
     " ${LIBCUDACXX_WARNING_LEVEL}"
   )
-# >>>>>>> END NEW CODE (75d398a0e0)
 
   string(
     APPEND LIBCUDACXX_TEST_LINKER_FLAGS
@@ -345,23 +285,16 @@ configure_lit_site_cfg(
   "${lit_site_cfg_path}"
 )
 
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-# # Set dependencies for hiprtcc executable when using HIPRTC tests
-# set(LIBHIPCXX_TEST_DEPENDS "")
-# if(LIBHIPCXX_TEST_WITH_HIPRTC)
-#   list(APPEND LIBHIPCXX_TEST_DEPENDS libcudacxx.nvrtcc)
-# endif()
-#
-# add_lit_testsuite(check-hipcxx
-#   "Running libhip++ tests"
-#   "${CMAKE_CURRENT_BINARY_DIR}"
-#   DEPENDS ${LIBHIPCXX_TEST_DEPENDS})
-# =======
-add_lit_testsuite(check-cudacxx
-  "Running libcu++ tests"
+# Set dependencies for hiprtcc executable when using HIPRTC tests
+set(LIBHIPCXX_TEST_DEPENDS "")
+if(LIBHIPCXX_TEST_WITH_HIPRTC)
+  list(APPEND LIBHIPCXX_TEST_DEPENDS libcudacxx.nvrtcc)
+endif()
+
+add_lit_testsuite(check-hipcxx
+  "Running libhip++ tests"
   "${CMAKE_CURRENT_BINARY_DIR}"
-)
-# >>>>>>> END NEW CODE (75d398a0e0)
+  DEPENDS ${LIBHIPCXX_TEST_DEPENDS})
 
 find_program(libcudacxx_LIT lit REQUIRED)
 
@@ -394,7 +327,6 @@ if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
   )
 endif()
 
-# >>>>>>> END NEW CODE (75d398a0e0)
 # Restricted to avoid oversubscribing the GPU:
 set(
   libcudacxx_LIT_PARALLEL_LEVEL
@@ -403,38 +335,6 @@ set(
   "Parallelism used to run libcudacxx's lit test suite."
 )
 
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-# if (LIBCUDACXX_ENABLE_CUDA)
-#   if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
-#     # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
-#     # Only executed if explicitly requested.
-#     add_custom_target(libcudacxx.test.lit.precompile
-#       DEPENDS libcudacxx.test.public_headers libcudacxx.test.internal_headers libcudacxx.test.public_headers_host_only
-#       COMMAND "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
-#       "${libcudacxx_LIT}" -vv --no-progress-bar --time-tests ${libcudacxx_LIT_FLAGS}
-#       "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
-#     )
-#
-#   endif()
-# elseif(LIBCUDACXX_ENABLE_HIP)
-#   if (NOT LIBHIPCXX_TEST_WITH_HIPRTC)
-#     # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
-#     # Only executed if explicitly requested.
-#     add_custom_target(libcudacxx.test.lit.precompile
-#       DEPENDS libcudacxx.test.public_headers libcudacxx.test.internal_headers libcudacxx.test.public_headers_host_only
-#       COMMAND "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
-#       "${libcudacxx_LIT}" -vv --no-progress-bar ${libcudacxx_LIT_FLAGS} -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
-#     )
-#
-#   endif()
-# endif()
-#
-# add_test(NAME libcudacxx.test.lit COMMAND
-#   "${CMAKE_COMMAND}" -E env
-#     "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
-#   "${libcudacxx_LIT}" -vv --no-progress-bar --time-tests ${libcudacxx_LIT_FLAGS}
-#     -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
-# =======
 add_test(
   NAME libcudacxx.test.lit
   # gersemi: off
@@ -444,9 +344,8 @@ add_test(
         -vv --no-progress-bar --time-tests
         ${libcudacxx_LIT_FLAGS}
         -j "${libcudacxx_LIT_PARALLEL_LEVEL}"
-        "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
+        "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
   # gersemi: on
-# >>>>>>> END NEW CODE (75d398a0e0)
 )
 
 set_tests_properties(
@@ -457,58 +356,15 @@ set_tests_properties(
     RUN_SERIAL TRUE
 )
 
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-# # Add c2h tests (CUDA only - c2h infrastructure is CUDA-specific):
-# if(LIBCUDACXX_ENABLE_CUDA)
-#   cccl_get_c2h()
-# =======
-# Add c2h tests:
-cccl_get_c2h()
+# Add c2h tests (CUDA only - c2h infrastructure is CUDA-specific):
+if(LIBCUDACXX_ENABLE_CUDA)
+  cccl_get_c2h()
 
-file(
-  GLOB_RECURSE test_srcs
-  RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-  CONFIGURE_DEPENDS
-  *.cu
-)
-# >>>>>>> END NEW CODE (75d398a0e0)
-
-# <<<<<<< OLD CODE from 6b318af440 (8dad8721b7) - COMMENTED OUT
-#   file(GLOB_RECURSE test_srcs
-#     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
-#     CONFIGURE_DEPENDS
-#     *.cu
-# =======
-set(c2h_all_target "libcudacxx.test.c2h_all")
-add_custom_target(${c2h_all_target})
-
-function(libcudacxx_add_test target_name_var source)
-  string(REPLACE "/" "." target_name "${source}")
-  string(PREPEND target_name "libcudacxx.test.")
-  string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
-  set(${target_name_var} ${target_name} PARENT_SCOPE)
-
-  add_executable(${target_name} "${source}")
-  cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-#   target_include_directories(${target_name} PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common")
-#   target_link_libraries(${target_name} PRIVATE
-#     libcudacxx::libcudacxx
-#     cccl.c2h.main
-#     libcudacxx.compiler_interface
-# # >>>>>>> END NEW CODE (8dad8721b7)
-# =======
-  target_include_directories(
-    ${target_name}
-    PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
-  )
-  target_link_libraries(
-    ${target_name}
-    PRIVATE #
-      libcudacxx::libcudacxx
-      cccl.c2h.main
-      libcudacxx.compiler_interface
-# >>>>>>> END NEW CODE (75d398a0e0)
+  file(
+    GLOB_RECURSE test_srcs
+    RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
+    CONFIGURE_DEPENDS
+    *.cu
   )
 
   set(c2h_all_target "libcudacxx.test.c2h_all")
@@ -522,11 +378,16 @@ function(libcudacxx_add_test target_name_var source)
 
     add_executable(${target_name} "${source}")
     cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-    target_include_directories(${target_name} PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common")
-    target_link_libraries(${target_name} PRIVATE
-      libcudacxx::libcudacxx
-      cccl.c2h.main
-      cccl.compiler_interface_cpp${CMAKE_CUDA_STANDARD}
+    target_include_directories(
+      ${target_name}
+      PRIVATE "${libhipcxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
+    )
+    target_link_libraries(
+      ${target_name}
+      PRIVATE #
+        libcudacxx::libcudacxx
+        cccl.c2h.main
+        libcudacxx.compiler_interface
     )
 
     add_dependencies(${c2h_all_target} ${target_name})

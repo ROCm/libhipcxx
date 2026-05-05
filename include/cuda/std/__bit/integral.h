@@ -8,35 +8,30 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
+// MIT License
 //
-// #ifndef _LIBCUDACXX___BIT_INTEGRAL_H
-// #define _LIBCUDACXX___BIT_INTEGRAL_H
-// =======
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___BIT_INTEGRAL_H
 #define _CUDA_STD___BIT_INTEGRAL_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -48,17 +43,11 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 7c0ecc0abb (92ba1f5494) - COMMENTED OUT
-// // #include <cuda/__ptx/instructions/bfind.h>
-// // #include <cuda/__ptx/instructions/shl.h>
-// // #include <cuda/__ptx/instructions/shr.h>
-// =======
 #if _CCCL_CUDA_COMPILATION()
 #  include <cuda/__ptx/instructions/bfind.h>
 #  include <cuda/__ptx/instructions/shl.h>
 #  include <cuda/__ptx/instructions/shr.h>
 #endif // _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (92ba1f5494)
 #include <cuda/std/__algorithm/max.h>
 #include <cuda/std/__bit/countl.h>
 #include <cuda/std/__concepts/concept_macros.h>
@@ -75,13 +64,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 template <class _Tp>
 _CCCL_API constexpr uint32_t __bit_log2(_Tp __t) noexcept
 {
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-//   // Note(HIP/AMD): bfind uses ptx which is not available for AMD hardware
-//   /*
-//   if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
-// =======
   if (!::cuda::std::__cccl_default_is_constant_evaluated())
-// >>>>>>> END NEW CODE (752febcc68)
   {
     if constexpr (sizeof(_Tp) <= 8)
     {
@@ -95,12 +78,7 @@ _CCCL_API constexpr uint32_t __bit_log2(_Tp __t) noexcept
                     return __high == ~uint32_t{0} ? ::cuda::ptx::bfind(static_cast<uint64_t>(__t)) : __high + 64;))
     }
   }
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-//   */
-//   return numeric_limits<_Tp>::digits - 1 - _CUDA_VSTD::countl_zero(__t);
-// =======
   return numeric_limits<_Tp>::digits - 1 - ::cuda::std::countl_zero(__t);
-// >>>>>>> END NEW CODE (752febcc68)
 }
 
 _CCCL_TEMPLATE(class _Tp)
@@ -123,13 +101,7 @@ _CCCL_REQUIRES(::cuda::std::__cccl_is_unsigned_integer_v<_Tp>)
   auto __width = ::cuda::std::bit_width(static_cast<_Up>(__t) - 1);
   if constexpr (sizeof(_Tp) <= 8)
   {
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-//     // Note(HIP/AMD): bfind uses ptx which is not available for AMD hardware
-//     /*
-//     if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
-// =======
     if (!::cuda::std::__cccl_default_is_constant_evaluated())
-// >>>>>>> END NEW CODE (752febcc68)
     {
       // CUDA right shift (ptx::shr) returns 0 if the right operand is larger than the number of bits of the type
       // The result is computed as max(1, bit_width(__t - 1)) because it is more efficient than the ternary operator
@@ -139,7 +111,6 @@ _CCCL_REQUIRES(::cuda::std::__cccl_is_unsigned_integer_v<_Tp>)
                     _CCCL_ASSUME(__ret >= __t);
                     return __ret;))
     }
-    */
   }
   auto __ret = static_cast<_Tp>(__t <= 1 ? _Up{1} : _Up{1} << __width);
   _CCCL_ASSUME(__ret >= __t);
@@ -155,13 +126,7 @@ _CCCL_REQUIRES(::cuda::std::__cccl_is_unsigned_integer_v<_Tp>)
   // __bit_log2 returns 0xFFFFFFFF if __t == 0
   if constexpr (sizeof(_Tp) <= 8)
   {
-// <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-//     // Note(HIP/AMD): bfind uses ptx which is not available for AMD hardware
-//     /*
-//     if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
-// =======
     if (!::cuda::std::__cccl_default_is_constant_evaluated())
-// >>>>>>> END NEW CODE (752febcc68)
     {
       // CUDA left shift (ptx::shl) returns 0 if the right operand is larger than the number of bits of the type
       // -> the result is 0 if __t == 0
@@ -170,7 +135,6 @@ _CCCL_REQUIRES(::cuda::std::__cccl_is_unsigned_integer_v<_Tp>)
                     _CCCL_ASSUME(__ret >= __t / 2 && __ret <= __t);
                     return __ret;))
     }
-    */
   }
   auto __ret = static_cast<_Tp>(__t == 0 ? _Up{0} : _Up{1} << __log2);
   _CCCL_ASSUME(__ret >= __t / 2 && __ret <= __t);

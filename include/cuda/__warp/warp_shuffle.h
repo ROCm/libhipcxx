@@ -43,24 +43,6 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 7c0ecc0abb (92ba1f5494) - COMMENTED OUT
-// #include <cuda/__cmath/ceil_div.h>
-// #include <cuda/std/__bit/has_single_bit.h>
-// #include <cuda/std/__concepts/concept_macros.h>
-// #include <cuda/std/__memory/addressof.h>
-// #include <cuda/std/__type_traits/enable_if.h>
-// #include <cuda/std/__type_traits/integral_constant.h>
-// #include <cuda/std/__type_traits/is_pointer.h>
-// #include <cuda/std/__type_traits/is_void.h>
-// #include <cuda/std/__type_traits/remove_cvref.h>
-// #include <cuda/std/cstdint>
-//
-// #if __cccl_ptx_isa >= 600
-// #include <cuda/__ptx/instructions/get_sreg.h>
-// #include <cuda/__ptx/instructions/shfl_sync.h>
-//
-// #  include <cuda/std/__cccl/prologue.h>
-// =======
 #if _CCCL_CUDA_COMPILATION()
 #  if __cccl_ptx_isa >= 600
 
@@ -78,7 +60,6 @@
 #    include <cuda/std/cstdint>
 
 #    include <cuda/std/__cccl/prologue.h>
-// >>>>>>> END NEW CODE (92ba1f5494)
 
 _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE
 

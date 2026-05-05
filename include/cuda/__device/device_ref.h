@@ -43,12 +43,8 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from cf89579d84 (d4218e3403) - COMMENTED OUT
-// #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
-// =======
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
-// >>>>>>> END NEW CODE (d4218e3403)
 #  include <cuda/__driver/driver_api.h>
 #  include <cuda/__fwd/devices.h>
 #  include <cuda/__runtime/types.h>
@@ -153,38 +149,10 @@ public:
 
   //! @brief Retrieve the name of this device.
   //!
-// <<<<<<< OLD CODE from cf89579d84 (d4218e3403) - COMMENTED OUT
-//   //! @return String containing the name of this device.
-//   [[nodiscard]] ::std::string name() const
-//   {
-//     constexpr int __max_name_length = 256;
-//     ::std::string __name(256, 0);
-//
-// #ifndef _CCCL_HIP_COMPILER
-//     // For some reason there is no separate name query in CUDA runtime
-// // <<<<<<< OLD CODE from a442ea92ca (752febcc68) - COMMENTED OUT
-// //     _CUDA_DRIVER::__deviceGetName(__name.data(), __max_name_length, get());
-// // #else
-// //     // HIP uses runtime API to get device name
-// //     cudaDeviceProp __prop;
-// //     _CCCL_TRY_CUDA_API(::cudaGetDeviceProperties, "Failed to get device properties", &__prop, get());
-// //     __name = __prop.name;
-// // #endif
-// // =======
-//     ::cuda::__driver::__deviceGetName(__name.data(), __max_name_length, get());
-// // >>>>>>> END NEW CODE (752febcc68)
-//     return __name;
-//   }
-// =======
   //! @return String view containing the name of this device.
-// <<<<<<< OLD CODE from b8a67f8512 (9fde2572bb) - COMMENTED OUT
-//   [[nodiscard]] ::cuda::std::string_view name() const;
-// // >>>>>>> END NEW CODE (d4218e3403)
-// =======
   [[nodiscard]] _CCCL_HOST_API ::cuda::std::string_view name() const; // implemented in
                                                                       // <cuda/__device/physical_device.h> to avoid
                                                                       // circular dependency
-// >>>>>>> END NEW CODE (9fde2572bb)
 
   //! @brief Queries if its possible for this device to directly access specified device's memory.
   //!
@@ -218,6 +186,6 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #endif // _CUDA___DEVICE_DEVICE_REF_H

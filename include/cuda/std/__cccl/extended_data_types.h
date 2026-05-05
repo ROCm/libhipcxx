@@ -60,13 +60,7 @@
 #define _CCCL_HAS_NVBF16()      0
 #define _CCCL_HAS_FLOAT128()    0
 
-// <<<<<<< OLD CODE from 8feaa3a149 (c75f819baf) - COMMENTED OUT
-// #define _CCCL_HAS_FLOAT128_LITERAL() _CCCL_HAS_FLOAT128()
-//
-// #if !defined(CCCL_DISABLE_INT128_SUPPORT) && (_CCCL_OS(LINUX) || (_CCCL_OS(WINDOWS) && defined(__HIP_PLATFORM_AMD__))) \
-// =======
-#if !defined(CCCL_DISABLE_INT128_SUPPORT) && _CCCL_OS(LINUX) \
-// >>>>>>> END NEW CODE (c75f819baf)
+#if !defined(CCCL_DISABLE_INT128_SUPPORT) && (_CCCL_OS(LINUX) || (_CCCL_OS(WINDOWS) && defined(__HIP_PLATFORM_AMD__))) \
   && ((_CCCL_COMPILER(NVRTC) && defined(__CUDACC_RTC_INT128__)) || defined(__SIZEOF_INT128__))
 #  undef _CCCL_HAS_INT128
 #  define _CCCL_HAS_INT128() 1
@@ -144,22 +138,6 @@ struct __nv_fp4x4_e2m1;
  * __float128
  **********************************************************************************************************************/
 
-// <<<<<<< OLD CODE from 8feaa3a149 (c75f819baf) - COMMENTED OUT
-// #if !defined(CCCL_DISABLE_FLOAT128_SUPPORT) && _CCCL_OS(LINUX) && !_CCCL_ARCH(ARM64)
-// #  if (defined(__CUDACC_RTC_FLOAT128__) || defined(__SIZEOF_FLOAT128__) || defined(__FLOAT128__)) /*HOST COMPILERS*/
-// // NOTE(HIP/AMD): treat HIP like CUDA here. HIP device code does not support
-// // __float128 either, so go down the same branch and only enable on the (HIP/CUDA)
-// // host pass via the inner check.
-// #    if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() // Only NVCC on architectures at least SM100 supports float128 on device
-// #      if _CCCL_CUDA_COMPILER(NVCC) && _CCCL_PTX_ARCH() >= 1000 /*DEVICE CODE*/
-// #        undef _CCCL_HAS_FLOAT128
-// #        define _CCCL_HAS_FLOAT128() 1
-// #      endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_PTX_ARCH() >= 1000
-// #    else // ^^^ CUDA/HIP compilation ^^^ / vvv !CUDA/HIP compilation vvv
-// #      undef _CCCL_HAS_FLOAT128
-// #      define _CCCL_HAS_FLOAT128() 1
-// #    endif // !CUDA/HIP compilation
-// =======
 #if !defined(CCCL_DISABLE_FLOAT128_SUPPORT) && _CCCL_HAS_INT128() && _CCCL_OS(LINUX) && !_CCCL_ARCH(ARM64)
 // Detect host compiler support
 #  if (defined(__CUDACC_RTC_FLOAT128__) || defined(__SIZEOF_FLOAT128__) || defined(__FLOAT128__))
@@ -173,7 +151,6 @@ struct __nv_fp4x4_e2m1;
 #      undef _CCCL_HAS_FLOAT128
 #      define _CCCL_HAS_FLOAT128() 1
 #    endif // ^^^ !_CCCL_DEVICE_COMPILATION() ^^^
-// >>>>>>> END NEW CODE (c75f819baf)
 #  endif // Host compiler support
 #endif // !defined(CCCL_DISABLE_FLOAT128_SUPPORT) && _CCCL_HAS_INT128() && _CCCL_OS(LINUX) && !_CCCL_ARCH(ARM64)
 
