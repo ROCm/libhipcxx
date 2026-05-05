@@ -218,10 +218,18 @@ template <>
 struct __dev_attr<::cudaDevAttrDirectManagedMemAccessFromHost> //
     : __dev_attr_impl<::cudaDevAttrDirectManagedMemAccessFromHost, bool>
 {};
+// NOTE(HIP/AMD): HIP collapses cudaDevAttrMaxSharedMemoryPerBlockOptin
+// and cudaDevAttrReservedSharedMemoryPerBlock onto the same enum value
+// as cudaDevAttrMaxSharedMemoryPerBlock, which would cause duplicate
+// template specializations. Skip those two specializations under HIP;
+// the using-aliases below resolve to the existing
+// __dev_attr<cudaDevAttrMaxSharedMemoryPerBlock> specialization.
+#if !_CCCL_HIP_COMPILATION()
 template <>
 struct __dev_attr<::cudaDevAttrMaxSharedMemoryPerBlockOptin> //
     : __dev_attr_impl<::cudaDevAttrMaxSharedMemoryPerBlockOptin, ::cuda::std::size_t>
 {};
+#endif // !_CCCL_HIP_COMPILATION()
 template <>
 struct __dev_attr<::cudaDevAttrMaxPersistingL2CacheSize> //
     : __dev_attr_impl<::cudaDevAttrMaxPersistingL2CacheSize, ::cuda::std::size_t>
@@ -230,10 +238,12 @@ template <>
 struct __dev_attr<::cudaDevAttrMaxAccessPolicyWindowSize> //
     : __dev_attr_impl<::cudaDevAttrMaxAccessPolicyWindowSize, ::cuda::std::size_t>
 {};
+#if !_CCCL_HIP_COMPILATION()
 template <>
 struct __dev_attr<::cudaDevAttrReservedSharedMemoryPerBlock> //
     : __dev_attr_impl<::cudaDevAttrReservedSharedMemoryPerBlock, ::cuda::std::size_t>
 {};
+#endif // !_CCCL_HIP_COMPILATION()
 template <>
 struct __dev_attr<::cudaDevAttrSparseCudaArraySupported> //
     : __dev_attr_impl<::cudaDevAttrSparseCudaArraySupported, bool>

@@ -469,8 +469,17 @@
 #ifndef cudaMemPoolReuseAllowOpportunistic
 #  define cudaMemPoolReuseAllowOpportunistic hipMemPoolReuseAllowOpportunistic
 #endif
+#ifndef cudaEventDefault
+#  define cudaEventDefault hipEventDefault
+#endif
 #ifndef cudaEventDisableTiming
 #  define cudaEventDisableTiming hipEventDisableTiming
+#endif
+#ifndef cudaEventBlockingSync
+#  define cudaEventBlockingSync hipEventBlockingSync
+#endif
+#ifndef cudaEventInterprocess
+#  define cudaEventInterprocess hipEventInterprocess
 #endif
 #ifndef cudaMemoryTypeDevice
 #  define cudaMemoryTypeDevice hipMemoryTypeDevice
@@ -664,6 +673,113 @@
 #ifndef HIPRT_CB
 #  define HIPRT_CB
 #endif
+// NOTE(HIP/AMD): aliases for the CUDA driver-API types and enumerators
+// used directly by upstream consumer code (physical_device.h,
+// stream_ref.h, ensure_current_context.h, host_device_accessor.h,
+// attributes.h, is_pointer_accessible.h, ...). The corresponding cuXxx
+// function aliases are NOT provided here -- the libhipcxx driver-API
+// wrappers in <amd/driver_api.h> call the HIP runtime / driver API
+// functions directly using their native hipXxx names. Ported from
+// upgrade/3.1.4.
+#ifndef CUcontext
+#  define CUcontext hipCtx_t
+#endif
+#ifndef CUdevice
+#  define CUdevice hipDevice_t
+#endif
+#ifndef CUdevice_attribute
+#  define CUdevice_attribute hipDeviceAttribute_t
+#endif
+#ifndef CUmemorytype
+#  define CUmemorytype hipMemoryType
+#endif
+#ifndef CU_MEMORYTYPE_HOST
+#  define CU_MEMORYTYPE_HOST hipMemoryTypeHost
+#endif
+#ifndef CU_MEMORYTYPE_DEVICE
+#  define CU_MEMORYTYPE_DEVICE hipMemoryTypeDevice
+#endif
+#ifndef CU_POINTER_ATTRIBUTE_MEMORY_TYPE
+#  define CU_POINTER_ATTRIBUTE_MEMORY_TYPE HIP_POINTER_ATTRIBUTE_MEMORY_TYPE
+#endif
+#ifndef CU_POINTER_ATTRIBUTE_IS_MANAGED
+#  define CU_POINTER_ATTRIBUTE_IS_MANAGED HIP_POINTER_ATTRIBUTE_IS_MANAGED
+#endif
+
+#ifndef CUstream
+#  define CUstream hipStream_t
+#endif
+#ifndef CUresult
+#  define CUresult hipError_t
+#endif
+#ifndef CUDA_SUCCESS
+#  define CUDA_SUCCESS hipSuccess
+#endif
+#ifndef CUDA_CB
+#  define CUDA_CB HIPRT_CB
+#endif
+
+#ifndef CUmemPool_attribute
+#  define CUmemPool_attribute hipMemPoolAttr
+#endif
+#ifndef CU_MEMPOOL_ATTR_RESERVED_MEM_HIGH
+#  define CU_MEMPOOL_ATTR_RESERVED_MEM_HIGH hipMemPoolAttrReservedMemHigh
+#endif
+#ifndef CU_MEMPOOL_ATTR_USED_MEM_HIGH
+#  define CU_MEMPOOL_ATTR_USED_MEM_HIGH hipMemPoolAttrUsedMemHigh
+#endif
+#ifndef cudaMemPoolAttrReservedMemCurrent
+#  define cudaMemPoolAttrReservedMemCurrent hipMemPoolAttrReservedMemCurrent
+#endif
+#ifndef cudaMemPoolAttrReservedMemHigh
+#  define cudaMemPoolAttrReservedMemHigh hipMemPoolAttrReservedMemHigh
+#endif
+#ifndef cudaMemPoolAttrUsedMemCurrent
+#  define cudaMemPoolAttrUsedMemCurrent hipMemPoolAttrUsedMemCurrent
+#endif
+#ifndef cudaMemPoolAttrUsedMemHigh
+#  define cudaMemPoolAttrUsedMemHigh hipMemPoolAttrUsedMemHigh
+#endif
+#ifndef cudaMemPoolReuseAllowInternalDependencies
+#  define cudaMemPoolReuseAllowInternalDependencies hipMemPoolReuseAllowInternalDependencies
+#endif
+#ifndef cudaMemPoolReuseFollowEventDependencies
+#  define cudaMemPoolReuseFollowEventDependencies hipMemPoolReuseFollowEventDependencies
+#endif
+#ifndef cudaStreamNonBlocking
+#  define cudaStreamNonBlocking hipStreamNonBlocking
+#endif
+#ifndef CUmemoryPool
+#  define CUmemoryPool hipMemPool_t
+#endif
+#ifndef CUmemLocation
+#  define CUmemLocation hipMemLocation
+#endif
+#ifndef CU_MEM_LOCATION_TYPE_DEVICE
+#  define CU_MEM_LOCATION_TYPE_DEVICE hipMemLocationTypeDevice
+#endif
+#ifndef CU_MEM_LOCATION_TYPE_HOST
+#  define CU_MEM_LOCATION_TYPE_HOST hipMemLocationTypeHost
+#endif
+#ifndef CUmemAccess_flags
+#  define CUmemAccess_flags hipMemAccessFlags
+#endif
+#ifndef CU_MEM_ACCESS_FLAGS_PROT_READ
+#  define CU_MEM_ACCESS_FLAGS_PROT_READ hipMemAccessFlagsProtRead
+#endif
+#ifndef CU_MEM_ACCESS_FLAGS_PROT_READWRITE
+#  define CU_MEM_ACCESS_FLAGS_PROT_READWRITE hipMemAccessFlagsProtReadWrite
+#endif
+#ifndef cudaErrorNotSupported
+#  define cudaErrorNotSupported hipErrorNotSupported
+#endif
+#ifndef CUstreamCallback
+#  define CUstreamCallback hipStreamCallback_t
+#endif
+#ifndef CUhostFn
+#  define CUhostFn hipHostFn_t
+#endif
+
 #ifndef CUDART_CB
 #  define CUDART_CB HIPRT_CB
 #endif
