@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_PTX_SHFL_SYNC_H
 #define _CUDA_PTX_SHFL_SYNC_H
 
@@ -236,6 +258,169 @@ shfl_sync_bfly(_Tp __data, uint32_t __lane_idx_offset, uint32_t __clamp_segmask,
 }
 
 #endif // __cccl_ptx_isa >= 600
+
+#if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): Software equivalents of PTX `shfl.sync.{idx,up,down,bfly}.b32`,
+// implemented on top of HIP's `__shfl{,_up,_down,_xor}` family. Ported
+// from upgrade/3.1_base PTX-on-HIP roadmap
+// (feat/moberste/add_partial_ptx_support_3_1).
+//
+// PTX <-> HIP signature mapping notes:
+//   1. lane_mask: PTX requires the caller to pass an explicit bitmask
+//      of participating lanes; HIP `__shfl*` is implicitly synchronized
+//      across the active wave. The lane_mask argument is therefore
+//      *ignored* on HIP. Code that relied on lanes outside the mask
+//      not participating must be audited; on AMDGCN the underlying
+//      `ds_swizzle`/`ds_bpermute` always involves all active lanes.
+//   2. clamp_segmask: PTX packs `clamp:segmask` into one uint32_t (low
+//      5 bits = clamp, bits 8..12 = segmask). HIP's third "width"
+//      parameter has the same role for sub-warp segments. We extract
+//      the segmask, derive the segment width, and pass it through.
+//   3. wave size: PTX `shfl.sync` is defined for 32-wide warps only.
+//      On AMD wave-64 (gfx9) the same call shuffles across 64 lanes.
+//      The `width` parameter caps the effective shuffle width and is
+//      honoured by the HIP shuffle family on both wave-32 and wave-64.
+//
+// PTX `shfl.sync.b32` only accepts 4-byte data; mirrored with a
+// static_assert. The `bool& pred` overloads return whether the source
+// lane was active. On HIP all participating lanes are by definition
+// active, so we always set pred to true.
+
+namespace __detail
+{
+[[maybe_unused]]
+_CCCL_DEVICE static inline int __hip_shfl_width_from_clamp_segmask(::cuda::std::uint32_t __clamp_segmask) noexcept
+{
+  // PTX clamp_segmask layout: low 5 bits = clamp position, bits 8..12 =
+  // segmask. The segmask `0b11111` (31) means "no segmentation"
+  // (whole warp); a smaller segmask defines sub-warps of size
+  // 32 - segmask. HIP `__shfl*` width is the segment size in lanes.
+  const ::cuda::std::uint32_t __segmask = (__clamp_segmask >> 8) & 0x1f;
+  if (__segmask == 0x1f)
+  {
+#  if defined(__HIP_DEVICE_COMPILE__)
+    return static_cast<int>(warpSize);
+#  else
+    return 32;
+#  endif
+  }
+  const int __seg = static_cast<int>(32u - __segmask);
+  return __seg < 2 ? 2 : __seg;
+}
+} // namespace __detail
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_idx(
+  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
+  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
+  (void) __lane_mask;
+#  if defined(__HIP_DEVICE_COMPILE__)
+  const int __width = __detail::__hip_shfl_width_from_clamp_segmask(__clamp_segmask);
+  const auto __data_u = ::cuda::std::bit_cast<::cuda::std::uint32_t>(__data);
+  const ::cuda::std::uint32_t __ret = ::__shfl(__data_u, static_cast<int>(__lane_idx_offset), __width);
+  __pred = true;
+  return ::cuda::std::bit_cast<_Tp>(__ret);
+#  else
+  __pred = false;
+  return __data;
+#  endif
+}
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp
+shfl_sync_idx(_Tp __data, ::cuda::std::uint32_t __lane_idx_offset,
+              ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  bool __pred_unused;
+  return ::cuda::ptx::shfl_sync_idx(__data, __pred_unused, __lane_idx_offset, __clamp_segmask, __lane_mask);
+}
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_up(
+  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
+  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
+  (void) __lane_mask;
+#  if defined(__HIP_DEVICE_COMPILE__)
+  const int __width = __detail::__hip_shfl_width_from_clamp_segmask(__clamp_segmask);
+  const auto __data_u = ::cuda::std::bit_cast<::cuda::std::uint32_t>(__data);
+  const ::cuda::std::uint32_t __ret = ::__shfl_up(__data_u, __lane_idx_offset, __width);
+  __pred = true;
+  return ::cuda::std::bit_cast<_Tp>(__ret);
+#  else
+  __pred = false;
+  return __data;
+#  endif
+}
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp
+shfl_sync_up(_Tp __data, ::cuda::std::uint32_t __lane_idx_offset,
+             ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  bool __pred_unused;
+  return ::cuda::ptx::shfl_sync_up(__data, __pred_unused, __lane_idx_offset, __clamp_segmask, __lane_mask);
+}
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_down(
+  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
+  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
+  (void) __lane_mask;
+#  if defined(__HIP_DEVICE_COMPILE__)
+  const int __width = __detail::__hip_shfl_width_from_clamp_segmask(__clamp_segmask);
+  const auto __data_u = ::cuda::std::bit_cast<::cuda::std::uint32_t>(__data);
+  const ::cuda::std::uint32_t __ret = ::__shfl_down(__data_u, __lane_idx_offset, __width);
+  __pred = true;
+  return ::cuda::std::bit_cast<_Tp>(__ret);
+#  else
+  __pred = false;
+  return __data;
+#  endif
+}
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp
+shfl_sync_down(_Tp __data, ::cuda::std::uint32_t __lane_idx_offset,
+               ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  bool __pred_unused;
+  return ::cuda::ptx::shfl_sync_down(__data, __pred_unused, __lane_idx_offset, __clamp_segmask, __lane_mask);
+}
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_bfly(
+  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
+  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
+  (void) __lane_mask;
+#  if defined(__HIP_DEVICE_COMPILE__)
+  const int __width = __detail::__hip_shfl_width_from_clamp_segmask(__clamp_segmask);
+  const auto __data_u = ::cuda::std::bit_cast<::cuda::std::uint32_t>(__data);
+  const ::cuda::std::uint32_t __ret = ::__shfl_xor(__data_u, static_cast<int>(__lane_idx_offset), __width);
+  __pred = true;
+  return ::cuda::std::bit_cast<_Tp>(__ret);
+#  else
+  __pred = false;
+  return __data;
+#  endif
+}
+
+template <typename _Tp>
+[[nodiscard]] _CCCL_DEVICE static inline _Tp
+shfl_sync_bfly(_Tp __data, ::cuda::std::uint32_t __lane_idx_offset,
+               ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+{
+  bool __pred_unused;
+  return ::cuda::ptx::shfl_sync_bfly(__data, __pred_unused, __lane_idx_offset, __clamp_segmask, __lane_mask);
+}
+#endif // _CCCL_HIP_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA_PTX
 
