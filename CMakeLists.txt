@@ -228,15 +228,12 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   include(cmake/LibcudacxxBuildCompilerTargets.cmake)
   libcudacxx_build_compiler_targets()
 
-  # Test all public and internal headers.
-  # The Internal/PublicHeaderTesting helpers create per-header .cu library
-  # targets that require enable_language(CUDA); only include them when CUDA
-  # is enabled. The PublicHeaderTestingHost helper creates .cpp library
-  # targets and works under both CUDA and HIP.
-  if (LIBCUDACXX_ENABLE_CUDA)
-    include(cmake/LibcudacxxInternalHeaderTesting.cmake)
-    include(cmake/LibcudacxxPublicHeaderTesting.cmake)
-  endif()
+  # Test all public and internal headers. The upstream helpers below
+  # are HIP-aware (they tag the configured TUs with LANGUAGE HIP and
+  # apply a HIP-side skip list when LIBCUDACXX_ENABLE_HIP is set), so
+  # they can be included unconditionally for both CUDA and HIP builds.
+  include(cmake/LibcudacxxInternalHeaderTesting.cmake)
+  include(cmake/LibcudacxxPublicHeaderTesting.cmake)
   include(cmake/LibcudacxxPublicHeaderTestingHost.cmake)
 
   add_subdirectory(test)
