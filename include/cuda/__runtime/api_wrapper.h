@@ -53,7 +53,7 @@
       case ::cudaSuccess:                                   \
         break;                                              \
       default:                                              \
-        ::cudaGetLastError(); /* clear CUDA error state */  \
+        (void) ::cudaGetLastError(); /* clear CUDA error state */ \
         ::cuda::__throw_cuda_error(__status, _MSG, #_NAME); \
     }                                                       \
   } while (0)
@@ -62,7 +62,7 @@
   do                                                                    \
   {                                                                     \
     [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__); \
-    ::cudaGetLastError(); /* clear CUDA error state */                  \
+    (void) ::cudaGetLastError(); /* clear CUDA error state */           \
     _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
   } while (0)
 
@@ -76,7 +76,7 @@
       ::fprintf(stderr, "%s\n", __msg_buffer.__buffer);                            \
       ::fflush(stderr);                                                            \
     }                                                                              \
-    ::cudaGetLastError(); /* clear CUDA error state */                             \
+    (void) ::cudaGetLastError(); /* clear CUDA error state */                      \
     return __status;                                                               \
   }()
 
