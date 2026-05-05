@@ -53,6 +53,7 @@ if (CCCL_ENABLE_TILE)
     "cuda/atomic"
     "cuda/barrier"
     "cuda/buffer"
+    "cuda/execution"
     "cuda/latch"
     "cuda/memory"
     "cuda/memory_resource"
