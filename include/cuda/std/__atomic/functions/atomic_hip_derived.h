@@ -28,6 +28,14 @@
 
 #include <hip/hip_runtime.h>
 #include <cuda/std/__type_traits/enable_if.h>
+// NOTE(HIP/AMD): is_scalar.h transitively pulls in is_pointer.h,
+// is_arithmetic.h (and from there is_integral.h + is_floating_point.h).
+// Mirrors the upstream CUDA-side transitive chain via
+// cuda_ptx_generated_helper.h, which the consumer files
+// <cuda/std/__atomic/api/{owned,reference}.h> rely on without including
+// the trait headers themselves. Keeping owned.h / reference.h
+// byte-identical to upstream by providing the chain on the HIP path.
+#include <cuda/std/__type_traits/is_scalar.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/__type_traits/is_unsigned.h>
 // NOTE(HIP/AMD): Use cuda/std/cstdint for both regular and HIPRTC builds.
@@ -37,7 +45,7 @@
 #include <cuda/std/cstdint>
 using ::intptr_t;
 using ::uint32_t;
-template<class _Type, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type) <= 2, int>::type = 0>
+template<class _Type, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type) <= 2, int>::type = 0>
 bool __device__ __atomic_compare_exchange_cuda(_Type volatile *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, _Scope __s) {
 
     auto const __aligned = (uint32_t*)((intptr_t)__ptr & ~(sizeof(uint32_t) - 1));
@@ -65,7 +73,7 @@ _Type __device__ __atomic_load_n_cuda(const _Type volatile *__ptr, int __memorde
     return __ret;
 }
 
-template<class _Type, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2, int>::type = 0>
+template<class _Type, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
 void __device__ __atomic_exchange_cuda(_Type* __ptr, _Type& __old, _Type __new, int __memorder, _Scope __s) {
 
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
@@ -74,7 +82,7 @@ void __device__ __atomic_exchange_cuda(_Type* __ptr, _Type& __old, _Type __new, 
     __old = __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2, int>::type = 0>
+template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
 _Type __device__ __atomic_fetch_add_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Type __desired = __expected + __val;
@@ -83,7 +91,7 @@ _Type __device__ __atomic_fetch_add_cuda(_Type volatile *__ptr, _Delta __val, in
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2 || _CUDA_VSTD::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2 || ::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 _Type __host__ __device__ __atomic_fetch_max_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Type __desired = __expected > __val ? __expected : __val;
@@ -96,7 +104,7 @@ _Type __host__ __device__ __atomic_fetch_max_cuda(_Type volatile *__ptr, _Delta 
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2 || _CUDA_VSTD::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2 || ::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 _Type __host__ __device__ __atomic_fetch_min_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Type __desired = __expected < __val ? __expected : __val;
@@ -109,7 +117,7 @@ _Type __host__ __device__ __atomic_fetch_min_cuda(_Type volatile *__ptr, _Delta 
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2, int>::type = 0>
+template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
 _Type __device__ __atomic_fetch_sub_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
 
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
@@ -119,7 +127,7 @@ _Type __device__ __atomic_fetch_sub_cuda(_Type volatile *__ptr, _Delta __val, in
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2, int>::type = 0>
+template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
 _Type __device__ __atomic_fetch_and_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
 
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
@@ -129,7 +137,7 @@ _Type __device__ __atomic_fetch_and_cuda(_Type volatile *__ptr, _Delta __val, in
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2, int>::type = 0>
+template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
 _Type __device__ __atomic_fetch_xor_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
 
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
@@ -139,7 +147,7 @@ _Type __device__ __atomic_fetch_xor_cuda(_Type volatile *__ptr, _Delta __val, in
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type)<=2, int>::type = 0>
+template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
 _Type __device__ __atomic_fetch_or_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
 
     _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);

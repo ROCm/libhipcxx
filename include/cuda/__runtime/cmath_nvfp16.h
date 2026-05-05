@@ -50,7 +50,7 @@
 
 #  include <nv/target>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // trigonometric functions
 _LIBCUDACXX_HIDE_FROM_ABI __half sin(__half __v)
@@ -169,7 +169,7 @@ _LIBCUDACXX_HIDE_FROM_ABI __half __constexpr_copysign(__half __x, __half __y) no
 
 _LIBCUDACXX_HIDE_FROM_ABI __half copysign(__half __x, __half __y)
 {
-  return _CUDA_VSTD::__constexpr_copysign(__x, __y);
+  return ::cuda::std::__constexpr_copysign(__x, __y);
 }
 
 _LIBCUDACXX_HIDE_FROM_ABI __half __constexpr_fabs(__half __x) noexcept
@@ -179,12 +179,12 @@ _LIBCUDACXX_HIDE_FROM_ABI __half __constexpr_fabs(__half __x) noexcept
 
 _LIBCUDACXX_HIDE_FROM_ABI __half fabs(__half __x)
 {
-  return _CUDA_VSTD::__constexpr_fabs(__x);
+  return ::cuda::std::__constexpr_fabs(__x);
 }
 
 _LIBCUDACXX_HIDE_FROM_ABI __half abs(__half __x)
 {
-  return _CUDA_VSTD::__constexpr_fabs(__x);
+  return ::cuda::std::__constexpr_fabs(__x);
 }
 
 _LIBCUDACXX_HIDE_FROM_ABI __half __constexpr_fmax(__half __x, __half __y) noexcept
@@ -192,7 +192,7 @@ _LIBCUDACXX_HIDE_FROM_ABI __half __constexpr_fmax(__half __x, __half __y) noexce
   return __hmax(__x, __y);
 }
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #endif /// _LIBCUDACXX_HAS_NVFP16
 

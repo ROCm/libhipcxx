@@ -54,7 +54,7 @@ _CCCL_DIAG_POP
 
 #  include <nv/target>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // trigonometric functions
 _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 sin(__nv_bfloat16 __v)
@@ -179,7 +179,7 @@ _LIBCUDACXX_HIDE_FROM_ABI __nv_bfloat16 __constexpr_fmax(__nv_bfloat16 __x, __nv
   return ::__hmax(__x, __y);
 }
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
 
 #endif /// _LIBCUDACXX_HAS_NVBF16
 
