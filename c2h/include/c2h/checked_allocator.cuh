@@ -1,13 +1,52 @@
 // SPDX-FileCopyrightText: Copyright (c) 2011-2024, NVIDIA CORPORATION. All rights reserved.
 // SPDX-License-Identifier: BSD-3
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
-#include <thrust/device_allocator.h>
-#include <thrust/mr/new.h>
-#include <thrust/system/cuda/memory.h>
-#include <thrust/system/cuda/memory_resource.h>
-#include <thrust/system/cuda/pointer.h>
+#include <cuda/std/detail/__config>
+
+// NOTE(HIP/AMD): the thrust-backed checked_cuda_allocator /
+// checked_cuda_memory_resource / checked_host_memory_resource templates
+// at the bottom of this file pull thrust headers that are not currently
+// HIP-portable in libhipcxx (no rocThrust dependency in this tree). The
+// transitive include chain reaches this file through
+// <c2h/catch2_test_helper.h> which is in turn pulled in by every
+// libhipcxx Catch2 test. To unblock c2h-on-HIP without depending on
+// thrust, gate the thrust-using portions under !_CCCL_HIP_COMPILATION();
+// the pure-C++ c2h::detail::* helpers (get_env, memory_info,
+// get_device_memory_limit, get_debug_checked_allocs, get_device_memory,
+// check_free_device_memory, checked_cuda_malloc) stay visible on HIP --
+// they only use the cuda runtime API which is shimmed by
+// <amd/cuda_runtime.h>.
+#if !_CCCL_HIP_COMPILATION()
+#  include <thrust/device_allocator.h>
+#  include <thrust/mr/new.h>
+#  include <thrust/system/cuda/memory.h>
+#  include <thrust/system/cuda/memory_resource.h>
+#  include <thrust/system/cuda/pointer.h>
+#endif // !_CCCL_HIP_COMPILATION()
 
 #include <cstdlib>
 #include <iostream>
@@ -15,7 +54,15 @@
 #include <optional>
 #include <string>
 
-#include <cuda_runtime_api.h>
+// NOTE(HIP/AMD): under HIP, <cuda_runtime_api.h> doesn't exist on a
+// HIP-only system. The libhipcxx detail/__config header already pulls
+// in <amd/cuda_runtime.h> (which provides the cuda* runtime API shim
+// over the HIP runtime), so we route through it instead.
+#if _CCCL_HIP_COMPILATION()
+#  include <amd/cuda_runtime.h>
+#else
+#  include <cuda_runtime_api.h>
+#endif
 
 namespace c2h
 {
@@ -142,6 +189,12 @@ inline cudaError_t checked_cuda_malloc(void** ptr, std::size_t bytes)
 }
 } // namespace detail
 
+// NOTE(HIP/AMD): the thrust-backed checked_cuda_allocator /
+// checked_cuda_memory_resource / checked_host_memory_resource templates
+// below are only available under !_CCCL_HIP_COMPILATION(); see the
+// rationale in the include guard at the top of this file. Tests that
+// need these allocator types remain CUDA-only.
+#if !_CCCL_HIP_COMPILATION()
 using checked_cuda_memory_resource = THRUST_NS_QUALIFIER::system::cuda::detail::
   cuda_memory_resource<detail::checked_cuda_malloc, cudaFree, THRUST_NS_QUALIFIER::cuda::pointer<void>>;
 
@@ -202,4 +255,5 @@ struct checked_host_memory_resource final : public THRUST_NS_QUALIFIER::mr::new_
 
 template <typename T>
 using checked_host_allocator = THRUST_NS_QUALIFIER::mr::stateless_resource_allocator<T, checked_host_memory_resource>;
+#endif // !_CCCL_HIP_COMPILATION()
 } // namespace c2h

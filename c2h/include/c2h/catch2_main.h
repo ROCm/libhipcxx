@@ -1,9 +1,36 @@
 // SPDX-FileCopyrightText: Copyright (c) 2011-2022, NVIDIA CORPORATION. All rights reserved.
 // SPDX-License-Identifier: BSD-3
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
-#include <thrust/detail/config/device_system.h>
+// NOTE(HIP/AMD): need _CCCL_HIP_COMPILATION() before the thrust gate.
+#include <cuda/std/detail/__config>
+
+#if !_CCCL_HIP_COMPILATION()
+#  include <thrust/detail/config/device_system.h>
+#endif // !_CCCL_HIP_COMPILATION()
 
 #include <iostream>
 
@@ -14,20 +41,34 @@
 
 #include <catch2/catch_session.hpp>
 
+// NOTE(HIP/AMD): when building under HIP we don't have thrust (no
+// rocThrust in this tree), so the THRUST_DEVICE_SYSTEM_CUDA gate below
+// is folded into a uniform _C2H_HAS_DEVICE_RUNTIME predicate that is
+// also true under HIP. The runner helper itself routes through
+// cuda* runtime API symbols that are shimmed to hip* by
+// <amd/cuda_runtime.h>.
+#if _CCCL_HIP_COMPILATION()
+#  define _C2H_HAS_DEVICE_RUNTIME 1
+#elif THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
+#  define _C2H_HAS_DEVICE_RUNTIME 1
+#else
+#  define _C2H_HAS_DEVICE_RUNTIME 0
+#endif
+
 #ifdef C2H_CONFIG_MAIN
-#  if THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
+#  if _C2H_HAS_DEVICE_RUNTIME
 #    include <c2h/catch2_runner_helper.h>
 
 #    ifndef C2H_EXCLUDE_CATCH2_HELPER_IMPL
 #      include "catch2_runner_helper.inl"
 #    endif // !C2H_EXCLUDE_CATCH2_HELPER_IMPL
-#  endif // THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
+#  endif // _C2H_HAS_DEVICE_RUNTIME
 
 int main(int argc, char* argv[])
 {
   Catch::Session session;
 
-#  if THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
+#  if _C2H_HAS_DEVICE_RUNTIME
   int device_id{};
 
   // Build a new parser on top of Catch's
@@ -42,7 +83,7 @@ int main(int argc, char* argv[])
   }
 
   set_device(device_id);
-#  endif // THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
+#  endif // _C2H_HAS_DEVICE_RUNTIME
   return session.run();
 }
 #endif // C2H_CONFIG_MAIN

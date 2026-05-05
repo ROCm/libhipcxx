@@ -355,10 +355,17 @@ set_tests_properties(
     RUN_SERIAL TRUE
 )
 
-# Add c2h tests (CUDA only - c2h infrastructure is CUDA-specific):
-if(LIBCUDACXX_ENABLE_CUDA)
-  cccl_get_c2h()
+# NOTE(HIP/AMD): on HIP we also pull in the c2h subdirectory so the
+# cccl.c2h / cccl.c2h.main library targets exist, but only as a
+# Catch2-only stripped-down build (see c2h/CMakeLists.txt). The
+# per-test executables below are still gated to CUDA-only because the
+# 22 *.cu test files in this directory tree were never HIPified
+# (they use cuda* runtime API directly + reach into upstream c2h
+# headers that pull thrust/cub). Tracked as HF5 in
+# 3.1.4_tmp/HEADER_TESTS_3.2_MEMORY.md.
+cccl_get_c2h()
 
+if(LIBCUDACXX_ENABLE_CUDA)
   file(
     GLOB_RECURSE test_srcs
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"

@@ -215,6 +215,34 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   include(cmake/CCCLGetDependencies.cmake)
   cccl_build_compiler_targets()
 
+  # CCCL_{SOURCE,BINARY}_DIR are referenced by some cccl_get_* macros
+  # (e.g. cccl_get_c2h() pulls add_subdirectory("${CCCL_SOURCE_DIR}/c2h"
+  # "${CCCL_BINARY_DIR}/c2h")). In a normal CCCL parent build these get
+  # set by the parent CMakeLists.txt; libhipcxx is standalone so we
+  # alias them to our own source / binary directories.
+  if (NOT DEFINED CCCL_SOURCE_DIR)
+    set(CCCL_SOURCE_DIR "${libcudacxx_SOURCE_DIR}")
+  endif()
+  if (NOT DEFINED CCCL_BINARY_DIR)
+    set(CCCL_BINARY_DIR "${CMAKE_BINARY_DIR}")
+  endif()
+
+  # On HIP we ship a Catch2-only stripped-down c2h (see c2h/CMakeLists.txt)
+  # that does not pull thrust / cub / cudaToolkit. The upstream
+  # c2h/CMakeLists.txt links cccl.c2h against CCCL::CCCL (the umbrella
+  # target normally provided by find_package(CCCL) -- which would also
+  # transitively try to find CUB, Thrust, ...). On HIP we don't have
+  # any of that, so pre-define CCCL::CCCL as an alias for
+  # libcudacxx::libcudacxx (the only CCCL component we ship under HIP)
+  # and have the c2h CMakeLists skip the find_package(CCCL) call on
+  # HIP. The libcudacxx::libcudacxx target is created by the libcudacxx
+  # package config below.
+  if (LIBCUDACXX_ENABLE_HIP AND NOT TARGET CCCL::CCCL)
+    include("${libcudacxx_SOURCE_DIR}/lib/cmake/libcudacxx/libcudacxx-config-version.cmake")
+    include("${libcudacxx_SOURCE_DIR}/lib/cmake/libcudacxx/libcudacxx-config.cmake")
+    add_library(CCCL::CCCL ALIAS libcudacxx::libcudacxx)
+  endif()
+
   # libcudacxx_build_compiler_targets() links libcudacxx.compiler_interface
   # against cccl.compiler_interface_cpp${CMAKE_CUDA_STANDARD}. When CUDA is
   # not enabled (HIP-only build) CMAKE_CUDA_STANDARD is empty and the link
