@@ -457,8 +457,14 @@
 #ifndef cudaMemHandleTypeWin32Kmt
 #  define cudaMemHandleTypeWin32Kmt hipMemHandleTypeWin32Kmt
 #endif
+#ifndef cudaMemLocation
+#  define cudaMemLocation hipMemLocation
+#endif
 #ifndef cudaMemLocationTypeDevice
 #  define cudaMemLocationTypeDevice hipMemLocationTypeDevice
+#endif
+#ifndef cudaMemLocationTypeHost
+#  define cudaMemLocationTypeHost hipMemLocationTypeHost
 #endif
 #ifndef cudaMemPoolReuseAllowOpportunistic
 #  define cudaMemPoolReuseAllowOpportunistic hipMemPoolReuseAllowOpportunistic
