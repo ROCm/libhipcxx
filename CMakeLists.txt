@@ -63,17 +63,12 @@ include(CTest)
 enable_testing()
 
 # Add codegen module
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-# option(libhipcxx_ENABLE_CODEGEN "Enable libhipcxx's atomics backend codegen and tests." OFF)
-# if (libhipcxx_ENABLE_CODEGEN)
-# =======
 option(
   libcudacxx_ENABLE_CODEGEN
   "Enable libcudacxx's atomics backend codegen and tests."
   OFF
 )
 if (libcudacxx_ENABLE_CODEGEN)
-# >>>>>>> END NEW CODE (75d398a0e0)
   add_subdirectory(codegen)
 endif()
 
@@ -101,176 +96,100 @@ endif()
 
 if (LIBCUDACXX_ENABLE_CUDA)
   enable_language(CUDA)
-# <<<<<<< OLD CODE from dbbea8d7cd (75d398a0e0) - COMMENTED OUT
-# elseif (LIBCUDACXX_ENABLE_HIP)
-#   # sync variables used by HIP CMake package etc.
-#   if ("${AMDGPU_TARGETS}" STREQUAL "")
-#     set(AMDGPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
-#   elseif(NOT "${AMDGPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
-#     message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and AMDGPU_TARGETS! Using AMDGPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', AMDGPU_TARGETS='${AMDGPU_TARGETS}'")
-#     set(CMAKE_HIP_ARCHITECTURES ${AMDGPU_TARGETS})
-#   endif()
-#   if ("${GPU_TARGETS}" STREQUAL "")
-#     set(GPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
-#   elseif(NOT "${GPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
-#     message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and GPU_TARGETS! Using GPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', GPU_TARGETS='${GPU_TARGETS}'")
-#     set(CMAKE_HIP_ARCHITECTURES ${GPU_TARGETS})
-#   endif()
-#
-#   find_package(hip REQUIRED)
-#   enable_language(HIP)
-# endif ()
-# =======
-endif()
-# >>>>>>> END NEW CODE (75d398a0e0)
+elseif (LIBCUDACXX_ENABLE_HIP)
+  # sync variables used by HIP CMake package etc.
+  if ("${AMDGPU_TARGETS}" STREQUAL "")
+    set(AMDGPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
+  elseif(NOT "${AMDGPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
+    message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and AMDGPU_TARGETS! Using AMDGPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', AMDGPU_TARGETS='${AMDGPU_TARGETS}'")
+    set(CMAKE_HIP_ARCHITECTURES ${AMDGPU_TARGETS})
+  endif()
+  if ("${GPU_TARGETS}" STREQUAL "")
+    set(GPU_TARGETS ${CMAKE_HIP_ARCHITECTURES})
+  elseif(NOT "${GPU_TARGETS}" STREQUAL "${CMAKE_HIP_ARCHITECTURES}")
+    message(WARNING "mismatch between CMAKE_HIP_ARCHITECTURES and GPU_TARGETS! Using GPU_TARGETS! CMAKE_HIP_ARCHITECTURES='${CMAKE_HIP_ARCHITECTURES}', GPU_TARGETS='${GPU_TARGETS}'")
+    set(CMAKE_HIP_ARCHITECTURES ${GPU_TARGETS})
+  endif()
 
-# <<<<<<< OLD CODE from 90c10be92c (98b11f3297) - COMMENTED OUT
-# # For Windows we should avoid symlinks by copying the file content (test, utils, and include/hip folder)
-# function(libhipcxx_path_is_link_like path out_var)
-#   if(IS_SYMLINK "${path}")
-#     set(${out_var} TRUE PARENT_SCOPE)
-#     return()
-#   endif()
-#
-#   if(NOT WIN32 OR NOT EXISTS "${path}")
-#     set(${out_var} FALSE PARENT_SCOPE)
-#     return()
-#   endif()
-#
-#   if(NOT IS_DIRECTORY "${path}")
-#     set(${out_var} TRUE PARENT_SCOPE)
-#     return()
-#   endif()
-#
-#   get_filename_component(_abs_path "${path}" ABSOLUTE)
-#   file(REAL_PATH "${path}" _real_path)
-#   file(TO_CMAKE_PATH "${_abs_path}" _abs_path_norm)
-#   file(TO_CMAKE_PATH "${_real_path}" _real_path_norm)
-#   string(REGEX REPLACE "/$" "" _abs_path_norm "${_abs_path_norm}")
-#   string(REGEX REPLACE "/$" "" _real_path_norm "${_real_path_norm}")
-#   string(TOLOWER "${_abs_path_norm}" _abs_path_lc)
-#   string(TOLOWER "${_real_path_norm}" _real_path_lc)
-#
-#   if(NOT _abs_path_lc STREQUAL _real_path_lc)
-#     set(${out_var} TRUE PARENT_SCOPE)
-#   else()
-#     set(${out_var} FALSE PARENT_SCOPE)
-#   endif()
-# endfunction()
-#
-# if(WIN32)
-#   message(STATUS "Checking ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip for symlink")
-#   # Delete hip symlink if not already a copy
-#   libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip" _hip_path_is_link)
-#   if(_hip_path_is_link)
-#     file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
-#     message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
-#   endif()
-#   # Delete test symlink if not already a copy
-#   libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/test" _test_path_is_link)
-#   if(_test_path_is_link)
-#     file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/test")
-#     message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/test")
-#   endif()
-#   # Delete test symlink if not already a copy
-#   libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/utils" _utils_path_is_link)
-#   if(_utils_path_is_link)
-#     file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/utils")
-#     message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/utils")
-#   endif()
-#   # Create a copy of cuda as hip folder
-#   message(STATUS "Copying cuda folder to hip to allow for hip/cuda aliasing.")
-#   file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
-#   file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/include/cuda/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip/")
-#   # Create a copy of .upstream_test/test as test folder
-#   message(STATUS "Copying .upstream_tests/test folder to test.")
-#   file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test")
-#   file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/test/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/test/")
-#   # Create a copy of .upstream_test/utils as utils folder
-#   message(STATUS "Copying .upstream_tests/utils folder to utils.")
-#   file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/utils")
-#   file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/utils/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/utils/")
-# endif()
-#
-# # As part of the TheRock testing process, we need the source directory within the build folder
-# # since we need to configure, build and run the tests from within the tester using lit.
-# # The reason for this is that lit cannot seperately generate binaries in the build step
-# # and execute them in the tester but directly executes and deletes any test binaries during the build.
-# if(DEFINED THEROCK_TOOLCHAIN_ROOT)
-#   file(COPY "${CMAKE_CURRENT_SOURCE_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-# endif()
-#
-# option(LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS "Enable libhip++ tests." ON)
-# if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
-#   enable_testing()
-#
-#   include(FindPythonInterp)
-#   if (NOT PYTHONINTERP_FOUND)
-#     message(FATAL_ERROR
-#       "Failed to find python interpreter, which is required for running tests and "
-#       "building a libcu++ static library.")
-#   endif ()
-#
-#   # Determine the host triple to avoid invoking `${CXX} -dumpmachine`.
-#   include(GetHostTriple)
-#   get_host_triple(LLVM_INFERRED_HOST_TRIPLE)
-#
-#   set(LLVM_HOST_TRIPLE "${LLVM_INFERRED_HOST_TRIPLE}" CACHE STRING
-#       "Host on which LLVM binaries will run")
-#
-#   # By default, we target the host, but this can be overridden at CMake
-#   # invocation time.
-#   set(LLVM_DEFAULT_TARGET_TRIPLE "${LLVM_HOST_TRIPLE}" CACHE STRING
-#     "Default target for which LLVM will generate code." )
-#   set(TARGET_TRIPLE "${LLVM_DEFAULT_TARGET_TRIPLE}")
-#   message(STATUS "LLVM host triple: ${LLVM_HOST_TRIPLE}")
-#   message(STATUS "LLVM default target triple: ${LLVM_DEFAULT_TARGET_TRIPLE}")
-#
-#   set(LIT_EXTRA_ARGS "" CACHE STRING "Use for additional options (e.g. -j12)")
-#   find_program(LLVM_DEFAULT_EXTERNAL_LIT lit)
-#   set(LLVM_LIT_ARGS "-sv ${LIT_EXTRA_ARGS}")
-#
-#   set(libhipcxx_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-#   add_subdirectory(test)
-#
-#   include(AddLLVM)
-#   get_property(LLVM_LIT_TESTSUITES          GLOBAL PROPERTY LLVM_LIT_TESTSUITES)
-#   get_property(LLVM_LIT_PARAMS              GLOBAL PROPERTY LLVM_LIT_PARAMS)
-#   get_property(LLVM_LIT_DEPENDS             GLOBAL PROPERTY LLVM_LIT_DEPENDS)
-#   get_property(LLVM_LIT_EXTRA_ARGS          GLOBAL PROPERTY LLVM_LIT_EXTRA_ARGS)
-#   get_property(LLVM_ADDITIONAL_TEST_TARGETS GLOBAL PROPERTY LLVM_ADDITIONAL_TEST_TARGETS)
-#   get_property(LLVM_ADDITIONAL_TEST_DEPENDS GLOBAL PROPERTY LLVM_ADDITIONAL_TEST_DEPENDS)
-#   add_lit_target(check-all
-#     "Running all regression tests"
-#     ${LLVM_LIT_TESTSUITES}
-#     PARAMS ${LLVM_LIT_PARAMS}
-#     DEPENDS ${LLVM_LIT_DEPENDS} ${LLVM_ADDITIONAL_TEST_TARGETS}
-#     ARGS ${LLVM_LIT_EXTRA_ARGS}
-#   )
-# endif ()
-#
-# # Package configuration
-# set(CPACK_DEBIAN_ARCHIVE_TYPE "gnutar")
-#
-# set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.TXT")
-# set(CPACK_RPM_PACKAGE_LICENSE "ASL 2.0 AND MIT")
-#
-# if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
-#   set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-# endif()
-#
-# set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "\${CPACK_PACKAGING_INSTALL_PREFIX}" )
-#
-# rocm_create_package(
-#   NAME libhipcxx
-#   DESCRIPTION "ROCm libhipcxx library"
-#   # FIXME(HIP/AMD): A maintainer string is required
-#   # Set to the following when available:
-#   # MAINTAINER "libhipcxx-maintainer@amd.com"
-#   MAINTAINER "AMD, Inc."
-#   HEADER_ONLY
-# )
-# =======
+  find_package(hip REQUIRED)
+  enable_language(HIP)
+endif ()
+
+# For Windows we should avoid symlinks by copying the file content (test, utils, and include/hip folder)
+function(libhipcxx_path_is_link_like path out_var)
+  if(IS_SYMLINK "${path}")
+    set(${out_var} TRUE PARENT_SCOPE)
+    return()
+  endif()
+
+  if(NOT WIN32 OR NOT EXISTS "${path}")
+    set(${out_var} FALSE PARENT_SCOPE)
+    return()
+  endif()
+
+  if(NOT IS_DIRECTORY "${path}")
+    set(${out_var} TRUE PARENT_SCOPE)
+    return()
+  endif()
+
+  get_filename_component(_abs_path "${path}" ABSOLUTE)
+  file(REAL_PATH "${path}" _real_path)
+  file(TO_CMAKE_PATH "${_abs_path}" _abs_path_norm)
+  file(TO_CMAKE_PATH "${_real_path}" _real_path_norm)
+  string(REGEX REPLACE "/$" "" _abs_path_norm "${_abs_path_norm}")
+  string(REGEX REPLACE "/$" "" _real_path_norm "${_real_path_norm}")
+  string(TOLOWER "${_abs_path_norm}" _abs_path_lc)
+  string(TOLOWER "${_real_path_norm}" _real_path_lc)
+
+  if(NOT _abs_path_lc STREQUAL _real_path_lc)
+    set(${out_var} TRUE PARENT_SCOPE)
+  else()
+    set(${out_var} FALSE PARENT_SCOPE)
+  endif()
+endfunction()
+
+if(WIN32)
+  message(STATUS "Checking ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip for symlink")
+  # Delete hip symlink if not already a copy
+  libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip" _hip_path_is_link)
+  if(_hip_path_is_link)
+    file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
+    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
+  endif()
+  # Delete test symlink if not already a copy
+  libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/test" _test_path_is_link)
+  if(_test_path_is_link)
+    file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/test")
+    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/test")
+  endif()
+  # Delete test symlink if not already a copy
+  libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/utils" _utils_path_is_link)
+  if(_utils_path_is_link)
+    file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/utils")
+    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/utils")
+  endif()
+  # Create a copy of cuda as hip folder
+  message(STATUS "Copying cuda folder to hip to allow for hip/cuda aliasing.")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/include/cuda/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip/")
+  # Create a copy of .upstream_test/test as test folder
+  message(STATUS "Copying .upstream_tests/test folder to test.")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/test/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/test/")
+  # Create a copy of .upstream_test/utils as utils folder
+  message(STATUS "Copying .upstream_tests/utils folder to utils.")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/utils")
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/utils/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/utils/")
+endif()
+
+# As part of the TheRock testing process, we need the source directory within the build folder
+# since we need to configure, build and run the tests from within the tester using lit.
+# The reason for this is that lit cannot seperately generate binaries in the build step
+# and execute them in the tester but directly executes and deletes any test binaries during the build.
+if(DEFINED THEROCK_TOOLCHAIN_ROOT)
+  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
 option(LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS "Enable libcu++ tests." ON)
 if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   enable_testing()
@@ -284,29 +203,27 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   include(cmake/LibcudacxxPublicHeaderTesting.cmake)
   include(cmake/LibcudacxxPublicHeaderTestingHost.cmake)
 
-# <<<<<<< OLD CODE from ebcf54d2f6 (9ce0b3421f) - COMMENTED OUT
-# # Determine the host triple to avoid invoking `${CXX} -dumpmachine`.
-# include(GetHostTriple)
-# get_host_triple(LLVM_INFERRED_HOST_TRIPLE)
-#
-# set(LLVM_HOST_TRIPLE "${LLVM_INFERRED_HOST_TRIPLE}" CACHE STRING
-#     "Host on which LLVM binaries will run")
-#
-# # By default, we target the host, but this can be overridden at CMake
-# # invocation time.
-# set(LLVM_DEFAULT_TARGET_TRIPLE "${LLVM_HOST_TRIPLE}" CACHE STRING
-#   "Default target for which LLVM will generate code." )
-# set(TARGET_TRIPLE "${LLVM_DEFAULT_TARGET_TRIPLE}")
-# message(STATUS "LLVM host triple: ${LLVM_HOST_TRIPLE}")
-# message(STATUS "LLVM default target triple: ${LLVM_DEFAULT_TARGET_TRIPLE}")
-#
-# set(LIT_EXTRA_ARGS "" CACHE STRING "Use for additional options (e.g. -j12)")
-# find_program(LLVM_DEFAULT_EXTERNAL_LIT lit)
-# set(LLVM_LIT_ARGS "-sv ${LIT_EXTRA_ARGS}")
-#
-# add_subdirectory(test)
-# # >>>>>>> END NEW CODE (98b11f3297)
-# =======
   add_subdirectory(test)
 endif()
-# >>>>>>> END NEW CODE (9ce0b3421f)
+
+# Package configuration
+set(CPACK_DEBIAN_ARCHIVE_TYPE "gnutar")
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.TXT")
+set(CPACK_RPM_PACKAGE_LICENSE "ASL 2.0 AND MIT")
+
+if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
+  set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+endif()
+
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "\${CPACK_PACKAGING_INSTALL_PREFIX}" )
+
+rocm_create_package(
+  NAME libhipcxx
+  DESCRIPTION "ROCm libhipcxx library"
+  # FIXME(HIP/AMD): A maintainer string is required
+  # Set to the following when available:
+  # MAINTAINER "libhipcxx-maintainer@amd.com"
+  MAINTAINER "AMD, Inc."
+  HEADER_ONLY
+)

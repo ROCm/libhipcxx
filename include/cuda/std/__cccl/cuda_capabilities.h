@@ -47,10 +47,6 @@
 
 #include <nv/target>
 
-// <<<<<<< OLD CODE from 827bee9b7f (b05693359d) - COMMENTED OUT
-// // True, when programmatic dependent launch is available, otherwise false.
-// #define _CCCL_HAS_PDL() _CCCL_CTK_AT_LEAST(12, 0)
-// =======
 #ifdef _CCCL_DOXYGEN_INVOKED // Only parse this during doxygen passes:
 //! When this macro is defined, Programmatic Dependent Launch (PDL) is disabled across CCCL
 #  define CCCL_DISABLE_PDL
@@ -61,7 +57,6 @@
 #else // CCCL_DISABLE_PDL
 #  define _CCCL_HAS_PDL() 1
 #endif // CCCL_DISABLE_PDL
-// >>>>>>> END NEW CODE (b05693359d)
 
 #if _CCCL_HAS_PDL()
 // Waits for the previous kernel to complete (when it reaches its final membar). Should be put before the first global

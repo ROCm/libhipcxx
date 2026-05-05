@@ -164,7 +164,10 @@ __host__ __device__ constexpr bool test(float val)
   test_type<long double>(val);
 #endif // _CCCL_HAS_LONG_DOUBLE()
 #if _CCCL_HAS_NVFP16()
+// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
+#  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
   test_type<__half>(val);
+#  endif
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
   test_type<__nv_bfloat16>(val);
@@ -209,42 +212,17 @@ __host__ __device__ constexpr bool test(float val)
 #if _CCCL_HAS_CONSTEXPR_BIT_CAST()
 __host__ __device__ constexpr bool test_constexpr(float val)
 {
-// <<<<<<< OLD CODE from d0ad88c268 (0dbc63ad98) - COMMENTED OUT
-// #if _LIBCUDACXX_HAS_NVFP16()
-// // NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-// #  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
-//   test_type<__half>();
-// #  endif
-// #endif // _LIBCUDACXX_HAS_NVFP16()
-// #if _LIBCUDACXX_HAS_NVBF16()
-//   test_type<__nv_bfloat16>();
-// #endif // _LIBCUDACXX_HAS_NVBF16()
-// #if _CCCL_HAS_NVFP8_E4M3()
-//   test_type<__nv_fp8_e4m3>();
-// #endif // _CCCL_HAS_NVFP8_E4M3
-// #if _CCCL_HAS_NVFP8_E5M2()
-//   test_type<__nv_fp8_e5m2>();
-// #endif // _CCCL_HAS_NVFP8_E5M2
-// #if _CCCL_HAS_NVFP8_E8M0()
-//   test_type<__nv_fp8_e8m0>();
-// #endif // _CCCL_HAS_NVFP8_E8M0
-// #if _CCCL_HAS_NVFP6_E2M3()
-//   test_type<__nv_fp6_e2m3>();
-// #endif // _CCCL_HAS_NVFP6_E2M3
-// #if _CCCL_HAS_NVFP6_E3M2()
-//   test_type<__nv_fp6_e3m2>();
-// #endif // _CCCL_HAS_NVFP6_E3M2
-// #if _CCCL_HAS_NVFP4_E2M1()
-//   test_type<__nv_fp4_e2m1>();
-// #endif // _CCCL_HAS_NVFP4_E2M1
-//
-//   // we cannot test integral types, because signbit(double) is not constexpr
-// =======
   test_type<float>(val);
   test_type<double>(val);
 #  if _CCCL_HAS_LONG_DOUBLE()
   test_type<long double>(val);
 #  endif // _CCCL_HAS_LONG_DOUBLE()
+#  if _LIBCUDACXX_HAS_NVFP16()
+// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
+#    if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
+  test_type<__half>(val);
+#    endif
+#  endif // _LIBCUDACXX_HAS_NVFP16()
 
   test_type<signed char>(val);
   test_type<unsigned char>(val);
@@ -260,7 +238,6 @@ __host__ __device__ constexpr bool test_constexpr(float val)
   test_type<__int128_t>(val);
   test_type<__uint128_t>(val);
 #  endif // _CCCL_HAS_INT128()
-// >>>>>>> END NEW CODE (0dbc63ad98)
 
   return true;
 }

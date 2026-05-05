@@ -7,30 +7,25 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 8ac92af3c4 (de9c251c78) - COMMENTED OUT
-// // Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// // The above copyright notice and this permission notice shall be included in
-// // all copies or substantial portions of the Software.
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// // THE SOFTWARE.
-//
-// #ifndef _LIBCUDACXX___TUPLE_STRUCTURED_BINDINGS_H
-// #define _LIBCUDACXX___TUPLE_STRUCTURED_BINDINGS_H
-// =======
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #ifndef _CUDA_STD___TUPLE_STRUCTURED_BINDINGS_H
 #define _CUDA_STD___TUPLE_STRUCTURED_BINDINGS_H
-// >>>>>>> END NEW CODE (de9c251c78)
 
 #include <cuda/std/detail/__config>
 
@@ -45,19 +40,16 @@
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 
-// <<<<<<< OLD CODE from 00c9bc1db4 (56b33f3bd8) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC)
-// // Fetch utility to get primary template for ::std::tuple_size necessary for the specialization of
-// // ::std::tuple_size<cuda::std::tuple> to enable structured bindings.
-// // See https://github.com/NVIDIA/libcudacxx/issues/316
-// // NOTE(HIP/AMD): Also needed under HIPRTC since libstdc++ provides std::tuple_size
-// // and our partial specializations need its primary template to be declared.
-// #  include <utility>
-// #endif // !_CCCL_COMPILER(NVRTC)
-//
-// =======
+#if !_CCCL_COMPILER(NVRTC)
+// Fetch utility to get primary template for ::std::tuple_size necessary for the specialization of
+// ::std::tuple_size<cuda::std::tuple> to enable structured bindings.
+// See https://github.com/NVIDIA/libcudacxx/issues/316
+// NOTE(HIP/AMD): Also needed under HIPRTC since libstdc++ provides std::tuple_size
+// and our partial specializations need its primary template to be declared.
+#  include <utility>
+#endif // !_CCCL_COMPILER(NVRTC)
+
 #include <cuda/__fwd/complex.h>
-// >>>>>>> END NEW CODE (56b33f3bd8)
 #include <cuda/std/__fwd/array.h>
 #include <cuda/std/__fwd/complex.h>
 #include <cuda/std/__fwd/pair.h>
@@ -76,36 +68,19 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 
 #include <cuda/std/__cccl/prologue.h>
 
-// <<<<<<< OLD CODE from 00c9bc1db4 (56b33f3bd8) - COMMENTED OUT
-// namespace std
-// {
-// // NOTE(HIP/AMD): When system <utility> isn't available (NVRTC), provide forward
-// // declarations of tuple_size/tuple_element using variadic template parameters.
-// // Under HIPRTC, we include <utility> to get the primary template from libstdc++.
-// #if _CCCL_COMPILER(NVRTC)
-// template <class... _Tp>
-// =======
 _CCCL_BEGIN_NAMESPACE_STD
 
 template <class _Tp>
-// >>>>>>> END NEW CODE (56b33f3bd8)
 struct tuple_size;
 
 #if _CCCL_COMPILER(NVRTC)
 
-// <<<<<<< OLD CODE from 00c9bc1db4 (56b33f3bd8) - COMMENTED OUT
-// // NOTE(HIP/AMD): Array specializations work with libstdc++'s std::tuple_size
-// // since they're proper partial specializations.
-// template <class _Tp, size_t _Size>
-// struct tuple_size<::cuda::std::array<_Tp, _Size>> : ::cuda::std::tuple_size<::cuda::std::array<_Tp, _Size>>
-// =======
 template <class _Tp>
 struct tuple_size<
   ::cuda::std::__enable_if_tuple_size_imp<const _Tp,
                                           ::cuda::std::enable_if_t<!::cuda::std::is_volatile_v<_Tp>>,
                                           ::cuda::std::integral_constant<size_t, sizeof(tuple_size<_Tp>)>>>
     : public ::cuda::std::integral_constant<size_t, tuple_size<_Tp>::value>
-// >>>>>>> END NEW CODE (56b33f3bd8)
 {};
 
 template <class _Tp>
@@ -211,49 +186,10 @@ struct tuple_element<0, ::cuda::std::pair<_Tp, _Up>>
 };
 
 template <class _Tp, class _Up>
-// <<<<<<< OLD CODE from 00c9bc1db4 (56b33f3bd8) - COMMENTED OUT
-// struct tuple_size<const volatile ::cuda::std::pair<_Tp, _Up>> : ::cuda::std::tuple_size<::cuda::std::pair<_Tp, _Up>>
-// {};
-//
-// template <size_t _Ip, class _Tp, class _Up>
-// struct tuple_element<_Ip, ::cuda::std::pair<_Tp, _Up>> : ::cuda::std::tuple_element<_Ip, ::cuda::std::pair<_Tp, _Up>>
-// {};
-//
-// template <size_t _Ip, class _Tp, class _Up>
-// struct tuple_element<_Ip, const ::cuda::std::pair<_Tp, _Up>>
-//     : ::cuda::std::tuple_element<_Ip, const ::cuda::std::pair<_Tp, _Up>>
-// {};
-//
-// template <size_t _Ip, class _Tp, class _Up>
-// struct tuple_element<_Ip, volatile ::cuda::std::pair<_Tp, _Up>>
-//     : ::cuda::std::tuple_element<_Ip, volatile ::cuda::std::pair<_Tp, _Up>>
-// {};
-//
-// template <size_t _Ip, class _Tp, class _Up>
-// struct tuple_element<_Ip, const volatile ::cuda::std::pair<_Tp, _Up>>
-//     : ::cuda::std::tuple_element<_Ip, const volatile ::cuda::std::pair<_Tp, _Up>>
-// {};
-//
-// // NOTE(HIP/AMD): Partial specializations for tuple/subrange work with libstdc++
-// // and libc++ since they're proper partial specializations of the standard's
-// // tuple_size/tuple_element template.
-// template <class... _Tp>
-// struct tuple_size<::cuda::std::tuple<_Tp...>> : ::cuda::std::tuple_size<::cuda::std::tuple<_Tp...>>
-// {};
-//
-// template <class... _Tp>
-// struct tuple_size<const ::cuda::std::tuple<_Tp...>> : ::cuda::std::tuple_size<::cuda::std::tuple<_Tp...>>
-// {};
-//
-// template <class... _Tp>
-// struct tuple_size<volatile ::cuda::std::tuple<_Tp...>> : ::cuda::std::tuple_size<::cuda::std::tuple<_Tp...>>
-// {};
-// =======
 struct tuple_element<1, ::cuda::std::pair<_Tp, _Up>>
 {
   using type = _Up;
 };
-// >>>>>>> END NEW CODE (56b33f3bd8)
 
 template <class... _Tp>
 struct tuple_size<::cuda::std::tuple<_Tp...>>

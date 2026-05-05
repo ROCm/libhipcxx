@@ -190,14 +190,10 @@ __host__ __device__ constexpr bool test(float val)
   test_type<long double>(val);
 #endif // _CCCL_HAS_LONG_DOUBLE()
 #if _LIBCUDACXX_HAS_NVFP16()
-// <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
-// // NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-// #  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
-//   test_type<__half>();
-// #  endif
-// =======
+// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
+#  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
   test_type<__half>(val);
-// >>>>>>> END NEW CODE (e2c8bf22d1)
+#  endif
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
   test_type<__nv_bfloat16>(val);
@@ -239,42 +235,6 @@ __host__ __device__ constexpr bool test(float val)
   return true;
 }
 
-// <<<<<<< OLD CODE from 8e1b782d9c (e2c8bf22d1) - COMMENTED OUT
-// __host__ __device__ constexpr bool test_constexpr()
-// {
-// #if _LIBCUDACXX_HAS_NVFP16()
-// // NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-// #  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
-//   test_type<__half>();
-// #  endif
-// #endif // _LIBCUDACXX_HAS_NVFP16()
-// #if _LIBCUDACXX_HAS_NVBF16()
-//   test_type<__nv_bfloat16>();
-// #endif // _LIBCUDACXX_HAS_NVBF16()
-// #if _CCCL_HAS_NVFP8_E4M3()
-//   test_type<__nv_fp8_e4m3>();
-// #endif // _CCCL_HAS_NVFP8_E4M3
-// #if _CCCL_HAS_NVFP8_E5M2()
-//   test_type<__nv_fp8_e5m2>();
-// #endif // _CCCL_HAS_NVFP8_E5M2
-// #if _CCCL_HAS_NVFP8_E8M0()
-//   test_type<__nv_fp8_e8m0>();
-// #endif // _CCCL_HAS_NVFP8_E8M0
-// #if _CCCL_HAS_NVFP6_E2M3()
-//   test_type<__nv_fp6_e2m3>();
-// #endif // _CCCL_HAS_NVFP6_E2M3
-// #if _CCCL_HAS_NVFP6_E3M2()
-//   test_type<__nv_fp6_e3m2>();
-// #endif // _CCCL_HAS_NVFP6_E3M2
-// #if _CCCL_HAS_NVFP4_E2M1()
-//   test_type<__nv_fp4_e2m1>();
-// #endif // _CCCL_HAS_NVFP4_E2M1
-//
-//   return true;
-// }
-//
-// =======
-// >>>>>>> END NEW CODE (e2c8bf22d1)
 int main(int, char**)
 {
   volatile float val = 1.0f;
