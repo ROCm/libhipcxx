@@ -35,7 +35,7 @@ set(
 )
 set(
   atomic_install_location
-  "${libhipcxx_SOURCE_DIR}/include/cuda/std/__atomic/functions"
+  "${libcudacxx_SOURCE_DIR}/include/cuda/std/__atomic/functions"
 )
 
 add_custom_target(
