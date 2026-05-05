@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _LIBCUDACXX___FORMAT_FORMAT_ERROR_H
 #define _LIBCUDACXX___FORMAT_FORMAT_ERROR_H
 
@@ -22,17 +44,22 @@
 
 #include <cuda/std/__exception/terminate.h>
 
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): Also exclude HIPRTC. Including <stdexcept> here pulls in
+// libstdc++ <string> -> <bits/char_traits.h> -> <cstdint> -> system <stdint.h>,
+// which under HIPRTC conflicts with the int_fast*_t / uint_fast*_t aliases
+// previously defined by cuda/std/cstdint (e.g. int_fast16_t aliased to
+// int16_t/short in our header vs. long int in glibc's stdint.h).
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  if __cpp_lib_format >= 201907L
 #    include <format>
 #  else // ^^^ __cpp_lib_format >= 201907L ^^^ / vvv __cpp_lib_format < 201907L vvv
 #    include <stdexcept>
 #  endif // ^^^ __cpp_lib_format < 201907L ^^^
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #include <cuda/std/__cccl/prologue.h>
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD_NOVERSION
 
@@ -56,7 +83,7 @@ public:
 
 _LIBCUDACXX_END_NAMESPACE_STD_NOVERSION
 
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 _LIBCUDACXX_BEGIN_NAMESPACE_STD
 

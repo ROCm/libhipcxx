@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -40,10 +40,12 @@
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
+#if !_CCCL_COMPILER(NVRTC)
 // Fetch utility to get primary template for ::std::tuple_size necessary for the specialization of
 // ::std::tuple_size<cuda::std::tuple> to enable structured bindings.
 // See https://github.com/NVIDIA/libcudacxx/issues/316
+// NOTE(HIP/AMD): Also needed under HIPRTC since libstdc++ provides std::tuple_size
+// and our partial specializations need its primary template to be declared.
 #  include <utility>
 #endif // !_CCCL_COMPILER(NVRTC)
 
@@ -64,7 +66,10 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 
 namespace std
 {
-#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): When system <utility> isn't available (NVRTC), provide forward
+// declarations of tuple_size/tuple_element using variadic template parameters.
+// Under HIPRTC, we include <utility> to get the primary template from libstdc++.
+#if _CCCL_COMPILER(NVRTC)
 template <class... _Tp>
 struct tuple_size;
 
@@ -72,6 +77,8 @@ template <size_t _Ip, class... _Tp>
 struct tuple_element;
 #endif // _CCCL_COMPILER(NVRTC)
 
+// NOTE(HIP/AMD): Array specializations work with libstdc++'s std::tuple_size
+// since they're proper partial specializations.
 template <class _Tp, size_t _Size>
 struct tuple_size<_CUDA_VSTD::array<_Tp, _Size>> : _CUDA_VSTD::tuple_size<_CUDA_VSTD::array<_Tp, _Size>>
 {};
@@ -107,6 +114,8 @@ struct tuple_element<_Ip, const volatile _CUDA_VSTD::array<_Tp, _Size>>
     : _CUDA_VSTD::tuple_element<_Ip, const volatile _CUDA_VSTD::array<_Tp, _Size>>
 {};
 
+// NOTE(HIP/AMD): These partial specializations work with both libstdc++ and our
+// tuple_size/tuple_element since they are single-template-parameter specializations.
 template <class _Tp>
 struct tuple_size<_CUDA_VSTD::complex<_Tp>> : _CUDA_VSTD::tuple_size<_CUDA_VSTD::complex<_Tp>>
 {};
@@ -150,6 +159,9 @@ struct tuple_element<_Ip, const volatile _CUDA_VSTD::pair<_Tp, _Up>>
     : _CUDA_VSTD::tuple_element<_Ip, const volatile _CUDA_VSTD::pair<_Tp, _Up>>
 {};
 
+// NOTE(HIP/AMD): Partial specializations for tuple/subrange work with libstdc++
+// and libc++ since they're proper partial specializations of the standard's
+// tuple_size/tuple_element template.
 template <class... _Tp>
 struct tuple_size<_CUDA_VSTD::tuple<_Tp...>> : _CUDA_VSTD::tuple_size<_CUDA_VSTD::tuple<_Tp...>>
 {};

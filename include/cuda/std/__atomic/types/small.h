@@ -51,13 +51,12 @@
 #include <cuda/std/__type_traits/is_arithmetic.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/cstring>
+#include <cuda/std/cstdint>
 
-#if defined(_CCCL_COMPILER_HIPRTC)
-// NOTE(AMD/HIP): We need to define these types here because
-// they are not defined in hiprtc. libhipcxx issue #104.
-typedef __hip_internal::uint32_t uint32_t;
-typedef __hip_internal::int32_t int32_t;
-#endif
+// NOTE(HIP/AMD): Now that cuda/std/cstdint works correctly under HIPRTC
+// (see libhipcxx issue #104), we can use standard types here.
+using ::uint32_t;
+using ::int32_t;
 
 #include <cuda/std/__cccl/prologue.h>
 

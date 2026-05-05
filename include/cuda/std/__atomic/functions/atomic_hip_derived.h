@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -30,14 +30,13 @@
 #include <cuda/std/__type_traits/enable_if.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/__type_traits/is_unsigned.h>
-#if !defined(_CCCL_COMPILER_HIPRTC)
-#include <cstdint>
-#else
-// NOTE(AMD/HIP): We need to define these types here because 
-// they are not defined in hiprtc. libhipcxx issue #104.
-typedef __hip_internal::int64_t intptr_t;
-typedef __hip_internal::uint32_t uint32_t;
-#endif
+// NOTE(HIP/AMD): Use cuda/std/cstdint for both regular and HIPRTC builds.
+// This now works correctly under HIPRTC thanks to the fixes for issue #104
+// (using compiler __INT*_TYPE__ builtins and _STDINT_H guards to coexist
+// with system headers).
+#include <cuda/std/cstdint>
+using ::intptr_t;
+using ::uint32_t;
 template<class _Type, class _Scope, typename _CUDA_VSTD::enable_if<sizeof(_Type) <= 2, int>::type = 0>
 bool __device__ __atomic_compare_exchange_cuda(_Type volatile *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, _Scope __s) {
 

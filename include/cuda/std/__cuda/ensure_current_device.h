@@ -38,7 +38,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK() && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
+#if _CCCL_HAS_CTK() && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
 
 #  include <cuda/std/__cuda/api_wrapper.h>
 

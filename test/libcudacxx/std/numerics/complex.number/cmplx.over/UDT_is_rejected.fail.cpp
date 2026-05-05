@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -28,6 +28,11 @@
 
 // Test that UDT's convertible to an integral or floating point type do not
 // participate in overload resolution.
+
+// UNSUPPORTED: hipcc
+// NOTE(HIP/AMD): cuda::std::arg/imag/proj/norm overloads accept UDTs convertible to arithmetic
+// types under HIP (hipcc), so the expected `no matching function` errors are not
+// emitted. HIPRTC has different overload resolution behavior and works correctly.
 
 #include <cuda/std/cassert>
 #include <cuda/std/complex>

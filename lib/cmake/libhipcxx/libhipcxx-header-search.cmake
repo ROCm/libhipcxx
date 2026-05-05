@@ -1,4 +1,4 @@
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -16,6 +16,9 @@
 # THE SOFTWARE.
 
 # Parse version information from version header:
+# (Mirrors upstream lib/cmake/libcudacxx/libcudacxx-header-search.cmake; the
+# only difference is the relative path to our headers, since libhipcxx keeps
+# its headers at <repo>/include/ rather than <repo>/libcudacxx/include/.)
 set(_libhipcxx_VERSION_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../include")
 if(EXISTS "${_libhipcxx_VERSION_INCLUDE_DIR}/cuda/std/detail/__config")
   set(_libhipcxx_VERSION_INCLUDE_DIR "${_libhipcxx_VERSION_INCLUDE_DIR}" CACHE FILEPATH "" FORCE) # Clear old result

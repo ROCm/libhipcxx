@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -41,7 +41,12 @@
 
 #include "cuda_space_selector.h"
 #include "test_macros.h"
+
+#ifdef __HIP_PLATFORM_AMD__
+#include <hip/hip_cooperative_groups.h>
+#else
 #include <cooperative_groups/memcpy_async.h>
+#endif
 
 TEST_NV_DIAG_SUPPRESS(static_var_with_dynamic_init)
 TEST_NV_DIAG_SUPPRESS(186) // pointless comparison of unsigned integer with zero

@@ -76,12 +76,12 @@
 #endif // !_CCCL_HAS_CUDA_COMPILER()
 
 #if _CCCL_HAS_INCLUDE(<cuda_fp16.h>) && (_CCCL_HAS_CTK() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16)) \
-                      && !defined(CCCL_DISABLE_FP16_SUPPORT) || defined (__HIP_PLATFORM_AMD__)
+                      && !defined(CCCL_DISABLE_FP16_SUPPORT) || _CCCL_HIP_COMPILATION()
 #  undef _CCCL_HAS_NVFP16
 #  define _CCCL_HAS_NVFP16() 1
 #endif
 
-#if _CCCL_HAS_INCLUDE(<cuda_bf16.h>) && _CCCL_HAS_NVFP16() && !defined(CCCL_DISABLE_BF16_SUPPORT)  || defined (__HIP_PLATFORM_AMD__)
+#if _CCCL_HAS_INCLUDE(<cuda_bf16.h>) && _CCCL_HAS_NVFP16() && !defined(CCCL_DISABLE_BF16_SUPPORT)  || _CCCL_HIP_COMPILATION()
 #  undef _CCCL_HAS_NVBF16
 #  define _CCCL_HAS_NVBF16() 1
 #endif
@@ -115,15 +115,18 @@
 
 #if !defined(CCCL_DISABLE_FLOAT128_SUPPORT) && _CCCL_OS(LINUX) && !_CCCL_ARCH(ARM64)
 #  if (defined(__CUDACC_RTC_FLOAT128__) || defined(__SIZEOF_FLOAT128__) || defined(__FLOAT128__)) /*HOST COMPILERS*/
-#    if _CCCL_CUDA_COMPILATION() // Only NVCC on architectures at least SM100 supports float128 on device
+// NOTE(HIP/AMD): treat HIP like CUDA here. HIP device code does not support
+// __float128 either, so go down the same branch and only enable on the (HIP/CUDA)
+// host pass via the inner check.
+#    if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() // Only NVCC on architectures at least SM100 supports float128 on device
 #      if _CCCL_CUDA_COMPILER(NVCC) && _CCCL_PTX_ARCH() >= 1000 /*DEVICE CODE*/
 #        undef _CCCL_HAS_FLOAT128
 #        define _CCCL_HAS_FLOAT128() 1
 #      endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_PTX_ARCH() >= 1000
-#    else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
+#    else // ^^^ CUDA/HIP compilation ^^^ / vvv !CUDA/HIP compilation vvv
 #      undef _CCCL_HAS_FLOAT128
 #      define _CCCL_HAS_FLOAT128() 1
-#    endif // !_CCCL_CUDA_COMPILATION()
+#    endif // !CUDA/HIP compilation
 #  endif // Host compiler support
 #endif // !CCCL_DISABLE_FLOAT128_SUPPORT && _CCCL_OS(LINUX)
 

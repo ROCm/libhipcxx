@@ -53,7 +53,7 @@
 
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 using __cuda_error_t = ::cudaError_t;
 #else
 using __cuda_error_t = int;
@@ -84,11 +84,11 @@ static char* __format_cuda_error(
     __loc.line(),
     __api ? __api : "",
     __api ? " " : "",
-#  if _CCCL_HAS_CTK()
+#  if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     ::cudaGetErrorString(::cudaError_t(__status)),
-#  else // ^^^ _CCCL_HAS_CTK() ^^^ / vvv !_CCCL_HAS_CTK() vvv
+#  else // ^^^ has CTK or HIP ^^^ / vvv neither CTK nor HIP vvv
     "cudaError",
-#  endif // ^^^ !_CCCL_HAS_CTK() ^^^
+#  endif // ^^^ neither CTK nor HIP ^^^
     __status,
     __msg);
   return __msg_buffer.__buffer;

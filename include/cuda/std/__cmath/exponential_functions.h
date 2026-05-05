@@ -52,9 +52,9 @@
 #include <cuda/std/cstdint>
 
 // MSVC and clang cuda need the host side functions included
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -69,11 +69,11 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // _CCCL_CHECK_BUILTIN(builtin_exp)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "expf"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_EXPF
 #  undef _CCCL_BUILTIN_EXP
 #  undef _CCCL_BUILTIN_EXPL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float exp(float __x) noexcept
 {
@@ -171,11 +171,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_frexp)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "frexp"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_FREXPF
 #  undef _CCCL_BUILTIN_FREXP
 #  undef _CCCL_BUILTIN_FREXPL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float frexp(float __x, int* __e) noexcept
 {
@@ -253,11 +253,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_ldexp)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "ldexp"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LDEXPF
 #  undef _CCCL_BUILTIN_LDEXP
 #  undef _CCCL_BUILTIN_LDEXPL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float ldexp(float __x, int __e) noexcept
 {
@@ -335,11 +335,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_exp2)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "exp2"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_EXP2F
 #  undef _CCCL_BUILTIN_EXP2
 #  undef _CCCL_BUILTIN_EXP2L
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float exp2(float __x) noexcept
 {
@@ -418,11 +418,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_expm1)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "expm1"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_EXPM1F
 #  undef _CCCL_BUILTIN_EXPM1
 #  undef _CCCL_BUILTIN_EXPM1L
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float expm1(float __x) noexcept
 {
@@ -500,11 +500,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_scalbln)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "scalblnf"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_SCALBLNF
 #  undef _CCCL_BUILTIN_SCALBLN
 #  undef _CCCL_BUILTIN_SCALBLNL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float scalbln(float __x, long __y) noexcept
 {
@@ -582,11 +582,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_scalbn)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "scalbnf"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_SCALBNF
 #  undef _CCCL_BUILTIN_SCALBN
 #  undef _CCCL_BUILTIN_SCALBNL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float scalbn(float __x, int __y) noexcept
 {
@@ -664,11 +664,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_pow)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "pow"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_POWF
 #  undef _CCCL_BUILTIN_POW
 #  undef _CCCL_BUILTIN_POWL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float pow(float __x, float __y) noexcept
 {

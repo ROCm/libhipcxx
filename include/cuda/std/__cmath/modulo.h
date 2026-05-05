@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _LIBCUDACXX___CMATH_MODULO_H
 #define _LIBCUDACXX___CMATH_MODULO_H
 
@@ -42,11 +64,11 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // _CCCL_CHECK_BUILTIN(builtin_fmod)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "modf"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_FMODF
 #  undef _CCCL_BUILTIN_FMOD
 #  undef _CCCL_BUILTIN_FMODL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float fmod(float __x, float __y) noexcept
 {
@@ -126,11 +148,11 @@ template <class _A1, class _A2, enable_if_t<is_arithmetic_v<_A1> && is_arithmeti
 #endif // _CCCL_CHECK_BUILTIN(builtin_modf)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "modf"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_MODFF
 #  undef _CCCL_BUILTIN_MODF
 #  undef _CCCL_BUILTIN_MODFL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float modf(float __x, float* __y) noexcept
 {

@@ -46,7 +46,7 @@
 namespace __cccl_internal
 {
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 template <class _Tp>
 __host__ __device__ _Tp&& __cccl_declval(int);
 template <class _Tp>

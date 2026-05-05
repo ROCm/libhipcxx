@@ -136,11 +136,11 @@ _CCCL_HOST_DEVICE
       _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
       ? (void) 0 : __assert_fail(message, __FILE__, __LINE__, __func__)
 #  endif // !_CCCL_COMPILER(MSVC)
-#elif _CCCL_CUDA_COMPILATION()
+#elif _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #  define _CCCL_ASSERT_IMPL_DEVICE(expression, message) _CCCL_ASSERT_IMPL_HOST(expression, message)
-#else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
+#else // ^^^ CUDA/HIP compilation ^^^ / vvv !CUDA/HIP compilation vvv
 #  define _CCCL_ASSERT_IMPL_DEVICE(expression, message) ((void) 0)
-#endif // !_CCCL_CUDA_COMPILATION()
+#endif // !CUDA/HIP compilation
 
 //! _CCCL_ASSERT_HOST is enabled conditionally depending on CCCL_ENABLE_HOST_ASSERTIONS
 #ifdef CCCL_ENABLE_HOST_ASSERTIONS
@@ -166,7 +166,7 @@ _CCCL_HOST_DEVICE
 #  else
 #    define _CCCL_ASSERT(expression, message) ((void) 0)
 #  endif
-#elif _CCCL_CUDA_COMPILATION()
+#elif _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #  if _CCCL_DEVICE_COMPILATION()
 #    define _CCCL_VERIFY(expression, message) _CCCL_ASSERT_IMPL_DEVICE(expression, message)
 #    define _CCCL_ASSERT(expression, message) _CCCL_ASSERT_DEVICE(expression, message)
@@ -174,9 +174,9 @@ _CCCL_HOST_DEVICE
 #    define _CCCL_VERIFY(expression, message) _CCCL_ASSERT_IMPL_HOST(expression, message)
 #    define _CCCL_ASSERT(expression, message) _CCCL_ASSERT_HOST(expression, message)
 #  endif // !_CCCL_DEVICE_COMPILATION()
-#else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
+#else // ^^^ CUDA/HIP compilation ^^^ / vvv !CUDA/HIP compilation vvv
 #  define _CCCL_VERIFY(expression, message) _CCCL_ASSERT_IMPL_HOST(expression, message)
 #  define _CCCL_ASSERT(expression, message) _CCCL_ASSERT_HOST(expression, message)
-#endif // !_CCCL_CUDA_COMPILATION()
+#endif // !CUDA/HIP compilation
 
 #endif // __CCCL_ASSERT_H

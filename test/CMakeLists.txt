@@ -20,6 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# Build HIPRTC/NVRTC compiler wrapper if needed
+if(LIBHIPCXX_TEST_WITH_HIPRTC)
+  add_subdirectory(utils/amd/hiprtc)
+elseif(LIBCUDACXX_TEST_WITH_NVRTC)
+  add_subdirectory(utils/nvidia/nvrtc)
+endif()
+
 # Libcudacxx's main lit tests
 add_subdirectory(libcudacxx)
 

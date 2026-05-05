@@ -50,7 +50,7 @@
 
 #include <nv/target>
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/std/__cccl/prologue.h>
 
@@ -293,6 +293,6 @@ _LIBCUDACXX_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #endif // _CUDA__FUNCTIONAL_FOR_EACH_CANCELED_H

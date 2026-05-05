@@ -108,7 +108,7 @@ __host__ __device__ TEST_CONSTEXPR_CXX23 bool test_basic()
   return true;
 }
 
-#if !_CCCL_CUDA_COMPILATION()
+#if !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION()
 DEFINE_AND_RUN_IS_INCOMPLETE_TEST(
   {
     doIncompleteTypeTest(0);
@@ -117,7 +117,7 @@ DEFINE_AND_RUN_IS_INCOMPLETE_TEST(
     doIncompleteTypeTest<IncompleteType[]>(0);
     doIncompleteTypeTest<IncompleteType[], Deleter<IncompleteType[]>>(0);
   })
-#endif // !_CCCL_CUDA_COMPILATION()
+#endif // !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION()
 
 __host__ __device__ TEST_CONSTEXPR_CXX23 bool test()
 {

@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,74 +44,14 @@
 #endif // no system header
 
 #if !_CCCL_COMPILER(NVRTC)
-#if !defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): Under HIPRTC, system C++ headers (libstdc++) are accessible
+// and pulled in transitively by other system headers (e.g. <stdexcept>).
+// We need to include <initializer_list> here to:
+//   1. Provide std::initializer_list for our `using ::std::initializer_list`
+//   2. Use the same definition as system headers (preventing redefinition conflicts)
+// Previously HIPRTC defined initializer_list locally to avoid undefined symbol
+// errors (Internal issue #72), but current HIPRTC versions don't have this issue.
 #  include <initializer_list>
-#else
-// NOTE(HIPRTC): We use local definition otherwise we get undefined symbol errors
-// Internal issue #72. Once issue is fixed we should use !defined(_CCCL_COMPILER_HIPRTC)
-// NOTE(HIPRTC): hiprtc does not include any headers. Define initializer_list locally.
-namespace std
-{
-  /// initializer_list
-  template<class _E>
-    class initializer_list
-    {
-    public:
-      typedef _E 		value_type;
-      typedef const _E& 	reference;
-      typedef const _E& 	const_reference;
-      typedef size_t 		size_type;
-      typedef const _E* 	iterator;
-      typedef const _E* 	const_iterator;
-
-    private:
-      iterator			_M_array;
-      size_type			_M_len;
-
-      // The compiler can call a private constructor.
-      constexpr initializer_list(const_iterator __a, size_type __l)
-      : _M_array(__a), _M_len(__l) { }
-
-    public:
-      constexpr initializer_list() noexcept
-      : _M_array(0), _M_len(0) { }
-
-      // Number of elements.
-      constexpr size_type
-      size() const noexcept { return _M_len; }
-
-      // First element.
-      constexpr const_iterator
-      begin() const noexcept { return _M_array; }
-
-      // One past the last element.
-      constexpr const_iterator
-      end() const noexcept { return begin() + size(); }
-    };
-
-  /**
-   *  @brief  Return an iterator pointing to the first element of
-   *          the initializer_list.
-   *  @param  __ils  Initializer list.
-   *  @relates initializer_list
-   */
-  template<class _Tp>
-    constexpr const _Tp*
-    begin(initializer_list<_Tp> __ils) noexcept
-    { return __ils.begin(); }
-
-  /**
-   *  @brief  Return an iterator pointing to one past the last element
-   *          of the initializer_list.
-   *  @param  __ils  Initializer list.
-   *  @relates initializer_list
-   */
-  template<class _Tp>
-    constexpr const _Tp*
-    end(initializer_list<_Tp> __ils) noexcept
-    { return __ils.end(); }
-}
-#endif // _CCCL_COMPILER_HIPRTC
 #endif // !_CCCL_COMPILER(NVRTC)
 
 #include <cuda/std/__cccl/prologue.h>

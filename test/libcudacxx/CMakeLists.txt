@@ -76,29 +76,29 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
 elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
   # TODO: Use project properties to get path to binary.
   # Should also set up dependency on the project when NVRTC is enabled
-  # HIPRTC is the AMD runtime; use the same HIP_PLATFORM-based compiler
-  # selection as the offline compilation path below.
-  set(CMAKE_CUDA_COMPILER_ID "AMDCLANG")
-  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
+  set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+  set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
-  set(LIBCUDACXX_FORCE_INCLUDE "-include '${libhipcxx_SOURCE_DIR}/test/support/nvrtc_limit_macros.h'")
+  set(LIBCUDACXX_FORCE_INCLUDE "")
   set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${HIP_INCLUDE_DIR}'")
   # NOTE(HIP/AMD): We need to identify clang version to find from the path to clang new header.
   # The header is used in libhipcxx/include/cuda/std/__memory/construct_at.h.
   execute_process(
-    COMMAND "${CMAKE_CXX_COMPILER}" --print-resource-dir
+    COMMAND "${HIP_HIPCC_EXECUTABLE}" --print-resource-dir
     OUTPUT_VARIABLE _clang_abs_resource_dir
     OUTPUT_STRIP_TRAILING_WHITESPACE
     COMMAND_ERROR_IS_FATAL ANY
   )
   cmake_path(GET _clang_abs_resource_dir FILENAME _clang_version)
-  set(_clang_new_header_prefix_resource_dir "lib/llvm/lib/clang/${_clang_version}/include/cuda_wrappers")
+  set(_clang_include_dir "lib/llvm/lib/clang/${_clang_version}/include")
+  set(_clang_cuda_wrappers_dir "${_clang_include_dir}/cuda_wrappers")
   string(JOIN " " LIBCUDACXX_TEST_COMPILER_FLAGS
     -I${HIP_INCLUDE_DIR}
-    -I${HIP_INCLUDE_DIR}/../${_clang_new_header_prefix_resource_dir}
+    -I${HIP_INCLUDE_DIR}/../${_clang_include_dir}
+    -I${HIP_INCLUDE_DIR}/../${_clang_cuda_wrappers_dir}
   )
   # Use the NVRTCC utility to run the built test outputs
   set(LIBCUDACXX_EXECUTOR "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())")
@@ -109,17 +109,9 @@ else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
     set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
     set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
   elseif(LIBCUDACXX_ENABLE_HIP)
-    set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/force_include_hip.h")
-    # Select compiler based on HIP_PLATFORM env var HIP_PLATFORM
-    # if HIP_PLAFORM=nvidia use nvcc; else use amdclang++.
-    if("$ENV{HIP_PLATFORM}" STREQUAL "nvidia" OR "$ENV{HIP_PLATFORM}" STREQUAL "nvcc")
-      find_program(NVCC_EXECUTABLE nvcc REQUIRED)
-      set(LIBCUDACXX_CUDA_COMPILER "${NVCC_EXECUTABLE}")
-      set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
-    else()
-      set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CXX_COMPILER}")
-      set(CMAKE_CUDA_COMPILER_ID "AMDCLANG")
-    endif()
+    set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/libcudacxx/force_include_hip.h")
+    #temporary workaround until we've found a way to make cmake find hipcc
+    set(LIBCUDACXX_CUDA_COMPILER "${HIP_HIPCC_EXECUTABLE}")
     set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
     set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
     set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
@@ -284,7 +276,7 @@ elseif(LIBCUDACXX_ENABLE_HIP)
     add_custom_target(libcudacxx.test.lit.precompile
       DEPENDS libcudacxx.test.public_headers libcudacxx.test.internal_headers libcudacxx.test.public_headers_host_only
       COMMAND "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
-      "${libcudacxx_LIT}" -vv --no-progress-bar ${libcudacxx_LIT_FLAGS} -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test"
+      "${libcudacxx_LIT}" -vv --no-progress-bar ${libcudacxx_LIT_FLAGS} -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "-Dexecutor=\"NoopExecutor()\"" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
     )
 
   endif()
@@ -294,7 +286,7 @@ add_test(NAME libcudacxx.test.lit COMMAND
   "${CMAKE_COMMAND}" -E env
     "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
   "${libcudacxx_LIT}" -vv --no-progress-bar --time-tests ${libcudacxx_LIT_FLAGS}
-    -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "${libhipcxx_SOURCE_DIR}/test"
+    -j "${libcudacxx_LIT_PARALLEL_LEVEL}" "${libhipcxx_SOURCE_DIR}/test/libcudacxx"
 )
 
 set_tests_properties(libcudacxx.test.lit PROPERTIES

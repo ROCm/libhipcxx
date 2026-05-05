@@ -39,15 +39,15 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_CUDA_COMPILATION() || defined(__HIP_PLATFORM_AMD__) || defined(__HIPCC_RTC__)
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || defined(__HIPCC_RTC__)
 #  define _CCCL_HOST        __host__
 #  define _CCCL_DEVICE      __device__
 #  define _CCCL_HOST_DEVICE __host__ __device__
-#else // ^^^ _CCCL_CUDA_COMPILATION ^^^ / vvv !_CCCL_CUDA_COMPILATION vvv
+#else // ^^^ CUDA/HIP compilation ^^^ / vvv !CUDA/HIP compilation vvv
 #  define _CCCL_HOST
 #  define _CCCL_DEVICE
 #  define _CCCL_HOST_DEVICE
-#endif // !_CCCL_CUDA_COMPILATION
+#endif // !CUDA/HIP compilation
 
 // Global variables of non builtin types are only device accessible if they are marked as `__device__`
 #if _CCCL_DEVICE_COMPILATION() && !_CCCL_CUDA_COMPILER(NVHPC)
