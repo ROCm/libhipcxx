@@ -40,6 +40,23 @@
 #endif
 #endif
 
+// NOTE(HIP/AMD): Wave-size selector. AMD wavefronts are 64 lanes wide on
+// gfx9 (MI100/MI200/MI300) and 32 lanes wide on RDNA (gfx10+, gfx11, gfx12).
+// Used by HIP-side PTX-wrapper emulations of the warp lanemask SREGs to
+// derive a wave-size-aware all-lanes mask without leaking bits into
+// positions above the actual wave size.
+//
+// The host pass defaults to wave-32 (no __GFX*__ defined); the bodies
+// that consume this macro are __device__-only so this only affects
+// codegen in the device pass.
+#if defined(__GFX9__)
+#  define _CCCL_HIP_WAVE_SIZE 64
+#elif defined(__GFX10_1__) || defined(__GFX10_3__) || defined(__GFX11__) || defined(__GFX12__)
+#  define _CCCL_HIP_WAVE_SIZE 32
+#else
+#  define _CCCL_HIP_WAVE_SIZE 32
+#endif
+
 namespace libhipcxx
 {
   __host__ __device__ inline void __trap(){
