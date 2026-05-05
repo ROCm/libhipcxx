@@ -66,6 +66,7 @@ _CCCL_API constexpr uint32_t __bit_log2(_Tp __t) noexcept
 {
   if (!::cuda::std::__cccl_default_is_constant_evaluated())
   {
+#if _CCCL_CUDA_COMPILATION()
     if constexpr (sizeof(_Tp) <= 8)
     {
       using _Up [[maybe_unused]] = _If<sizeof(_Tp) <= 4, uint32_t, uint64_t>;
@@ -77,6 +78,7 @@ _CCCL_API constexpr uint32_t __bit_log2(_Tp __t) noexcept
                    (auto __high = ::cuda::ptx::bfind(static_cast<uint64_t>(__t >> 64));
                     return __high == ~uint32_t{0} ? ::cuda::ptx::bfind(static_cast<uint64_t>(__t)) : __high + 64;))
     }
+#endif // _CCCL_CUDA_COMPILATION()
   }
   return numeric_limits<_Tp>::digits - 1 - ::cuda::std::countl_zero(__t);
 }
