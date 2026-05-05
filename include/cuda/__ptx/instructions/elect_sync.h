@@ -9,6 +9,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_PTX_ELECT_SYNC_H_
 #define _CUDA_PTX_ELECT_SYNC_H_
 
@@ -33,6 +55,31 @@
 _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 
 #include <cuda/__ptx/instructions/generated/elect_sync.h>
+
+#if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): Software emulation of PTX SM_90+ `elect.sync`. Returns
+// true on exactly the lane corresponding to the lowest set bit of
+// (membermask & __activemask()). Slower than the dedicated PTX
+// instruction. Ported from upgrade/3.1_base PTX-on-HIP roadmap
+// (feat/moberste/add_partial_ptx_support_3_1).
+template <typename = void>
+_CCCL_DEVICE static inline bool elect_sync(const ::cuda::std::uint32_t& __membermask)
+{
+#  if defined(__HIP_DEVICE_COMPILE__)
+  const unsigned long long __active = static_cast<unsigned long long>(__membermask) & ::__activemask();
+  if (__active == 0ull)
+  {
+    return false;
+  }
+  // __ffsll is 1-based; subtract 1 for 0-based lane id.
+  return static_cast<unsigned>(::__ffsll(static_cast<long long>(__active)) - 1) == ::__lane_id();
+#  else
+  // On the host pass the function is never called; just return false.
+  (void) __membermask;
+  return false;
+#  endif
+}
+#endif // _CCCL_HIP_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA_PTX
 
