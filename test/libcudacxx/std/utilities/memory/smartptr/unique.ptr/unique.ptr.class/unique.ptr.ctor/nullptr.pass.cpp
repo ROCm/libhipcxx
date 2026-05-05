@@ -93,7 +93,7 @@ __host__ __device__ TEST_CONSTEXPR_CXX23 void test_sfinae()
   }
 }
 
-#if !_CCCL_CUDA_COMPILATION()
+#if !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION()
 DEFINE_AND_RUN_IS_INCOMPLETE_TEST({
   {
     doIncompleteTypeTest(0, nullptr);
@@ -112,7 +112,7 @@ DEFINE_AND_RUN_IS_INCOMPLETE_TEST({
   }
   checkNumIncompleteTypeAlive(0);
 })
-#endif // !_CCCL_CUDA_COMPILATION()
+#endif // !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION()
 
 __host__ __device__ TEST_CONSTEXPR_CXX23 bool test()
 {

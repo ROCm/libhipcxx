@@ -51,9 +51,9 @@
 #include <nv/target>
 
 // MSVC and clang cuda need the host side functions included
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -68,11 +68,11 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #endif // _CCCL_CHECK_BUILTIN(builtin_log)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "logf"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LOGF
 #  undef _CCCL_BUILTIN_LOG
 #  undef _CCCL_BUILTIN_LOGL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float log(float __x) noexcept
 {
@@ -171,7 +171,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_log10)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "log10f"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LOG10F
 #  undef _CCCL_BUILTIN_LOG10
 #  undef _CCCL_BUILTIN_LOG10L
@@ -260,11 +260,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 
 // Below 11.7 nvcc treats the builtin as a host only function
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "ilogb"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_ILOGBF
 #  undef _CCCL_BUILTIN_ILOGB
 #  undef _CCCL_BUILTIN_ILOGBL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline int ilogb(float __x) noexcept
 {
@@ -346,7 +346,7 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_log1p)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "log1p"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LOG1PF
 #  undef _CCCL_BUILTIN_LOG1P
 #  undef _CCCL_BUILTIN_LOG1PL
@@ -432,11 +432,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_log1)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "log2f"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LOG2F
 #  undef _CCCL_BUILTIN_LOG2
 #  undef _CCCL_BUILTIN_LOG2L
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float log2(float __x) noexcept
 {
@@ -520,11 +520,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #endif // _CCCL_CHECK_BUILTIN(builtin_log1)
 
 // clang-cuda fails with fatal error: error in backend: Undefined external symbol "logb"
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LOGBF
 #  undef _CCCL_BUILTIN_LOGB
 #  undef _CCCL_BUILTIN_LOGBL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float logb(float __x) noexcept
 {

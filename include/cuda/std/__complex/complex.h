@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _LIBCUDACXX___COMPLEX_COMPLEX_H
 #define _LIBCUDACXX___COMPLEX_COMPLEX_H
 
@@ -36,13 +58,14 @@
 #include <cuda/std/limits>
 
 // Compatibility helpers for thrust to convert between `std::complex` and `cuda::std::complex`
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): Also exclude for HIPRTC to avoid system math.h enum conflicts
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <complex>
 #  include <sstream> // for std::basic_ostringstream
 
 #  define _LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__c) reinterpret_cast<const _Up(&)[2]>(__c)[0]
 #  define _LIBCUDACXX_ACCESS_STD_COMPLEX_IMAG(__c) reinterpret_cast<const _Up(&)[2]>(__c)[1]
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -109,7 +132,8 @@ public:
     return *this;
   }
 
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): Exclude for HIPRTC to avoid system math.h enum conflicts
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
   template <class _Up>
   _CCCL_API inline complex(const ::std::complex<_Up>& __other)
       : __re_(_LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__other))
@@ -128,7 +152,7 @@ public:
   {
     return {__re_, __im_};
   }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
   [[nodiscard]] _CCCL_API constexpr value_type real() const
   {
@@ -566,7 +590,8 @@ template <class _Tp>
 }
 #endif // _CCCL_STD_VER <= 2017
 
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): Exclude for HIPRTC to avoid system math.h enum conflicts
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 template <class _Tp, class _Up>
 [[nodiscard]] _CCCL_API constexpr bool operator==(const complex<_Tp>& __x, const ::std::complex<_Up>& __y)
 {
@@ -594,7 +619,7 @@ template <class _Tp, class _Up>
   return !(__x == __y);
 }
 #  endif // _CCCL_STD_VER <= 2017
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 // real
 
@@ -652,7 +677,8 @@ template <class _Tp>
   return 0;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): Exclude for HIPRTC to avoid system math.h enum conflicts
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 template <class _Tp, class _CharT, class _Traits>
 ::std::basic_istream<_CharT, _Traits>& operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<_Tp>& __x)
 {
@@ -667,7 +693,7 @@ template <class _Tp, class _CharT, class _Traits>
 {
   return __os << static_cast<::std::complex<_Tp>>(__x);
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 _LIBCUDACXX_END_NAMESPACE_STD
 

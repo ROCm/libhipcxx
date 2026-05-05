@@ -429,7 +429,7 @@ class Configuration(object):
                                 self.cxx.default_dialect))
             self.cxx.compile_env = dict(os.environ)
             
-            # NOTE(AMD/HIP): Get rocm version and define attributes to unsupport tests based on ROCm version.
+            # NOTE(HIP/AMD): Get rocm version and define attributes to unsupport tests based on ROCm version.
             rocm_version = self.get_rocm_version()  # (major, minor, patch) as ints
             if rocm_version is None:
                 print("Warning: rocm_version could not be identified, some tests may fail\

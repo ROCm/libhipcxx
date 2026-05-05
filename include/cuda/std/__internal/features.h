@@ -74,14 +74,14 @@
 
 // libcu++ requires host device support for its tests. Until then restrict usage to at least 12.2
 #if (_CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2) \
-  && (_CCCL_HAS_CUDA_COMPILER() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16))) || defined(__HIP_PLATFORM_AMD__)
+  && (_CCCL_HAS_CUDA_COMPILER() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16))) || _CCCL_HIP_COMPILATION()
 #  define _LIBCUDACXX_HAS_NVFP16() 1
 #else
 #  define _LIBCUDACXX_HAS_NVFP16() 0
 #endif // _CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2)
 
 // libcu++ requires host device support for its tests. Until then restrict usage to at least 12.2
-#if (_CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2)) || defined(__HIP_PLATFORM_AMD__)
+#if (_CCCL_HAS_NVBF16() && _CCCL_CTK_AT_LEAST(12, 2)) || _CCCL_HIP_COMPILATION()
 #  define _LIBCUDACXX_HAS_NVBF16() 1
 #else
 #  define _LIBCUDACXX_HAS_NVBF16() 0

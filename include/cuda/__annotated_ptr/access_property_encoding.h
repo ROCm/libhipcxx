@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___ANNOTATED_PTR_ACCESS_PROPERTY_ENCODING
 #define _CUDA___ANNOTATED_PTR_ACCESS_PROPERTY_ENCODING
 
@@ -113,7 +135,13 @@ enum class __l2_descriptor_mode_t : uint32_t
   NV_IF_ELSE_TARGET(
     NV_IS_HOST,
     (return ::cuda::__block_encoding_host(__primary, __secondary, __ptr, __primary_bytes1, __total_bytes1);),
-    (return ::cuda::__createpolicy_range(__primary, __secondary, __ptr, __primary_bytes1, __total_bytes1);))
+#ifndef _CCCL_HIP_COMPILER
+    (return ::cuda::__createpolicy_range(__primary, __secondary, __ptr, __primary_bytes1, __total_bytes1);)
+#else
+    // HIP doesn't have PTX createpolicy, use host implementation
+    (return ::cuda::__block_encoding_host(__primary, __secondary, __ptr, __primary_bytes1, __total_bytes1);)
+#endif
+    )
 }
 
 /***********************************************************************************************************************
@@ -140,8 +168,13 @@ __l2_interleave(__l2_evict_t __primary, __l2_evict_t __secondary, float __fracti
 {
   if (!_CUDA_VSTD::__cccl_default_is_constant_evaluated())
   {
+#ifndef _CCCL_HIP_COMPILER
     NV_IF_ELSE_TARGET(
       NV_PROVIDES_SM_80, (return ::cuda::__createpolicy_fraction(__primary, __secondary, __fraction);), (return 0;))
+#else
+    // HIP doesn't have createpolicy_fraction, fall back to software implementation below
+    return 0;
+#endif
   }
   _CCCL_ASSERT(__fraction > 0.0f && __fraction <= 1.0f, "fraction must be between 0.0f and 1.0f");
   _CCCL_ASSERT(__secondary == __l2_evict_t::_L2_Evict_First || __secondary == __l2_evict_t::_L2_Evict_Unchanged,

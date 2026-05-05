@@ -155,11 +155,25 @@
 #  define _CCCL_HAS_CUDA_COMPILER() 0
 #endif // ^^^ no cuda compiler ^^^
 
-#if defined(__CUDACC__) || _CCCL_CUDA_COMPILER(NVHPC) || defined(_CCCL_COMPILER_HIPCC) || defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): hipcc/hiprtc are intentionally excluded here so that
+// _CCCL_CUDA_COMPILATION() retains its strict upstream meaning ("compiling a CUDA
+// translation unit"). HIP support is opted in at each consumer site via
+// "_CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()".
+#if defined(__CUDACC__) || _CCCL_CUDA_COMPILER(NVHPC)
 #  define _CCCL_CUDA_COMPILATION() 1
 #else // ^^^ compiling .cu file ^^^ / vvv not compiling .cu file vvv
 #  define _CCCL_CUDA_COMPILATION() 0
 #endif // ^^^ not compiling .cu file ^^^
+
+// NOTE(HIP/AMD): mirror of _CCCL_CUDA_COMPILATION() for HIP. True when compiling
+// a HIP translation unit (i.e. __HIP_PLATFORM_AMD__ is defined). Use this at
+// consumer sites instead of "defined(__HIP_PLATFORM_AMD__)" so that intent
+// matches _CCCL_CUDA_COMPILATION() semantically.
+#if defined(__HIP_PLATFORM_AMD__)
+#  define _CCCL_HIP_COMPILATION() 1
+#else // ^^^ compiling HIP TU ^^^ / vvv not compiling HIP TU vvv
+#  define _CCCL_HIP_COMPILATION() 0
+#endif // ^^^ not compiling HIP TU ^^^
 
 // Determine if we are compiling host code, this includes both CUDA and C++ compilation
 // nvc++ does not define __CUDA_ARCH__, but it compiles both host and device code at the same time
@@ -169,7 +183,11 @@
 #  define _CCCL_HOST_COMPILATION() 0
 #endif // ^^^ not compiling host code ^^^
 
-#if (_CCCL_CUDA_COMPILATION() && (defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__))) || _CCCL_CUDA_COMPILER(NVHPC)
+// NOTE(HIP/AMD): _CCCL_CUDA_COMPILATION() is 0 on hipcc/hiprtc, so include
+// _CCCL_HIP_COMPILATION() explicitly to keep device-side detection working on HIP.
+#if (_CCCL_CUDA_COMPILATION() && defined(__CUDA_ARCH__)) \
+  || (_CCCL_HIP_COMPILATION() && defined(__HIP_DEVICE_COMPILE__)) \
+  || _CCCL_CUDA_COMPILER(NVHPC)
 #  define _CCCL_DEVICE_COMPILATION() 1
 #else // ^^^ compiling device code ^^^ / vvv not compiling device code vvv
 #  define _CCCL_DEVICE_COMPILATION() 0

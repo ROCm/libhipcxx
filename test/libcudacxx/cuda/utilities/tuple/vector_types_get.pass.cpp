@@ -24,9 +24,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// NOTE(HIP/AMD): currently not supported due to union member of HIP_vector_types (see SWDEV-527890)
-// UNSUPPORTED: hipcc, hiprtc
-
 #include <cuda/std/__floating_point/fp.h>
 #include <cuda/std/cassert>
 #include <cuda/std/limits>

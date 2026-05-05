@@ -131,11 +131,15 @@ static RunConfig parse_run_config(const std::string& input)
 
 // Fake main for adapting kernels
 static const char* program = R"program(
-// NOTE(HIP): libhipcxx specific macros and types
-typedef unsigned int uint32_t;
-typedef unsigned long long uint64_t;
-typedef signed int int32_t;
-typedef signed long long int64_t;
+// C++ standard library types needed for libhipcxx headers
+// Guard against redefinition from system headers (use clang's guard)
+#ifndef __CLANG_MAX_ALIGN_T_DEFINED
+#define __CLANG_MAX_ALIGN_T_DEFINED
+typedef struct {
+  long long __clang_max_align_nonce1 __attribute__((__aligned__(__alignof__(long long))));
+  long double __clang_max_align_nonce2 __attribute__((__aligned__(__alignof__(long double))));
+} max_align_t;
+#endif
 
 // Taken from the reference implementation repo
 // TODO(HIP/AMD): this is a temporary WAR to create leass file modifications.
@@ -151,49 +155,63 @@ typedef signed long long int64_t;
 #define NV_IS_DEVICE NV_IS_DEVICE
 #endif
 
+// NOTE(HIP/AMD): HIPRTC does not include hip/hip_runtime.h, so types and
+// constants from the HIP runtime API are not available. Provide minimal stub
+// definitions needed by libhipcxx headers (referenced via cuda_*->hip_* macro
+// mappings in include/amd/cuda_runtime.h).
+typedef int hipError_t;
+#define hipSuccess ((hipError_t)0)
+typedef enum hipMemoryType {
+  hipMemoryTypeUnregistered = 0,
+  hipMemoryTypeHost         = 1,
+  hipMemoryTypeDevice       = 2,
+  hipMemoryTypeManaged      = 3,
+  hipMemoryTypeArray        = 10,
+  hipMemoryTypeUnified      = 11
+} hipMemoryType;
+typedef struct hipPointerAttribute_t {
+  enum hipMemoryType type;
+  int device;
+  void* devicePointer;
+  void* hostPointer;
+  int isManaged;
+  unsigned allocationFlags;
+} hipPointerAttribute_t;
+// Stub declarations for runtime APIs (not actually callable from device code,
+// but allow code paths that reference them to compile).
+hipError_t hipPointerGetAttributes(hipPointerAttribute_t* attributes, const void* ptr);
+hipError_t hipGetLastError(void);
+// __managed__ qualifier is hipcc-specific; provide empty definition under HIPRTC.
+#ifndef __managed__
+#  define __managed__
+#endif
+
 // Define all macros required for reverse hipification here
 #ifndef __nv_bfloat16
-#  define __nv_bfloat16 __nv_bfloat16
+#  define __nv_bfloat16 __hip_bfloat16
 #endif
 #ifndef __nv_bfloat16_raw
-#  define __nv_bfloat16_raw __nv_bfloat16_raw
+#  define __nv_bfloat16_raw __hip_bfloat16_raw
 #endif
 #ifndef __nv_bfloat162
-#  define __nv_bfloat162 __nv_bfloat162
+#  define __nv_bfloat162 __hip_bfloat162
 #endif
-typedef int64_t intptr_t;
 
 __host__ __device__ void __trap(){
     __hip_assert(false);
 }
 
-template <typename T>
-__device__ inline int __FFS(T v);
-
-template <>
-__device__ inline int __FFS<int32_t>(int32_t v) {
-  return __ffs(v);
-}
-
-template <>
-__device__ inline int __FFS<int64_t>(int64_t v) {
-  return __ffsll(static_cast<unsigned long long int>(v));
-}
-
-template <>
-__device__ inline int __FFS<uint32_t>(uint32_t v) {
-  return __ffs(v);
-}
-
-template <>
-__device__ inline int __FFS<unsigned long long>(unsigned long long v) {
-  return __ffsll(static_cast<unsigned long long int>(v));
-}
-
-__host__ __device__ __half __double2half(const double& __value) noexcept
-{
-  return __float2half(static_cast<float>(__value));
-}
+// NOTE(HIP/AMD): HIPRTC doesn't provide <cassert>, so define assert as a polyfill
+// using __builtin_trap which is available in HIPRTC device code. Using a function
+// expression form so it works in ternary expressions like `(cond ? (void)0 : assert(...))`.
+#ifndef assert
+#  ifdef NDEBUG
+#    define assert(expr) ((void)0)
+#  else
+__host__ __device__ inline void __libhipcxx_assert_fail() { __builtin_trap(); }
+#    define assert(expr) ((expr) ? (void)0 : __libhipcxx_assert_fail())
+#  endif
+#endif
 
 __host__ __device__ int fake_main(int argc, char ** argv);
 #if defined(__HIP_PLATFORM_AMD__)

@@ -37,7 +37,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
@@ -52,9 +52,9 @@ _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 #  include <cuda/std/__utility/forward.h>
 #  include <cuda/std/__utility/move.h>
 
-#  if !_CCCL_CUDA_COMPILATION() && !defined(__HIP_PLATFORM_AMD__) && !defined(__HIPCC_RTC__)
+#  if !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
 #    include <cuda_runtime_api.h>
-#  endif // !_CCCL_CUDA_COMPILATION()
+#  endif // !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION() && !defined(__HIPCC_RTC__)
 
 #  define _LIBCUDACXX_SPECIALIZE_TUPLE_INTERFACE(__name, __type, __size, ...)                      \
     template <>                                                                                    \
@@ -313,6 +313,6 @@ _LIBCUDACXX_END_NAMESPACE_STD
 
 _CCCL_DIAG_POP
 
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #endif // _LIBCUDACXX___TUPLE_VECTOR_TYPES_H

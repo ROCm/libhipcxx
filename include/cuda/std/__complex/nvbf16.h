@@ -284,38 +284,6 @@ _CCCL_API inline complex<double>& complex<double>::operator=(const complex<__nv_
   return *this;
 }
 
-#  if defined(__HIP_PLATFORM_AMD__)
-// NOTE(HIP/AMD): bfloat16 currently does not provide __int2bfloat16_rn; this is only implemented for floating point types
-// (see https://github.com/ROCm/clr/blob/amd-staging/hipamd/include/hip/amd_detail/amd_hip_bf16.h)
-// corresponding ticket SWDEV-529927
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 arg(__nv_bfloat16 __re)
-{
-  return _CUDA_VSTD::atan2(__float2bfloat16(0.0f), __re);
-}
-
-// We have performance issues with some trigonometric functions with __nv_bfloat16
-template <>
-_CCCL_API inline complex<__nv_bfloat16> asinh(const complex<__nv_bfloat16>& __x)
-{
-  return complex<__nv_bfloat16>{_CUDA_VSTD::asinh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__nv_bfloat16> acosh(const complex<__nv_bfloat16>& __x)
-{
-  return complex<__nv_bfloat16>{_CUDA_VSTD::acosh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__nv_bfloat16> atanh(const complex<__nv_bfloat16>& __x)
-{
-  return complex<__nv_bfloat16>{_CUDA_VSTD::atanh(complex<float>{__x})};
-}
-template <>
-_CCCL_API inline complex<__nv_bfloat16> acos(const complex<__nv_bfloat16>& __x)
-{
-  return complex<__nv_bfloat16>{_CUDA_VSTD::acos(complex<float>{__x})};
-}
-#  endif // __HIP_PLATFORM_AMD__
-
 template <>
 struct __get_complex_impl<__nv_bfloat16>
 {

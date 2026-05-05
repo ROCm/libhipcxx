@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___NUMERIC_NARROW_H
 #define _CUDA___NUMERIC_NARROW_H
 
@@ -25,8 +47,10 @@
 #endif // !_CCCL_COMPILER(NVRTC)
 
 #include <cuda/std/__exception/terminate.h>
+#include <cuda/std/__floating_point/nvfp_types.h>
 #include <cuda/std/__type_traits/is_arithmetic.h>
 #include <cuda/std/__type_traits/is_constructible.h>
+#include <cuda/std/__type_traits/is_same.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/__utility/forward.h>
 
@@ -64,6 +88,47 @@ struct narrowing_error : ::std::runtime_error
 #endif // !_CCCL_HAS_EXCEPTIONS()
 }
 
+#if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): __hip_bfloat16 / __half on HIP do not have direct constructors
+// from `(unsigned) long` / `(unsigned) long long`, nor between each other;
+// `is_constructible_v<__hip_bfloat16, long>` etc. are false. All half-precision
+// types do support construction from / conversion to `double`, so we use
+// `double` as a pivot when the direct construction is unavailable. The reverse
+// direction (half-precision -> integer) is already covered by the `operator T()`
+// member overloads on the half-precision types.
+// Tracked: ROCM-23887.
+template <class _To, class _From>
+inline constexpr bool __narrow_needs_double_pivot_v =
+  !_CCCL_TRAIT(_CUDA_VSTD::is_constructible, _To, _From)
+  && (_CCCL_TRAIT(_CUDA_VSTD::is_same, _To, __nv_bfloat16) || _CCCL_TRAIT(_CUDA_VSTD::is_same, _To, __half));
+
+template <class _To, class _From>
+inline constexpr bool __narrow_is_constructible_v =
+  _CCCL_TRAIT(_CUDA_VSTD::is_constructible, _To, _From) || __narrow_needs_double_pivot_v<_To, _From>;
+
+template <class _To, class _From>
+[[nodiscard]] _CCCL_API constexpr _To __narrow_construct(_From __from)
+{
+  if constexpr (_CCCL_TRAIT(_CUDA_VSTD::is_constructible, _To, _From))
+  {
+    return static_cast<_To>(__from);
+  }
+  else
+  {
+    return static_cast<_To>(static_cast<double>(__from));
+  }
+}
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
+template <class _To, class _From>
+inline constexpr bool __narrow_is_constructible_v = _CCCL_TRAIT(_CUDA_VSTD::is_constructible, _To, _From);
+
+template <class _To, class _From>
+[[nodiscard]] _CCCL_API constexpr _To __narrow_construct(_From __from)
+{
+  return static_cast<_To>(__from);
+}
+#endif // !_CCCL_HIP_COMPILATION()
+
 //! Uses static_cast to cast a value \p __from to type \p _To and checks whether the value has changed. \p _To needs
 //! to be constructible from \p _From and vice versa, and \p implement operator!=. Throws \ref narrowing_error in host
 //! code and traps in device code if the value has changed. Modelled after `gsl::narrow`. See also the C++ Core
@@ -72,11 +137,11 @@ struct narrowing_error : ::std::runtime_error
 template <class _To, class _From>
 [[nodiscard]] _CCCL_API constexpr _To narrow(_From __from)
 {
-  static_assert(_CUDA_VSTD::is_constructible_v<_From, _To>);
-  static_assert(_CUDA_VSTD::is_constructible_v<_To, _From>);
+  static_assert(__narrow_is_constructible_v<_From, _To>);
+  static_assert(__narrow_is_constructible_v<_To, _From>);
 
-  const auto __converted = static_cast<_To>(__from);
-  if (static_cast<_From>(__converted) != __from)
+  const auto __converted = ::cuda::__narrow_construct<_To>(__from);
+  if (::cuda::__narrow_construct<_From>(__converted) != __from)
   {
     ::cuda::__throw_narrowing_error();
   }

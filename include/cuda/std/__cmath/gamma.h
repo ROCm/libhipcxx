@@ -50,9 +50,9 @@
 #include <nv/target>
 
 // MSVC and clang cuda need the host side functions included
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -66,11 +66,11 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #  define _CCCL_BUILTIN_LGAMMAL(...) __builtin_lgammal(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_lgamma)
 
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_LGAMMAF
 #  undef _CCCL_BUILTIN_LGAMMA
 #  undef _CCCL_BUILTIN_LGAMMAL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float lgamma(float __x) noexcept
 {
@@ -147,11 +147,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  define _CCCL_BUILTIN_TGAMMAL(...) __builtin_tgammal(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_tgamma)
 
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_TGAMMAF
 #  undef _CCCL_BUILTIN_TGAMMA
 #  undef _CCCL_BUILTIN_TGAMMAL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float tgamma(float __x) noexcept
 {

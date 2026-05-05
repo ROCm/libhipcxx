@@ -51,9 +51,9 @@
 #include <nv/target>
 
 // MSVC and clang cuda need the host side functions included
-#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  include <math.h>
-#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_COMPILER(MSVC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -67,11 +67,11 @@ _LIBCUDACXX_BEGIN_NAMESPACE_STD
 #  define _CCCL_BUILTIN_COSL(...) __builtin_cosl(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_cos)
 
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_COSF
 #  undef _CCCL_BUILTIN_COS
 #  undef _CCCL_BUILTIN_COSL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float cos(float __x) noexcept
 {
@@ -166,11 +166,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  define _CCCL_BUILTIN_SINL(...) __builtin_sinl(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_sin)
 
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_SINF
 #  undef _CCCL_BUILTIN_SIN
 #  undef _CCCL_BUILTIN_SINL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float sin(float __x) noexcept
 {
@@ -270,11 +270,11 @@ template <class _Integer, enable_if_t<_CCCL_TRAIT(is_integral, _Integer), int> =
 #  define _CCCL_BUILTIN_TANL(...) __builtin_tanl(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_tan)
 
-#if _CCCL_CUDA_COMPILER(CLANG)
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_TANF
 #  undef _CCCL_BUILTIN_TAN
 #  undef _CCCL_BUILTIN_TANL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 [[nodiscard]] _CCCL_API inline float tan(float __x) noexcept
 {

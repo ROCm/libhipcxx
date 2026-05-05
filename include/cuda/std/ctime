@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD_CTIME
 #define _CUDA_STD_CTIME
 
@@ -61,7 +83,17 @@ using ::timespec;
 #  undef _LIBCUDACXX_POP_CLOCK_MACRO
 #endif // _LIBCUDACXX_POP_CLOCK_MACRO
 {
-  NV_IF_ELSE_TARGET(NV_IS_HOST, (return ::clock();), (return static_cast<clock_t>(_CUDA_VPTX::get_sreg_clock64());))
+  NV_IF_ELSE_TARGET(
+    NV_IS_HOST,
+    (return ::clock();),
+#if _CCCL_HIP_COMPILATION()
+    // NOTE(HIP/AMD): use clock64() (per-CU performance counter, raw cycles)
+    // rather than wall_clock64() (TSC) so the unit semantics match NVIDIA's
+    // get_sreg_clock64() — both return per-multiprocessor cycle counts.
+    (return static_cast<clock_t>(clock64());))
+#else
+    (return static_cast<clock_t>(_CUDA_VPTX::get_sreg_clock64());))
+#endif
 }
 
 // difftime
@@ -82,17 +114,31 @@ using ::timespec;
 
 // time
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE time_t __cccl_time_impl_device(time_t* __v) noexcept
 {
-  const auto __t = static_cast<clock_t>(_CUDA_VPTX::get_sreg_globaltimer() / 1'000'000'000);
+#  if defined(__HIP_DEVICE_COMPILE__)
+  // NOTE(HIP/AMD): wall_clock64() returns TSC cycles, not nanoseconds. The TSC
+  // clock rate (cycles/sec) is arch-dependent and defined as
+  // _LIBCUDACXX_HIP_TSC_CLOCKRATE in <cuda/std/detail/libcxx/include/__config>
+  // (e.g. 25 MHz on gfx908/gfx90a, 100 MHz on gfx940/gfx950 and most other
+  // architectures). Both that macro and wall_clock64() are only available in
+  // the HIP device pass, so this branch is gated on __HIP_DEVICE_COMPILE__.
+  const auto __t = static_cast<time_t>(wall_clock64() / _LIBCUDACXX_HIP_TSC_CLOCKRATE);
+#  elif _CCCL_HIP_COMPILATION()
+  // Host pass on hipcc: this device function body is parsed but never
+  // codegen'd, so a stub return suffices.
+  const time_t __t = 0;
+#  else
+  const auto __t = static_cast<time_t>(_CUDA_VPTX::get_sreg_globaltimer() / 1'000'000'000);
+#  endif
   if (__v != nullptr)
   {
     *__v = __t;
   }
   return __t;
 }
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #if defined(time)
 #  pragma push_macro("time")
@@ -112,19 +158,38 @@ _CCCL_API inline time_t time(time_t* __v) noexcept
 
 // timespec_get
 
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE int __cccl_timespec_get_impl_device(timespec* __ts, int __base) noexcept
 {
   if (__base != TIME_UTC)
   {
     return 0;
   }
+#    if defined(__HIP_DEVICE_COMPILE__)
+  // NOTE(HIP/AMD): wall_clock64() returns TSC cycles, not nanoseconds.
+  // Convert with the arch-dependent TSC rate (see __cccl_time_impl_device):
+  //   tv_sec  = cycles / CLOCKRATE
+  //   tv_nsec = (cycles % CLOCKRATE) * NANOSECONDS_PER_CYCLE
+  // Both _LIBCUDACXX_HIP_TSC_CLOCKRATE and
+  // _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE are only defined in the HIP
+  // device pass.
+  const auto __t = wall_clock64();
+  __ts->tv_sec   = static_cast<time_t>(__t / _LIBCUDACXX_HIP_TSC_CLOCKRATE);
+  __ts->tv_nsec  = static_cast<long>((__t % _LIBCUDACXX_HIP_TSC_CLOCKRATE)
+                                     * _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE);
+#    elif _CCCL_HIP_COMPILATION()
+  // Host pass on hipcc: this device function body is parsed but never
+  // codegen'd, so a stub suffices.
+  __ts->tv_sec  = 0;
+  __ts->tv_nsec = 0;
+#    else
   const auto __t = _CUDA_VPTX::get_sreg_globaltimer();
   __ts->tv_sec   = static_cast<time_t>(__t / 1'000'000'000);
   __ts->tv_nsec  = static_cast<long>(__t % 1'000'000'000);
+#    endif
   return __base;
 }
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #  if defined(timespec_get)
 #    pragma push_macro("timespec_get")

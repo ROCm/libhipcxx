@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// NOTE(AMD/HIP): This test fails with hiprtc on ROCm 7.0.0, 7.0.1 and 7.0.2. Issue #105.
+// NOTE(HIP/AMD): This test fails with hiprtc on ROCm 7.0.0, 7.0.1 and 7.0.2. Issue #105.
 // UNSUPPORTED: rocm_lt_7.0.2
 
 // <algorithm>

@@ -29,9 +29,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// TODO(HIP/AMD): hipcc compiler issue with complex transcendentals - ticket ROCM-20557
-// UNSUPPORTED: hipcc
-
 // <cuda/std/complex>
 
 // template<class T>

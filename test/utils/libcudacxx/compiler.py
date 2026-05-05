@@ -513,10 +513,12 @@ class CXXCompiler(object):
             flags += ["-Wno-unused-command-line-argument"]
 
         if self.type == 'hiprtcc':
-            # NOTE(HIPRTC): HIPRTC does not like compiling empty files. 
-            # "ERROR: hiprtcLinkComplete(rtc_link_state, &codePtr, &codeSize2) failed with error HIPRTC_ERROR_LINKING".
-            # Instead use nothing_to_do.pass.cpp for hiprtcc.
-            empty_cpp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../test/nothing_to_do.pass.cpp")
+            # NOTE(HIP/AMD): HIPRTC does not like compiling empty files
+            # ("ERROR: hiprtcLinkComplete failed with error HIPRTC_ERROR_LINKING"),
+            # so use the existing minimal `nothing_to_do.pass.cpp` test file
+            # (which has a `__host__ __device__ int main()` body) instead of
+            # the upstream-default `empty.cpp`.
+            empty_cpp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../libcudacxx/nothing_to_do.pass.cpp")
         else:
             empty_cpp = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "empty.cpp"
