@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___RUNTIME_TYPES_H
 #define _CUDA___RUNTIME_TYPES_H
 
@@ -21,20 +43,24 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): mirror the CTK enablement on HIP. The amd/cuda_runtime.h
+// shim aliases ::cudaMemLocation -> ::hipMemLocation and the
+// ::cudaMemLocationType{Host,Device} enumerators, so the body below
+// compiles unchanged on HIP.
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
 using memory_location = ::cudaMemLocation;
-#  if _CCCL_CTK_AT_LEAST(12, 2)
+#  if _CCCL_CTK_AT_LEAST(12, 2) || _CCCL_HIP_COMPILATION()
 inline constexpr memory_location host_memory_location = {::cudaMemLocationTypeHost, 0};
-#  endif // _CCCL_CTK_AT_LEAST(12, 2)
+#  endif // _CCCL_CTK_AT_LEAST(12, 2) || _CCCL_HIP_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA
 
-#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #include <cuda/std/__cccl/epilogue.h>
 
