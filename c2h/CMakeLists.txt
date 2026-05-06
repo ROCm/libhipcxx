@@ -59,6 +59,19 @@ endif()
 
 if (LIBCUDACXX_ENABLE_HIP)
   find_package(hip REQUIRED)
+  # NOTE(HIP/AMD): rocThrust 4.x ships under /opt/rocm/lib/cmake/rocthrust
+  # and provides the 'roc::rocthrust' interface target, which exposes
+  # the 'thrust::' namespace via Thrust 2.8 with the HIP backend
+  # selected. Make it OPTIONAL so a HIP install without rocThrust still
+  # builds the Catch2-only c2h library; consumers (per-test executables)
+  # that need thrust check 'TARGET roc::rocthrust' before linking and
+  # otherwise stay out of the build via the LIBCUDACXX_C2H_HIP_SKIP_LIST.
+  find_package(rocthrust QUIET CONFIG)
+  if (rocthrust_FOUND)
+    message(STATUS "Found rocThrust: ${rocthrust_VERSION}")
+  else()
+    message(STATUS "rocThrust not found; thrust-using c2h tests will be skip-listed.")
+  endif()
 else()
   find_package(CUDAToolkit)
 endif()

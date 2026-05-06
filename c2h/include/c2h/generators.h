@@ -25,19 +25,15 @@
 
 #pragma once
 
-// NOTE(HIP/AMD): this c2h header pulls thrust (which has no HIP
-// equivalent in this tree), so its body is gated out under HIP. The
-// header is still safe to include from c2h/catch2_test_helper.h on
-// HIP -- it just exposes nothing. Tests that actually use the
-// symbols defined here are added to LIBCUDACXX_C2H_HIP_SKIP_LIST in
-// test/libcudacxx/CMakeLists.txt.
-#include <cuda/std/detail/__config>
-#if !_CCCL_HIP_COMPILATION()
 
 
 #include <thrust/detail/config/device_system.h>
 
 #include <cuda/std/limits>
+// NOTE(HIP/AMD): on CUDA the upstream c2h transitively pulls
+// <cuda/std/span> via <thrust/...>; rocThrust does not, so include
+// it explicitly. The include is portable and harmless on CUDA.
+#include <cuda/std/span>
 
 #include <c2h/custom_type.h>
 #include <c2h/vector.h>
@@ -196,5 +192,3 @@ void init_key_segments(const device_vector<OffsetT>& segment_offsets, device_vec
     sizeof(custom_type_t<Ps...>));
 }
 } // namespace c2h
-#endif // !_CCCL_HIP_COMPILATION()
-

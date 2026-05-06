@@ -2,6 +2,28 @@
 // SPDX-FileCopyrightText: Copyright (c) 2011-2019, NVIDIA CORPORATION. All rights reserved.
 // SPDX-License-Identifier: BSD-3
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
 /**
@@ -9,9 +31,24 @@
  * Utilities for interacting with the opaque CUDA __half type
  */
 
-#include <cuda_fp16.h>
-
-#include <cub/util_type.cuh>
+// NOTE(HIP/AMD): the upstream-named <cuda_fp16.h> / <cub/util_type.cuh>
+// are not present on a HIP-only system. Pull the HIP-named equivalents
+// (hip/hip_fp16.h ships with the libhipcxx HIP bridge; hipCUB ships
+// under <hipcub/...> as the rocPRIM-backed CUB API replacement, with
+// 'BEGIN_HIPCUB_NAMESPACE' opening 'namespace hipcub'). Provide a
+// 'cub::' namespace alias and map CUB_NAMESPACE_BEGIN/END to the
+// hipCUB equivalents so the upstream cub::-using specialisations
+// below compile unchanged on HIP.
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <hip/hip_fp16.h>
+#  include <hipcub/util_type.hpp>
+namespace cub = hipcub;
+#  define CUB_NAMESPACE_BEGIN BEGIN_HIPCUB_NAMESPACE
+#  define CUB_NAMESPACE_END   END_HIPCUB_NAMESPACE
+#else
+#  include <cuda_fp16.h>
+#  include <cub/util_type.cuh>
+#endif
 
 #include <cuda/std/limits>
 #include <cuda/std/type_traits>
@@ -334,9 +371,19 @@ public:
 
 CUB_NAMESPACE_BEGIN
 
+// NOTE(HIP/AMD): hipcub::BaseTraits has 5 template parameters
+// (Category, _PRIMITIVE, _nullptr_TYPE, _UnsignedBits, T) vs the
+// upstream cub::BaseTraits 4 (Category, _PRIMITIVE, _UnsignedBits,
+// T). Insert a literal 'false' for _nullptr_TYPE on HIP.
+#if defined(__HIP_PLATFORM_AMD__)
+template <>
+struct NumericTraits<half_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, half_t>
+{};
+#else
 template <>
 struct NumericTraits<half_t> : BaseTraits<FLOATING_POINT, true, uint16_t, half_t>
 {};
+#endif
 
 CUB_NAMESPACE_END
 

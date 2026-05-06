@@ -53,27 +53,25 @@
 
 // NOTE(HIP/AMD): on HIP the upstream-named <cuda_fp16.h> /
 // <cuda_bf16.h> headers do not exist; pull the HIP-named equivalents
-// (which alias __half / __nv_bfloat16 via the libhipcxx HIP bridge).
-// The c2h/half.cuh + c2h/bfloat16.cuh helpers themselves are
-// thrust-using and unsupported on HIP, so they stay gated out --
-// instead provide the bare 'half_t' / 'bfloat16_t' type aliases that
-// c2h consumer code (e.g. catch2_test_helper.h) expects.
+// (which alias __half / __nv_bfloat16 via the libhipcxx HIP bridge)
+// before c2h/half.cuh / c2h/bfloat16.cuh, which include the
+// upstream-named headers themselves. With rocThrust + the HIP fp16
+// bridge in place, c2h/half.cuh / c2h/bfloat16.cuh ARE buildable on
+// HIP (they only pull thrust + cub plus the fp16/bf16 aliases).
 #if TEST_HALF_T()
 #  if _CCCL_HIP_COMPILATION()
 #    include <hip/hip_fp16.h>
-using half_t = __half;
 #  else
 #    include <cuda_fp16.h>
-#    include <c2h/half.cuh>
 #  endif
+#  include <c2h/half.cuh>
 #endif // TEST_HALF_T()
 
 #if TEST_BF_T()
 #  if _CCCL_HIP_COMPILATION()
 #    include <hip/hip_bf16.h>
-using bfloat16_t = __nv_bfloat16;
 #  else
 #    include <cuda_bf16.h>
-#    include <c2h/bfloat16.cuh>
 #  endif
+#  include <c2h/bfloat16.cuh>
 #endif // TEST_BF_T()
