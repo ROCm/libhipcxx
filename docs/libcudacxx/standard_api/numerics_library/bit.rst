@@ -33,6 +33,16 @@
 This page documents ``<cuda/std/bit>`` in libhipcxx, which provides the C++ Standard Library bit manipulation
 functions, such as ``popcount``, ``rotl``, ``rotr``, and ``bit_width``, in host and device code.
 
+``cuda::std::bit_cast``
+-----------------------
+
+``cuda::std::bit_cast`` extended the standard ``std::bit_cast`` to also recognize the HIP extended floating-point scalar and vector types as trivially copyable.
+
+**Limitations**
+
+- The function can be used in ``constexpr`` contexts only when the source and destination types are trivially copyable.
+- The function cannot be used in ``constexpr`` contexts with MSVC <= 19.25 and GCC <= 10.
+
 Notes
 -----
 
