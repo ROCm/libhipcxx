@@ -138,8 +138,6 @@ _CCCL_END_NV_DIAG_SUPPRESS()
 #undef _CCCL_STD_NUMBERS_SPECIALATION_IMPL
 
 #if _CCCL_HAS_NVFP16()
-// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-#  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
 template <>
 struct __numbers<__half>
 {
@@ -196,7 +194,6 @@ struct __numbers<__half>
     return ::cuda::std::__fp_from_storage<__half>(__fp_storage_of_t<__half>{0x3e79u});
   }
 };
-#  endif // LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
@@ -290,8 +287,6 @@ inline constexpr _Tp phi_v = __numbers<_Tp>::__phi();
 #if !_CCCL_COMPILER(MSVC)
 // MSVC errors here because of "error: A __device__ variable template cannot have a const qualified type on Windows"
 #  if _CCCL_HAS_NVFP16()
-// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-#    if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
 template <>
 _CCCL_GLOBAL_CONSTANT __half e_v<__half> = __numbers<__half>::__e();
 template <>
@@ -318,7 +313,6 @@ template <>
 _CCCL_GLOBAL_CONSTANT __half egamma_v<__half> = __numbers<__half>::__egamma();
 template <>
 _CCCL_GLOBAL_CONSTANT __half phi_v<__half> = __numbers<__half>::__phi();
-#    endif // LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
 #  endif // _CCCL_HAS_NVFP16()
 
 #  if _CCCL_HAS_NVBF16()
