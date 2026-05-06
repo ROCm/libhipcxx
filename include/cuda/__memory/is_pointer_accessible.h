@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___MEMORY_IS_POINTER_ACCESSIBLE_H
 #define _CUDA___MEMORY_IS_POINTER_ACCESSIBLE_H
 
@@ -24,6 +46,17 @@
 #include <cuda/__device/device_ref.h>
 #include <cuda/__driver/driver_api.h>
 #include <cuda/std/__exception/cuda_error.h>
+
+// NOTE(HIP/AMD): the CUDA driver-API shim for the pointer-attribute
+// queries (cuda::__driver::__pointerGetAttributesNoThrow,
+// __mempoolGetAccess, __deviceCanAccessPeer) is not available on HIP.
+// Instead we implement cuda::is_managed / cuda::is_host_accessible /
+// cuda::is_device_accessible directly against the HIP runtime
+// hipPointerGetAttributes() / hipDeviceCanAccessPeer() shims (no
+// driver-API equivalent needed).
+#if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
+#  include <hip/hip_runtime_api.h>
+#endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -156,6 +189,161 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
 }
 
 #endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+
+#if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
+
+// NOTE(HIP/AMD): HIP has only a single pointer-attribute query
+// (hipPointerGetAttributes) returning the full hipPointerAttribute_t
+// struct, in contrast to CUDA's per-attribute driver-API path. We
+// query it once per call and read the relevant fields. The struct
+// reports:
+//   * type             : hipMemoryType{Unregistered, Host, Device, Managed, Array}
+//   * device           : owning device for Device/Managed memory
+//   * isManaged        : 1 if hipMallocManaged / __managed__
+//   * hostPointer/devicePointer : valid host/device aliases for the
+//                        pointer (not used here)
+// HIP does not expose a memory-pool handle or per-pool access flags
+// via hipPointerAttribute_t, so the pool-aware paths from the CUDA
+// implementation are not replicated; the matching pool-related
+// branches in the lit test
+// (test/libcudacxx/cuda/memory/is_pointer_accessible.pass.cpp) are
+// gated on _CCCL_CTK_AT_LEAST(12, 2)/(13, 0) which both evaluate to
+// false on HIP, so this is an acceptable subset.
+
+namespace __detail
+{
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t
+__hip_pointer_get_attributes(::hipPointerAttribute_t& __attr, const void* __p) noexcept
+{
+  // Zero-initialize so that an early-out (hipErrorInvalidValue) leaves
+  // the type field as hipMemoryTypeUnregistered (0).
+  __attr = {};
+  return ::hipPointerGetAttributes(&__attr, __p);
+}
+} // namespace __detail
+
+/**
+ * @brief Checks if a pointer is a managed pointer.
+ *
+ * @param __p The pointer to check.
+ * @return `true` if the pointer is a managed pointer, `false` otherwise.
+ */
+[[nodiscard]]
+_CCCL_HOST_API inline bool is_managed(const void* __p)
+{
+  if (__p == nullptr)
+  {
+    return false;
+  }
+  ::hipPointerAttribute_t __attr{};
+  const auto __status = __detail::__hip_pointer_get_attributes(__attr, __p);
+  switch (__status)
+  {
+    case ::hipSuccess:
+      return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged;
+    case ::hipErrorInvalidValue:
+      // Unregistered host memory is reported as hipErrorInvalidValue
+      // by older ROCm releases (newer releases return hipSuccess with
+      // type=hipMemoryTypeUnregistered). In both cases the pointer is
+      // not managed.
+      return false;
+    default:
+      ::cuda::__throw_cuda_error(__status, "is_managed() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
+  }
+}
+
+/**
+ * @brief Checks if a pointer is a host accessible pointer.
+ *
+ * @param __p The pointer to check.
+ * @return `true` if the pointer is a host accessible pointer, `false` otherwise.
+ */
+[[nodiscard]]
+_CCCL_HOST_API inline bool is_host_accessible(const void* __p)
+{
+  if (__p == nullptr)
+  {
+    return false;
+  }
+  ::hipPointerAttribute_t __attr{};
+  const auto __status = __detail::__hip_pointer_get_attributes(__attr, __p);
+  switch (__status)
+  {
+    case ::hipSuccess:
+      // Unregistered, plain host, pinned host, and managed memory are
+      // all host-accessible.
+      return __attr.type == ::hipMemoryTypeUnregistered //
+          || __attr.type == ::hipMemoryTypeHost //
+          || __attr.type == ::hipMemoryTypeManaged //
+          || __attr.isManaged != 0;
+    case ::hipErrorInvalidValue:
+      // Older-ROCm legacy: unregistered host memory reports invalid
+      // value. Such a pointer (e.g. stack, global, plain malloc) is
+      // host-accessible.
+      return true;
+    default:
+      ::cuda::__throw_cuda_error(__status, "is_host_accessible() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
+  }
+}
+
+/**
+ * @brief Checks if a pointer is a device accessible pointer.
+ *
+ * @param __p The pointer to check.
+ * @param __device The device to check.
+ * @return `true` if the pointer is a device accessible pointer, `false` otherwise.
+ */
+[[nodiscard]]
+_CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __device)
+{
+  if (__p == nullptr)
+  {
+    return false;
+  }
+  ::hipPointerAttribute_t __attr{};
+  const auto __status = __detail::__hip_pointer_get_attributes(__attr, __p);
+  if (__status == ::hipErrorInvalidValue || (__status == ::hipSuccess && __attr.type == ::hipMemoryTypeUnregistered))
+  {
+    return false;
+  }
+  if (__status != ::hipSuccess)
+  {
+    ::cuda::__throw_cuda_error(__status, "is_device_accessible() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
+  }
+  // Managed memory is accessible from every device.
+  if (__attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged)
+  {
+    return true;
+  }
+  // Plain host memory is not device-accessible (HIP does not expose a
+  // per-pointer "host-accessible-from-device" flag like CUDA's
+  // hostPointer-on-mapped-memory bit; users must rely on UVA-mapped
+  // pinned allocations being both host- and device-accessible by
+  // virtue of returning hipMemoryTypeHost with a non-null
+  // devicePointer; for the lit test this distinction is not
+  // exercised).
+  if (__attr.type == ::hipMemoryTypeHost)
+  {
+    return false;
+  }
+  // Device memory: accessible from the owning device, or from peers
+  // that have peer-access enabled.
+  if (__attr.device == __device.get())
+  {
+    return true;
+  }
+  int __can_access_peer = 0;
+  const auto __peer_status =
+    ::hipDeviceCanAccessPeer(&__can_access_peer, __device.get(), __attr.device);
+  if (__peer_status != ::hipSuccess)
+  {
+    ::cuda::__throw_cuda_error(
+      __peer_status, "is_device_accessible() peer-access query failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
+  }
+  return __can_access_peer != 0;
+}
+
+#endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
 
 _CCCL_END_NAMESPACE_CUDA
 

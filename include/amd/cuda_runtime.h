@@ -669,6 +669,36 @@
 #ifndef cudaDeviceCanAccessPeer
 #  define cudaDeviceCanAccessPeer hipDeviceCanAccessPeer
 #endif
+#ifndef cudaDeviceEnablePeerAccess
+#  define cudaDeviceEnablePeerAccess hipDeviceEnablePeerAccess
+#endif
+
+// NOTE(HIP/AMD): additional cuda* shims required by lit tests that
+// directly call the CUDA runtime API (cuda/memory/
+// is_pointer_accessible.pass.cpp uses cudaHostAlloc,
+// cudaGetSymbolAddress, the cudaMem* memory-pool / access-descriptor
+// types and cudaMemPoolSetAccess).
+#ifndef cudaHostAlloc
+#  define cudaHostAlloc hipHostAlloc
+#endif
+#ifndef cudaGetSymbolAddress
+#  define cudaGetSymbolAddress hipGetSymbolAddress
+#endif
+#ifndef cudaMemAllocationType
+#  define cudaMemAllocationType hipMemAllocationType
+#endif
+#ifndef cudaMemLocationType
+#  define cudaMemLocationType hipMemLocationType
+#endif
+#ifndef cudaMemAccessDesc
+#  define cudaMemAccessDesc hipMemAccessDesc
+#endif
+#ifndef cudaMemAccessFlagsProtReadWrite
+#  define cudaMemAccessFlagsProtReadWrite hipMemAccessFlagsProtReadWrite
+#endif
+#ifndef cudaMemPoolSetAccess
+#  define cudaMemPoolSetAccess hipMemPoolSetAccess
+#endif
 
 #ifndef HIPRT_CB
 #  define HIPRT_CB
