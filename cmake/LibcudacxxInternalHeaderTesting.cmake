@@ -67,7 +67,12 @@ list(FILTER internal_headers EXCLUDE REGEX "__ptx/instructions/generated")
 
 function(libcudacxx_create_internal_header_test header_name headertest_src)
   # NOTE(HIP/AMD): Skip headers without HIP support as of 2026 when
-  # building under HIP.
+  # building under HIP -- with one carve-out: individual cuda::ptx::*
+  # wrapper headers that ship a HIP software emulation (see the
+  # consolidated NOTE in <cuda/__ptx/ptx_helper_functions.h>) are still
+  # tested standalone so the emulations don't bitrot. Their pure-C++
+  # helper headers (ptx_helper_functions.h, ptx_dot_variants.h) are
+  # also tested.
   if (LIBCUDACXX_ENABLE_HIP)
     string(
       REGEX MATCH
@@ -76,7 +81,19 @@ function(libcudacxx_create_internal_header_test header_name headertest_src)
       "${header_name}"
     )
     if (match)
-      return()
+      # NOTE(HIP/AMD): header_name has had '/' replaced with '_' by the
+      # caller (libcudacxx_add_internal_header_test, line 188) so the
+      # carve-out regex works on the underscore form, e.g.
+      # 'cuda___ptx_instructions_shl.h'.
+      string(
+        REGEX MATCH
+        "__ptx_(ptx_helper_functions|ptx_dot_variants)\\.h$|__ptx_instructions_(bmsk|elect_sync|fence|get_sreg|shfl_sync|shl|shr|trap)\\.h$"
+        hip_emul_match
+        "${header_name}"
+      )
+      if (NOT hip_emul_match)
+        return()
+      endif()
     endif()
   endif()
 
