@@ -410,8 +410,6 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
       cuda/ccclrt/device/device_smoke.c2h.cu
       # Use cuda::copy_bytes / cuda::fill_bytes which are not yet
       # implemented for HIP.
-      cuda/ccclrt/algorithm/copy.cu
-      cuda/ccclrt/algorithm/fill.cu
       # CUDA mempool feature surface (cudaMemAllocationType,
       # cudaMemAccessDesc, cudaMemPoolGetAttribute,
       # cudaMemPoolExportToShareableHandle) only partially mirrors
