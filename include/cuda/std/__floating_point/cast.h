@@ -74,13 +74,48 @@ template <class _To, class _From>
 #if _CCCL_HAS_NVFP16()
     else if constexpr (is_same_v<_To, __half>)
     {
+      // NOTE(HIP/AMD): HIP's '::__float2half(float)' is 'inline
+      // __HOST_DEVICE__' but NOT marked constexpr (see
+      // <hip/amd_detail/amd_hip_fp16.h:479>), so calling it from a
+      // constexpr context errors with 'non-constexpr function
+      // __float2half cannot be used in a constant expression'. Inline
+      // the same body under HIP and route through __cccl_make_nvfp16_raw
+      // (which is SFINAE-aware about which __half_raw member name the
+      // current ROCm release exposes -- see
+      // <cuda/std/__floating_point/storage.h>) so the constructor of
+      // __half reads an active union member. The runtime-side path on
+      // CUDA still uses the upstream ::__float2half intrinsic.
+#  if _CCCL_HIP_COMPILATION()
+      return __half{__cccl_make_nvfp16_raw(__builtin_bit_cast(unsigned short, static_cast<_Float16>(__v)))};
+#  else
       return ::__float2half(__v);
+#  endif
     }
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
     else if constexpr (is_same_v<_To, __nv_bfloat16>)
     {
+      // NOTE(HIP/AMD): see __float2half above. HIP's
+      // '::__float2bfloat16(float)' (<hip/amd_detail/amd_hip_bf16.h:441>)
+      // is also not constexpr. Mirror the fp16 path: route through
+      // 'static_cast<__bf16>(__v)' (a clang built-in type whose
+      // float -> bf16 conversion is constexpr-compatible AND
+      // performs IEEE round-to-nearest-even, matching the runtime
+      // ::__float2bfloat16 semantics), then bit_cast the resulting
+      // 16-bit __bf16 to unsigned short to feed __nv_bfloat16_raw.
+      // An earlier truncation-based shortcut
+      //    static_cast<unsigned short>(__builtin_bit_cast(unsigned, __v) >> 16)
+      // produced silently different constexpr-vs-runtime results for
+      // ~50% of inputs that needed rounding (verified bit-mismatch on
+      // 1/3, 0.1, e, ...; agreement only on values exactly representable
+      // in bf16). Routing through static_cast<__bf16>(...) is verified
+      // bit-identical to ::__float2bfloat16 across the rounding-sensitive
+      // value space and across NaN payloads.
+#  if _CCCL_HIP_COMPILATION()
+      return __nv_bfloat16{__nv_bfloat16_raw{__builtin_bit_cast(unsigned short, static_cast<__bf16>(__v))}};
+#  else
       return ::__float2bfloat16(__v);
+#  endif
     }
 #endif // _CCCL_HAS_NVBF16()
 #if _CCCL_HAS_NVFP8_E4M3()
