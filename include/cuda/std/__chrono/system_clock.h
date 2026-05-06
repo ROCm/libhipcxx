@@ -60,7 +60,7 @@
 // protocol.
 #if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 #  if _CCCL_STD_VER > 2017 && defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
-#    include <cuda/std/detail/libcxx/include/support/hip/chrono_hip_extension.h>
+#    include <amd/hip_chrono_extension.h>
 #  endif // _CCCL_STD_VER > 2017 && _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP
 #endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
 
@@ -106,8 +106,7 @@ public:
     //    LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS at file scope, populated by
     //    initialize_amdgpu_sysclock_on_current_device() at runtime) so
     //    the device-side time_point IS a UNIX timestamp.
-    //    See <cuda/std/detail/libcxx/include/support/hip/chrono_hip_extension.h>
-    //    for the full opt-in protocol.
+    //    See <amd/hip_chrono_extension.h> for the full opt-in protocol.
     NV_IF_ELSE_TARGET(
       NV_IS_HOST,
       (return time_point(duration_cast<duration>(nanoseconds(

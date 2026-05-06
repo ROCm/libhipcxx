@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,11 @@ add_executable(hash_map concurrent_hash_table.hip)
 target_compile_features(hash_map PRIVATE cxx_std_14)
 target_link_libraries(hash_map PRIVATE libhipcxx::libhipcxx)
 
-#This example requires C++20
-#add_executable(chrono_sysclock_workaround chrono_sysclock_workaround.hip)
-#target_compile_features(chrono_sysclock_workaround PRIVATE cxx_std_20)
-#target_compile_options(chrono_sysclock_workaround PRIVATE -D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
-#target_link_libraries(chrono_sysclock_workaround PRIVATE libhipcxx::libhipcxx)
+# This example requires C++20 and -fgpu-rdc (since the __constant__
+# variables defined by LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS are referenced
+# from cuda::std::chrono::system_clock::now() across TUs).
+add_executable(chrono_sysclock_workaround chrono_sysclock_workaround.hip)
+target_compile_features(chrono_sysclock_workaround PRIVATE cxx_std_20)
+target_compile_options(chrono_sysclock_workaround PRIVATE -D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP -fgpu-rdc)
+target_link_options(chrono_sysclock_workaround PRIVATE -fgpu-rdc --hip-link)
+target_link_libraries(chrono_sysclock_workaround PRIVATE libhipcxx::libhipcxx)
