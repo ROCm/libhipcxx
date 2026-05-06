@@ -35,7 +35,6 @@
 TEST_DIAG_SUPPRESS_MSVC(4505)
 
 #include <cuda/annotated_ptr>
-#include <cuda/__barrier/aligned_size.h>
 #include <cuda/std/cassert>
 
 #include <nv/target>

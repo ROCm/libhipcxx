@@ -9,6 +9,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___MEMCPY_ASYNC_MEMCPY_ASYNC_H_
 #define _CUDA___MEMCPY_ASYNC_MEMCPY_ASYNC_H_
 
@@ -22,6 +44,13 @@
 #  pragma system_header
 #endif // no system header
 
+// NOTE(HIP/AMD): cuda::aligned_size_t is a pure type-trait template (no
+// PTX); pulling it in unconditionally so the umbrella <cuda/annotated_ptr>
+// transitively makes it available on HIP. Upstream's NVIDIA-only consumers
+// (e.g. test/libcudacxx/cuda/annotated_ptr/utils.h) rely on this transitive
+// chain and would otherwise fail to compile under HIP.
+#include <cuda/__memory/aligned_size.h>
+
 #if _CCCL_HAS_CUDA_COMPILER()
 
 #  include <cuda/__barrier/async_contract_fulfillment.h>
@@ -30,7 +59,6 @@
 #  include <cuda/__barrier/barrier_thread_scope.h>
 #  include <cuda/__memcpy_async/check_preconditions.h>
 #  include <cuda/__memcpy_async/memcpy_async_barrier.h>
-#  include <cuda/__memory/aligned_size.h>
 #  include <cuda/std/__atomic/scopes.h>
 #  include <cuda/std/__type_traits/void_t.h>
 #  include <cuda/std/cstddef>
