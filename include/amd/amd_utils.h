@@ -31,6 +31,11 @@
 #endif
 #include <rocm-core/rocm_version.h>
 #endif
+
+// NOTE(HIP/AMD): for _CCCL_VERIFY used by libhipcxx::__isConstant below.
+// Safe to include here -- assert.h only depends on the cccl compiler /
+// preprocessor / target headers and does not pull amd_utils.h back in.
+#include <cuda/std/__cccl/assert.h>
 #ifndef __HIP_DEVICE_COMPILE__
 #ifndef __host__
 #define __host__
@@ -154,31 +159,31 @@ namespace libhipcxx
   /**
    * @brief Check if a pointer points to constant memory
    * @param ptr Pointer to check (can be any type)
-   * @return true if pointer is in constant memory address space
+   * @return false unconditionally; the call also triggers _CCCL_VERIFY.
    *
-   * AMD doesn't have a direct builtin for constant memory detection.
-   * We use a heuristic: if it's not shared, not private, and not global, it's likely constant.
-   * This isn't perfect but works for typical use cases.
+   * NOTE(HIP/AMD): AMDGCN does not expose a `__builtin_amdgcn_is_constant`
+   * builtin, and the existing address-space builtins
+   * (`__builtin_amdgcn_is_shared`, `__builtin_amdgcn_is_private`) cannot
+   * disambiguate `__constant__` memory from regular global memory --
+   * `__constant__` globals live in the global address space on AMDGCN
+   * and are reported as global by the existing builtins. Adapted from
+   * upgrade/3.1.4's amd_utils.h: rather than silently returning a wrong
+   * answer (the previous heuristic had a logic bug that always returned
+   * `false`; `is_global` was defined as the same set of conditions as
+   * the final return, making them mutually exclusive), trip a hard
+   * failure via _CCCL_VERIFY so callers know the query is unsupported.
+   * Reintroduce a real implementation once the HIP / AMDGCN toolchain
+   * grows a builtin equivalent to NVIDIA's `isspacep.const` PTX op.
    */
   template<typename T>
   __device__ inline bool __isConstant(const T* ptr) {
-#if __has_builtin(__builtin_amdgcn_is_shared) && __has_builtin(__builtin_amdgcn_is_private)
-    const __attribute__((address_space(0))) void* flat_ptr =
-        (const __attribute__((address_space(0))) void*)ptr;
-
-    // Constant memory is not shared, not private, and not global
-    // This is a heuristic approach since AMD doesn't provide __builtin_amdgcn_is_constant
-    bool is_shared = __builtin_amdgcn_is_shared(flat_ptr);
-    bool is_private = __builtin_amdgcn_is_private(flat_ptr);
-    bool is_global = !is_shared && !is_private && (flat_ptr != nullptr);
-
-    // If it's none of the above and not null, it's likely constant
-    // NOTE(HIP/AMD): This may have false positives in some cases
-    return flat_ptr != nullptr && !is_shared && !is_private && !is_global;
-#else
-    (void)ptr;
+    (void) ptr;
+    _CCCL_VERIFY(false,
+                 "cuda::device::address_space::constant queries are not "
+                 "supported on AMDGCN: __isConstant has no AMDGCN builtin "
+                 "equivalent and __constant__ globals are indistinguishable "
+                 "from regular global memory.");
     return false;
-#endif
   }
 
   /**
