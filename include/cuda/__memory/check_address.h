@@ -49,16 +49,21 @@
 #include <cuda/std/climits>
 #include <cuda/std/cstddef>
 #include <cuda/std/cstdint>
-#if _CCCL_CUDA_COMPILATION()
+// NOTE(HIP/AMD): cuda::device::__is_smem_valid_address_range and the
+// cuda::device::__internal_is_address_from helpers it uses are also
+// available under HIP via the libhipcxx::__isShared / __isGlobal /
+// __isLocal / __isConstant family in <amd/amd_utils.h> (exposed at
+// global namespace as ::__isShared etc. on HIP-device pass).
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #  include <cuda/__memory/address_space.h>
 #  include <cuda/__ptx/instructions/get_sreg.h>
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #include <nv/target>
 
 #include <cuda/std/__cccl/prologue.h>
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE
 
@@ -84,7 +89,7 @@ __is_smem_valid_address_range(const void* __ptr, ::cuda::std::size_t __n) noexce
 
 _CCCL_END_NAMESPACE_CUDA_DEVICE
 
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
@@ -99,7 +104,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
   {
     return false;
   }
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
   // clang-format off
   NV_IF_TARGET(NV_IS_DEVICE, (
     if (::cuda::device::__internal_is_address_from(__ptr, ::cuda::device::address_space::shared) &&
@@ -109,7 +114,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
     }
   ));
   // clang-format on
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
   return (__ptr != nullptr);
 }
 

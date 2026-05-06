@@ -236,6 +236,30 @@ _CCCL_DEVICE static inline ::cuda::std::uint64_t get_sreg_clock64()
   return 0ull;
 #  endif
 }
+
+// Total shared (LDS) memory size visible to the kernel. NV PTX exposes
+// %total_smem_size which returns the per-block static + dynamic LDS
+// allocation; AMDGCN's __builtin_amdgcn_groupstaticsize() gives the
+// static portion only. For the consumers in libhipcxx this value is
+// used as an upper-bound sanity check (see
+// cuda::device::__is_smem_valid_address_range), so returning a
+// generous architecture-wide LDS maximum is acceptable. gfx90a /
+// gfx94x / gfx11/12 cap LDS at 64 KB per workgroup; gfx950 raises
+// this to 160 KB. The default of 65536 is the safe minimum across
+// supported architectures.
+template <typename = void>
+_CCCL_DEVICE static inline ::cuda::std::uint32_t get_sreg_total_smem_size()
+{
+#  if defined(__HIP_DEVICE_COMPILE__)
+#    if defined(__gfx950__)
+  return 163840u; // 160 KB
+#    else
+  return 65536u; // 64 KB (gfx90a/94x/10/11/12)
+#    endif
+#  else
+  return 0u;
+#  endif
+}
 #endif // _CCCL_HIP_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA_PTX
