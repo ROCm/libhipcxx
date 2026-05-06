@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <thrust/execution_policy.h>
 #include <thrust/fill.h>
 #include <thrust/reduce.h>
@@ -16,6 +38,12 @@
 #include <cuda/memory_resource>
 #include <cuda/std/cassert>
 #include <cuda/std/cstdint>
+// NOTE(HIP/AMD): on CUDA the test relies on <thrust/reduce.h>
+// transitively pulling <cuda/std/functional> for cuda::std::plus.
+// rocThrust does not pull libhipcxx's <cuda/std/functional>, so on
+// HIP we have to include it explicitly. The include is portable and
+// harmless on CUDA.
+#include <cuda/std/functional>
 #include <cuda/std/span>
 #include <cuda/std/type_traits>
 #include <cuda/std/utility>
