@@ -82,7 +82,7 @@ __host__ __device__ constexpr void test_type()
   {
     // TODO(HIP/AMD): remove this workaround once we can initialize a half with 0 as a constexpr
     if constexpr (cuda::std::is_same_v<T, __half>){
-      test_isnan(__half{__half_raw{.x = 0}}, false);
+      test_isnan(__half{cuda::std::__cccl_make_nvfp16_raw(0)}, false);
     }
     else{
       test_isnan(T{}, false);
@@ -123,10 +123,7 @@ __host__ __device__ constexpr bool test()
   test_type<__float128>();
 #endif // _CCCL_HAS_FLOAT128()
 #if _CCCL_HAS_NVFP16()
-// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-#  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
   test_type<__half>();
-#  endif
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
   test_type<__nv_bfloat16>();

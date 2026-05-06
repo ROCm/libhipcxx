@@ -132,8 +132,6 @@ __host__ __device__ void test_ext_fp()
   // MSVC errors here because of "error: A __device__ variable template cannot have a const qualified type on Windows"
 #  if _LIBCUDACXX_HAS_NVFP16()
   // __half constants
-// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-#    if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
   assert(cuda::std::numbers::e_v<__half> == __half{2.7182817f});
   assert(cuda::std::numbers::log2e_v<__half> == __half{1.442695f});
   assert(cuda::std::numbers::log10e_v<__half> == __half{0.4342945f});
@@ -147,7 +145,6 @@ __host__ __device__ void test_ext_fp()
   assert(cuda::std::numbers::inv_sqrt3_v<__half> == __half{0.57735026f});
   assert(cuda::std::numbers::egamma_v<__half> == __half{0.5772157f});
   assert(cuda::std::numbers::phi_v<__half> == __half{1.618034f});
-#    endif
 #  endif // _LIBCUDACXX_HAS_NVFP16()
 
 #  if _LIBCUDACXX_HAS_NVBF16()
