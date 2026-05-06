@@ -669,6 +669,15 @@
 #ifndef cudaDeviceCanAccessPeer
 #  define cudaDeviceCanAccessPeer hipDeviceCanAccessPeer
 #endif
+
+// NOTE(HIP/AMD): CUDA exposes both 'cudaError' (the enum tag) and
+// 'cudaError_t' (the typedef). HIP only has 'hipError_t' (which is
+// itself a typedef of 'enum hipError_t'). Some upstream test code
+// (c2h/catch2_test_helper.h) refers to 'cudaError' bare, so alias
+// it to 'hipError_t' for HIP.
+#ifndef cudaError
+#  define cudaError hipError_t
+#endif
 #ifndef cudaDeviceEnablePeerAccess
 #  define cudaDeviceEnablePeerAccess hipDeviceEnablePeerAccess
 #endif
@@ -698,6 +707,15 @@
 #endif
 #ifndef cudaMemPoolSetAccess
 #  define cudaMemPoolSetAccess hipMemPoolSetAccess
+#endif
+#ifndef cudaMemPoolGetAttribute
+#  define cudaMemPoolGetAttribute hipMemPoolGetAttribute
+#endif
+#ifndef cudaMemPoolExportToShareableHandle
+#  define cudaMemPoolExportToShareableHandle hipMemPoolExportToShareableHandle
+#endif
+#ifndef cudaMemHandleTypePosixFileDescriptor
+#  define cudaMemHandleTypePosixFileDescriptor hipMemHandleTypePosixFileDescriptor
 #endif
 
 #ifndef HIPRT_CB
@@ -972,7 +990,12 @@
 // have an internal-helper symbol clash, see
 // /home/moberste/Coding/Reproducer/claude/hip_fp4_fp6_internal_helpers_redefinition.cpp.
 #include <hip/hip_fp8.h>
-__host__ __device__ __half __double2half(const double& __value) noexcept
+// NOTE(HIP/AMD): mark 'inline' to avoid ODR violations when multiple
+// TUs that include <amd/cuda_runtime.h> are linked together (the
+// c2h-on-HIP test executables hit this -- catch2_runner.cpp.o,
+// catch2_runner_helper.cu.o and the per-test .cu.o all otherwise
+// emit their own copy of this function).
+__host__ __device__ inline __half __double2half(const double& __value) noexcept
 {
   return __float2half(static_cast<float>(__value));
 }

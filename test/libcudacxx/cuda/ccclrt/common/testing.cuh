@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef __LIBCUDACXX_CCCLRT_COMMON_TESTING_H__
 #define __LIBCUDACXX_CCCLRT_COMMON_TESTING_H__
 
@@ -41,19 +63,35 @@ __device__ inline void ccclrt_require_impl(
            threadIdx.y,
            threadIdx.z,
            condition_text);
+    // NOTE(HIP/AMD): on CUDA '__trap()' is a free function intrinsic;
+    // on HIP/AMDGCN there is no '__trap' free function but
+    // '__builtin_trap()' compiles down to the equivalent
+    // s_trap instruction (clang-hip mode).
+#if defined(__HIP_PLATFORM_AMD__)
+    __builtin_trap();
+#else
     __trap();
+#endif // !__HIP_PLATFORM_AMD__
   }
 }
 
 // There is a problem with clang-cuda and nv/target, but we don't need the device side macros yet,
 // disable them for now
-#if _CCCL_CUDA_COMPILER(CLANG)
+//
+// NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
+// behaviour as clang-cuda (the device pass parses host-only function
+// bodies for type checking, then discards them) so the
+// 'NV_IF_ELSE_TARGET(NV_IS_DEVICE, <__device__-only>, <host>)'
+// dispatch pattern below trips a 'no matching function' error inside
+// host-only functions instantiated by templated tests. Take the same
+// host-only definitions as the clang-cuda path on HIP.
+#if _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 #  define CCCLRT_REQUIRE(condition)     REQUIRE(condition)
 #  define CCCLRT_CHECK(condition)       CHECK(condition)
 #  define CCCLRT_FAIL(message)          FAIL(message)
 #  define CCCLRT_CHECK_FALSE(condition) CCCLRT_CHECK(!(condition))
 
-#else // _CCCL_CUDA_COMPILER(CLANG)
+#else // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 #  define CCCLRT_REQUIRE(condition)                                                                           \
     NV_IF_ELSE_TARGET(NV_IS_DEVICE,                                                                           \
                       (ccclrt_require_impl(condition, #condition, __FILE__, __LINE__, __PRETTY_FUNCTION__);), \
@@ -70,7 +108,7 @@ __device__ inline void ccclrt_require_impl(
                       (FAIL(message);))
 
 #  define CCCLRT_CHECK_FALSE(condition) CCCLRT_CHECK(!(condition))
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 
 // Explicit device side require macros for clang-cuda
 #define CCCLRT_REQUIRE_DEVICE(condition) \
@@ -103,8 +141,18 @@ namespace
 {
 namespace test
 {
+// NOTE(HIP/AMD): the CUDA-driver-API context-stack model (push /
+// pop / GetCurrent walking back to nullptr) does not have a 1:1
+// counterpart in HIP. hipCtxGetCurrent typically reports the
+// primary context as "current" once the runtime has been touched,
+// and trying to pop it returns hipErrorInvalidDevice (201). The
+// stack-cleanliness invariant the upstream fixture enforces is a
+// CUDA-only concern, so on HIP both helpers below are no-ops and
+// the fixture skips the bookkeeping. Tests still get a fresh
+// scope for Catch2 reporting.
 inline int count_driver_stack()
 {
+#if !_CCCL_HIP_COMPILATION()
   if (::cuda::__driver::__ctxGetCurrent() != nullptr)
   {
     auto ctx    = ::cuda::__driver::__ctxPop();
@@ -112,18 +160,18 @@ inline int count_driver_stack()
     ::cuda::__driver::__ctxPush(ctx);
     return result;
   }
-  else
-  {
-    return 0;
-  }
+#endif // !_CCCL_HIP_COMPILATION()
+  return 0;
 }
 
 inline void empty_driver_stack()
 {
+#if !_CCCL_HIP_COMPILATION()
   while (::cuda::__driver::__ctxGetCurrent() != nullptr)
   {
     ::cuda::__driver::__ctxPop();
   }
+#endif // !_CCCL_HIP_COMPILATION()
 }
 
 inline int cuda_driver_version()
