@@ -105,38 +105,97 @@ struct __cccl_nvfp16_manip_helper : __half
 };
 
 #  if _CCCL_HIP_COMPILATION()
-// NOTE(HIP/AMD): SFINAE trait to detect whether HIP's __half_raw exposes
-// its 16-bit storage member as '__x' (future ROCm releases that match
-// __half's own member naming) or as 'x' (current ROCm <=7.2).
-template <class _Tp, class = void>
-struct __cccl_nvfp16_raw_has_underscore_x : false_type
-{};
-template <class _Tp>
-struct __cccl_nvfp16_raw_has_underscore_x<_Tp, void_t<decltype(declval<_Tp>().__x)>> : true_type
-{};
+// NOTE(HIP/AMD): The relevant cross-version axis on HIP's __half is which
+// union member of __half_raw the converting constructor
+// '__half(const __half_raw&)' reads from, NOT the member's name (the
+// member is named 'x' on every ROCm release we know of):
+//
+//   ROCm <= 7.2 :  __half(__half_raw const& r) : data{r.data} {}    // reads .data
+//   ROCm >= ??? :  __half(__half_raw const& r) : __x  {r.x   } {}   // reads .x
+//
+// (See <hip/amd_detail/amd_hip_fp16.h>'s __half struct in each release.)
+//
+// To stay constexpr-compatible we have to make whichever union member the
+// ctor will read be the *active* member of the __half_raw we hand it.
+// Reading an inactive union member at compile time is constant-evaluation-
+// invalid in C++17, which is exactly what blocks the upstream
+// 'helper.__x = __v' assign-via-friend pattern under HIP.
+//
+// The SFINAE probe below detects which body the local ROCm headers ship
+// by checking whether the *constructor invocation*
+// '__half{__half_raw{.x = 0}}' is a constant expression -- which is true
+// only when the body reads .x (an active member of the .x-initialised
+// raw). On the older body the same expression reads inactive .data and
+// the constant evaluation fails. This is a real failure type that gets
+// diverted into SFINAE because the failing expression appears as the
+// initialiser of a non-type template parameter (which must be a constant
+// expression; non-constant initialisers are removed from the candidate
+// set instead of triggering a hard error).
+template <class _HalfRaw = __half_raw, int = (__half{_HalfRaw{.x = 0}}, 0)>
+constexpr true_type __cccl_nvfp16_ctor_reads_x_probe(int);
+template <class = __half_raw>
+constexpr false_type __cccl_nvfp16_ctor_reads_x_probe(...);
+
+template <class _HalfRaw = __half_raw>
+inline constexpr bool __cccl_nvfp16_ctor_reads_x_v =
+  decltype(::cuda::std::__cccl_nvfp16_ctor_reads_x_probe<_HalfRaw>(0))::value;
 
 // One unified helper: '__cccl_make_nvfp16_raw(v)' returns a properly-
 // initialised __half_raw using whichever activation pattern lets
 // __half(const __half_raw&) consume it constexpr-compatibly on the
 // current ROCm release. Two SFINAE-guarded overloads pick between them
 // automatically; callers do not need an if/else.
-template <class _HalfRaw = __half_raw,
-          enable_if_t<__cccl_nvfp16_raw_has_underscore_x<_HalfRaw>::value, int> = 0>
+template <class _HalfRaw = __half_raw, enable_if_t<__cccl_nvfp16_ctor_reads_x_v<_HalfRaw>, int> = 0>
 [[nodiscard]] _CCCL_API constexpr _HalfRaw __cccl_make_nvfp16_raw(unsigned short __v) noexcept
 {
-  // Future ROCm: __half_raw exposes the 16-bit storage as '__x' and
-  // __half's constructor reads it from there.
-  return _HalfRaw{.__x = __v};
+  // Newer ROCm: __half's ctor reads .x (unsigned short) from the raw.
+  // Make .x the active union member so the read is constant-valid.
+  return _HalfRaw{.x = __v};
 }
-template <class _HalfRaw = __half_raw,
-          enable_if_t<!__cccl_nvfp16_raw_has_underscore_x<_HalfRaw>::value, int> = 0>
+template <class _HalfRaw = __half_raw, enable_if_t<!__cccl_nvfp16_ctor_reads_x_v<_HalfRaw>, int> = 0>
 [[nodiscard]] _CCCL_API constexpr _HalfRaw __cccl_make_nvfp16_raw(unsigned short __v) noexcept
 {
-  // Current ROCm (<=7.2): __half_raw has {_Float16 data; unsigned short x;}
-  // and __half's constructor reads 'x.data'. Bit-cast the storage into
-  // the _Float16 member so that one ends up active (constexpr-friendly
-  // since clang v9 because both are scalar types of equal size).
+  // ROCm <= 7.2: __half's ctor reads .data (_Float16) from the raw.
+  // Bit-cast the storage into the _Float16 union member so .data is the
+  // active member (constexpr-friendly since clang v9 because both are
+  // scalar types of equal size).
   return _HalfRaw{.data = __builtin_bit_cast(_Float16, __v)};
+}
+
+// Helper exposing __half's protected union members so we can extract the
+// 16-bit storage from a constexpr __half value. Mirror of
+// __cccl_nvfp16_manip_helper but exposing 'data' (current ROCm) too so
+// __cccl_get_nvfp16_storage() below can use whichever member is active.
+struct __cccl_nvfp16_extract_helper : __half
+{
+  using __half::__x;
+#    if !_CCCL_HIP_COMPILATION()
+  // 'data' is HIP-only; on NVIDIA, __half does not expose a 'data' member
+  // and the upstream path '.__x' suffices.
+#    else
+  using __half::data;
+#    endif
+};
+
+// One unified helper: '__cccl_get_nvfp16_storage(v)' returns the 16-bit
+// representation of a __half value in a constexpr-compatible way on the
+// current ROCm release. Two SFINAE-guarded overloads pick between the
+// __x and data union members automatically -- the active one is the
+// member __half's ctor wrote to (which is the one the corresponding
+// __cccl_make_nvfp16_raw above made active in the input raw).
+template <class _HalfRaw = __half_raw, enable_if_t<__cccl_nvfp16_ctor_reads_x_v<_HalfRaw>, int> = 0>
+[[nodiscard]] _CCCL_API constexpr unsigned short __cccl_get_nvfp16_storage(__half __v) noexcept
+{
+  // Newer ROCm: ctor sets '__x{r.x}' so '__half::__x' is the active
+  // member -- read it directly.
+  return __cccl_nvfp16_extract_helper{__v}.__x;
+}
+template <class _HalfRaw = __half_raw, enable_if_t<!__cccl_nvfp16_ctor_reads_x_v<_HalfRaw>, int> = 0>
+[[nodiscard]] _CCCL_API constexpr unsigned short __cccl_get_nvfp16_storage(__half __v) noexcept
+{
+  // ROCm <= 7.2: ctor sets 'data{r.data}' (the _Float16 member). Read
+  // 'data' and bit_cast back to the 16-bit storage scalar.
+  return __builtin_bit_cast(unsigned short, __cccl_nvfp16_extract_helper{__v}.data);
 }
 #  endif // _CCCL_HIP_COMPILATION()
 #endif // _CCCL_HAS_NVFP16()
@@ -263,7 +322,13 @@ template <class _Tp>
 #if _CCCL_HAS_NVFP16()
   else if constexpr (is_same_v<_Tp, __half>)
   {
+    // NOTE(HIP/AMD): see __cccl_get_nvfp16_storage above for the constexpr
+    // WAR rationale. Mirrors __fp_from_storage<__half>.
+#  if _CCCL_HIP_COMPILATION()
+    return __cccl_get_nvfp16_storage(__v);
+#  else
     return __cccl_nvfp16_manip_helper{__v}.__x;
+#  endif
   }
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
