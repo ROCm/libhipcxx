@@ -116,6 +116,18 @@ _CCCL_HOST_API inline void __deviceGetName(char* __name_out, int __len, int __or
   return static_cast<::cudaError_t>(::hipDevicePrimaryCtxRelease(__dev));
 }
 
+// NOTE(HIP/AMD): mirrors upstream cuda::__driver::__isPrimaryCtxActive.
+// HIP's hipDevicePrimaryCtxGetState matches the CUDA driver-API
+// signature (flags-out, active-out).
+[[nodiscard]] _CCCL_HOST_API inline bool __isPrimaryCtxActive(::hipDevice_t __dev)
+{
+  int __active{};
+  unsigned int __flags{};
+  _CCCL_TRY_CUDA_API(
+    ::hipDevicePrimaryCtxGetState, "Failed to check the primary ctx state", __dev, &__flags, &__active);
+  return __active == 1;
+}
+
 // Context management
 
 _CCCL_HOST_API inline void __ctxPush(::hipCtx_t __ctx)
@@ -127,6 +139,27 @@ _CCCL_HOST_API inline ::hipCtx_t __ctxPop()
 {
   ::hipCtx_t __result{};
   _CCCL_TRY_CUDA_API(::hipCtxPopCurrent, "Failed to pop context", &__result);
+  return __result;
+}
+
+// NOTE(HIP/AMD): test/libcudacxx/cuda/ccclrt/common/testing.cuh and
+// some ccclrt c2h tests use this to detect whether any context is
+// pushed (compare against nullptr). Mirror the upstream
+// cuda::__driver::__ctxGetCurrent() shape.
+[[nodiscard]] _CCCL_HOST_API inline ::hipCtx_t __ctxGetCurrent()
+{
+  ::hipCtx_t __result{};
+  _CCCL_TRY_CUDA_API(::hipCtxGetCurrent, "Failed to get current context", &__result);
+  return __result;
+}
+
+// NOTE(HIP/AMD): mirrors upstream cuda::__driver::__getVersion(). HIP
+// returns the driver version as the runtime version on
+// hipDriverGetVersion (semantically same as CUDA's cuDriverGetVersion).
+[[nodiscard]] _CCCL_HOST_API inline int __getVersion()
+{
+  int __result{};
+  _CCCL_TRY_CUDA_API(::hipDriverGetVersion, "Failed to get driver version", &__result);
   return __result;
 }
 
