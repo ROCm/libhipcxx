@@ -832,8 +832,116 @@
 #  define __nv_bfloat162 __hip_bfloat162
 #endif
 
+// NOTE(HIP/AMD): map upstream __nv_fp{8,6,4}_* names to HIP's __hip_fp{8,6,4}_*
+// equivalents. _CCCL_HAS_NVFP{8,6,4}() in <cuda/std/__cccl/extended_data_types.h>
+// is enabled on HIP via these aliases; the HIP umbrella headers
+// <hip/hip_fp{8,6,4}.h> are pulled in by
+// <cuda/std/__floating_point/cuda_fp_types.h>.
+#ifndef __nv_fp8_e4m3
+#  define __nv_fp8_e4m3 __hip_fp8_e4m3
+#endif
+#ifndef __nv_fp8x2_e4m3
+#  define __nv_fp8x2_e4m3 __hip_fp8x2_e4m3
+#endif
+#ifndef __nv_fp8x4_e4m3
+#  define __nv_fp8x4_e4m3 __hip_fp8x4_e4m3
+#endif
+#ifndef __nv_fp8_e5m2
+#  define __nv_fp8_e5m2 __hip_fp8_e5m2
+#endif
+#ifndef __nv_fp8x2_e5m2
+#  define __nv_fp8x2_e5m2 __hip_fp8x2_e5m2
+#endif
+#ifndef __nv_fp8x4_e5m2
+#  define __nv_fp8x4_e5m2 __hip_fp8x4_e5m2
+#endif
+
+#ifndef __nv_fp6_e2m3
+#  define __nv_fp6_e2m3 __hip_fp6_e2m3
+#endif
+#ifndef __nv_fp6x2_e2m3
+#  define __nv_fp6x2_e2m3 __hip_fp6x2_e2m3
+#endif
+#ifndef __nv_fp6x4_e2m3
+#  define __nv_fp6x4_e2m3 __hip_fp6x4_e2m3
+#endif
+#ifndef __nv_fp6_e3m2
+#  define __nv_fp6_e3m2 __hip_fp6_e3m2
+#endif
+#ifndef __nv_fp6x2_e3m2
+#  define __nv_fp6x2_e3m2 __hip_fp6x2_e3m2
+#endif
+#ifndef __nv_fp6x4_e3m2
+#  define __nv_fp6x4_e3m2 __hip_fp6x4_e3m2
+#endif
+
+#ifndef __nv_fp4_e2m1
+#  define __nv_fp4_e2m1 __hip_fp4_e2m1
+#endif
+#ifndef __nv_fp4x2_e2m1
+#  define __nv_fp4x2_e2m1 __hip_fp4x2_e2m1
+#endif
+#ifndef __nv_fp4x4_e2m1
+#  define __nv_fp4x4_e2m1 __hip_fp4x4_e2m1
+#endif
+
+// NOTE(HIP/AMD): map upstream __nv_cvt_* fp8 conversion helpers and the
+// __NV_E4M3 / __NV_E5M2 / __NV_NOSAT enum tags to HIP's __hip_cvt_* and
+// __HIP_E4M3 / __HIP_E5M2 / __HIP_NOSAT equivalents. fp6 / fp4 / e8m0
+// conversion helpers are not aliased because the corresponding fp6 / fp4
+// type families are intentionally left disabled on HIP (see
+// <cuda/std/__cccl/extended_data_types.h>) and e8m0 has no HIP analogue.
+#ifndef __nv_saturation_t
+#  define __nv_saturation_t __hip_saturation_t
+#endif
+#ifndef __nv_fp8_interpretation_t
+#  define __nv_fp8_interpretation_t __hip_fp8_interpretation_t
+#endif
+
+#ifndef __NV_E4M3
+#  define __NV_E4M3 __HIP_E4M3
+#endif
+#ifndef __NV_E5M2
+#  define __NV_E5M2 __HIP_E5M2
+#endif
+#ifndef __NV_NOSAT
+#  define __NV_NOSAT __HIP_NOSAT
+#endif
+#ifndef __NV_SATFINITE
+#  define __NV_SATFINITE __HIP_SATFINITE
+#endif
+
+#ifndef __nv_cvt_float_to_fp8
+#  define __nv_cvt_float_to_fp8 __hip_cvt_float_to_fp8
+#endif
+#ifndef __nv_cvt_double_to_fp8
+#  define __nv_cvt_double_to_fp8 __hip_cvt_double_to_fp8
+#endif
+#ifndef __nv_cvt_halfraw_to_fp8
+#  define __nv_cvt_halfraw_to_fp8 __hip_cvt_halfraw_to_fp8
+#endif
+#ifndef __nv_cvt_bfloat16raw_to_fp8
+#  define __nv_cvt_bfloat16raw_to_fp8 __hip_cvt_bfloat16raw_to_fp8
+#endif
+#ifndef __nv_cvt_fp8_to_halfraw
+#  define __nv_cvt_fp8_to_halfraw __hip_cvt_fp8_to_halfraw
+#endif
+
 #include <hip/hip_bf16.h>
 #include <hip/hip_fp16.h>
+// NOTE(HIP/AMD): pull <hip/hip_fp8.h> in here (same pattern as bf16/fp16
+// above) so that '__hip_fp8_e4m3' / '__hip_fp8_e5m2' are complete types
+// by the time '__nv_fp8_e4m3' / '__nv_fp8_e5m2' (defined as macros
+// expanding to '__hip_fp8_*' below) reach a use site like
+// 'is_same_v<_RawTp, __nv_fp8_e4m3>' in <cuda/std/__type_traits/num_bits.h>.
+// Without this, TUs whose first include is '<cuda/__cccl_config>' (which
+// pulls extended_data_types.h before <amd/cuda_runtime.h>) end up with
+// '::__nv_fp8_e4m3' forward-declared instead of '::__hip_fp8_e4m3', and
+// later macro expansion finds an undeclared name. fp4 / fp6 are
+// intentionally NOT pulled in here -- their <hip/hip_fp{4,6}.h> headers
+// have an internal-helper symbol clash, see
+// /home/moberste/Coding/Reproducer/claude/hip_fp4_fp6_internal_helpers_redefinition.cpp.
+#include <hip/hip_fp8.h>
 __host__ __device__ __half __double2half(const double& __value) noexcept
 {
   return __float2half(static_cast<float>(__value));
