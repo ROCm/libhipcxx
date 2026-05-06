@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef __CUDA___ALGORITHM_FILL
 #define __CUDA___ALGORITHM_FILL
 
@@ -21,9 +43,15 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): mirror the CTK enablement on HIP. The body uses
+// only ::cuda::__driver::__memsetAsync (already shimmed in
+// <amd/driver_api.h>), ::cuda::stream_ref / device_transform (HIP-
+// enabled) and the standard <cuda/std/...> headers -- no
+// CUDA-only types or PTX. Compiles unchanged on HIP.
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__algorithm/common.h>
+#  include <cuda/__driver/driver_api.h>
 #  include <cuda/__stream/device_transform.h>
 #  include <cuda/__stream/stream_ref.h>
 #  include <cuda/std/__concepts/concept_macros.h>
@@ -105,6 +133,6 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #endif // __CUDA___ALGORITHM_FILL
