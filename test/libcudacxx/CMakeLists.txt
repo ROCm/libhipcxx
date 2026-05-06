@@ -364,6 +364,15 @@ set_tests_properties(
 # tree). Tracked as Phase 6 in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
 cccl_get_c2h()
 
+# NOTE(HIP/AMD): rocThrust is found inside c2h/CMakeLists.txt (see
+# cccl_get_c2h() above), but the resulting 'rocthrust_FOUND' variable
+# is local to that subdirectory. Re-do the lookup here so we can use
+# the result to (a) decide whether to skip-list thrust-using tests
+# below and (b) link 'roc::rocthrust' to the per-test executable.
+if (LIBCUDACXX_ENABLE_HIP)
+  find_package(rocthrust QUIET CONFIG)
+endif()
+
 if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
   file(
     GLOB_RECURSE test_srcs
@@ -373,13 +382,10 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
   )
 
   if (LIBCUDACXX_ENABLE_HIP)
-    # NOTE(HIP/AMD): per-test skip-list. These pull thrust /
-    # cooperative_groups directly (no thrust replacement available
-    # for HIP in this tree); enable them only when the HIPification
-    # of those upstream dependencies has landed.
+    # NOTE(HIP/AMD): per-test skip-list. These pull cooperative_groups
+    # directly or depend on upstream-CUDA-only feature surfaces;
+    # enable them only when the corresponding HIP support has landed.
     set(LIBCUDACXX_C2H_HIP_SKIP_LIST
-      # Uses thrust execution policies, fill, reduce.
-      cuda/containers/uninitialized_async_buffer.cu
       # Use cooperative_groups, no AMDGCN equivalent in this tree.
       cuda/ccclrt/hierarchy/hierarchy_custom_types.cu
       cuda/ccclrt/hierarchy/hierarchy_smoke.cu
@@ -419,6 +425,13 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
       # does not expose a multi-context per-thread stack.
       cuda/ccclrt/utility/ensure_current_context.c2h.cu
     )
+    # If rocThrust is NOT available, also skip the thrust-using test;
+    # otherwise leave it in the build and link rocThrust to the
+    # per-test executable (handled below).
+    if (NOT rocthrust_FOUND)
+      list(APPEND LIBCUDACXX_C2H_HIP_SKIP_LIST
+        cuda/containers/uninitialized_async_buffer.cu)
+    endif()
   endif()
 
   set(c2h_all_target "libcudacxx.test.c2h_all")
@@ -450,6 +463,15 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
         cccl.c2h.main
         libcudacxx.compiler_interface
     )
+    # NOTE(HIP/AMD): link rocThrust to every c2h test on HIP when it is
+    # available. The thrust-using tests (currently
+    # uninitialized_async_buffer.cu) need it on the link line; the
+    # other tests don't reference any thrust symbol and the link is a
+    # no-op for them. Cheaper to do this unconditionally than to
+    # maintain a per-test "needs rocthrust" allow-list.
+    if (LIBCUDACXX_ENABLE_HIP AND TARGET roc::rocthrust)
+      target_link_libraries(${target_name} PRIVATE roc::rocthrust)
+    endif()
 
     add_dependencies(${c2h_all_target} ${target_name})
 

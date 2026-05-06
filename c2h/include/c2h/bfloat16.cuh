@@ -1,6 +1,28 @@
 // SPDX-FileCopyrightText: Copyright (c) 2011-2021, NVIDIA CORPORATION. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
 /**
@@ -8,9 +30,17 @@
  * Utilities for interacting with the opaque CUDA __nv_bfloat16 type
  */
 
-#include <cuda_bf16.h>
-
-#include <cub/util_type.cuh>
+// NOTE(HIP/AMD): see matching note in c2h/half.cuh.
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <hip/hip_bf16.h>
+#  include <hipcub/util_type.hpp>
+namespace cub = hipcub;
+#  define CUB_NAMESPACE_BEGIN BEGIN_HIPCUB_NAMESPACE
+#  define CUB_NAMESPACE_END   END_HIPCUB_NAMESPACE
+#else
+#  include <cuda_bf16.h>
+#  include <cub/util_type.cuh>
+#endif
 
 #include <cuda/std/limits>
 #include <cuda/std/type_traits>
@@ -239,9 +269,17 @@ public:
 
 CUB_NAMESPACE_BEGIN
 
+// NOTE(HIP/AMD): see matching note in c2h/half.cuh -- hipcub's
+// BaseTraits has an extra _nullptr_TYPE parameter.
+#if defined(__HIP_PLATFORM_AMD__)
+template <>
+struct NumericTraits<bfloat16_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, bfloat16_t>
+{};
+#else
 template <>
 struct NumericTraits<bfloat16_t> : BaseTraits<FLOATING_POINT, true, uint16_t, bfloat16_t>
 {};
+#endif
 
 CUB_NAMESPACE_END
 
