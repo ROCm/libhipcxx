@@ -878,12 +878,11 @@ constexpr chrono::year                                  operator ""y(unsigned lo
 #include <cuda/std/limits>
 #include <cuda/std/ratio>
 
-#if defined(__HIP__) || defined(__HIPCC_RTC__)
-#  if _CCCL_STD_VER > 2017 && defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
-// Workaround for system_clock on AMD GPUs for c++20, please see documentation in the below header file
-#    include "support/hip/chrono_hip_extension.h"
-#  endif
-#endif
+// NOTE(HIP/AMD): the legacy "support/hip/chrono_hip_extension.h" include
+// has been replaced. The C++20 UNIX-timestamp workaround for system_clock
+// on AMD GPUs now lives at <amd/hip_chrono_extension.h> and is pulled in
+// by <cuda/std/__chrono/system_clock.h> directly under
+// _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP. No action needed here.
 
 // standard-mandated includes
 // TODO: Fix CPOs in split H/D compilation or inform users of what may happen

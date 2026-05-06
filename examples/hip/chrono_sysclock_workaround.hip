@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS
 
 /*
-* This example tests the workaround described in include/cuda/std/detail/libcxx/include/support/hip/chrono_hip_extension.h,
+* This example tests the workaround described in include/amd/hip_chrono_extension.h,
 * which enables UNIX timestamps for HIP on AMD devices (for chrono::system_clock::now()).
 * It needs to be compiled with -std=c++20 support and the compile time flag -D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP.
 */
