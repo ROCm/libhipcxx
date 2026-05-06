@@ -103,6 +103,9 @@
 #ifndef cudaMemcpy
 #  define cudaMemcpy hipMemcpy
 #endif
+#ifndef cudaMemcpyToSymbol
+#  define cudaMemcpyToSymbol hipMemcpyToSymbol
+#endif
 #ifndef cudaMemcpyDefault
 #  define cudaMemcpyDefault hipMemcpyDefault
 #endif
