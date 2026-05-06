@@ -672,9 +672,6 @@
 #ifndef cudaDeviceEnablePeerAccess
 #  define cudaDeviceEnablePeerAccess hipDeviceEnablePeerAccess
 #endif
-#ifndef cudaDeviceDisablePeerAccess
-#  define cudaDeviceDisablePeerAccess hipDeviceDisablePeerAccess
-#endif
 
 // NOTE(HIP/AMD): additional cuda* shims required by lit tests that
 // directly call the CUDA runtime API (cuda/memory/
