@@ -47,7 +47,7 @@
 #endif // !_CCCL_COMPILER(NVRTC)
 
 #include <cuda/std/__exception/terminate.h>
-#include <cuda/std/__floating_point/nvfp_types.h>
+#include <cuda/std/__floating_point/cuda_fp_types.h>
 #include <cuda/std/__type_traits/is_arithmetic.h>
 #include <cuda/std/__type_traits/is_constructible.h>
 #include <cuda/std/__type_traits/is_same.h>
