@@ -442,9 +442,6 @@
 #ifndef cudaMemAllocationTypePinned
 #  define cudaMemAllocationTypePinned hipMemAllocationTypePinned
 #endif
-#ifndef cudaMemPoolAttrReleaseThreshold
-#  define cudaMemPoolAttrReleaseThreshold hipMemPoolAttrReleaseThreshold
-#endif
 #ifndef cudaMemHandleTypeNone
 #  define cudaMemHandleTypeNone hipMemHandleTypeNone
 #endif
