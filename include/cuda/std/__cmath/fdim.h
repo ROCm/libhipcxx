@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___CMATH_FDIM_H
 #define _CUDA_STD___CMATH_FDIM_H
 
@@ -41,11 +63,19 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #  define _CCCL_BUILTIN_FDIML(...) __builtin_fdiml(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_fdim)
 
-#if _CCCL_CUDA_COMPILER(CLANG) // Unresolved extern function 'fdim'
+// NOTE(HIP/AMD): _CCCL_HIP_COMPILATION() shares the same root cause as the
+// pre-existing _CCCL_CUDA_COMPILER(CLANG) arm: clang's __builtin_fdim{f,,l}
+// lowers to a libm call to 'fdim{f,,l}' which is not provided by AMDGPU's
+// device libraries. Folded into the same undef block so we fall through to
+// '::fdim{f,,l}' on both -- on HIP-device that symbol comes from clang's
+// auto-included <__clang_hip_math.h> as an always-inline wrapper that
+// lowers to __ocml_fdim_f{32,64}; on HIP-host it's the regular libm symbol
+// from glibc.
+#if _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION() // Unresolved extern function 'fdim'
 #  undef _CCCL_BUILTIN_FDIMF
 #  undef _CCCL_BUILTIN_FDIM
 #  undef _CCCL_BUILTIN_FDIML
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 
 [[nodiscard]] _CCCL_API inline float fdim(float __x, float __y) noexcept
 {

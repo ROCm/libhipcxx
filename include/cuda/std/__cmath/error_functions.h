@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___CMATH_ERROR_FUNCTIONS_H
 #define _CUDA_STD___CMATH_ERROR_FUNCTIONS_H
 
@@ -41,11 +63,19 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #  define _CCCL_BUILTIN_ERFL(...) __builtin_erfl(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_erf)
 
-#if _CCCL_CUDA_COMPILER(CLANG) // Unresolved extern function 'erf'
+// NOTE(HIP/AMD): _CCCL_HIP_COMPILATION() shares the same root cause as the
+// pre-existing _CCCL_CUDA_COMPILER(CLANG) arm: clang's __builtin_erf{f,,l}
+// lowers to a libm call to 'erf{f,,l}' which is not provided by AMDGPU's
+// device libraries. Folded into the same undef block so we fall through to
+// '::erf{f,,l}' on both -- on HIP-device that symbol comes from clang's
+// auto-included <__clang_hip_math.h> as an always-inline wrapper that
+// lowers to __ocml_erf_f{32,64}; on HIP-host it's the regular libm symbol
+// from glibc.
+#if _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION() // Unresolved extern function 'erf'
 #  undef _CCCL_BUILTIN_ERFF
 #  undef _CCCL_BUILTIN_ERF
 #  undef _CCCL_BUILTIN_ERFL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 
 [[nodiscard]] _CCCL_API inline float erf(float __x) noexcept
 {
@@ -123,11 +153,15 @@ _CCCL_REQUIRES(is_integral_v<_Tp>)
 #  define _CCCL_BUILTIN_ERFCL(...) __builtin_erfcl(__VA_ARGS__)
 #endif // _CCCL_CHECK_BUILTIN(builtin_ercf)
 
-#if _CCCL_CUDA_COMPILER(CLANG) // Unresolved extern function 'erfc'
+// NOTE(HIP/AMD): same rationale as the erf{f,,l} block above -- folded into
+// the same _CCCL_CUDA_COMPILER(CLANG) undef so HIP also falls through to
+// '::erfc{f,,}', which on HIP-device resolves to clang's <__clang_hip_math.h>
+// wrapper that inlines to __ocml_erfc_f{32,64}.
+#if _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION() // Unresolved extern function 'erfc'
 #  undef _CCCL_BUILTIN_ERFCF
 #  undef _CCCL_BUILTIN_ERFC
 #  undef _CCCL_BUILTIN_ERFCL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 
 [[nodiscard]] _CCCL_API inline float erfc(float __x) noexcept
 {
