@@ -684,16 +684,27 @@ _CCCL_API inline constexpr _Tp __constexpr_scalbn(_Tp __x, int __exp)
     }
 
     _Tp __mult(1);
+    // NOTE(HIP/AMD): cast 'numeric_limits<_Tp>::radix' (an int) to _Tp
+    // before assigning. HIP's __half / __nv_bfloat16 expose only a
+    // '__device__'-marked 'operator=(T)' template for integral T (see
+    // <hip/amd_detail/amd_hip_fp16.h:163>), but their integral-typed
+    // converting constructors are '__HOST_DEVICE__'. Without the
+    // explicit _Tp(...) cast, __mult = int picks the device-only
+    // operator= and clang errors with 'reference to __device__ function
+    // operator=<int, nullptr> in __host__ __device__ function' at this
+    // call site (e.g. from cuda::std::operator/<__half> in <complex.h>).
+    // The cast routes through the constructor + defaulted
+    // operator=(const _Tp&), both of which are __HOST_DEVICE__.
     if (__exp > 0)
     {
-      __mult = numeric_limits<_Tp>::radix;
+      __mult = _Tp(numeric_limits<_Tp>::radix);
       --__exp;
     }
     else
     {
       ++__exp;
       __exp = -__exp;
-      __mult /= numeric_limits<_Tp>::radix;
+      __mult /= _Tp(numeric_limits<_Tp>::radix);
     }
 
     while (__exp > 0)
