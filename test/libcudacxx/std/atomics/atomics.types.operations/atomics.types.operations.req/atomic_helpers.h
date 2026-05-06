@@ -6,6 +6,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef ATOMIC_HELPERS_H
 #define ATOMIC_HELPERS_H
 
@@ -32,9 +54,9 @@ struct UserAtomicType
 template <template <class, template <typename, typename> class, cuda::thread_scope> class TestFunctor,
           template <typename, typename> class Selector,
           cuda::thread_scope Scope
-#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           = cuda::thread_scope_system
-#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           >
 struct TestEachIntegralType
 {
@@ -68,9 +90,9 @@ struct TestEachIntegralType
 template <template <class, template <typename, typename> class, cuda::thread_scope> class TestFunctor,
           template <typename, typename> class Selector,
           cuda::thread_scope Scope
-#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           = cuda::thread_scope_system
-#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           >
 struct TestEachFloatingPointType
 {
@@ -84,9 +106,9 @@ struct TestEachFloatingPointType
 template <template <class, template <typename, typename> class, cuda::thread_scope> class TestFunctor,
           template <typename, typename> class Selector,
           cuda::thread_scope Scope
-#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           = cuda::thread_scope_system
-#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           >
 struct TestEachAtomicType
 {
@@ -103,9 +125,9 @@ struct TestEachAtomicType
 template <template <class, template <typename, typename> class, cuda::thread_scope> class TestFunctor,
           template <typename, typename> class Selector,
           cuda::thread_scope Scope
-#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           = cuda::thread_scope_system
-#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           >
 struct TestEachIntegralRefType
 {
@@ -128,9 +150,9 @@ struct TestEachIntegralRefType
 template <template <class, template <typename, typename> class, cuda::thread_scope> class TestFunctor,
           template <typename, typename> class Selector,
           cuda::thread_scope Scope
-#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           = cuda::thread_scope_system
-#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           >
 struct TestEachFLoatingPointRefType
 {
@@ -144,9 +166,9 @@ struct TestEachFLoatingPointRefType
 template <template <class, template <typename, typename> class, cuda::thread_scope> class TestFunctor,
           template <typename, typename> class Selector = shared_memory_selector,
           cuda::thread_scope Scope
-#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#if _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           = cuda::thread_scope_system
-#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+#endif // _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600 || _CCCL_HIP_COMPILATION()
           >
 struct TestEachAtomicRefType
 {
