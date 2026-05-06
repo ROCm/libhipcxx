@@ -32,10 +32,6 @@
 #include <rocm-core/rocm_version.h>
 #endif
 
-// NOTE(HIP/AMD): for _CCCL_VERIFY used by libhipcxx::__isConstant below.
-// Safe to include here -- assert.h only depends on the cccl compiler /
-// preprocessor / target headers and does not pull amd_utils.h back in.
-#include <cuda/std/__cccl/assert.h>
 #ifndef __HIP_DEVICE_COMPILE__
 #ifndef __host__
 #define __host__
@@ -77,6 +73,16 @@ namespace libhipcxx
   // Provides CUDA-compatible __isShared and __isGlobal for HIP
   //===----------------------------------------------------------------------===//
   #ifdef __HIP_DEVICE_COMPILE__
+  // NOTE(HIP/AMD): the libhipcxx::__is* functions below are unconditional
+  // because they live inside namespace libhipcxx and never collide with
+  // a future global '::__isShared' (etc.) ROCm may add. The collision
+  // risk is at the global-namespace 'using' declarations + host-side
+  // stubs further down in this file -- those are guarded by
+  // '!defined(<name>) && !__has_builtin(<name>)' so future ROCm
+  // releases that ship the same name (either as a regular function
+  // declaration or as a clang builtin) automatically suppress our
+  // re-export.
+
   /**
    * @brief Check if a pointer points to shared memory (LDS - Local Data Share)
    * @param ptr Pointer to check (can be any type)
@@ -159,7 +165,7 @@ namespace libhipcxx
   /**
    * @brief Check if a pointer points to constant memory
    * @param ptr Pointer to check (can be any type)
-   * @return false unconditionally; the call also triggers _CCCL_VERIFY.
+   * @return false unconditionally; the call also traps the device.
    *
    * NOTE(HIP/AMD): AMDGCN does not expose a `__builtin_amdgcn_is_constant`
    * builtin, and the existing address-space builtins
@@ -171,18 +177,23 @@ namespace libhipcxx
    * answer (the previous heuristic had a logic bug that always returned
    * `false`; `is_global` was defined as the same set of conditions as
    * the final return, making them mutually exclusive), trip a hard
-   * failure via _CCCL_VERIFY so callers know the query is unsupported.
+   * failure (printf + __builtin_trap) so callers know the query is
+   * unsupported. We don't use _CCCL_VERIFY here because including
+   * <cuda/std/__cccl/assert.h> from this file (which is pulled in
+   * very early via <cuda/std/detail/__config> -> <amd/cuda_runtime.h>)
+   * baked CCCL_ENABLE_*_ASSERTIONS macros in before lit tests like
+   * libcxx/asserts/assert_device_disabled.pass.cpp could '#undef' them.
    * Reintroduce a real implementation once the HIP / AMDGCN toolchain
    * grows a builtin equivalent to NVIDIA's `isspacep.const` PTX op.
    */
   template<typename T>
   __device__ inline bool __isConstant(const T* ptr) {
     (void) ptr;
-    _CCCL_VERIFY(false,
-                 "cuda::device::address_space::constant queries are not "
-                 "supported on AMDGCN: __isConstant has no AMDGCN builtin "
-                 "equivalent and __constant__ globals are indistinguishable "
-                 "from regular global memory.");
+    printf("ERROR: cuda::device::address_space::constant queries are not "
+           "supported on AMDGCN: __isConstant has no AMDGCN builtin "
+           "equivalent and __constant__ globals are indistinguishable "
+           "from regular global memory.\n");
+    __builtin_trap();
     return false;
   }
 
@@ -218,32 +229,69 @@ namespace libhipcxx
 // Make address space query functions available in global namespace
 // to match CUDA's behavior where __isShared/__isGlobal are global
 //===----------------------------------------------------------------------===//
+// NOTE(HIP/AMD): each global-scope export below is guarded by the pair
+//   !defined(<name>) && !__has_builtin(<name>)
+// so a future ROCm release that ships either a regular global
+// declaration of '::__isShared' (etc.) or a corresponding clang
+// builtin '__isShared' automatically suppresses our re-export -- this
+// avoids redefinition errors and using-declaration ambiguities. The
+// in-namespace 'libhipcxx::__is*' definitions further up are
+// unconditional because they live in a separate namespace and never
+// participate in the collision.
 #if defined(__HIP__)
   #ifdef __HIP_DEVICE_COMPILE__
+#if !defined(__isShared) && !__has_builtin(__isShared)
   using libhipcxx::__isShared;
+#endif
+#if !defined(__isGlobal) && !__has_builtin(__isGlobal)
   using libhipcxx::__isGlobal;
+#endif
+#if !defined(__isPrivate) && !__has_builtin(__isPrivate)
   using libhipcxx::__isPrivate;
+#endif
+#if !defined(__isLocal) && !__has_builtin(__isLocal)
   using libhipcxx::__isLocal;
+#endif
+#if !defined(__isConstant) && !__has_builtin(__isConstant)
   using libhipcxx::__isConstant;
+#endif
+#if !defined(__isGridConstant) && !__has_builtin(__isGridConstant)
   using libhipcxx::__isGridConstant;
+#endif
+#if !defined(__isClusterShared) && !__has_builtin(__isClusterShared)
   using libhipcxx::__isClusterShared;
+#endif
   #else
   // Host-side stubs (always return false, since host doesn't have these address spaces)
   // Marked as __host__ __device__ to allow calling from __global__ functions during host compilation
+#if !defined(__isShared) && !__has_builtin(__isShared)
   template<typename T>
   __host__ __device__ inline bool __isShared(const T*) { return false; }
+#endif
+#if !defined(__isGlobal) && !__has_builtin(__isGlobal)
   template<typename T>
   __host__ __device__ inline bool __isGlobal(const T*) { return false; }
+#endif
+#if !defined(__isPrivate) && !__has_builtin(__isPrivate)
   template<typename T>
   __host__ __device__ inline bool __isPrivate(const T*) { return false; }
+#endif
+#if !defined(__isLocal) && !__has_builtin(__isLocal)
   template<typename T>
   __host__ __device__ inline bool __isLocal(const T*) { return false; }
+#endif
+#if !defined(__isConstant) && !__has_builtin(__isConstant)
   template<typename T>
   __host__ __device__ inline bool __isConstant(const T*) { return false; }
+#endif
+#if !defined(__isGridConstant) && !__has_builtin(__isGridConstant)
   template<typename T>
   __host__ __device__ inline bool __isGridConstant(const T*) { return false; }
+#endif
+#if !defined(__isClusterShared) && !__has_builtin(__isClusterShared)
   template<typename T>
   __host__ __device__ inline bool __isClusterShared(const T*) { return false; }
+#endif
   #endif
 #endif
 
