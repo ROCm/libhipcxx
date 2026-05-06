@@ -177,7 +177,12 @@
 
 // Determine if we are compiling host code, this includes both CUDA and C++ compilation
 // nvc++ does not define __CUDA_ARCH__, but it compiles both host and device code at the same time
-#if !defined(__CUDA_ARCH__)
+// NOTE(HIP/AMD): __HIP_DEVICE_COMPILE__ is the HIP equivalent of __CUDA_ARCH__
+// (defined only during the HIP device pass) and must also disqualify the
+// translation unit from "host compilation". Without this, macros like
+// _CCCL_TRY / _CCCL_THROW expand to 'try' / 'throw' in the HIP device
+// pass and clang errors out on '__host__ __device__' callers.
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
 #  define _CCCL_HOST_COMPILATION() 1
 #else // ^^^ compiling host code ^^^ / vvv not compiling host code vvv
 #  define _CCCL_HOST_COMPILATION() 0
