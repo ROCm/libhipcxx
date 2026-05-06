@@ -322,10 +322,20 @@ class __device_accessor : public _Accessor
   {
     return ::cuda::device::is_address_from(__p, ::cuda::device::address_space::global)
         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::shared)
+#if !_CCCL_HIP_COMPILATION()
+        // NOTE(HIP/AMD): __isConstant has no AMDGCN equivalent (see
+        // <amd/amd_utils.h>); calling is_address_from(..., constant)
+        // on HIP-device traps. __constant__ globals on AMDGCN live in
+        // the global address space anyway and are reported by the
+        // is_address_from(..., global) query above, so we skip the
+        // constant / grid_constant / cluster_shared checks here on
+        // HIP. The first two queries (global / shared) cover all
+        // supported AMDGCN address spaces.
         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::constant)
-        || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::local)
         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::grid_constant)
-        || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::cluster_shared);
+        || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::cluster_shared)
+#endif // !_CCCL_HIP_COMPILATION()
+        || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::local);
   }
 
 #endif // _CCCL_DEVICE_COMPILATION()
