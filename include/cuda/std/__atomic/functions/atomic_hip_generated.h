@@ -36,6 +36,7 @@
 #include <cuda/std/__type_traits/is_unsigned.h>
 
 #include <cuda/std/__atomic/scopes.h>
+#include <cuda/std/__atomic/functions/cuda_local.h>
 //#include <cuda/std/__atomic/order.h>
 //#include <cuda/std/__atomic/functions/common.h>
 //#include <cuda/std/__atomic/functions/cuda_ptx_generated_helper.h>
@@ -50,56 +51,75 @@ static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __threa
 
 template<class _Type>
 __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_block_tag) {
+    if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
     __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_block_tag) {
+    if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
     __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_block_tag) {
+    bool __success;
+    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
     return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_block_tag) {
+    if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
     __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+    _Type __ret;
+    if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+    _Type __ret;
+    if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+    _Type __ret;
+    if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+    _Type __ret;
+    if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+    _Type __ret;
+    if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+    _Type __ret;
+    if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+    _Type __ret;
+    if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
@@ -114,56 +134,75 @@ static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __threa
 
 template<class _Type>
 __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_device_tag) {
+    if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
     __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_device_tag) {
+    if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
     __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_device_tag) {
+    bool __success;
+    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
     return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_device_tag) {
+    if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
     __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+    _Type __ret;
+    if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+    _Type __ret;
+    if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+    _Type __ret;
+    if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+    _Type __ret;
+    if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+    _Type __ret;
+    if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+    _Type __ret;
+    if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+    _Type __ret;
+    if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
@@ -182,16 +221,20 @@ static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __threa
 
 template<class _Type>
 __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_system_tag) {
+    if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
     __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_system_tag) {
+    if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
     __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool __is_weak, int __success_memorder, int __failure_memorder, __thread_scope_system_tag) {
+    bool __success;
+    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
     if(__is_weak)
         return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_SYSTEM);
     else 
@@ -200,41 +243,56 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__e
 
 template<class _Type>
 __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_system_tag) {
+    if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
     __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+    _Type __ret;
+    if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+    _Type __ret;
+    if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+    _Type __ret;
+    if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+    _Type __ret;
+    if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
    return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+    _Type __ret;
+    if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+    _Type __ret;
+    if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
 __device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+    _Type __ret;
+    if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
