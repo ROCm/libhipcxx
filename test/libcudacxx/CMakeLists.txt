@@ -358,20 +358,68 @@ set_tests_properties(
 # NOTE(HIP/AMD): on HIP we also pull in the c2h subdirectory so the
 # cccl.c2h / cccl.c2h.main library targets exist, but only as a
 # Catch2-only stripped-down build (see c2h/CMakeLists.txt). The
-# per-test executables below are still gated to CUDA-only because the
-# 22 *.cu test files in this directory tree were never HIPified
-# (they use cuda* runtime API directly + reach into upstream c2h
-# headers that pull thrust/cub). Tracked as HF5 in
-# 3.1.4_tmp/HEADER_TESTS_3.2_MEMORY.md.
+# per-test executables below are now also enabled under HIP, with
+# a HIP-only skip-list for the *.cu test files that use thrust /
+# cub / cooperative_groups (none of which are wired up in this
+# tree). Tracked as Phase 6 in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
 cccl_get_c2h()
 
-if(LIBCUDACXX_ENABLE_CUDA)
+if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
   file(
     GLOB_RECURSE test_srcs
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
     CONFIGURE_DEPENDS
     *.cu
   )
+
+  if (LIBCUDACXX_ENABLE_HIP)
+    # NOTE(HIP/AMD): per-test skip-list. These pull thrust /
+    # cooperative_groups directly (no thrust replacement available
+    # for HIP in this tree); enable them only when the HIPification
+    # of those upstream dependencies has landed.
+    set(LIBCUDACXX_C2H_HIP_SKIP_LIST
+      # Uses thrust execution policies, fill, reduce.
+      cuda/containers/uninitialized_async_buffer.cu
+      # Use cooperative_groups, no AMDGCN equivalent in this tree.
+      cuda/ccclrt/hierarchy/hierarchy_custom_types.cu
+      cuda/ccclrt/hierarchy/hierarchy_smoke.cu
+      cuda/ccclrt/launch/host_launch.cu
+      # Tests the CUDA driver-API context-stack semantics including
+      # cuStreamGetCtx for which HIP has no public equivalent
+      # (hipStreamGetCtx does not exist; consumers route through
+      # hipStreamGetDevice instead).
+      cuda/ccclrt/utility/driver_api.c2h.cu
+      # Use cuda::device::current_arch_id / current_arch_traits /
+      # current_compute_capability which are not yet wired into the
+      # libhipcxx HIP bridge (need a HIP-side AMDGCN architecture
+      # registry).
+      cuda/ccclrt/device/arch_id.c2h.cu
+      cuda/ccclrt/device/arch_traits.c2h.cu
+      cuda/ccclrt/device/compute_capability.c2h.cu
+      # cuda::device_attribute_result_t<Attr> uses CUDA-runtime
+      # attribute typing (int) that does not match the HIP runtime's
+      # underlying type (unsigned long for several attributes); also
+      # asserts a CUDA-specific cudaMemAllocationHandleType bitmask
+      # that does not exist on HIP.
+      cuda/ccclrt/device/device_smoke.c2h.cu
+      # Use cuda::copy_bytes / cuda::fill_bytes which are not yet
+      # implemented for HIP.
+      cuda/ccclrt/algorithm/copy.cu
+      cuda/ccclrt/algorithm/fill.cu
+      # CUDA mempool feature surface (cudaMemAllocationType,
+      # cudaMemAccessDesc, cudaMemPoolGetAttribute,
+      # cudaMemPoolExportToShareableHandle) only partially mirrors
+      # to HIP; the test exercises shareable IPC handles which HIP
+      # does not currently support in the same shape.
+      cuda/memory_resource/resources/memory_pools.cu
+      cuda/memory_resource/resources/device_memory_resource.cu
+      # Directly checks 'test::count_driver_stack() == cuda::devices.size()
+      # - id' which only makes sense in the CUDA driver-API context-stack
+      # model. On HIP the helper is a no-op (see testing.cuh) since HIP
+      # does not expose a multi-context per-thread stack.
+      cuda/ccclrt/utility/ensure_current_context.c2h.cu
+    )
+  endif()
 
   set(c2h_all_target "libcudacxx.test.c2h_all")
   add_custom_target(${c2h_all_target})
@@ -383,7 +431,14 @@ if(LIBCUDACXX_ENABLE_CUDA)
     set(${target_name_var} ${target_name} PARENT_SCOPE)
 
     add_executable(${target_name} "${source}")
-    cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
+    if (LIBCUDACXX_ENABLE_HIP)
+      # The .cu file extension defaults to LANGUAGE CUDA in CMake.
+      # Force LANGUAGE HIP on HIP builds so hipcc / clang -x hip
+      # picks the file up. Mirrors the pattern in c2h/CMakeLists.txt.
+      set_source_files_properties("${source}" PROPERTIES LANGUAGE HIP)
+    else()
+      cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
+    endif()
     target_include_directories(
       ${target_name}
       PRIVATE "${libcudacxx_SOURCE_DIR}/test/libcudacxx/cuda/ccclrt/common"
@@ -402,6 +457,13 @@ if(LIBCUDACXX_ENABLE_CUDA)
   endfunction()
 
   foreach (test_src IN LISTS test_srcs)
+    if (LIBCUDACXX_ENABLE_HIP)
+      list(FIND LIBCUDACXX_C2H_HIP_SKIP_LIST "${test_src}" _skip_idx)
+      if (NOT _skip_idx EQUAL -1)
+        message(STATUS "c2h test (HIP skip-list): ${test_src}")
+        continue()
+      endif()
+    endif()
     libcudacxx_add_test(test_target "${test_src}")
   endforeach()
 endif()
