@@ -97,10 +97,16 @@
 # >>>>>>> END NEW CODE (9ce7bd182c)
 set -euo pipefail
 
-## Usage: dump_and_check test.a test.cu PREFIX
-input_archive="$1"
-input_testfile="$2"
-input_prefix="$3"
+## Usage: dump_and_check test.a test.cu PREFIXES [cuobjdump-mode]
+input_archive="${1}"
+input_testfile="${2}"
+input_prefix="${3}"
+dump_mode="${4:---dump-ptx}"
+filecheck="${FILECHECK:-FileCheck}"
 
-cuobjdump --dump-ptx "$input_archive" | FileCheck --match-full-lines --check-prefix "$input_prefix" "$input_testfile"
-# >>>>>>> END NEW CODE (cea302960f)
+# <<<<<<< OLD CODE from 0b6dd61b7c (fee1b5cb56) - COMMENTED OUT
+# cuobjdump --dump-ptx "$input_archive" | FileCheck --match-full-lines --check-prefix "$input_prefix" "$input_testfile"
+# # >>>>>>> END NEW CODE (cea302960f)
+# =======
+cuobjdump "${dump_mode}" "${input_archive}" | "${filecheck}" --match-full-lines --check-prefixes="${input_prefix}" "${input_testfile}"
+# >>>>>>> END NEW CODE (fee1b5cb56)
