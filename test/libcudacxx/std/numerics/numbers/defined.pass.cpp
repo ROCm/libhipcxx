@@ -92,10 +92,7 @@ __host__ __device__ constexpr bool test()
   test_type<long double>();
 #endif // _CCCL_HAS_LONG_DOUBLE()
 #if _LIBCUDACXX_HAS_NVFP16()
-// NOTE(HIP/AMD): for ROCm 7.10 and earlier constexpression setting of __half values is not possible
-#  if LIBHIPCXX_ROCM_VERSION_GE(7, 11, 0)
   test_type<__half>();
-#  endif
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
   test_type<__nv_bfloat16>();
