@@ -202,7 +202,11 @@ public:
 };
 
 template <class _Range>
-_CCCL_CTAD_HOST_DEVICE drop_view(_Range&&, range_difference_t<_Range>)
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE drop_view(_Range&&, range_difference_t<_Range>)
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES drop_view(_Range&&, range_difference_t<_Range>)
+// >>>>>>> END NEW CODE (5a016e2713)
   -> drop_view<::cuda::std::ranges::views::all_t<_Range>>;
 
 template <class _Tp>

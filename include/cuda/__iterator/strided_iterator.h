@@ -411,10 +411,14 @@ public:
 
 #ifndef _CCCL_DOXYGEN_INVOKED
 template <class _Iter, typename _Stride>
-// <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE strided_iterator(_Iter, _Stride) -> strided_iterator<_Iter, _Stride>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
+// // _CCCL_CTAD_HOST_DEVICE strided_iterator(_Iter, _Stride) -> strided_iterator<_Iter, _Stride>;
+// // =======
+// _CCCL_HOST_DEVICE strided_iterator(_Iter, _Stride) -> strided_iterator<_Iter, _Stride>;
 // =======
-_CCCL_HOST_DEVICE strided_iterator(_Iter, _Stride) -> strided_iterator<_Iter, _Stride>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES strided_iterator(_Iter, _Stride) -> strided_iterator<_Iter, _Stride>;
+// >>>>>>> END NEW CODE (5a016e2713)
 #endif // _CCCL_DOXYGEN_INVOKED
 // >>>>>>> END NEW CODE (c8300b755a)
 

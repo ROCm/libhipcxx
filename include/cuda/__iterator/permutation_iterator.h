@@ -457,10 +457,14 @@ public:
 _CCCL_TEMPLATE(class _Iter, class _Index)
 _CCCL_REQUIRES(
   ::cuda::std::__has_random_access_traversal<_Iter> _CCCL_AND ::cuda::std::__has_random_access_traversal<_Index>)
-// <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE permutation_iterator(_Iter, _Index) -> permutation_iterator<_Iter, _Index>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// // <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
+// // _CCCL_CTAD_HOST_DEVICE permutation_iterator(_Iter, _Index) -> permutation_iterator<_Iter, _Index>;
+// // =======
+// _CCCL_HOST_DEVICE permutation_iterator(_Iter, _Index) -> permutation_iterator<_Iter, _Index>;
 // =======
-_CCCL_HOST_DEVICE permutation_iterator(_Iter, _Index) -> permutation_iterator<_Iter, _Index>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES permutation_iterator(_Iter, _Index) -> permutation_iterator<_Iter, _Index>;
+// >>>>>>> END NEW CODE (5a016e2713)
 #endif // _CCCL_DOXYGEN_INVOKED
 // >>>>>>> END NEW CODE (c8300b755a)
 

@@ -540,13 +540,20 @@ public:
 
 #ifndef _CCCL_DOXYGEN_INVOKED
 template <class... _Iterators>
-_CCCL_CTAD_HOST_DEVICE zip_iterator(::cuda::std::tuple<_Iterators...>) -> zip_iterator<_Iterators...>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE zip_iterator(::cuda::std::tuple<_Iterators...>) -> zip_iterator<_Iterators...>;
+//
+// template <class... _Iterators>
+// // <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
+// // _CCCL_CTAD_HOST_DEVICE zip_iterator(_Iterators...) -> zip_iterator<_Iterators...>;
+// // =======
+// _CCCL_HOST_DEVICE zip_iterator(_Iterators...) -> zip_iterator<_Iterators...>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES zip_iterator(::cuda::std::tuple<_Iterators...>) -> zip_iterator<_Iterators...>;
 
 template <class... _Iterators>
-// <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE zip_iterator(_Iterators...) -> zip_iterator<_Iterators...>;
-// =======
-_CCCL_HOST_DEVICE zip_iterator(_Iterators...) -> zip_iterator<_Iterators...>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES zip_iterator(_Iterators...) -> zip_iterator<_Iterators...>;
+// >>>>>>> END NEW CODE (5a016e2713)
 #endif // _CCCL_DOXYGEN_INVOKED
 // >>>>>>> END NEW CODE (c8300b755a)
 
