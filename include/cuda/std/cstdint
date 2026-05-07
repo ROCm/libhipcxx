@@ -50,6 +50,23 @@
 #else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
 #  include <cuda/std/climits>
 
+// NOTE(HIP/AMD): Under HIPRTC the test infrastructure adds
+// '-I/opt/rocm/include' (and clang's resource-dir) to the COMGR
+// compile so the runtime headers (<hip/hip_bf16.h>, <hip/hip_fp16.h>,
+// ...) are reachable. Those runtime headers transitively pull in
+// libstdc++'s <chrono> -> <ratio> -> <cstdint> -> clang's <stdint.h>
+// -> glibc's <stdint.h>, which then tries to typedef
+// 'int_fast16_t = long' / 'uint_fast16_t = unsigned long' -- in
+// conflict with the 'using int_fast16_t = int16_t' aliases below
+// (int16_t is 'short' via __INT16_TYPE__). Pull in <stdint.h> here
+// up front so the system definitions land first and our '_STDINT_H'
+// guard then suppresses the conflicting typedefs. The global
+// '::int_fast16_t' (= long) is brought into cuda::std via the
+// 'using ::int_fast16_t;' decls further down.
+#  if defined(_CCCL_COMPILER_HIPRTC)
+#    include <stdint.h>
+#  endif // _CCCL_COMPILER_HIPRTC
+
 // NOTE(HIP/AMD): Prefer the compiler-provided __INT*_TYPE__ / __UINT*_TYPE__
 // builtins for the fixed-width integer types. These expand to exactly the
 // underlying types the host C library uses for int{8,16,32,64}_t and
