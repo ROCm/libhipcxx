@@ -102,6 +102,59 @@ elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "True")
+  # NOTE(HIP/AMD): the lit.site.cfg.in template substitutes
+  # '@LIBCUDACXX_CUDA_TEST_WITH_NVRTC@' into 'config.is_nvrtc = ...'.
+  # If the variable is unset (which is the case in this HIPRTC branch
+  # because we don't go through the LIBCUDACXX_TEST_WITH_NVRTC arm
+  # above), the substitution yields 'config.is_nvrtc =' which is a
+  # Python syntax error. Set the value explicitly to "False" so the
+  # generated lit.site.cfg parses.
+  set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
+  set(LIBCUDACXX_FORCE_INCLUDE "")
+  # NOTE(HIP/AMD): HIPRTC's COMGR-bundled inline-clang sandbox does
+  # NOT have <hip/hip_runtime.h>, <hip/hip_bf16.h>, <hip/hip_fp16.h>,
+  # <hip/hip_fp8.h> on its include search path -- only the C++ stdlib
+  # and clang's builtin headers are reachable. Pass the host ROCm
+  # <hip/...> include dir AND clang's own resource dirs through to the
+  # hiprtcc test driver via -I; hiprtcc forwards every -I to the
+  # nvrtcCompileProgram() options, so the source files compiled inside
+  # COMGR can finally find these runtime headers. Without this the
+  # bf16/fp8 type forward-declarations in
+  # <cuda/std/__cccl/extended_data_types.h> never get a complete
+  # definition and every TU touching __fp_from_storage<__nv_bfloat16>
+  # fails. Mirrors the 3.1.4 setup that was lost during the 3.2 port.
+  set(LIBCUDACXX_TEST_COMPILER_FLAGS "-I'${HIP_INCLUDE_DIR}'")
+  # NOTE(HIP/AMD): We need to identify clang version to find from the path to clang new header.
+  # The header is used in libhipcxx/include/cuda/std/__memory/construct_at.h.
+  execute_process(
+    COMMAND "${HIP_HIPCC_EXECUTABLE}" --print-resource-dir
+    OUTPUT_VARIABLE _clang_abs_resource_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    COMMAND_ERROR_IS_FATAL ANY
+  )
+  cmake_path(GET _clang_abs_resource_dir FILENAME _clang_version)
+  set(_clang_include_dir "lib/llvm/lib/clang/${_clang_version}/include")
+  set(_clang_cuda_wrappers_dir "${_clang_include_dir}/cuda_wrappers")
+  string(JOIN " " LIBCUDACXX_TEST_COMPILER_FLAGS
+    -I${HIP_INCLUDE_DIR}
+    -I${HIP_INCLUDE_DIR}/../${_clang_include_dir}
+    -I${HIP_INCLUDE_DIR}/../${_clang_cuda_wrappers_dir}
+  )
+  # NOTE(HIP/AMD): the hiprtcc test driver does NOT produce a host
+  # '.exe' -- it writes per-arch '.gpu' device-code files plus a
+  # '<test>.build.yml' index next to where the executable would
+  # normally land. The lit harness therefore cannot exec the .exe
+  # directly. Wrap the executable invocation with hiprtcc itself
+  # (PrefixExecutor) so 'hiprtcc <test>.exe ...' detects the .exe
+  # extension, loads the matching .build.yml, and launches the
+  # pre-built device kernel via hipModuleLaunchKernel. Mirrors the
+  # NVRTC branch above and the 3.1.4 setup that was lost during the
+  # 3.2 port. Without this, every '.compile.pass.cpp' / '.pass.cpp'
+  # ends up UNRESOLVED with 'FileNotFoundError: <test>.exe'.
+  set(
+    LIBCUDACXX_EXECUTOR
+    "PrefixExecutor(['${LIBCUDACXX_CUDA_COMPILER}'], LocalExecutor())"
+  )
 else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
   string(
     APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
