@@ -69,8 +69,7 @@ struct custom_level_test
     // behaviour as clang-cuda -- the device pass parses the body of
     // host_device functions and tries to resolve the host-only
     // REQUIRE() symbols. Extend the upstream guard to skip the
-    // device-pass parsing on HIP too. See P41 in
-    // 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+    // device-pass parsing on HIP too.
 #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(dims.count() == 84 * 1024);
     CCCLRT_REQUIRE(dims.count(custom_level(), cuda::grid) == 42);
