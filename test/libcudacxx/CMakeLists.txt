@@ -387,9 +387,6 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
     # enable them only when the corresponding HIP support has landed.
     set(LIBCUDACXX_C2H_HIP_SKIP_LIST
       # Use cooperative_groups, no AMDGCN equivalent in this tree.
-      cuda/ccclrt/hierarchy/hierarchy_custom_types.cu
-      cuda/ccclrt/hierarchy/hierarchy_smoke.cu
-      cuda/ccclrt/launch/host_launch.cu
       # Tests the CUDA driver-API context-stack semantics including
       # cuStreamGetCtx for which HIP has no public equivalent
       # (hipStreamGetCtx does not exist; consumers route through
@@ -402,25 +399,25 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
       cuda/ccclrt/device/arch_id.c2h.cu
       cuda/ccclrt/device/arch_traits.c2h.cu
       cuda/ccclrt/device/compute_capability.c2h.cu
-      # cuda::device_attribute_result_t<Attr> uses CUDA-runtime
-      # attribute typing (int) that does not match the HIP runtime's
-      # underlying type (unsigned long for several attributes); also
-      # asserts a CUDA-specific cudaMemAllocationHandleType bitmask
-      # that does not exist on HIP.
+      # Compiles and runs (134 of 136 assertions pass) but two
+      # cuda::device_attribute_result_t<Attr> queries fail at
+      # runtime with hipErrorInvalidValue from hipDeviceGetAttribute
+      # for one or more attributes that ROCm 7.2 does not yet
+      # implement. Needs a per-attribute HIP-gating audit;
+      # tracked as SF9 in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
       cuda/ccclrt/device/device_smoke.c2h.cu
-      # Use cuda::copy_bytes / cuda::fill_bytes which are not yet
-      # implemented for HIP.
-      # CUDA mempool feature surface (cudaMemAllocationType,
-      # cudaMemAccessDesc, cudaMemPoolGetAttribute,
-      # cudaMemPoolExportToShareableHandle) only partially mirrors
-      # to HIP; the test exercises shareable IPC handles which HIP
-      # does not currently support in the same shape.
+      # Compiles and runs (48 of 52 assertions pass) but the IPC
+      # export-handle round-trip and a couple of mempool-attribute
+      # invariants do not hold byte-for-byte on HIP. Needs an
+      # assertion-by-assertion HIP-gating audit; tracked as SF10
+      # in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
       cuda/memory_resource/resources/memory_pools.cu
-      cuda/memory_resource/resources/device_memory_resource.cu
       # Directly checks 'test::count_driver_stack() == cuda::devices.size()
       # - id' which only makes sense in the CUDA driver-API context-stack
       # model. On HIP the helper is a no-op (see testing.cuh) since HIP
-      # does not expose a multi-context per-thread stack.
+      # does not expose a multi-context per-thread stack. Needs the
+      # test rewritten to query cudaGetDevice() instead; tracked as
+      # SF14 in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
       cuda/ccclrt/utility/ensure_current_context.c2h.cu
     )
     # If rocThrust is NOT available, also skip the thrust-using test;
