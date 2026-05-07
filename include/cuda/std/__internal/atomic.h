@@ -7,6 +7,28 @@
 //
 //===---------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___INTERNAL_ATOMIC_H
 #define _CUDA_STD___INTERNAL_ATOMIC_H
 
@@ -35,6 +57,31 @@
 #    define _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
 #  endif // _CCCL_CUDACC_BELOW(13, 1)
 #endif // _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
+
+// NOTE(HIP/AMD): the SAFE automatic-storage path inlines a
+// '__cuda_is_local(ptr)' check (which lowers to
+// '__builtin_amdgcn_is_private') into every cuda::atomic<T> op
+// in cuda/std/__atomic/functions/atomic_hip_generated.h. On the
+// HIPCC offline-compile path that is fine and is needed for
+// atomic.local.pass.cpp (a stack-local cuda::atomic<T> would
+// otherwise trap because AMDGCN has no HW atomics on the private
+// address space). The HIPRTC runtime-compile pipeline (COMGR ->
+// inline-clang -> bitcode link) however chokes on the resulting
+// IR with a backend codegen failure ("V_CMP_NE_U32_e32 0,
+// $src_shared_base, ..." spam followed by HIPRTC_ERROR_LINKING)
+// for any TU that exercises a wide spread of atomic<T>
+// instantiations -- atomic_fetch_min / max, address(_ref) /
+// constness, and compare_exchange_weak{,_explicit} all regress.
+// Force-enable the UNSAFE knob on the HIPRTC path so
+// __cuda_is_local() short-circuits to false and the SAFE shims
+// degenerate to a single tail-call into the underlying
+// __hip_atomic_* builtin, restoring 7 atomic FAILs to PASS.
+// atomic.local.pass.cpp is the only test that requires the SAFE
+// path on HIP and is marked '// UNSUPPORTED: hiprtc' for that
+// reason.
+#if defined(_CCCL_COMPILER_HIPRTC) && !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE)
+#  define _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
+#endif // _CCCL_COMPILER_HIPRTC && !_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
 
 #define _CCCL_ATOMIC_FLAG_TYPE int
 
