@@ -399,23 +399,6 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
       cuda/ccclrt/device/arch_id.c2h.cu
       cuda/ccclrt/device/arch_traits.c2h.cu
       cuda/ccclrt/device/compute_capability.c2h.cu
-      # Compiles and runs (134 of 136 assertions pass) but two
-      # cuda::device_attribute_result_t<Attr> queries fail at
-      # runtime with hipErrorInvalidValue from hipDeviceGetAttribute
-      # for one or more attributes that ROCm 7.2 does not yet
-      # implement. Needs a per-attribute HIP-gating audit.
-      cuda/ccclrt/device/device_smoke.c2h.cu
-      # Compiles and runs (48 of 52 assertions pass) but the IPC
-      # export-handle round-trip and a couple of mempool-attribute
-      # invariants do not hold byte-for-byte on HIP. Needs an
-      # assertion-by-assertion HIP-gating audit.
-      cuda/memory_resource/resources/memory_pools.cu
-      # Directly checks 'test::count_driver_stack() == cuda::devices.size()
-      # - id' which only makes sense in the CUDA driver-API context-
-      # stack model. On HIP the helper is a no-op (see testing.cuh)
-      # since HIP does not expose a multi-context per-thread stack.
-      # Needs the test rewritten to query cudaGetDevice() instead.
-      cuda/ccclrt/utility/ensure_current_context.c2h.cu
     )
     # If rocThrust is NOT available, also skip the thrust-using test;
     # otherwise leave it in the build and link rocThrust to the
