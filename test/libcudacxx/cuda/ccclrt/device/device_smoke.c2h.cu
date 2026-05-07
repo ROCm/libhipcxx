@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/__driver/driver_api.h>
 #include <cuda/devices>
 #include <cuda/std/__type_traits/is_same.h>
@@ -77,8 +99,20 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
     ::test_device_attribute<attributes::max_texture_1d_mipmapped_width, ::cudaDevAttrMaxTexture1DMipmappedWidth, int>();
     ::test_device_attribute<attributes::max_texture_2d_width, ::cudaDevAttrMaxTexture2DWidth, int>();
     ::test_device_attribute<attributes::max_texture_2d_height, ::cudaDevAttrMaxTexture2DHeight, int>();
+// NOTE(HIP/AMD): on HIP all three of MaxTexture2DLinearWidth /
+// LinearHeight / LinearPitch are aliased to a single
+// 'hipDeviceAttributeMaxTexture2DLinear' enumerator (HIP returns
+// the {width, height, pitch} tuple as one query). The libhipcxx
+// __dev_attr<> specialisation for that enumerator picks size_t
+// (matching the upstream Pitch typing), so on HIP the result type
+// for Width/Height collapses to size_t and the static_assert in
+// the helper trips on int != size_t. Skip the Width/Height
+// sub-checks on HIP; the Pitch check still runs and exercises the
+// shared HIP enumerator.
+#if !defined(__HIP_PLATFORM_AMD__)
     ::test_device_attribute<attributes::max_texture_2d_linear_width, ::cudaDevAttrMaxTexture2DLinearWidth, int>();
     ::test_device_attribute<attributes::max_texture_2d_linear_height, ::cudaDevAttrMaxTexture2DLinearHeight, int>();
+#endif // !__HIP_PLATFORM_AMD__
     ::test_device_attribute<attributes::max_texture_2d_linear_pitch,
                             ::cudaDevAttrMaxTexture2DLinearPitch,
                             cuda::std::size_t>();
@@ -256,9 +290,17 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 #if _CCCL_CTK_AT_LEAST(12, 4)
       STATIC_REQUIRE(::cudaMemHandleTypeFabric == 0x8);
       STATIC_REQUIRE(::cudaMemHandleTypeFabric == attributes::memory_pool_supported_handle_types.fabric);
-#else // ^^^ _CCCL_CTK_AT_LEAST(12, 4) ^^^ / vvv _CCCL_CTK_BELOW(12, 4) vvv
+#elif !defined(__HIP_PLATFORM_AMD__) // ^^^ _CCCL_CTK_AT_LEAST(12, 4) ^^^ / vvv _CCCL_CTK_BELOW(12, 4) vvv
       STATIC_REQUIRE(0x8 == attributes::memory_pool_supported_handle_types.fabric);
-#endif // ^^^ _CCCL_CTK_BELOW(12, 4) ^^^
+#else // ^^^ _CCCL_CTK_BELOW(12, 4) && !HIP ^^^ / vvv HIP vvv
+      // NOTE(HIP/AMD): hipMemAllocationHandleType is a 4-value
+      // enum (None/PosixFD/Win32/Win32Kmt) with no Fabric entry. The
+      // libhipcxx fallback in <cuda/__device/attributes.h> aliases
+      // 'fabric' to 'hipMemHandleTypeNone' (0) on HIP because a
+      // constexpr static_cast to 0x8 is rejected by clang
+      // ('integer value 8 is outside the valid range [0, 7] of the
+      // enumeration type'). Skip the 0x8 == fabric assertion here.
+#endif // ^^^ HIP ^^^
 
       constexpr int all_handle_types =
         attributes::memory_pool_supported_handle_types.none
