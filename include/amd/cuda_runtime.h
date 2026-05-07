@@ -718,6 +718,39 @@
 #  define cudaMemHandleTypePosixFileDescriptor hipMemHandleTypePosixFileDescriptor
 #endif
 
+// NOTE(HIP/AMD): additional cuda* -> hip* aliases confirmed available
+// in HIP per the HIPIFY CUDA Runtime API mapping table:
+// https://github.com/ROCm/HIPIFY/blob/main/docs/reference/tables/CUDA_Runtime_API_functions_supported_by_HIP.md
+// Used by c2h tests (host_launch.cu, memory_pools.cu,
+// device_memory_resource.cu, hierarchy_*.cu).
+#ifndef cudaLaunchHostFunc
+#  define cudaLaunchHostFunc hipLaunchHostFunc
+#endif
+#ifndef cudaStreamGetDevice
+#  define cudaStreamGetDevice hipStreamGetDevice
+#endif
+#ifndef cudaMemPoolGetAccess
+#  define cudaMemPoolGetAccess hipMemPoolGetAccess
+#endif
+#ifndef cudaMemPoolImportFromShareableHandle
+#  define cudaMemPoolImportFromShareableHandle hipMemPoolImportFromShareableHandle
+#endif
+#ifndef cudaMemPoolTrimTo
+#  define cudaMemPoolTrimTo hipMemPoolTrimTo
+#endif
+#ifndef cudaLaunchConfig_t
+#  define cudaLaunchConfig_t hipLaunchConfig_t
+#endif
+#ifndef cudaLaunchAttribute
+#  define cudaLaunchAttribute hipLaunchAttribute
+#endif
+#ifndef cudaLaunchKernelEx
+#  define cudaLaunchKernelEx hipLaunchKernelEx
+#endif
+#ifndef cudaLaunchKernelExC
+#  define cudaLaunchKernelExC hipLaunchKernelExC
+#endif
+
 #ifndef HIPRT_CB
 #  define HIPRT_CB
 #endif

@@ -298,7 +298,14 @@ struct __dev_attr<::cudaDevAttrMemoryPoolSupportedHandleTypes> //
 #  if _CCCL_CTK_AT_LEAST(12, 4)
   static constexpr type fabric = ::cudaMemHandleTypeFabric;
 #  else // ^^^ _CCCL_CTK_AT_LEAST(12, 4) ^^^ / vvv _CCCL_CTK_BELOW(12, 4) vvv
-  static inline const type fabric = static_cast<::cudaMemAllocationHandleType>(0x8);
+  // NOTE(HIP/AMD): On HIP, hipMemAllocationHandleType has only 4
+  // enumerators (None=0x0, PosixFD=0x1, Win32=0x2, Win32Kmt=0x4), so
+  // a constexpr 'static_cast<type>(0x8)' is rejected by clang in
+  // C++17 strict mode (8 is outside the [0, 7] range of the enum).
+  // The fabric attribute is a CUDA-NVLink feature; just use the
+  // 'none' (0x0) value as a placeholder on HIP. Tests that probe
+  // 'fabric' must HIP-gate the assertion.
+  static inline constexpr type fabric = ::cudaMemHandleTypeNone;
 #  endif // ^^^ _CCCL_CTK_BELOW(12, 4) ^^^
 };
 #  if _CCCL_CTK_AT_LEAST(12, 2)

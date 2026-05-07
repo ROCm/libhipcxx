@@ -8,9 +8,40 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <iostream>
 
-#include <cooperative_groups.h>
+// NOTE(HIP/AMD): on HIP the upstream-named <cooperative_groups.h>
+// does not exist; the HIP equivalent is
+// <hip/hip_cooperative_groups.h>. Both populate
+// "namespace cooperative_groups" so consumer code that uses cg::
+// aliases works unchanged.
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <hip/hip_cooperative_groups.h>
+#else
+#  include <cooperative_groups.h>
+#endif // !__HIP_PLATFORM_AMD__
 #include <host_device.cuh>
 
 struct custom_level : public cuda::hierarchy_level
@@ -34,7 +65,13 @@ struct custom_level_test
   __host__ __device__ void operator()(const DynDims& dims) const
   {
     // device-side require doesn't work with clang-cuda for now
-#if !_CCCL_CUDA_COMPILER(CLANG)
+// NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
+    // behaviour as clang-cuda -- the device pass parses the body of
+    // host_device functions and tries to resolve the host-only
+    // REQUIRE() symbols. Extend the upstream guard to skip the
+    // device-pass parsing on HIP too. See P41 in
+    // 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+#if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(dims.count() == 84 * 1024);
     CCCLRT_REQUIRE(dims.count(custom_level(), cuda::grid) == 42);
     CCCLRT_REQUIRE(dims.extents() == dim3(42 * 512, 2, 2));
