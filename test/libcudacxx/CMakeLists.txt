@@ -387,11 +387,6 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
     # enable them only when the corresponding HIP support has landed.
     set(LIBCUDACXX_C2H_HIP_SKIP_LIST
       # Use cooperative_groups, no AMDGCN equivalent in this tree.
-      # Tests the CUDA driver-API context-stack semantics including
-      # cuStreamGetCtx for which HIP has no public equivalent
-      # (hipStreamGetCtx does not exist; consumers route through
-      # hipStreamGetDevice instead).
-      cuda/ccclrt/utility/driver_api.c2h.cu
       # Use cuda::device::current_arch_id / current_arch_traits /
       # current_compute_capability which are not yet wired into the
       # libhipcxx HIP bridge (need a HIP-side AMDGCN architecture
