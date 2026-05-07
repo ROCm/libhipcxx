@@ -29,7 +29,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// UNSUPPORTED: nvrtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 #include <cuda/__runtime/ensure_current_context.h>
 #include <cuda/devices>
