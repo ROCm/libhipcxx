@@ -356,7 +356,8 @@
         "libcudacxx.test.internal_headers",
         "libcudacxx.test.public_headers",
         "libcudacxx.test.public_headers_host_only",
-        "libcudacxx.test.lit.precompile"
+        "libcudacxx.test.lit.precompile",
+        "libcudacxx.test.c2h_all"
       ]
     },
     {

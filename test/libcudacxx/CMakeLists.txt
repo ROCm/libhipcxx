@@ -326,13 +326,29 @@ if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
   )
 endif()
 
-# Restricted to avoid oversubscribing the GPU:
+# NOTE(HIP/AMD): the upstream default of 8 was chosen to avoid
+# oversubscribing the GPU. On AMD multi-GPU systems (e.g. an 8x
+# MI210 box) this is a ~14x slowdown vs the 'ninja check-hipcxx'
+# target, which lets lit auto-detect (defaulting to
+# multiprocessing.cpu_count()). Match check-hipcxx's behaviour by
+# default: 0 tells lit to auto-detect. Override at configure time
+# with -Dlibcudacxx_LIT_PARALLEL_LEVEL=N if a particular CI
+# machine cannot tolerate the auto-detected level.
 set(
   libcudacxx_LIT_PARALLEL_LEVEL
-  8
+  0
   CACHE STRING
-  "Parallelism used to run libcudacxx's lit test suite."
+  "Parallelism used to run libcudacxx's lit test suite. 0 = lit auto-detects (cpu_count())."
 )
+
+# NOTE(HIP/AMD): only pass '-j N' if the user explicitly set a
+# non-zero level. When 0 (the default), omit the flag entirely so
+# lit auto-detects -- matches the 'ninja check-hipcxx' invocation
+# above which has no -j cap.
+set(_libcudacxx_lit_j_flag "")
+if(libcudacxx_LIT_PARALLEL_LEVEL GREATER 0)
+  set(_libcudacxx_lit_j_flag -j "${libcudacxx_LIT_PARALLEL_LEVEL}")
+endif()
 
 add_test(
   NAME libcudacxx.test.lit
@@ -342,7 +358,7 @@ add_test(
       "${libcudacxx_LIT}"
         -vv --no-progress-bar --time-tests
         ${libcudacxx_LIT_FLAGS}
-        -j "${libcudacxx_LIT_PARALLEL_LEVEL}"
+        ${_libcudacxx_lit_j_flag}
         "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
   # gersemi: on
 )
