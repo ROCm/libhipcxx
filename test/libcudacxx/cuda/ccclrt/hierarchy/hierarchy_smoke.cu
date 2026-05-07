@@ -112,8 +112,7 @@ struct basic_test_single_dim
     // behaviour as clang-cuda -- the device pass parses the body of
     // host_device functions and tries to resolve the host-only
     // REQUIRE() symbols. Extend the upstream guard to skip the
-    // device-pass parsing on HIP too. See P41 in
-    // 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+    // device-pass parsing on HIP too.
 #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(dims.extents().x == grid_size * block_size);
     CCCLRT_REQUIRE(dims.extents(cuda::thread).x == grid_size * block_size);
@@ -180,8 +179,7 @@ struct basic_test_multi_dim
     // behaviour as clang-cuda -- the device pass parses the body of
     // host_device functions and tries to resolve the host-only
     // REQUIRE() symbols. Extend the upstream guard to skip the
-    // device-pass parsing on HIP too. See P41 in
-    // 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+    // device-pass parsing on HIP too.
 #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(dims.extents() == dim3(32, 12, 4));
     CCCLRT_REQUIRE(dims.extents(cuda::thread) == dim3(32, 12, 4));
@@ -253,8 +251,7 @@ struct basic_test_mixed
     // behaviour as clang-cuda -- the device pass parses the body of
     // host_device functions and tries to resolve the host-only
     // REQUIRE() symbols. Extend the upstream guard to skip the
-    // device-pass parsing on HIP too. See P41 in
-    // 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+    // device-pass parsing on HIP too.
 #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(dims.extents() == dim3(2048, 4, 2));
     CCCLRT_REQUIRE(dims.extents(cuda::thread) == dim3(2048, 4, 2));
@@ -304,8 +301,7 @@ struct basic_test_cluster
     // behaviour as clang-cuda -- the device pass parses the body of
     // host_device functions and tries to resolve the host-only
     // REQUIRE() symbols. Extend the upstream guard to skip the
-    // device-pass parsing on HIP too. See P41 in
-    // 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+    // device-pass parsing on HIP too.
 #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(dims.extents() == dim3(512, 6, 9));
     CCCLRT_REQUIRE(dims.count() == 27 * 1024);

@@ -361,7 +361,7 @@ set_tests_properties(
 # per-test executables below are now also enabled under HIP, with
 # a HIP-only skip-list for the *.cu test files that use thrust /
 # cub / cooperative_groups (none of which are wired up in this
-# tree). Tracked as Phase 6 in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+# tree). Tracked as Phase 6.
 cccl_get_c2h()
 
 # NOTE(HIP/AMD): rocThrust is found inside c2h/CMakeLists.txt (see
@@ -403,21 +403,18 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
       # cuda::device_attribute_result_t<Attr> queries fail at
       # runtime with hipErrorInvalidValue from hipDeviceGetAttribute
       # for one or more attributes that ROCm 7.2 does not yet
-      # implement. Needs a per-attribute HIP-gating audit;
-      # tracked as SF9 in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+      # implement. Needs a per-attribute HIP-gating audit.
       cuda/ccclrt/device/device_smoke.c2h.cu
       # Compiles and runs (48 of 52 assertions pass) but the IPC
       # export-handle round-trip and a couple of mempool-attribute
       # invariants do not hold byte-for-byte on HIP. Needs an
-      # assertion-by-assertion HIP-gating audit; tracked as SF10
-      # in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+      # assertion-by-assertion HIP-gating audit.
       cuda/memory_resource/resources/memory_pools.cu
       # Directly checks 'test::count_driver_stack() == cuda::devices.size()
-      # - id' which only makes sense in the CUDA driver-API context-stack
-      # model. On HIP the helper is a no-op (see testing.cuh) since HIP
-      # does not expose a multi-context per-thread stack. Needs the
-      # test rewritten to query cudaGetDevice() instead; tracked as
-      # SF14 in 3.1.4_tmp/LIT_TESTS_3.2_MEMORY.md.
+      # - id' which only makes sense in the CUDA driver-API context-
+      # stack model. On HIP the helper is a no-op (see testing.cuh)
+      # since HIP does not expose a multi-context per-thread stack.
+      # Needs the test rewritten to query cudaGetDevice() instead.
       cuda/ccclrt/utility/ensure_current_context.c2h.cu
     )
     # If rocThrust is NOT available, also skip the thrust-using test;
