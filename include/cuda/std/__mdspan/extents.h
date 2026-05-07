@@ -659,7 +659,12 @@ struct __to_dynamic_extent
 
 // Deduction guide for extents
 template <class... _IndexTypes>
-_CCCL_CTAD_HOST_DEVICE extents(_IndexTypes...) -> extents<size_t, __to_dynamic_extent::template value<_IndexTypes>...>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE extents(_IndexTypes...) -> extents<size_t, __to_dynamic_extent::template value<_IndexTypes>...>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES extents(_IndexTypes...)
+  -> extents<size_t, __to_dynamic_extent::template value<_IndexTypes>...>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 namespace __mdspan_detail
 {

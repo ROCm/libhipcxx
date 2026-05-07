@@ -311,12 +311,20 @@ private:
 
 _CCCL_TEMPLATE(template <class...> class _Interface, class _Super)
 _CCCL_REQUIRES(__is_interface<_Interface<_Super>>)
-_CCCL_CTAD_HOST_DEVICE __basic_any(_Interface<_Super>*) //
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE __basic_any(_Interface<_Super>*) //
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES __basic_any(_Interface<_Super>*) //
+// >>>>>>> END NEW CODE (5a016e2713)
   -> __basic_any<__normalized_interface_of<__basic_any<_Super>*>>;
 
 _CCCL_TEMPLATE(template <class...> class _Interface, class _Super)
 _CCCL_REQUIRES(__is_interface<_Interface<_Super>>)
-_CCCL_CTAD_HOST_DEVICE __basic_any(_Interface<_Super> const*) //
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE __basic_any(_Interface<_Super> const*) //
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES __basic_any(_Interface<_Super> const*) //
+// >>>>>>> END NEW CODE (5a016e2713)
   -> __basic_any<__normalized_interface_of<__basic_any<_Super> const*>>;
 
 _CCCL_END_NAMESPACE_CUDA

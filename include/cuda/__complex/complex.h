@@ -244,13 +244,21 @@ public:
 //! @brief Deduction guide for construction from complex types.
 _CCCL_TEMPLATE(class _Tp)
 _CCCL_REQUIRES(__is_any_complex_v<_Tp>)
-_CCCL_CTAD_HOST_DEVICE complex(const _Tp&) -> complex<typename _Tp::value_type>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE complex(const _Tp&) -> complex<typename _Tp::value_type>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES complex(const _Tp&) -> complex<typename _Tp::value_type>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 #if _CCCL_STD_VER >= 2020
 //! @brief Deduction guide for construction from a tuple-like object.
 _CCCL_TEMPLATE(class _Tp)
 _CCCL_REQUIRES((!__is_any_complex_v<_Tp>) _CCCL_AND __is_complex_compatible_tuple_like<_Tp>)
-_CCCL_CTAD_HOST_DEVICE complex(const _Tp&) -> complex<__complex_tuple_like_value_type_t<_Tp>>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE complex(const _Tp&) -> complex<__complex_tuple_like_value_type_t<_Tp>>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES complex(const _Tp&) -> complex<__complex_tuple_like_value_type_t<_Tp>>;
+// >>>>>>> END NEW CODE (5a016e2713)
 #endif // _CCCL_STD_VER >= 2020
 
 _CCCL_END_NAMESPACE_CUDA

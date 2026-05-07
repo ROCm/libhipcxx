@@ -364,14 +364,22 @@ public:
 
 #ifndef _CCCL_DOXYGEN_INVOKED
 template <class _Fn>
-_CCCL_CTAD_HOST_DEVICE tabulate_output_iterator(_Fn) -> tabulate_output_iterator<_Fn, ::cuda::std::ptrdiff_t>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE tabulate_output_iterator(_Fn) -> tabulate_output_iterator<_Fn, ::cuda::std::ptrdiff_t>;
+//
+// _CCCL_TEMPLATE(class _Fn, class _Index)
+// _CCCL_REQUIRES(::cuda::std::__integer_like<_Index>)
+// // <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
+// // _CCCL_CTAD_HOST_DEVICE tabulate_output_iterator(_Fn, _Index) -> tabulate_output_iterator<_Fn, _Index>;
+// // =======
+// _CCCL_HOST_DEVICE tabulate_output_iterator(_Fn, _Index) -> tabulate_output_iterator<_Fn, _Index>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES tabulate_output_iterator(_Fn) -> tabulate_output_iterator<_Fn, ::cuda::std::ptrdiff_t>;
 
 _CCCL_TEMPLATE(class _Fn, class _Index)
 _CCCL_REQUIRES(::cuda::std::__integer_like<_Index>)
-// <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE tabulate_output_iterator(_Fn, _Index) -> tabulate_output_iterator<_Fn, _Index>;
-// =======
-_CCCL_HOST_DEVICE tabulate_output_iterator(_Fn, _Index) -> tabulate_output_iterator<_Fn, _Index>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES tabulate_output_iterator(_Fn, _Index) -> tabulate_output_iterator<_Fn, _Index>;
+// >>>>>>> END NEW CODE (5a016e2713)
 #endif // _CCCL_DOXYGEN_INVOKED
 // >>>>>>> END NEW CODE (c8300b755a)
 

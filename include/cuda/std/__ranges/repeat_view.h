@@ -323,7 +323,11 @@ private:
 };
 
 template <class _Tp, class _Bound>
-_CCCL_CTAD_HOST_DEVICE repeat_view(_Tp, _Bound) -> repeat_view<_Tp, _Bound>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE repeat_view(_Tp, _Bound) -> repeat_view<_Tp, _Bound>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES repeat_view(_Tp, _Bound) -> repeat_view<_Tp, _Bound>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 _CCCL_END_NAMESPACE_CUDA_STD_RANGES
 

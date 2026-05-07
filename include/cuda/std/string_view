@@ -856,11 +856,20 @@ _CCCL_CTAD_SUPPORTED_FOR_TYPE(basic_string_view);
 
 _CCCL_TEMPLATE(class _It, class _End)
 _CCCL_REQUIRES(contiguous_iterator<_It> _CCCL_AND sized_sentinel_for<_End, _It>)
-_CCCL_CTAD_HOST_DEVICE basic_string_view(_It, _End) -> basic_string_view<iter_value_t<_It>>;
+# <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+# _CCCL_CTAD_HOST_DEVICE basic_string_view(_It, _End) -> basic_string_view<iter_value_t<_It>>;
+#
+# _CCCL_TEMPLATE(class _Range)
+# _CCCL_REQUIRES(::cuda::std::ranges::contiguous_range<_Range>)
+# _CCCL_CTAD_HOST_DEVICE basic_string_view(_Range&&) -> basic_string_view<::cuda::std::ranges::range_value_t<_Range>>;
+# =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES basic_string_view(_It, _End) -> basic_string_view<iter_value_t<_It>>;
 
 _CCCL_TEMPLATE(class _Range)
 _CCCL_REQUIRES(::cuda::std::ranges::contiguous_range<_Range>)
-_CCCL_CTAD_HOST_DEVICE basic_string_view(_Range&&) -> basic_string_view<::cuda::std::ranges::range_value_t<_Range>>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES basic_string_view(_Range&&)
+  -> basic_string_view<::cuda::std::ranges::range_value_t<_Range>>;
+# >>>>>>> END NEW CODE (5a016e2713)
 
 # <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
 # #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)

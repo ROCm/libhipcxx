@@ -132,7 +132,11 @@ public:
 };
 
 template <class _Range>
-_CCCL_CTAD_HOST_DEVICE ref_view(_Range&) -> ref_view<_Range>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE ref_view(_Range&) -> ref_view<_Range>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES ref_view(_Range&) -> ref_view<_Range>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 template <class _Tp>
 inline constexpr bool enable_borrowed_range<ref_view<_Tp>> = true;

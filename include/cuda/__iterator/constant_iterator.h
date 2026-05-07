@@ -332,14 +332,22 @@ public:
 
 #ifndef _CCCL_DOXYGEN_INVOKED
 template <class _Tp>
-_CCCL_CTAD_HOST_DEVICE constant_iterator(_Tp) -> constant_iterator<_Tp, ::cuda::std::ptrdiff_t>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE constant_iterator(_Tp) -> constant_iterator<_Tp, ::cuda::std::ptrdiff_t>;
+//
+// _CCCL_TEMPLATE(class _Tp, typename _Index)
+// _CCCL_REQUIRES(::cuda::std::__integer_like<_Index>)
+// // <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
+// // _CCCL_CTAD_HOST_DEVICE constant_iterator(_Tp, _Index) -> constant_iterator<_Tp, _Index>;
+// // =======
+// _CCCL_HOST_DEVICE constant_iterator(_Tp, _Index) -> constant_iterator<_Tp, _Index>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES constant_iterator(_Tp) -> constant_iterator<_Tp, ::cuda::std::ptrdiff_t>;
 
 _CCCL_TEMPLATE(class _Tp, typename _Index)
 _CCCL_REQUIRES(::cuda::std::__integer_like<_Index>)
-// <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE constant_iterator(_Tp, _Index) -> constant_iterator<_Tp, _Index>;
-// =======
-_CCCL_HOST_DEVICE constant_iterator(_Tp, _Index) -> constant_iterator<_Tp, _Index>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES constant_iterator(_Tp, _Index) -> constant_iterator<_Tp, _Index>;
+// >>>>>>> END NEW CODE (5a016e2713)
 #endif // _CCCL_DOXYGEN_INVOKED
 // >>>>>>> END NEW CODE (c8300b755a)
 

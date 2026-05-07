@@ -614,7 +614,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT pair : public __pair_base<_T1, _T2>
 };
 
 template <class _T1, class _T2>
-_CCCL_CTAD_HOST_DEVICE pair(_T1, _T2) -> pair<_T1, _T2>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE pair(_T1, _T2) -> pair<_T1, _T2>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES pair(_T1, _T2) -> pair<_T1, _T2>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 // [pairs.spec], specialized algorithms
 

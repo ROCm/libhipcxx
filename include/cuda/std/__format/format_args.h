@@ -121,7 +121,12 @@ private:
 };
 
 template <class _Context, class... _Args>
-_CCCL_CTAD_HOST_DEVICE basic_format_args(__format_arg_store<_Context, _Args...>) -> basic_format_args<_Context>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE basic_format_args(__format_arg_store<_Context, _Args...>) -> basic_format_args<_Context>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES basic_format_args(__format_arg_store<_Context, _Args...>)
+  -> basic_format_args<_Context>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 template <class _Context = format_context, class... _Args>
 [[nodiscard]] _CCCL_API __format_arg_store<_Context, _Args...> make_format_args(_Args&... __args)
