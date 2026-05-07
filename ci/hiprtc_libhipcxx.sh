@@ -17,7 +17,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-source "$(dirname "$0")/build_common.sh"
+cd "$(dirname "${BASH_SOURCE[0]}")"
+source "./build_common.sh"
 
 # On RHEL/CentOS-based containers, set LLVM_PATH to help COMGR find the correct clang binary
 # This prevents COMGR from defaulting to /bin/clang which causes incorrect GCC detection
@@ -27,12 +28,28 @@ fi
 
 print_environment_details
 
-
 PRESET="libcudacxx-nvrtc-cpp${CXX_STANDARD}"
 CMAKE_OPTIONS=""
 
-configure_and_build_preset "libcudacxx NVRTC" "$PRESET" "$CMAKE_OPTIONS"
+configure_preset "libcudacxx NVRTC" "$PRESET" "$CMAKE_OPTIONS"
+
+# Build only the hiprtcc test driver (the 'libcudacxx.nvrtcc' target).
+# The lit tests themselves are *runtime-compiled* by hiprtcc inside
+# COMGR -- there is no precompile step to burn cycles on at build time.
+# This mirrors ci/test_libhipcxx.sh's pattern of doing a targeted
+# 'cmake --build --target ...' between configure and ctest so the
+# script is standalone-friendly (works without a prior
+# ./build_libhipcxx.sh) without doubling compile work.
+if ! $CONFIGURE_ONLY; then
+    pushd .. > /dev/null
+    run_command "🏗️  Build libcudacxx NVRTC (hiprtcc only)" \
+        cmake --build "${BUILD_DIR}/${PRESET}" \
+              --target libcudacxx.nvrtcc
+    popd > /dev/null
+fi
 
 source "./sccache_stats.sh" "start"
 test_preset "libcudacxx NVRTC" "${PRESET}"
 source "./sccache_stats.sh" "end"
+
+print_time_summary
