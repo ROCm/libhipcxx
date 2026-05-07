@@ -242,7 +242,11 @@ public:
 _CCCL_TEMPLATE(class _Start, class _BoundSentinel)
 _CCCL_REQUIRES((!__integer_like<_Start> || !__integer_like<_BoundSentinel>
                 || (__signed_integer_like<_Start> == __signed_integer_like<_BoundSentinel>) ))
-_CCCL_CTAD_HOST_DEVICE iota_view(_Start, _BoundSentinel) -> iota_view<_Start, _BoundSentinel>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE iota_view(_Start, _BoundSentinel) -> iota_view<_Start, _BoundSentinel>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES iota_view(_Start, _BoundSentinel) -> iota_view<_Start, _BoundSentinel>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 template <class _Start, class _BoundSentinel>
 inline constexpr bool enable_borrowed_range<iota_view<_Start, _BoundSentinel>> = true;

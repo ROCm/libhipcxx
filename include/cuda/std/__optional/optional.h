@@ -566,7 +566,11 @@ public:
 };
 
 template <class _Tp>
-_CCCL_CTAD_HOST_DEVICE optional(_Tp) -> optional<_Tp>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE optional(_Tp) -> optional<_Tp>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES optional(_Tp) -> optional<_Tp>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 // Comparisons between optionals
 _CCCL_EXEC_CHECK_DISABLE

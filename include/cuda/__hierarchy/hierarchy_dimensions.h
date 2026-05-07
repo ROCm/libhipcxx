@@ -453,7 +453,11 @@ public:
 
 _CCCL_TEMPLATE(class... _LevelDescs)
 _CCCL_REQUIRES(::cuda::std::__fold_and_v<__is_hierarchy_level_desc_v<_LevelDescs>...>)
-_CCCL_CTAD_HOST_DEVICE hierarchy(const _LevelDescs&...)
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE hierarchy(const _LevelDescs&...)
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES hierarchy(const _LevelDescs&...)
+// >>>>>>> END NEW CODE (5a016e2713)
   -> hierarchy<__detail::__default_unit_below<
                  ::cuda::std::__type_index_c<sizeof...(_LevelDescs) - 1, __level_type_of<_LevelDescs>...>>,
                _LevelDescs...>;
@@ -461,11 +465,20 @@ _CCCL_CTAD_HOST_DEVICE hierarchy(const _LevelDescs&...)
 _CCCL_TEMPLATE(class _BottomUnit, class... _LevelDescs)
 _CCCL_REQUIRES(
   __is_hierarchy_level_v<_BottomUnit> _CCCL_AND ::cuda::std::__fold_and_v<__is_hierarchy_level_desc_v<_LevelDescs>...>)
-_CCCL_CTAD_HOST_DEVICE hierarchy(const _BottomUnit&, const _LevelDescs&...) -> hierarchy<_BottomUnit, _LevelDescs...>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE hierarchy(const _BottomUnit&, const _LevelDescs&...) -> hierarchy<_BottomUnit, _LevelDescs...>;
+//
+// _CCCL_TEMPLATE(class... _LevelDescs)
+// _CCCL_REQUIRES(::cuda::std::__fold_and_v<__is_hierarchy_level_desc_v<_LevelDescs>...>)
+// _CCCL_CTAD_HOST_DEVICE hierarchy(const ::cuda::std::tuple<_LevelDescs...>&)
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES hierarchy(const _BottomUnit&, const _LevelDescs&...)
+  -> hierarchy<_BottomUnit, _LevelDescs...>;
 
 _CCCL_TEMPLATE(class... _LevelDescs)
 _CCCL_REQUIRES(::cuda::std::__fold_and_v<__is_hierarchy_level_desc_v<_LevelDescs>...>)
-_CCCL_CTAD_HOST_DEVICE hierarchy(const ::cuda::std::tuple<_LevelDescs...>&)
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES hierarchy(const ::cuda::std::tuple<_LevelDescs...>&)
+// >>>>>>> END NEW CODE (5a016e2713)
   -> hierarchy<__detail::__default_unit_below<
                  ::cuda::std::__type_index_c<sizeof...(_LevelDescs) - 1, __level_type_of<_LevelDescs>...>>,
                _LevelDescs...>;
@@ -473,7 +486,11 @@ _CCCL_CTAD_HOST_DEVICE hierarchy(const ::cuda::std::tuple<_LevelDescs...>&)
 _CCCL_TEMPLATE(class _BottomUnit, class... _LevelDescs)
 _CCCL_REQUIRES(
   __is_hierarchy_level_v<_BottomUnit> _CCCL_AND ::cuda::std::__fold_and_v<__is_hierarchy_level_desc_v<_LevelDescs>...>)
-_CCCL_CTAD_HOST_DEVICE hierarchy(const _BottomUnit&, const ::cuda::std::tuple<_LevelDescs...>&)
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE hierarchy(const _BottomUnit&, const ::cuda::std::tuple<_LevelDescs...>&)
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES hierarchy(const _BottomUnit&, const ::cuda::std::tuple<_LevelDescs...>&)
+// >>>>>>> END NEW CODE (5a016e2713)
   -> hierarchy<_BottomUnit, _LevelDescs...>;
 
 #  if !_CCCL_COMPILER(NVRTC)

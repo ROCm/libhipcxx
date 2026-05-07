@@ -237,7 +237,12 @@ public:
 };
 
 template <class _Range, class _Pred>
-_CCCL_CTAD_HOST_DEVICE take_while_view(_Range&&, _Pred) -> take_while_view<::cuda::std::ranges::views::all_t<_Range>, _Pred>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE take_while_view(_Range&&, _Pred) -> take_while_view<::cuda::std::ranges::views::all_t<_Range>, _Pred>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES take_while_view(_Range&&, _Pred)
+  -> take_while_view<::cuda::std::ranges::views::all_t<_Range>, _Pred>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 _CCCL_END_NAMESPACE_CUDA_STD_RANGES
 

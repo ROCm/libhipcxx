@@ -262,7 +262,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_DECLSPEC_EMPTY_BASES prop : _Query
 #endif // !_CCCL_HAS_ATTRIBUTE_NO_UNIQUE_ADDRESS()
 
 template <class _Query, class _Value>
-_CCCL_CTAD_HOST_DEVICE prop(_Query, _Value) -> prop<_Query, _Value>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE prop(_Query, _Value) -> prop<_Query, _Value>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES prop(_Query, _Value) -> prop<_Query, _Value>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 //! @brief A variadic template structure representing an environment.
 //!
@@ -335,7 +339,11 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT env
 };
 
 template <class... _Envs>
-_CCCL_CTAD_HOST_DEVICE env(_Envs...) -> env<__unwrap_reference_t<_Envs>...>;
+// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
+// _CCCL_CTAD_HOST_DEVICE env(_Envs...) -> env<__unwrap_reference_t<_Envs>...>;
+// =======
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES env(_Envs...) -> env<__unwrap_reference_t<_Envs>...>;
+// >>>>>>> END NEW CODE (5a016e2713)
 
 #ifndef _CCCL_DOXYGEN_INVOKED
 
