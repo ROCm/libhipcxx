@@ -28,8 +28,20 @@ macro(pythonize_bool var)
   endif()
 endmacro()
 
-#add dlpack
-cccl_get_dlpack()
+# NOTE(HIP/AMD): dlpack is *only* consumed by the NV-only TMA descriptor
+# code in 'include/cuda/__tma/make_tma_descriptor.h', whose entire body is
+# guarded by '_CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC) &&
+# _CCCL_HAS_INCLUDE(<dlpack/dlpack.h>)'. The matching test
+# 'test/libcudacxx/cuda/tma/make_tma_descriptor.pass.cpp' is itself marked
+# '// UNSUPPORTED: hipcc, hiprtc' and 'pre-sm-90'. On HIP-only builds the
+# dlpack include is therefore dead code -- and 'cccl_get_dlpack()' would
+# otherwise call CPM/'git clone gh:dmlc/dlpack#v1.2', which fails in
+# air-gapped CI containers (observed on the ROCm-DS Jenkins job
+# 'libhipcxx/155': 'Failed to clone repository ...dlpack...'). Gate the
+# fetch on 'LIBCUDACXX_ENABLE_CUDA' so HIP-only builds skip it entirely.
+if (LIBCUDACXX_ENABLE_CUDA)
+  cccl_get_dlpack()
+endif()
 
 if (LIBCUDACXX_ENABLE_CUDA)
 
@@ -181,7 +193,12 @@ endif()
 
 # enable exceptions and assertions in tests
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_ASSERTIONS")
-string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -I ${dlpack_SOURCE_DIR}/include")
+# NOTE(HIP/AMD): dlpack only fetched for CUDA builds (see comment at
+# 'cccl_get_dlpack()' above); skip the include path on HIP-only builds so
+# we don't reference an undefined 'dlpack_SOURCE_DIR'.
+if (LIBCUDACXX_ENABLE_CUDA)
+  string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -I ${dlpack_SOURCE_DIR}/include")
+endif()
 
 # enable optional<T&>
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_OPTIONAL_REF")
