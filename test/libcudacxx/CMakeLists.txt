@@ -448,7 +448,28 @@ set_tests_properties(
 # a HIP-only skip-list for the *.cu test files that use thrust /
 # cub / cooperative_groups (none of which are wired up in this
 # tree). Tracked as Phase 6.
-cccl_get_c2h()
+#
+# NOTE(HIP/AMD): cccl_get_c2h() pulls add_subdirectory(c2h), and
+# c2h/CMakeLists.txt unconditionally calls cccl_get_catch2(), which
+# CPM-resolves to 'git clone gh:catchorg/Catch2#3.8.1'. That git
+# clone fails in air-gapped CI containers (observed on the ROCm-DS
+# Jenkins job 'libhipcxx/159': 'Build step for catch2 failed: 1
+# c2h/CMakeLists.txt:42 (cccl_get_catch2)'). Provide an opt-out
+# 'LIBCUDACXX_ENABLE_C2H_TESTS' (default ON to preserve the existing
+# behaviour) so air-gapped builds can run with
+# '-DLIBCUDACXX_ENABLE_C2H_TESTS=OFF'. The lit test suite (which is
+# the bulk of the test coverage) does not depend on c2h / Catch2 at
+# all, so disabling c2h on air-gapped CI loses only the c2h-style
+# per-test executables (libcudacxx.test.*.cu); 'ctest' / lit / the
+# header-self-contained tests still run.
+option(
+  LIBCUDACXX_ENABLE_C2H_TESTS
+  "Enable the c2h test framework (catch2-based per-test .cu executables). Disabling this skips the cccl_get_catch2() git fetch and the libcudacxx.test.c2h_all umbrella target. Default ON."
+  ON
+)
+if (LIBCUDACXX_ENABLE_C2H_TESTS)
+  cccl_get_c2h()
+endif()
 
 # NOTE(HIP/AMD): rocThrust is found inside c2h/CMakeLists.txt (see
 # cccl_get_c2h() above), but the resulting 'rocthrust_FOUND' variable
@@ -459,7 +480,7 @@ if (LIBCUDACXX_ENABLE_HIP)
   find_package(rocthrust QUIET CONFIG)
 endif()
 
-if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
+if(LIBCUDACXX_ENABLE_C2H_TESTS AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP))
   file(
     GLOB_RECURSE test_srcs
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
@@ -544,4 +565,17 @@ if(LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
     endif()
     libcudacxx_add_test(test_target "${test_src}")
   endforeach()
+elseif (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
+  # NOTE(HIP/AMD): when c2h tests are disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF,
+  # used in air-gapped CI to avoid the cccl_get_catch2() git fetch), still
+  # define an *empty* 'libcudacxx.test.c2h_all' target. The
+  # 'libcudacxx-base' build preset in CMakePresets.json lists this target
+  # by name; without this stub a 'cmake --build --preset libcudacxx-cppNN'
+  # invocation would fail with 'ninja: error: unknown target
+  # libcudacxx.test.c2h_all'. Building the empty target is a near-zero-cost
+  # no-op.
+  add_custom_target(libcudacxx.test.c2h_all)
+  message(STATUS
+    "c2h tests disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF). "
+    "libcudacxx.test.c2h_all defined as an empty stub.")
 endif()
