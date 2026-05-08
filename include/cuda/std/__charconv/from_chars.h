@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___CHARCONV_FROM_CHARS_H
 #define _CUDA_STD___CHARCONV_FROM_CHARS_H
 
@@ -64,8 +86,35 @@ __from_chars_char_to_value(char __c, int __base) noexcept
   }
 }
 
+// FIXME(HIP/AMD): WAR for an upstream LLVM AMDGPU codegen bug. Under HIPRTC
+// the AMDGPU backend at -O2/-O3 (HIPRTC's default) miscompiles the result of
+// inlining '__from_chars_int_generic' through the heavy template fan-out
+// produced by the upstream charconv tests
+// (test/libcudacxx/std/text/charconv/charconv.from.chars/integral/intN.pass.cpp,
+// which instantiates 'cuda::std::from_chars<T, Base>' for several T across
+// base in [2..36] from a 'cuda::static_for'). The optimiser produces a
+// correct 'value' but a miscomputed 'result.ptr' (off by N-1 digits) for
+// inputs that go through the case-conversion / negative-sign branches --
+// e.g. 'from_chars("-A3", 3, &value, 11)' returns 'ptr=buff+1' even though
+// it correctly stores '-113' into value. In addition, COMGR's compile time
+// on int128.pass.cpp blows up to 400+s (lit timeout) on the same heavily-
+// inlined IR. Both go away when '__from_chars_int_generic' is forced out
+// of line on the HIPRTC path, dropping int128.pass.cpp to ~93s and making
+// int8.pass.cpp produce correct results. HIPCC offline builds are
+// unaffected (the attribute only fires when '_CCCL_COMPILER_HIPRTC' is
+// defined).
+//
+// REMOVE WHEN: the upstream LLVM AMDGPU bug is fixed and our minimum-
+// supported ROCm bumps past the fix. Tagged FIXME (not NOTE) so a
+// branch-wide grep for FIXME catches this WAR for cleanup at that point.
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  define _LIBCUDACXX_HIPRTC_NOINLINE __attribute__((noinline))
+#else
+#  define _LIBCUDACXX_HIPRTC_NOINLINE
+#endif
+
 template <class _Tp>
-[[nodiscard]] _CCCL_API constexpr from_chars_result
+[[nodiscard]] _CCCL_API _LIBCUDACXX_HIPRTC_NOINLINE constexpr from_chars_result
 __from_chars_int_generic(const char* __first, const char* __last, _Tp& __value, int __base) noexcept
 {
   bool __overflow  = false;
