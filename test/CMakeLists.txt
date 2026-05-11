@@ -110,4 +110,20 @@ elseif (LIBCUDACXX_TEST_WITH_NVRTC)
   add_subdirectory(utils/nvidia/nvrtc)
 endif()
 
-add_subdirectory(atomic_codegen)
+# NOTE(HIP/AMD): the atomic_codegen tests are purely NVIDIA / CUDA --
+# they use 'cuobjdump' (an NVIDIA-CUDA toolkit tool) to disassemble
+# emitted SASS/PTX and FileCheck the result against expected codegen
+# patterns. Both 'cuobjdump' and the .cu test sources themselves
+# (which assert on NVIDIA-specific ISA mnemonics, sm_NN code-object
+# layout, etc.) are NV-only -- there is no HIP/AMDGCN equivalent
+# wired up in this tree, and the SASS/PTX checks would not be
+# meaningful on AMDGCN even if cuobjdump existed. The subdirectory's
+# own 'CMakeLists.txt:33' does 'find_program(cuobjdump REQUIRED)' so
+# on a HIP-only build it aborts the configure step ("Could not find
+# cuobjdump using the following names: cuobjdump", observed on the
+# ROCm-DS Jenkins job 'libhipcxx/166'). Gate the entry on
+# 'LIBCUDACXX_ENABLE_CUDA' so HIP-only builds skip the codegen-test
+# subdirectory entirely.
+if (LIBCUDACXX_ENABLE_CUDA)
+  add_subdirectory(atomic_codegen)
+endif()
