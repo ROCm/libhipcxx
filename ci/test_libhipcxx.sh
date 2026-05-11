@@ -50,6 +50,35 @@ if ! $CONFIGURE_ONLY; then
     run_command "🏗️  Build libcudacxx (c2h only)" \
         cmake --build "${BUILD_DIR}/${PRESET}" \
               --target libcudacxx.test.c2h_all
+
+    # Build the atomic codegen tests when FileCheck was found at
+    # configure time. The 'libcudacxx.test.atomics.ptx' umbrella
+    # target depends on per-.cu custom targets that each compile
+    # the .cu (HIP path: clang -emit-llvm; NV path: cuobjdump
+    # --dump-ptx on a static lib) and FileCheck the result against
+    # the trailing '/* ... */' comment block in the .cu.
+    #
+    # If FileCheck is NOT available, 'test/atomic_codegen/CMakeLists.txt'
+    # early-returns at configure time, the per-.cu targets are not
+    # created, the umbrella is empty, and 'cmake --build --target
+    # libcudacxx.test.atomics.ptx' would silently no-op. The check
+    # below makes the skip explicit so CI logs do not show a misleading
+    # "atomic codegen build OK" group when in fact nothing was built.
+    #
+    # The signal we read is the 'filecheck:FILEPATH=...' cache entry
+    # that 'find_program(filecheck "FileCheck" HINTS ...)' populates --
+    # this is the same source of truth CMake itself used at configure
+    # time, so we cannot disagree.
+    filecheck_path=$(grep '^filecheck:FILEPATH=' "${BUILD_DIR}/${PRESET}/CMakeCache.txt" 2>/dev/null \
+                     | cut -d= -f2)
+    if [ -n "$filecheck_path" ] && [ "$filecheck_path" != "filecheck-NOTFOUND" ]; then
+        run_command "🏗️  Build libcudacxx (atomic codegen)" \
+            cmake --build "${BUILD_DIR}/${PRESET}" \
+                  --target libcudacxx.test.atomics.ptx
+    else
+        echo "atomic codegen tests skipped (FileCheck not found at configure time)"
+    fi
+
     popd > /dev/null
 fi
 
