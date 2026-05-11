@@ -42,4 +42,11 @@ __global__ void add_relaxed_device_non_volatile(int* data, int* out, int n)
 ; SM8X-NEXT: st.global.u32 [%rd[[#GOUT]]], %r[[#DEST]];
 ; SM8X-NEXT: ret;
 
+
+; ----- AMD/HIP additions below (LLVM-IR check; see test/atomic_codegen/CMakeLists.txt) -----
+; HIP_IR-LABEL: define{{.*}}amdgpu_kernel void @{{.*}}add_relaxed_device_non_volatile{{.*}}
+; HIP_IR:       atomicrmw {{(volatile )?}}add ptr %{{[^,]+}}, i32 %{{[^ ]+}} syncscope("agent") monotonic
+; HIP_IR:       store i32 %{{[^,]+}}, ptr addrspace(1) %{{[^,]+}}
+; HIP_IR:       ret void
+
 */
