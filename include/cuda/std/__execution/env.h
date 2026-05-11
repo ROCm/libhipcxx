@@ -345,8 +345,6 @@ template <class... _Envs>
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES env(_Envs...) -> env<__unwrap_reference_t<_Envs>...>;
 // >>>>>>> END NEW CODE (5a016e2713)
 
-#ifndef _CCCL_DOXYGEN_INVOKED
-
 // Partial specialization for no env because NVCC segfaults trying to compile `__tuple<>`
 template <>
 struct _CCCL_TYPE_VISIBILITY_DEFAULT env<>
@@ -354,6 +352,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT env<>
   _CCCL_API auto query() const = delete;
 };
 
+#ifndef _CCCL_DOXYGEN_INVOKED
 // Partial specialization for two environments so that the syntax `env(env0, env1)` is
 // valid. That is, `env` can use CTAD with a parentesized list of arguments.
 template <class _Env0, class _Env1>
