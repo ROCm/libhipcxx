@@ -37,10 +37,15 @@ set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
 project(libhipcxx LANGUAGES CXX VERSION 3.0.2)
 
-# Expose libcudacxx_SOURCE_DIR for parity with the upstream libcudacxx
-# project name; lets all libhipcxx CMake code use the upstream variable
-# name so vendored cmake/Libcudacxx*.cmake helpers stay byte-identical.
+# Expose libcudacxx_SOURCE_DIR / libcudacxx_BINARY_DIR for parity with the
+# upstream libcudacxx project name; lets all libhipcxx CMake code use the
+# upstream variable name so vendored cmake/Libcudacxx*.cmake helpers stay
+# byte-identical. Without the BINARY_DIR alias, code in subdirectories
+# (notably codegen/CMakeLists.txt) that interpolates ${libcudacxx_BINARY_DIR}
+# expands to an empty string, which silently produces broken absolute paths
+# beginning with '/' (e.g. '/codegen/cuda_ptx_generated.h').
 set(libcudacxx_SOURCE_DIR "${libhipcxx_SOURCE_DIR}")
+set(libcudacxx_BINARY_DIR "${libhipcxx_BINARY_DIR}")
 
 # rocm-cmake contains common cmake code for rocm projects to help
 # setup and install
