@@ -120,6 +120,8 @@ foreach (test_path IN LISTS libcudacxx_atomic_codegen_tests)
       POST_BUILD
       # gersemi: off
       COMMAND
+        ${CMAKE_COMMAND} -E env
+          FILECHECK=${filecheck}
         "${CMAKE_CURRENT_SOURCE_DIR}/dump_and_check.bash"
           $<TARGET_FILE:atomic_codegen_${test_name}>
           "${test_path}"
@@ -142,6 +144,7 @@ foreach (test_path IN LISTS libcudacxx_atomic_codegen_tests)
           LIBCUDACXX_SOURCE_DIR=${libcudacxx_SOURCE_DIR}
           HIP_IR_ARCH=${LIBCUDACXX_ATOMIC_CODEGEN_HIP_ARCH}
           HIP_IR_CXX=${CMAKE_HIP_COMPILER}
+          FILECHECK=${filecheck}
         "${CMAKE_CURRENT_SOURCE_DIR}/dump_and_check.bash"
           "${test_path}"
           "${test_path}"

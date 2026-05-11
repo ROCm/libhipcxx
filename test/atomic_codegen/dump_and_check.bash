@@ -38,16 +38,33 @@ set -e
 #                         $HIP_IR_ARCH (default gfx90a). FileCheck
 #                         runs strict (no --allow-empty), so a .cu
 #                         with no HIP_IR check lines fails the build.
+#
+# Both branches honour $FILECHECK (default: bare 'FileCheck' resolved
+# via $PATH) so the caller can pass the absolute path that CMake's
+# find_program(filecheck ...) located, avoiding a redundant $PATH
+# lookup on systems where /opt/rocm/lib/llvm/bin is not on PATH.
 
 input="$1"
 input_testfile="$2"
 input_prefix="$3"
 platform="${4:-NV}"
 
+# NOTE(HIP/AMD): FileCheck lives at /opt/rocm/lib/llvm/bin/FileCheck on
+# ROCm installs and is generally NOT on $PATH (the ROCm toolchain dir
+# isn't prepended to PATH on Ubuntu CI containers, for example). The
+# CMake side already located it via 'find_program(filecheck "FileCheck"
+# HINTS /opt/rocm/lib/llvm/bin)' and forwards the resolved absolute
+# path through the FILECHECK env var. Honour it here so we use exactly
+# the binary CMake found, instead of re-doing a $PATH lookup that
+# would fail with 'FileCheck: command not found' (rc=127). The default
+# bare 'FileCheck' keeps the script working for ad-hoc developer
+# invocations from a shell that does have FileCheck on PATH.
+filecheck="${FILECHECK:-FileCheck}"
+
 case "$platform" in
   NV)
     cuobjdump --dump-ptx "$input" |
-      FileCheck --check-prefix "$input_prefix" "$input_testfile"
+      "$filecheck" --check-prefix "$input_prefix" "$input_testfile"
     ;;
   HIP)
     LH="${LIBCUDACXX_SOURCE_DIR:?LIBCUDACXX_SOURCE_DIR must be set on the HIP path}"
@@ -65,7 +82,7 @@ case "$platform" in
         -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT \
         -DLIBCUDACXX_IGNORE_DEPRECATED_ABI \
         "$input" -o "$ll_out"
-    FileCheck --check-prefix "$input_prefix" "$input_testfile" < "$ll_out"
+    "$filecheck" --check-prefix "$input_prefix" "$input_testfile" < "$ll_out"
     ;;
   *)
     echo "dump_and_check.bash: unknown platform '$platform' (NV or HIP)" >&2
