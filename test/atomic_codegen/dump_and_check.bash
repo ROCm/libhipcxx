@@ -24,9 +24,51 @@
 
 set -e
 
-## Usage: dump_and_check test.a test.cu PREFIX
-input_archive=$1
-input_testfile=$2
-input_prefix=$3
+# Usage:
+#   dump_and_check.bash <input> <test.cu> <prefix> [PLATFORM]
+#
+# PLATFORM=NV  (default): <input> is a static archive built by CMake;
+#                         cuobjdump --dump-ptx + FileCheck against PTX.
+# PLATFORM=HIP          : <input> is the .cu source itself; the script
+#                         compiles it with clang -emit-llvm using a
+#                         baked-in flag set, then FileChecks the
+#                         resulting LLVM-IR against the test file.
+#                         Honours $HIP_IR_CXX (default
+#                         /opt/rocm/lib/llvm/bin/clang++) and
+#                         $HIP_IR_ARCH (default gfx90a). FileCheck
+#                         runs strict (no --allow-empty), so a .cu
+#                         with no HIP_IR check lines fails the build.
 
-cuobjdump --dump-ptx $input_archive | FileCheck --check-prefix $input_prefix $input_testfile
+input="$1"
+input_testfile="$2"
+input_prefix="$3"
+platform="${4:-NV}"
+
+case "$platform" in
+  NV)
+    cuobjdump --dump-ptx "$input" |
+      FileCheck --check-prefix "$input_prefix" "$input_testfile"
+    ;;
+  HIP)
+    LH="${LIBCUDACXX_SOURCE_DIR:?LIBCUDACXX_SOURCE_DIR must be set on the HIP path}"
+    ll_out="$(mktemp /tmp/atomic_codegen_hip.XXXXXX.ll)"
+    trap 'rm -f "$ll_out"' EXIT
+    "${HIP_IR_CXX:-/opt/rocm/lib/llvm/bin/clang++}" \
+        -O3 -x hip --offload-arch="${HIP_IR_ARCH:-gfx90a}" \
+        -S -emit-llvm --cuda-device-only \
+        -std=c++17 -fno-rtti \
+        -include "$LH/test/libcudacxx/force_include_hip.h" \
+        -I "$LH/include" -I "$LH/test/support" -I /opt/rocm/include \
+        -D_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE=1 \
+        -D_CCCL_NO_SYSTEM_HEADER \
+        -DCCCL_ENABLE_OPTIONAL_REF \
+        -DCCCL_IGNORE_DEPRECATED_CPP_DIALECT \
+        -DLIBCUDACXX_IGNORE_DEPRECATED_ABI \
+        "$input" -o "$ll_out"
+    FileCheck --check-prefix "$input_prefix" "$input_testfile" < "$ll_out"
+    ;;
+  *)
+    echo "dump_and_check.bash: unknown platform '$platform' (NV or HIP)" >&2
+    exit 2
+    ;;
+esac
