@@ -72,6 +72,27 @@ if (LIBCUDACXX_ENABLE_HIP)
   else()
     message(STATUS "rocThrust not found; thrust-using c2h tests will be skip-listed.")
   endif()
+  # NOTE(HIP/AMD): force '-pthread' onto every c2h test executable.
+  # cuda::__physical_device (in include/cuda/__device/physical_device.h)
+  # uses 'std::once_flag' on the very first device touch
+  # (__primary_context, __name, __peers) -- that is, every C2H_CCCLRT_TEST
+  # that constructs 'cuda::device_ref{0}', 'cuda::stream{...}' or
+  # '__ensure_current_context'. On glibc < 2.34 (manylinux_2_28 ships
+  # glibc 2.28) libpthread is still a separate '.so'; libstdc++'s
+  # 'std::call_once' resolves '__gthread_once' to a weak no-op stub
+  # when the binary was not linked '-pthread', the stub returns -1, and
+  # 'call_once' rethrows that as 'std::system_error(-1, generic_category)'
+  # whose 'what()' is exactly 'Unknown error -1' (== glibc strerror(-1)).
+  # The callable is *never invoked*, so no HIP API name appears in the
+  # message, which matched the CCCLRT failure pattern (same source built
+  # & passing on Ubuntu 22.04 / glibc 2.35 -- where libpthread is folded
+  # into libc -- and failing only inside the manylinux_2_28 container on
+  # the same physical host). Propagating Threads::Threads through
+  # cccl.c2h (INTERFACE) and cccl.c2h.main (PUBLIC) makes every per-test
+  # executable inherit '-pthread' transitively. NV-only builds are
+  # unaffected; this is HIP-side only by intention.
+  set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+  find_package(Threads REQUIRED)
 else()
   find_package(CUDAToolkit)
 endif()
@@ -110,6 +131,7 @@ if (LIBCUDACXX_ENABLE_HIP)
       Catch2::Catch2
       cccl.compiler_interface_cpp17
       hip::host
+      Threads::Threads
   )
 else()
   target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
@@ -145,7 +167,7 @@ if (LIBCUDACXX_ENABLE_HIP)
     catch2_runner.cpp catch2_runner_helper.cu
     PROPERTIES LANGUAGE HIP
   )
-  target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h hip::host)
+  target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h hip::host Threads::Threads)
 else()
   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
 endif()
