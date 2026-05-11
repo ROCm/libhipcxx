@@ -38,36 +38,73 @@
 // =============================================================================
 // HIP-side __atomic_*_cuda emitter.
 //
-// Emits the ENTIRE 'atomic_hip_generated.h' header (header + 3 scope blocks +
+// Emits the ENTIRE 'atomic_hip_generated.h' header (header + scope blocks +
 // footer) when 'codegen --hip <out>' is invoked.
 //
-// Scope of this emitter (Tier 1, see commit message):
-//   * Output is intended to be byte-equivalent to the file that has lived in
-//     'include/cuda/std/__atomic/functions/atomic_hip_generated.h' since the
-//     HIP backend was first added, modulo a single whitespace fix on the
-//     system-scope 'fetch_add' overload (3-space indent normalised to 4).
-//   * No new operations, sizes, types, semantics, scopes or MMIO axes are
-//     added relative to the hand-maintained file. Each of the three scope
-//     blocks below emits exactly the (12 or 13) overloads the in-tree file
-//     already defines, parameterised only by:
-//       - scope_tag       : __thread_scope_{block,device,system}_tag
-//       - fence_func      : __threadfence_{block,,system}
-//       - scope_macro     : __HIP_MEMORY_SCOPE_{WORKGROUP,AGENT,SYSTEM}
-//       - has_ptr_fetch_sub : false for block (the in-tree file does not
-//                             define it for block scope), true for the other
-//                             two -- preserved as-is to keep the output
-//                             byte-equivalent.
-//       - cas_branches_on_weak : false for block/device (the in-tree file
-//                                accepts a 'bool' but ignores it and always
-//                                does a weak CAS), true for system (in-tree
-//                                file branches between weak and strong).
-//                                Preserved as-is.
+// Scope coverage (Tier 2):
+//   * 'block' / 'device' / 'system' scope blocks are emitted by
+//     'FormatHipScope' -- ~12-13 templated overloads per scope, routed
+//     through clang's '__hip_atomic_*' builtins with a baked-in
+//     '__HIP_MEMORY_SCOPE_*' macro. The (size, type) cross-product NV
+//     enumerates explicitly is handled implicitly here -- clang HIP
+//     builtins are runtime-typed and runtime-ordered.
+//   * 'cluster' scope block is emitted by 'FormatHipScopeUnsupported'.
+//     The signatures match the supported scopes (so consumers who do
+//     'cuda::atomic_ref<T, thread_scope_cluster>' overload-resolve to
+//     a real overload), but every body is just a 'static_assert'
+//     fenced behind '__always_false_v<_Type>' so it only fires at
+//     instantiation. Reasoning: AMDGCN has no cluster-scope equivalent.
+//     Mapping cluster -> AGENT (next-larger scope) silently
+//     over-synchronises and lies to the consumer about what was
+//     actually compiled; mapping cluster -> WORKGROUP under-synchronises.
+//     A clean static_assert at instantiation is the honest answer.
 //
-// Tier 2 (a follow-up commit) will replace these scope-only loops with the
-// per-(size, type, semantic, scope, mmio) emission shape the NV side already
-// uses in cuda_ptx_generated.h. Until then this emitter exists purely to
-// (a) set up a 'libcudacxx.test.atomics.codegen.hip.diff' regen-vs-in-tree
-// drift test and (b) stop calling a hand-maintained file 'generated'.
+// Type coverage (Tier 2):
+//   * Per-template '_Type' is sized at instantiation. For
+//     'sizeof(_Type) > 8', the load/store/compare_exchange/exchange
+//     overloads emit a 'static_assert(__always_false_v<_Type>, ...)'
+//     inside an 'if constexpr' branch -- clang's '__hip_atomic_*'
+//     builtins cap at 64-bit, so any wider type (incl. __int128, 128-bit
+//     structs, long double on some ABIs) would otherwise hit a noisier
+//     clang diagnostic somewhere deeper. The if-constexpr keeps the
+//     function signature singular and keeps the supported-size path
+//     identical to Tier 1's emit.
+//   * fetch_{add,sub,and,or,xor,max,min} are NOT gated on size in the
+//     same way -- the existing atomic_hip_derived.h CAS-loop fallback
+//     path supplies overloads for sub-word and oversized types.
+//
+// Order / semantic / MMIO axes (Tier 2):
+//   * Order:  passed through as 'int __memorder' to the clang builtin
+//     directly; no compile-time semantic tag layer needed (PTX needs
+//     that because the asm string has to know the order at compile
+//     time; clang HIP builtins do not).
+//   * Volatile: collapsed to relaxed by the clang builtin's runtime
+//     order semantics; no separate emission.
+//   * MMIO:   not emitted on HIP. AMDGCN has no per-op MMIO modifier;
+//     the equivalent is a one-time allocation-side cache attribute via
+//     'hipHostMalloc(..., hipHostMallocCoherent)'. A consumer that
+//     ever instantiates the NV-side MMIO overload via the public
+//     atomic_ref API surface gets a "no matching overload" template
+//     error pointing at the '__atomic_cuda_mmio_enable' parameter --
+//     honest about the gap.
+//
+// Architectural shape (Tier 2 picks 'flat'):
+//   * Stay with Tier 1's 'public API only' shape. Don't introduce the
+//     NV-side '__cuda_atomic_*' + bind-helper + memory-order dispatch
+//     layering. clang HIP builtins consume runtime 'int memorder'
+//     directly, so the NV layering would be pure overhead with no
+//     upstream-tracking benefit on HIP (the layer-4 intrinsics are
+//     necessarily backend-specific either way).
+//
+// Per-scope quirks preserved verbatim from Tier 1 (so the Tier 1 -> Tier 2
+// in-tree diff is small enough to eyeball):
+//   - has_ptr_fetch_sub  : false for block (no ptr fetch_sub in the
+//                          in-tree file's block-scope section); true for
+//                          device/system.
+//   - cas_branches_on_weak : false for block/device (anonymous bool param,
+//                            always weak CAS); true for system (named
+//                            __is_weak param, branches between weak and
+//                            strong CAS).
 // =============================================================================
 
 // Stream-emit the contents of the file pointed to by the LICENSE_FILE env var
@@ -129,6 +166,7 @@ inline void FormatHipHeader(std::ostream& out)
 //#include <cuda/std/cassert>
 //#include <cuda/std/cstdint>
 
+#include <cuda/std/__type_traits/always_false.h>
 #include <cuda/std/__type_traits/enable_if.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/__type_traits/is_unsigned.h>
@@ -169,38 +207,54 @@ static inline __device__ void __atomic_thread_fence_cuda(int __memorder, {0}) {{
 )XXX",
                      scope_tag, fence_func);
 
-  // load
+  // load -- gated on sizeof(_Type) > 8 for clang HIP builtin's 64-bit cap.
   out << fmt::format(R"XXX(
 template<class _Type>
 __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, {0}) {{
-    if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
-    __dst = __hip_atomic_load(__ptr, __memorder, {1});
+    if constexpr (sizeof(_Type) > 8) {{
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
+    }} else {{
+        if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
+        __dst = __hip_atomic_load(__ptr, __memorder, {1});
+    }}
 }}
 )XXX",
                      scope_tag, scope_macro);
 
-  // store
+  // store -- gated on sizeof(_Type) > 8 (clang HIP __hip_atomic_store cap).
   out << fmt::format(R"XXX(
 template<class _Type>
 __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, {0}) {{
-    if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
-    __hip_atomic_store(__ptr, __val, __memorder, {1});
+    if constexpr (sizeof(_Type) > 8) {{
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
+    }} else {{
+        if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
+        __hip_atomic_store(__ptr, __val, __memorder, {1});
+    }}
 }}
 )XXX",
                      scope_tag, scope_macro);
 
-  // compare_exchange
+  // compare_exchange -- gated on sizeof(_Type) > 8 (clang HIP cap).
   if (cas_branches_on_weak)
   {
     out << fmt::format(R"XXX(
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool __is_weak, int __success_memorder, int __failure_memorder, {0}) {{
-    bool __success;
-    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
-    if(__is_weak)
-        return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, {1});
-    else
-        return __hip_atomic_compare_exchange_strong(__ptr, __expected, __desired, __success_memorder, __failure_memorder, {1});
+    if constexpr (sizeof(_Type) > 8) {{
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_* caps at 64-bit)");
+        return false;
+    }} else {{
+        bool __success;
+        if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
+        if(__is_weak)
+            return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, {1});
+        else
+            return __hip_atomic_compare_exchange_strong(__ptr, __expected, __desired, __success_memorder, __failure_memorder, {1});
+    }}
 }}
 )XXX",
                        scope_tag, scope_macro);
@@ -210,20 +264,31 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__e
     out << fmt::format(R"XXX(
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, {0}) {{
-    bool __success;
-    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
-    return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, {1});
+    if constexpr (sizeof(_Type) > 8) {{
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_weak caps at 64-bit)");
+        return false;
+    }} else {{
+        bool __success;
+        if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
+        return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, {1});
+    }}
 }}
 )XXX",
                        scope_tag, scope_macro);
   }
 
-  // exchange
+  // exchange -- gated on sizeof(_Type) > 8 (clang HIP __hip_atomic_exchange cap).
   out << fmt::format(R"XXX(
 template<class _Type>
 __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, {0}) {{
-    if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
-    __old = __hip_atomic_exchange(__ptr, __new, __memorder, {1});
+    if constexpr (sizeof(_Type) > 8) {{
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
+    }} else {{
+        if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
+        __old = __hip_atomic_exchange(__ptr, __new, __memorder, {1});
+    }}
 }}
 )XXX",
                      scope_tag, scope_macro);
@@ -276,6 +341,114 @@ __device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __va
   }
 }
 
+// Emit a scope block whose every overload is a static_assert at instantiation.
+// Used for HIP-unsupported scope tags (today: 'cluster' -- AMDGCN has no
+// cluster-scope equivalent and any silent mapping would lie about what was
+// actually compiled). The signatures match the supported scopes 1:1 so that
+// overload resolution from the public 'cuda::atomic_ref<T, scope>' API picks
+// up THESE overloads on cluster scope and produces the static_assert message
+// at the right call site, instead of a "no matching function" template-tower.
+//
+// Body shape: 'static_assert(__always_false_v<_Type>, "<msg>")' is
+// value-dependent on the template parameter, so it is NOT evaluated at
+// template definition time -- only when the function is instantiated. That
+// keeps the file compilable in NV-mode builds where these overloads exist
+// but are never instantiated.
+//
+// Where the function has a non-void return type we emit a trivially-typed
+// fallback return ('return false;' / 'return _Type{};' / 'return nullptr;')
+// after the static_assert. The fallback is unreachable at runtime (the
+// static_assert aborts compilation before any caller is generated) but
+// keeps the function well-formed for the tooling that walks the file
+// looking for return-statement coverage.
+inline void FormatHipScopeUnsupported(std::ostream& out, const std::string& scope_tag, const std::string& reason)
+{
+  // thread_fence (void). The supported scopes' '__atomic_thread_fence_cuda'
+  // is a NON-template function. Mirroring that shape here verbatim would make
+  // the static_assert fire at PARSE time -- there is no value-dependent
+  // expression in the body to defer it to instantiation. Wrap as a function
+  // template with a dummy template parameter '_Dummy' that the static_assert
+  // references via '__always_false_v<_Dummy>' so the assertion is
+  // value-dependent on '_Dummy' and only fires at instantiation. Overload
+  // resolution still picks this for any call shape
+  // '(int, __thread_scope_cluster_tag)' because _Dummy has a default.
+  out << fmt::format(R"XXX(
+template <class _Dummy = void>
+static inline __device__ void __atomic_thread_fence_cuda(int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Dummy>, "{1}");
+}}
+)XXX",
+                     scope_tag, reason);
+
+  // load (void)
+  out << fmt::format(R"XXX(
+template<class _Type>
+__device__ void __atomic_load_cuda(const volatile _Type *, _Type&, int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
+}}
+)XXX",
+                     scope_tag, reason);
+
+  // store (void)
+  out << fmt::format(R"XXX(
+template<class _Type>
+__device__ void __atomic_store_cuda(volatile _Type *, _Type&, int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
+}}
+)XXX",
+                     scope_tag, reason);
+
+  // compare_exchange (bool)
+  out << fmt::format(R"XXX(
+template<class _Type>
+__device__ bool __atomic_compare_exchange_cuda(volatile _Type *, _Type *, const _Type, bool, int, int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
+    return false;
+}}
+)XXX",
+                     scope_tag, reason);
+
+  // exchange (void)
+  out << fmt::format(R"XXX(
+template<class _Type>
+__device__ void __atomic_exchange_cuda(volatile _Type*, _Type&, _Type, int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
+}}
+)XXX",
+                     scope_tag, reason);
+
+  // fetch_{and, or, xor, add, max, min, sub} (_Type)
+  for (const char* op : {"and", "or", "xor", "add", "max", "min", "sub"})
+  {
+    out << fmt::format(R"XXX(
+template<class _Type>
+__device__ _Type __atomic_fetch_{2}_cuda(volatile _Type *, _Type, int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
+    return _Type{{}};
+}}
+)XXX",
+                       scope_tag, reason, op);
+  }
+
+  // pointer fetch_add / fetch_sub (_Type*) -- emit both for the cluster path
+  // even though Tier 1's 'block' scope omits ptr fetch_sub (the reason for
+  // that quirk -- preserving the in-tree file -- doesn't apply here, so we
+  // give the unsupported-scope version full coverage).
+  out << fmt::format(R"XXX(
+template<class _Type>
+__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *, ptrdiff_t, int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
+    return nullptr;
+}}
+template<class _Type>
+__device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *, ptrdiff_t, int, {0}) {{
+    static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
+    return nullptr;
+}}
+)XXX",
+                     scope_tag, reason);
+}
+
 inline void FormatHip(std::ostream& out)
 {
   FormatHipHeader(out);
@@ -285,6 +458,14 @@ inline void FormatHip(std::ostream& out)
                  /*scope_macro=*/"__HIP_MEMORY_SCOPE_WORKGROUP",
                  /*has_ptr_fetch_sub=*/false,
                  /*cas_branches_on_weak=*/false);
+  // Cluster scope is HIP-unsupported (AMDGCN has no equivalent). Emit a
+  // signature-matching block that static_asserts at instantiation, BEFORE
+  // the device/system scopes -- ordering mirrors the upstream NV file which
+  // emits cluster between block and device.
+  FormatHipScopeUnsupported(out,
+                            /*scope_tag=*/"__thread_scope_cluster_tag",
+                            /*reason=*/"thread_scope_cluster is not supported on HIP "
+                                       "(AMDGCN has no cluster-scope equivalent)");
   FormatHipScope(out,
                  /*scope_tag=*/"__thread_scope_device_tag",
                  /*fence_func=*/"__threadfence",

@@ -37,6 +37,7 @@
 //#include <cuda/std/cassert>
 //#include <cuda/std/cstdint>
 
+#include <cuda/std/__type_traits/always_false.h>
 #include <cuda/std/__type_traits/enable_if.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/__type_traits/is_unsigned.h>
@@ -57,27 +58,48 @@ static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __threa
 
 template<class _Type>
 __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_block_tag) {
-    if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
-    __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
+    } else {
+        if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
+        __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    }
 }
 
 template<class _Type>
 __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_block_tag) {
-    if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
-    __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
+    } else {
+        if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
+        __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    }
 }
 
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_block_tag) {
-    bool __success;
-    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
-    return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_weak caps at 64-bit)");
+        return false;
+    } else {
+        bool __success;
+        if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
+        return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    }
 }
 
 template<class _Type>
 __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_block_tag) {
-    if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
-    __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
+    } else {
+        if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
+        __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
+    }
 }
 
 template<class _Type>
@@ -134,33 +156,133 @@ __device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __va
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
+template <class _Dummy = void>
+static inline __device__ void __atomic_thread_fence_cuda(int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Dummy>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+}
+
+template<class _Type>
+__device__ void __atomic_load_cuda(const volatile _Type *, _Type&, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+}
+
+template<class _Type>
+__device__ void __atomic_store_cuda(volatile _Type *, _Type&, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+}
+
+template<class _Type>
+__device__ bool __atomic_compare_exchange_cuda(volatile _Type *, _Type *, const _Type, bool, int, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return false;
+}
+
+template<class _Type>
+__device__ void __atomic_exchange_cuda(volatile _Type*, _Type&, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+}
+
+template<class _Type>
+__device__ _Type __atomic_fetch_and_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+__device__ _Type __atomic_fetch_or_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+__device__ _Type __atomic_fetch_xor_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+__device__ _Type __atomic_fetch_add_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+__device__ _Type __atomic_fetch_max_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+__device__ _Type __atomic_fetch_min_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+__device__ _Type __atomic_fetch_sub_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *, ptrdiff_t, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return nullptr;
+}
+template<class _Type>
+__device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *, ptrdiff_t, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return nullptr;
+}
+
 static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __thread_scope_device_tag) {
     __threadfence();
 }
 
 template<class _Type>
 __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_device_tag) {
-    if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
-    __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_AGENT);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
+    } else {
+        if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
+        __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_AGENT);
+    }
 }
 
 template<class _Type>
 __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_device_tag) {
-    if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
-    __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
+    } else {
+        if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
+        __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
+    }
 }
 
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_device_tag) {
-    bool __success;
-    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
-    return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_AGENT);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_weak caps at 64-bit)");
+        return false;
+    } else {
+        bool __success;
+        if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
+        return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_AGENT);
+    }
 }
 
 template<class _Type>
 __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_device_tag) {
-    if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
-    __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_AGENT);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
+    } else {
+        if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
+        __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_AGENT);
+    }
 }
 
 template<class _Type>
@@ -227,30 +349,51 @@ static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __threa
 
 template<class _Type>
 __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_system_tag) {
-    if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
-    __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
+    } else {
+        if (__cuda_load_weak_if_local(__ptr, &__dst, sizeof(_Type))) return;
+        __dst = __hip_atomic_load(__ptr, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    }
 }
 
 template<class _Type>
 __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_system_tag) {
-    if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
-    __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
+    } else {
+        if (__cuda_store_weak_if_local(__ptr, &__val, sizeof(_Type))) return;
+        __hip_atomic_store(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    }
 }
 
 template<class _Type>
 __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool __is_weak, int __success_memorder, int __failure_memorder, __thread_scope_system_tag) {
-    bool __success;
-    if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
-    if(__is_weak)
-        return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_SYSTEM);
-    else
-        return __hip_atomic_compare_exchange_strong(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_* caps at 64-bit)");
+        return false;
+    } else {
+        bool __success;
+        if (__cuda_compare_exchange_weak_if_local(__ptr, __expected, &__desired, &__success)) return __success;
+        if(__is_weak)
+            return __hip_atomic_compare_exchange_weak(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+        else
+            return __hip_atomic_compare_exchange_strong(__ptr, __expected, __desired, __success_memorder, __failure_memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    }
 }
 
 template<class _Type>
 __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_system_tag) {
-    if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
-    __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    if constexpr (sizeof(_Type) > 8) {
+        static_assert(::cuda::std::__always_false_v<_Type>,
+                      ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
+    } else {
+        if (__cuda_exchange_weak_if_local(__ptr, &__new, &__old)) return;
+        __old = __hip_atomic_exchange(__ptr, __new, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
+    }
 }
 
 template<class _Type>
