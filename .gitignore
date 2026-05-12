@@ -68,3 +68,6 @@ pyproject.toml
 # Sphinx build
 docs/.sphinx/_build/
 docs/.sphinx/_toc.yml
+
+# Claude Code session files
+.claude/
