@@ -44,6 +44,7 @@
 #endif // no system header
 
 #include <cuda/__fwd/iterator.h>
+#include <cuda/std/__concepts/constructible.h>
 #include <cuda/std/__iterator/concepts.h>
 #include <cuda/std/__iterator/iterator_traits.h>
 #include <cuda/std/__ranges/compressed_movable_box.h>
@@ -124,6 +125,7 @@ public:
   using reference = _Tp;
   using pointer   = void;
 
+  _CCCL_EXEC_CHECK_DISABLE
   _CCCL_TEMPLATE(class _Tp2 = _Tp)
   _CCCL_REQUIRES(::cuda::std::default_initializable<_Tp2>)
   _CCCL_API constexpr constant_iterator() noexcept(::cuda::std::is_nothrow_default_constructible_v<_Tp2>)
@@ -154,12 +156,14 @@ public:
     return static_cast<difference_type>(__index());
   }
 
+  _CCCL_EXEC_CHECK_DISABLE
   //! @brief Returns the stored value
   [[nodiscard]] _CCCL_API constexpr reference operator*() const noexcept
   {
     return __value();
   }
 
+  _CCCL_EXEC_CHECK_DISABLE
   //! @brief Returns the stored value
   [[nodiscard]] _CCCL_API constexpr reference operator[](difference_type) const noexcept
   {
@@ -167,6 +171,7 @@ public:
   }
 
   //! @brief Increments the stored index
+  _CCCL_EXEC_CHECK_DISABLE
   _CCCL_API constexpr constant_iterator& operator++() noexcept
   {
     ++__index();
@@ -183,6 +188,7 @@ public:
   }
 
   //! @brief Decrements the stored index
+  _CCCL_EXEC_CHECK_DISABLE
   _CCCL_API constexpr constant_iterator& operator--() noexcept
   {
     if constexpr (::cuda::std::is_signed_v<_Index> || !::cuda::std::is_integral_v<_Index>)
@@ -208,6 +214,7 @@ public:
 
   //! @brief Advances a @c constant_iterator by a given number of elements
   //! @param __n The amount of elements to advance
+  _CCCL_EXEC_CHECK_DISABLE
   _CCCL_API constexpr constant_iterator& operator+=(difference_type __n) noexcept
   {
     if constexpr (::cuda::std::is_signed_v<_Index> || !::cuda::std::is_integral_v<_Index>)
@@ -221,6 +228,7 @@ public:
   //! @brief Creates a copy of a @c constant_iterator advanced by a given number of elements
   //! @param __iter The @c constant_iterator to advance
   //! @param __n The amount of elements to advance
+  _CCCL_EXEC_CHECK_DISABLE
   template <int = 0> // Must be template, or the compiler complains about a nonliteral return type
   [[nodiscard]] _CCCL_API friend constexpr constant_iterator operator+(
     const constant_iterator& __iter, difference_type __n) noexcept(::cuda::std::is_nothrow_copy_constructible_v<_Tp>)
@@ -235,6 +243,7 @@ public:
   //! @brief Creates a copy of a @c constant_iterator advanced by a given number of elements
   //! @param __n The amount of elements to advance
   //! @param __iter The @c constant_iterator to advance
+  _CCCL_EXEC_CHECK_DISABLE
   template <int = 0> // Must be template, or the compiler complains about a nonliteral return type
   [[nodiscard]] _CCCL_API friend constexpr constant_iterator operator+(
     difference_type __n, const constant_iterator& __iter) noexcept(::cuda::std::is_nothrow_copy_constructible_v<_Tp>)
@@ -248,6 +257,7 @@ public:
 
   //! @brief Decrements a @c constant_iterator by a given number of elements
   //! @param __n The amount of elements to decrement
+  _CCCL_EXEC_CHECK_DISABLE
   _CCCL_API constexpr constant_iterator& operator-=(difference_type __n) noexcept
   {
     if constexpr (::cuda::std::is_signed_v<_Index>)
@@ -261,6 +271,7 @@ public:
   //! @brief Creates a copy of a @c constant_iterator decremented by a given number of elements
   //! @param __n The amount of elements to decrement
   //! @param __iter The @c constant_iterator to decrement
+  _CCCL_EXEC_CHECK_DISABLE
   template <int = 0> // Must be template, or the compiler complains about a nonliteral return type
   [[nodiscard]] _CCCL_API friend constexpr constant_iterator operator-(
     const constant_iterator& __iter, difference_type __n) noexcept(::cuda::std::is_nothrow_copy_constructible_v<_Tp>)
