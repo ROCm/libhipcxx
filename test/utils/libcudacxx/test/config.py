@@ -754,11 +754,14 @@ class Configuration(object):
     def configure_ccache(self):
         use_ccache_default = os.environ.get("CMAKE_CUDA_COMPILER_LAUNCHER") is not None
         use_ccache = self.get_lit_bool("use_ccache", use_ccache_default)
-# <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
-#         if use_ccache and not self.cxx.type == 'nvrtcc' and not self.cxx.type == 'hiprtcc':
+# <<<<<<< OLD CODE from e4d60a4dd3 (fda59c92c6) - COMMENTED OUT
+# # <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
+# #         if use_ccache and not self.cxx.type == 'nvrtcc' and not self.cxx.type == 'hiprtcc':
+# # =======
+#         if "enable-tile" in self.config.available_features:
+#             return
 # =======
-        if "enable-tile" in self.config.available_features:
-            return
+# >>>>>>> END NEW CODE (fda59c92c6)
         if use_ccache and not self.cxx.type == "nvrtcc":
 # >>>>>>> END NEW CODE (ba2df44002)
             self.cxx.use_ccache = True
