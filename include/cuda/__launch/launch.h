@@ -46,10 +46,7 @@
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__driver/driver_api.h>
-#  include <cuda/__hierarchy/block_level.h>
-#  include <cuda/__hierarchy/cluster_level.h>
-#  include <cuda/__hierarchy/grid_level.h>
-#  include <cuda/__hierarchy/thread_level.h>
+#  include <cuda/__hierarchy/hierarchy_levels.h>
 #  include <cuda/__hierarchy/traits.h>
 #  include <cuda/__launch/configuration.h>
 #  include <cuda/__runtime/api_wrapper.h>
