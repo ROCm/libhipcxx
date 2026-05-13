@@ -1,3 +1,25 @@
+# MIT License
+#
+# Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 # This file defines the `cccl_build_compiler_targets()` function, which
 # creates the following interface targets:
 #
@@ -86,11 +108,20 @@ function(
   endforeach()
 
   foreach (cxx_option IN LISTS cxx_compile_options)
+    # NOTE(HIP/AMD): also emit the option for COMPILE_LANGUAGE:HIP. clang's
+    # HIP front-end accepts the same -W*-style warning flags as plain C++,
+    # but without this generator expression the entire libcudacxx /
+    # libhipcxx HIP test surface (header tests, c2h tests) compiles without
+    # -Wall / -Wextra / -Werror -- regressions that would have been caught
+    # immediately on the NV side land silently on the HIP side. The
+    # asymmetry is invisible until someone explicitly injects 'CMAKE_HIP_FLAGS'
+    # at configure time, at which point the latent warnings flood out.
     target_compile_options(
       ${interface_target}
       INTERFACE
         $<$<COMPILE_LANGUAGE:CXX>:${cxx_option}>
         $<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:-Xcompiler=${cxx_option}>
+        $<$<COMPILE_LANGUAGE:HIP>:${cxx_option}>
     )
   endforeach()
 
