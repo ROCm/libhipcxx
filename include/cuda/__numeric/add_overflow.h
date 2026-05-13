@@ -205,9 +205,14 @@ template <typename _Tp>
                  (return ::cuda::__add_overflow_host(__lhs, __rhs);))
 #else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
     // NOTE(HIP/AMD): __add_overflow_device is only defined under
-    // _CCCL_CUDA_COMPILATION() (NVPTX inline asm). Under HIP, use the host
-    // implementation when on host, and fall through to generic_impl below
-    // when on device.
+    // _CCCL_CUDA_COMPILATION() (NVPTX inline asm). Under HIP, use the
+    // host implementation when on host, and fall through to
+    // ::cuda::__add_overflow_generic_impl(__lhs, __rhs) (the trailing
+    // 'return' below) when on device -- the same path taken under
+    // constant evaluation. The fall-through is intentional: any
+    // upstream improvement to __add_overflow_generic_impl (e.g. a
+    // future device-friendly intrinsic-based fast path) is picked up
+    // automatically without touching this branch.
     NV_IF_TARGET(NV_IS_HOST, (return ::cuda::__add_overflow_host(__lhs, __rhs);))
 #endif // !_CCCL_CUDA_COMPILATION()
   }
