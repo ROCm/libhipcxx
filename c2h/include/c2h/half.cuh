@@ -375,10 +375,22 @@ CUB_NAMESPACE_BEGIN
 // (Category, _PRIMITIVE, _nullptr_TYPE, _UnsignedBits, T) vs the
 // upstream cub::BaseTraits 4 (Category, _PRIMITIVE, _UnsignedBits,
 // T). Insert a literal 'false' for _nullptr_TYPE on HIP.
+//
+// The 'Category' enum (FLOATING_POINT) and the BaseTraits/NumericTraits
+// scaffolding it parameterises were deprecated in hipCub in favour of
+// '<rocprim/type_traits>' (rocprim::traits::define<T>). Migration is a
+// follow-up: the new API is structurally different (per-trait 'using'
+// declarations like is_arithmetic / number_format / float_bit_mask
+// instead of one BaseTraits inheritance) and would require maintaining
+// two specialisations -- one for old hipCub, one for new. For now we
+// keep using the deprecated path (which still works -- only deprecated,
+// not removed) and suppress the -Wdeprecated-declarations noise narrowly.
 #if defined(__HIP_PLATFORM_AMD__)
+_CCCL_SUPPRESS_DEPRECATED_PUSH
 template <>
 struct NumericTraits<half_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, half_t>
 {};
+_CCCL_SUPPRESS_DEPRECATED_POP
 #else
 template <>
 struct NumericTraits<half_t> : BaseTraits<FLOATING_POINT, true, uint16_t, half_t>

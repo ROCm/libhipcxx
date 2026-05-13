@@ -270,11 +270,16 @@ public:
 CUB_NAMESPACE_BEGIN
 
 // NOTE(HIP/AMD): see matching note in c2h/half.cuh -- hipcub's
-// BaseTraits has an extra _nullptr_TYPE parameter.
+// BaseTraits has an extra _nullptr_TYPE parameter, and the entire
+// FLOATING_POINT / BaseTraits / NumericTraits scaffolding is now
+// deprecated in favour of '<rocprim/type_traits>'. Same suppression
+// rationale as half.cuh.
 #if defined(__HIP_PLATFORM_AMD__)
+_CCCL_SUPPRESS_DEPRECATED_PUSH
 template <>
 struct NumericTraits<bfloat16_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, bfloat16_t>
 {};
+_CCCL_SUPPRESS_DEPRECATED_POP
 #else
 template <>
 struct NumericTraits<bfloat16_t> : BaseTraits<FLOATING_POINT, true, uint16_t, bfloat16_t>
