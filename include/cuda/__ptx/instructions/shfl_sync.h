@@ -261,9 +261,7 @@ shfl_sync_bfly(_Tp __data, uint32_t __lane_idx_offset, uint32_t __clamp_segmask,
 
 #if _CCCL_HIP_COMPILATION()
 // NOTE(HIP/AMD): Software equivalents of PTX `shfl.sync.{idx,up,down,bfly}.b32`,
-// implemented on top of HIP's `__shfl{,_up,_down,_xor}` family. Ported
-// from upgrade/3.1_base PTX-on-HIP roadmap
-// (feat/moberste/add_partial_ptx_support_3_1).
+// implemented on top of HIP's `__shfl{,_up,_down,_xor}` family.
 //
 // PTX <-> HIP signature mapping notes:
 //   1. lane_mask: PTX requires the caller to pass an explicit bitmask

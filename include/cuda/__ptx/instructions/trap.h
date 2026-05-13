@@ -60,8 +60,6 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // NOTE(HIP/AMD): Software equivalent of PTX `trap`. `__builtin_trap()`
 // emits the AMDGCN s_trap instruction (with a debugger trap code), which
 // halts the wave. Same effect as PTX trap from the user's point of view.
-// Ported from upgrade/3.1_base PTX-on-HIP roadmap
-// (feat/moberste/add_partial_ptx_support_3_1).
 template <typename = void>
 _CCCL_DEVICE static inline void trap()
 {

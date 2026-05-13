@@ -69,9 +69,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // (%laneid, %lanemask_{eq,le,lt,ge,gt}) and the block / grid coordinate
 // SREGs (%tid.*, %ntid.*, %ctaid.*, %nctaid.*) and cycle counters
 // (%clock, %clock_hi, %clock64). The other PTX special registers
-// (%smid, %cluster_*, %globaltimer, ...) are not exposed on HIP. Ported
-// from upgrade/3.1_base PTX-on-HIP roadmap
-// (feat/moberste/add_partial_ptx_support_3_1).
+// (%smid, %cluster_*, %globaltimer, ...) are not exposed on HIP.
 //
 // Wave size compatibility:
 //   PTX `%lanemask_*` SREGs are 32-bit because NVIDIA warps are 32 lanes
