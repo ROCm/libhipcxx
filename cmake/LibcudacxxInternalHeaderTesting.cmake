@@ -76,182 +76,185 @@ list(FILTER internal_headers EXCLUDE REGEX "__cuda/*")
 # generated cuda::ptx headers are not standalone
 list(FILTER internal_headers EXCLUDE REGEX "__ptx/instructions/generated")
 
-# <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
-# # <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
-# # # <<<<<<< OLD CODE from f17cf0067f (5c6dd87a64) - COMMENTED OUT
-# # # # NOTE(HIP/AMD): under HIP, filter out the upstream feature surfaces that
-# # # # have no HIP-portable implementation as of 2026, then re-add the
-# # # # individual cuda::ptx::* wrappers that DO ship a HIP software emulation
-# # # # (see the consolidated NOTE in <cuda/__ptx/ptx_helper_functions.h>) so
-# # # # the emulations don't bitrot. Block-list / allow-list pattern (per the
-# # # # g17 review feedback on PR #217) -- adding a new upstream header under
-# # # # one of the SKIP_DIRS will surface as a build failure rather than being
-# # # # silently skipped, which makes loss-of-coverage regressions visible.
-# # # if (LIBCUDACXX_ENABLE_HIP)
-# # #   include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
-# # #   libcudacxx_filter_backend_headers(internal_headers
-# # #     BACKEND HIP
-# # #     SKIP_DIRS
-# # #       cuda/__barrier cuda/__latch cuda/__semaphore
-# # #       cuda/__annotated_ptr cuda/__pipeline cuda/__memcpy_async cuda/__ptx
-# # #       # CUDA-only PTX atomic dispatch headers (inline-PTX asm; the HIP
-# # #       # path uses atomic_hip_{generated,derived}.h instead).
-# # #       cuda/std/__atomic/functions/cuda_ptx_generated.h
-# # #       cuda/std/__atomic/functions/cuda_ptx_derived.h
-# # #       cuda/std/__atomic/functions/cuda_ptx_generated_helper.h
-# # #     ALLOWLIST_HEADERS
-# # #       cuda/__ptx/ptx_helper_functions.h
-# # #       cuda/__ptx/ptx_dot_variants.h
-# # #       cuda/__ptx/instructions/bmsk.h
-# # #       cuda/__ptx/instructions/elect_sync.h
-# # #       cuda/__ptx/instructions/fence.h
-# # #       cuda/__ptx/instructions/get_sreg.h
-# # #       cuda/__ptx/instructions/shfl_sync.h
-# # #       cuda/__ptx/instructions/shl.h
-# # #       cuda/__ptx/instructions/shr.h
-# # #       cuda/__ptx/instructions/trap.h
+# <<<<<<< OLD CODE from b76e2cd013 (c866c70459) - COMMENTED OUT
+# # <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
+# # # <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
+# # # # <<<<<<< OLD CODE from f17cf0067f (5c6dd87a64) - COMMENTED OUT
+# # # # # NOTE(HIP/AMD): under HIP, filter out the upstream feature surfaces that
+# # # # # have no HIP-portable implementation as of 2026, then re-add the
+# # # # # individual cuda::ptx::* wrappers that DO ship a HIP software emulation
+# # # # # (see the consolidated NOTE in <cuda/__ptx/ptx_helper_functions.h>) so
+# # # # # the emulations don't bitrot. Block-list / allow-list pattern (per the
+# # # # # g17 review feedback on PR #217) -- adding a new upstream header under
+# # # # # one of the SKIP_DIRS will surface as a build failure rather than being
+# # # # # silently skipped, which makes loss-of-coverage regressions visible.
+# # # # if (LIBCUDACXX_ENABLE_HIP)
+# # # #   include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
+# # # #   libcudacxx_filter_backend_headers(internal_headers
+# # # #     BACKEND HIP
+# # # #     SKIP_DIRS
+# # # #       cuda/__barrier cuda/__latch cuda/__semaphore
+# # # #       cuda/__annotated_ptr cuda/__pipeline cuda/__memcpy_async cuda/__ptx
+# # # #       # CUDA-only PTX atomic dispatch headers (inline-PTX asm; the HIP
+# # # #       # path uses atomic_hip_{generated,derived}.h instead).
+# # # #       cuda/std/__atomic/functions/cuda_ptx_generated.h
+# # # #       cuda/std/__atomic/functions/cuda_ptx_derived.h
+# # # #       cuda/std/__atomic/functions/cuda_ptx_generated_helper.h
+# # # #     ALLOWLIST_HEADERS
+# # # #       cuda/__ptx/ptx_helper_functions.h
+# # # #       cuda/__ptx/ptx_dot_variants.h
+# # # #       cuda/__ptx/instructions/bmsk.h
+# # # #       cuda/__ptx/instructions/elect_sync.h
+# # # #       cuda/__ptx/instructions/fence.h
+# # # #       cuda/__ptx/instructions/get_sreg.h
+# # # #       cuda/__ptx/instructions/shfl_sync.h
+# # # #       cuda/__ptx/instructions/shl.h
+# # # #       cuda/__ptx/instructions/shr.h
+# # # #       cuda/__ptx/instructions/trap.h
+# # # #   )
+# # # #   set(cudart_name hip::device)
+# # # # elseif ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
+# # # #   set(cudart_name NVHPC::CUDART)
+# # # # else()
+# # # #   set(cudart_name CUDA::cudart)
+# # # # endif()
+# # # #
+# # # # =======
+# # # # >>>>>>> END NEW CODE (5c6dd87a64)
+# # # function(libcudacxx_create_internal_header_test header_name headertest_src)
+# # #   # Create the default target for that file. The TU is always written to
+# # #   # disk as '.cu' (see configure_file in libcudacxx_add_internal_header_test
+# # #   # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
+# # #   # association by tagging the source file with LANGUAGE HIP, which routes
+# # #   # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
+# # #   # natively, so no separate '.cpp' shadow file is needed.
+# # #   add_library(internal_headertest_${header_name} SHARED "${headertest_src}.cu")
+# # #   cccl_configure_target(internal_headertest_${header_name})
+# # #   if (LIBCUDACXX_ENABLE_HIP)
+# # #     set_source_files_properties(
+# # #       "${headertest_src}.cu"
+# # #       PROPERTIES LANGUAGE HIP
+# # #     )
+# # #   endif()
+# # #   target_include_directories(
+# # #     internal_headertest_${header_name}
+# # #     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
 # # #   )
-# # #   set(cudart_name hip::device)
-# # # elseif ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
-# # #   set(cudart_name NVHPC::CUDART)
-# # # else()
-# # #   set(cudart_name CUDA::cudart)
-# # # endif()
-# # #
+# # #   target_compile_definitions(
+# # #     internal_headertest_${header_name}
+# # #     PRIVATE _CCCL_HEADER_TEST
+# # #   )
+# # #   # Bring in the global CCCL compile definitions
+# # #   # Link against the right runtime
 # # # =======
-# # # >>>>>>> END NEW CODE (5c6dd87a64)
-# # function(libcudacxx_create_internal_header_test header_name headertest_src)
-# #   # Create the default target for that file. The TU is always written to
-# #   # disk as '.cu' (see configure_file in libcudacxx_add_internal_header_test
-# #   # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
-# #   # association by tagging the source file with LANGUAGE HIP, which routes
-# #   # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
-# #   # natively, so no separate '.cpp' shadow file is needed.
-# #   add_library(internal_headertest_${header_name} SHARED "${headertest_src}.cu")
-# #   cccl_configure_target(internal_headertest_${header_name})
-# #   if (LIBCUDACXX_ENABLE_HIP)
-# #     set_source_files_properties(
-# #       "${headertest_src}.cu"
-# #       PROPERTIES LANGUAGE HIP
-# #     )
-# #   endif()
-# #   target_include_directories(
-# #     internal_headertest_${header_name}
-# #     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
-# #   )
-# #   target_compile_definitions(
-# #     internal_headertest_${header_name}
-# #     PRIVATE _CCCL_HEADER_TEST
-# #   )
-# #   # Bring in the global CCCL compile definitions
-# #   # Link against the right runtime
 # # =======
+# if (CCCL_ENABLE_TILE)
+#   # error: asm statement is unsupported in tile code
+#   list(FILTER internal_headers EXCLUDE REGEX "cuda/std/__pstl/")
+#
+#   list(
+#     # error: asm statement is unsupported in tile code
+#     REMOVE_ITEM internal_headers
+#     "cuda/__annotated_ptr/access_property.h"
+#     "cuda/__annotated_ptr/access_property_encoding.h"
+#     "cuda/__annotated_ptr/apply_access_property.h"
+#     "cuda/__annotated_ptr/annotated_ptr.h"
+#     "cuda/__annotated_ptr/annotated_ptr_base.h"
+#     "cuda/__annotated_ptr/associate_access_property.h"
+#     "cuda/__atomic/atomic.h"
+#     "cuda/__barrier/barrier.h"
+#     "cuda/__barrier/barrier_arrive_tx.h"
+#     "cuda/__barrier/barrier_block_scope.h"
+#     "cuda/__barrier/barrier_expect_tx.h"
+#     "cuda/__barrier/barrier_thread_scope.h"
+#     "cuda/__container/buffer.h"
+#     "cuda/__container/make_buffer_with_pool.h"
+#     "cuda/__latch/latch.h"
+#     "cuda/__memcpy_async/cp_async_bulk_shared_global.h"
+#     "cuda/__memcpy_async/cp_async_shared_global.h"
+#     "cuda/__memcpy_async/dispatch_memcpy_async.h"
+#     "cuda/__memcpy_async/elect_one.h"
+#     "cuda/__memcpy_async/is_local_smem_barrier.h"
+#     "cuda/__memcpy_async/memcpy_async.h"
+#     "cuda/__memcpy_async/memcpy_async_barrier.h"
+#     "cuda/__memcpy_async/memcpy_async_tx.h"
+#     "cuda/__memcpy_async/memcpy_completion.h"
+#     "cuda/__memcpy_async/try_get_barrier_handle.h"
+#     "cuda/__memory/discard_memory.h"
+#     "cuda/__memory_resource/shared_resource.h"
+#     "cuda/__semaphore/counting_semaphore.h"
+#     "cuda/std/__atomic/api/common.h"
+#     "cuda/std/__atomic/api/owned.h"
+#     "cuda/std/__atomic/api/reference.h"
+#     "cuda/std/__atomic/functions.h"
+#     "cuda/std/__atomic/functions/cuda_local.h"
+#     "cuda/std/__atomic/functions/cuda_ptx_derived.h"
+#     "cuda/std/__atomic/functions/cuda_ptx_generated.h"
+#     "cuda/std/__atomic/types.h"
+#     "cuda/std/__atomic/types/base.h"
+#     "cuda/std/__atomic/types/common.h"
+#     "cuda/std/__atomic/types/locked.h"
+#     "cuda/std/__atomic/types/reference.h"
+#     "cuda/std/__atomic/types/small.h"
+#     "cuda/std/__atomic/wait/notify_wait.h"
+#     "cuda/std/__atomic/wait/polling.h"
+#     "cuda/std/__barrier/barrier.h"
+#     "cuda/std/__latch/latch.h"
+#     "cuda/std/__semaphore/atomic_semaphore.h"
+#     "cuda/std/__semaphore/counting_semaphore.h"
+#   )
+#
+#   list(
+#     # error: global scope non-placement dynamic deallocation with operator delete is unsupported in tile code
+#     REMOVE_ITEM internal_headers
+#     "cuda/std/__random/seed_seq.h"
+#   )
+#
+#   list(
+#     # error: bit field read/write is unsupported in tile code
+#     REMOVE_ITEM internal_headers
+#     "cuda/std/__format/format_integral.h"
+#     "cuda/std/__format/format_spec_parser.h"
+#     "cuda/std/__format/output_utils.h"
+#     "cuda/std/__format/formatters/bool.h"
+#     "cuda/std/__format/formatters/char.h"
+#     "cuda/std/__format/formatters/int.h"
+#     "cuda/std/__format/formatters/fp.h"
+#     "cuda/std/__format/formatters/ptr.h"
+#     "cuda/std/__format/formatters/str.h"
+#   )
+#
+#   list(
+#     # error: accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code
+#     REMOVE_ITEM internal_headers
+#     "cuda/__annotated_ptr/annotated_ptr.h"
+#     "cuda/__container/buffer.h"
+#     "cuda/__memcpy_async/cp_async_bulk_shared_global.h"
+#     "cuda/__memcpy_async/dispatch_memcpy_async.h"
+#     "cuda/__memcpy_async/elect_one.h"
+#     "cuda/__memcpy_async/memcpy_async.h"
+#     "cuda/__memcpy_async/memcpy_async_barrier.h"
+#   )
+#
+#   list(
+#     # error: indirect call is unsupported in tile code
+#     REMOVE_ITEM internal_headers
+#     "cuda/__annotated_ptr/annotated_ptr.h"
+#     "cuda/__barrier/barrier_arrive_tx.h"
+#     "cuda/__barrier/barrier_block_scope.h"
+#     "cuda/__barrier/barrier_expect_tx.h"
+#     "cuda/__barrier/barrier_thread_scope.h"
+#     "cuda/__memcpy_async/try_get_barrier_handle.h"
+#     "cuda/__memcpy_async/memcpy_async.h"
+#     "cuda/__memcpy_async/memcpy_async_barrier.h"
+#     "cuda/__memcpy_async/memcpy_async_tx.h"
+#     "cuda/__memcpy_async/memcpy_completion.h"
+#   )
+# endif()
+#
+# # >>>>>>> END NEW CODE (ba2df44002)
 # =======
-if (CCCL_ENABLE_TILE)
-  # error: asm statement is unsupported in tile code
-  list(FILTER internal_headers EXCLUDE REGEX "cuda/std/__pstl/")
-
-  list(
-    # error: asm statement is unsupported in tile code
-    REMOVE_ITEM internal_headers
-    "cuda/__annotated_ptr/access_property.h"
-    "cuda/__annotated_ptr/access_property_encoding.h"
-    "cuda/__annotated_ptr/apply_access_property.h"
-    "cuda/__annotated_ptr/annotated_ptr.h"
-    "cuda/__annotated_ptr/annotated_ptr_base.h"
-    "cuda/__annotated_ptr/associate_access_property.h"
-    "cuda/__atomic/atomic.h"
-    "cuda/__barrier/barrier.h"
-    "cuda/__barrier/barrier_arrive_tx.h"
-    "cuda/__barrier/barrier_block_scope.h"
-    "cuda/__barrier/barrier_expect_tx.h"
-    "cuda/__barrier/barrier_thread_scope.h"
-    "cuda/__container/buffer.h"
-    "cuda/__container/make_buffer_with_pool.h"
-    "cuda/__latch/latch.h"
-    "cuda/__memcpy_async/cp_async_bulk_shared_global.h"
-    "cuda/__memcpy_async/cp_async_shared_global.h"
-    "cuda/__memcpy_async/dispatch_memcpy_async.h"
-    "cuda/__memcpy_async/elect_one.h"
-    "cuda/__memcpy_async/is_local_smem_barrier.h"
-    "cuda/__memcpy_async/memcpy_async.h"
-    "cuda/__memcpy_async/memcpy_async_barrier.h"
-    "cuda/__memcpy_async/memcpy_async_tx.h"
-    "cuda/__memcpy_async/memcpy_completion.h"
-    "cuda/__memcpy_async/try_get_barrier_handle.h"
-    "cuda/__memory/discard_memory.h"
-    "cuda/__memory_resource/shared_resource.h"
-    "cuda/__semaphore/counting_semaphore.h"
-    "cuda/std/__atomic/api/common.h"
-    "cuda/std/__atomic/api/owned.h"
-    "cuda/std/__atomic/api/reference.h"
-    "cuda/std/__atomic/functions.h"
-    "cuda/std/__atomic/functions/cuda_local.h"
-    "cuda/std/__atomic/functions/cuda_ptx_derived.h"
-    "cuda/std/__atomic/functions/cuda_ptx_generated.h"
-    "cuda/std/__atomic/types.h"
-    "cuda/std/__atomic/types/base.h"
-    "cuda/std/__atomic/types/common.h"
-    "cuda/std/__atomic/types/locked.h"
-    "cuda/std/__atomic/types/reference.h"
-    "cuda/std/__atomic/types/small.h"
-    "cuda/std/__atomic/wait/notify_wait.h"
-    "cuda/std/__atomic/wait/polling.h"
-    "cuda/std/__barrier/barrier.h"
-    "cuda/std/__latch/latch.h"
-    "cuda/std/__semaphore/atomic_semaphore.h"
-    "cuda/std/__semaphore/counting_semaphore.h"
-  )
-
-  list(
-    # error: global scope non-placement dynamic deallocation with operator delete is unsupported in tile code
-    REMOVE_ITEM internal_headers
-    "cuda/std/__random/seed_seq.h"
-  )
-
-  list(
-    # error: bit field read/write is unsupported in tile code
-    REMOVE_ITEM internal_headers
-    "cuda/std/__format/format_integral.h"
-    "cuda/std/__format/format_spec_parser.h"
-    "cuda/std/__format/output_utils.h"
-    "cuda/std/__format/formatters/bool.h"
-    "cuda/std/__format/formatters/char.h"
-    "cuda/std/__format/formatters/int.h"
-    "cuda/std/__format/formatters/fp.h"
-    "cuda/std/__format/formatters/ptr.h"
-    "cuda/std/__format/formatters/str.h"
-  )
-
-  list(
-    # error: accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code
-    REMOVE_ITEM internal_headers
-    "cuda/__annotated_ptr/annotated_ptr.h"
-    "cuda/__container/buffer.h"
-    "cuda/__memcpy_async/cp_async_bulk_shared_global.h"
-    "cuda/__memcpy_async/dispatch_memcpy_async.h"
-    "cuda/__memcpy_async/elect_one.h"
-    "cuda/__memcpy_async/memcpy_async.h"
-    "cuda/__memcpy_async/memcpy_async_barrier.h"
-  )
-
-  list(
-    # error: indirect call is unsupported in tile code
-    REMOVE_ITEM internal_headers
-    "cuda/__annotated_ptr/annotated_ptr.h"
-    "cuda/__barrier/barrier_arrive_tx.h"
-    "cuda/__barrier/barrier_block_scope.h"
-    "cuda/__barrier/barrier_expect_tx.h"
-    "cuda/__barrier/barrier_thread_scope.h"
-    "cuda/__memcpy_async/try_get_barrier_handle.h"
-    "cuda/__memcpy_async/memcpy_async.h"
-    "cuda/__memcpy_async/memcpy_async_barrier.h"
-    "cuda/__memcpy_async/memcpy_async_tx.h"
-    "cuda/__memcpy_async/memcpy_completion.h"
-  )
-endif()
-
-# >>>>>>> END NEW CODE (ba2df44002)
+# >>>>>>> END NEW CODE (c866c70459)
 function(libcudacxx_add_internal_header_test_target target_name)
   if (NOT ARGN)
     return()

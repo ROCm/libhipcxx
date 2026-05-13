@@ -44,84 +44,87 @@ if ("Clang" STREQUAL "${CMAKE_CUDA_COMPILER_ID}")
   list(REMOVE_ITEM public_headers "annotated_ptr")
 endif()
 
-if (CCCL_ENABLE_TILE)
-  list(
-    # error: asm statement is unsupported in tile code
-    REMOVE_ITEM public_headers
-    "cuda/access_property"
-    "cuda/annotated_ptr"
-    "cuda/atomic"
-    "cuda/barrier"
-    "cuda/buffer"
-    "cuda/execution"
-    "cuda/latch"
-    "cuda/memory"
-    "cuda/memory_resource"
-    "cuda/pipeline"
-    "cuda/random"
-    "cuda/semaphore"
-    "cuda/discard_memory"
-    "cuda/std/atomic"
-    "cuda/std/barrier"
-    "cuda/std/execution"
-    "cuda/std/latch"
-    "cuda/std/semaphore"
-  )
-
-  list(
-    # error: global scope non-placement dynamic deallocation with operator delete is unsupported in tile code
-    REMOVE_ITEM public_headers
-    "cuda/random"
-    "cuda/std/random"
-  )
-
-  list(
-    # error: bit field read/write is unsupported in tile code
-    REMOVE_ITEM public_headers
-    "cuda/std/__format_"
-  )
-
-  list(
-    # error: accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code
-    REMOVE_ITEM public_headers
-    "cuda/annotated_ptr"
-    "cuda/barrier"
-    "cuda/buffer"
-    "cuda/hierarchy"
-    "cuda/pipeline"
-    "cuda/std/execution"
-  )
-
-  list(
-    # error: indirect call is unsupported in tile code
-    REMOVE_ITEM public_headers
-    "cuda/annotated_ptr"
-    "cuda/barrier"
-    "cuda/pipeline"
-  )
-endif()
-
-# <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
-# # NOTE(HIP/AMD): same block-list pattern as the internal/host-only
-# # sweeps (PR #217 review). New upstream headers under SKIP_DIRS will
-# # surface as build failures rather than being silently filtered out.
-# if (LIBCUDACXX_ENABLE_HIP)
-#   include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
-#   libcudacxx_filter_backend_headers(public_headers
-#     BACKEND HIP
-#     SKIP_DIRS
-#       cuda/ptx cuda/barrier cuda/latch cuda/semaphore
-#       cuda/annotated_ptr cuda/pipeline cuda/memcpy_async
-#       cuda/std/barrier cuda/std/latch cuda/std/semaphore
+# <<<<<<< OLD CODE from b76e2cd013 (c866c70459) - COMMENTED OUT
+# if (CCCL_ENABLE_TILE)
+#   list(
+#     # error: asm statement is unsupported in tile code
+#     REMOVE_ITEM public_headers
+#     "cuda/access_property"
+#     "cuda/annotated_ptr"
+#     "cuda/atomic"
+#     "cuda/barrier"
+#     "cuda/buffer"
+#     "cuda/execution"
+#     "cuda/latch"
+#     "cuda/memory"
+#     "cuda/memory_resource"
+#     "cuda/pipeline"
+#     "cuda/random"
+#     "cuda/semaphore"
+#     "cuda/discard_memory"
+#     "cuda/std/atomic"
+#     "cuda/std/barrier"
+#     "cuda/std/execution"
+#     "cuda/std/latch"
+#     "cuda/std/semaphore"
+#   )
+#
+#   list(
+#     # error: global scope non-placement dynamic deallocation with operator delete is unsupported in tile code
+#     REMOVE_ITEM public_headers
+#     "cuda/random"
+#     "cuda/std/random"
+#   )
+#
+#   list(
+#     # error: bit field read/write is unsupported in tile code
+#     REMOVE_ITEM public_headers
+#     "cuda/std/__format_"
+#   )
+#
+#   list(
+#     # error: accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code
+#     REMOVE_ITEM public_headers
+#     "cuda/annotated_ptr"
+#     "cuda/barrier"
+#     "cuda/buffer"
+#     "cuda/hierarchy"
+#     "cuda/pipeline"
+#     "cuda/std/execution"
+#   )
+#
+#   list(
+#     # error: indirect call is unsupported in tile code
+#     REMOVE_ITEM public_headers
+#     "cuda/annotated_ptr"
+#     "cuda/barrier"
+#     "cuda/pipeline"
 #   )
 # endif()
 #
-# # We need to handle atomic headers differently as they do not compile on architectures below sm70
-# set(architectures_at_least_sm70)
-# foreach (item IN LISTS CMAKE_CUDA_ARCHITECTURES)
-#   if (item GREATER_EQUAL 70)
-#     list(APPEND architectures_at_least_sm70 ${item})
+# # <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
+# # # NOTE(HIP/AMD): same block-list pattern as the internal/host-only
+# # # sweeps (PR #217 review). New upstream headers under SKIP_DIRS will
+# # # surface as build failures rather than being silently filtered out.
+# # if (LIBCUDACXX_ENABLE_HIP)
+# #   include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
+# #   libcudacxx_filter_backend_headers(public_headers
+# #     BACKEND HIP
+# #     SKIP_DIRS
+# #       cuda/ptx cuda/barrier cuda/latch cuda/semaphore
+# #       cuda/annotated_ptr cuda/pipeline cuda/memcpy_async
+# #       cuda/std/barrier cuda/std/latch cuda/std/semaphore
+# #   )
+# # endif()
+# #
+# # # We need to handle atomic headers differently as they do not compile on architectures below sm70
+# # set(architectures_at_least_sm70)
+# # foreach (item IN LISTS CMAKE_CUDA_ARCHITECTURES)
+# #   if (item GREATER_EQUAL 70)
+# #     list(APPEND architectures_at_least_sm70 ${item})
+# # =======
 # =======
+# >>>>>>> END NEW CODE (c866c70459)
 function(libcudacxx_add_public_header_test_target target_name)
   if (NOT ARGN)
     return()
