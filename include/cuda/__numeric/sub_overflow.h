@@ -223,8 +223,12 @@ template <typename _Tp>
     // with the NVPTX-specific output constraints '=r' / '=l' which AMDGPU
     // rejects). Under HIP, use the host implementation when on host, and
     // fall through to ::cuda::__sub_overflow_generic_impl(__lhs, __rhs)
-    // (the outer 'return' below) when on device. Same rationale as the
-    // sibling block in add_overflow.h.
+    // (the trailing 'return' below) when on device -- the same path
+    // taken under constant evaluation. The fall-through is intentional:
+    // any upstream improvement to __sub_overflow_generic_impl (e.g. a
+    // future device-friendly intrinsic-based fast path) is picked up
+    // automatically without touching this branch. Same rationale as
+    // the sibling block in add_overflow.h.
     NV_IF_TARGET(NV_IS_HOST, (return ::cuda::__sub_overflow_host(__lhs, __rhs);))
 #endif // !_CCCL_CUDA_COMPILATION()
   }
