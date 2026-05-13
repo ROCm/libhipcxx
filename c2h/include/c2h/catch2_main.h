@@ -41,12 +41,18 @@
 
 #include <catch2/catch_session.hpp>
 
-// NOTE(HIP/AMD): when building under HIP we don't have thrust (no
-// rocThrust in this tree), so the THRUST_DEVICE_SYSTEM_CUDA gate below
-// is folded into a uniform _C2H_HAS_DEVICE_RUNTIME predicate that is
-// also true under HIP. The runner helper itself routes through
-// cuda* runtime API symbols that are shimmed to hip* by
-// <amd/cuda_runtime.h>.
+// NOTE(HIP/AMD): rocThrust is *optional* under HIP -- the c2h
+// CMakeLists does `find_package(rocthrust QUIET CONFIG)` so a HIP
+// build without rocThrust still compiles the Catch2-only c2h library.
+// That means <thrust/detail/config/device_system.h> may or may not be
+// available at parse time on HIP, so we can't rely on
+// THRUST_DEVICE_SYSTEM being defined here. Keep the dedicated
+// `_CCCL_HIP_COMPILATION()` arm: HIP always has a (cuda*-aliased-to-
+// hip*) runtime regardless of whether rocThrust is wired up, so
+// `_C2H_HAS_DEVICE_RUNTIME` is unconditionally true on HIP. The
+// runner helper itself routes through cuda* runtime API symbols that
+// are shimmed to hip* by <amd/cuda_runtime.h>; it does not consume
+// thrust.
 #if _CCCL_HIP_COMPILATION()
 #  define _C2H_HAS_DEVICE_RUNTIME 1
 #elif THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
