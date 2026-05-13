@@ -314,7 +314,7 @@ __pointerGetAttributeNoThrow(__pointer_attribute_value_type_t<_Attr>& __result, 
   }
   else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_IS_MANAGED)
   {
-    // NOTE(HIP/AMD): WAR-18 (CHANGELOG_v3.1.md). The HIP runtime does not
+    // NOTE(HIP/AMD): tracked as AIRUNTIME-2114. The HIP runtime does not
     // currently report `__managed__` global variables as managed. Use the
     // "devicePointer == hostPointer" heuristic that works for explicitly
     // `hipMallocManaged()`-allocated memory.
