@@ -199,9 +199,14 @@ inline void FormatHipScope(std::ostream& out,
                            bool has_ptr_fetch_sub,
                            bool cas_branches_on_weak)
 {
-  // thread_fence
+  // thread_fence -- the int __memorder is named with a leading-underscore
+  // pseudo-uglify form for upstream-API parity (callers pass __ATOMIC_*
+  // constants), but the HIP body uses scope-based __threadfence_*() builtins
+  // that don't take an order. Mark [[maybe_unused]] to silence
+  // -Wunused-parameter without dropping the name (which would diverge from
+  // the upstream signature shape).
   out << fmt::format(R"XXX(
-static inline __device__ void __atomic_thread_fence_cuda(int __memorder, {0}) {{
+static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, {0}) {{
     {1}();
 }}
 )XXX",
