@@ -56,7 +56,7 @@ template <typename _AccessProperty>
 class __annotated_ptr_base
 {
 protected:
-  _CCCL_API static constexpr uint64_t __default_property() noexcept
+  _CCCL_HOST_DEVICE_API static constexpr uint64_t __default_property() noexcept
   {
     return ::cuda::std::is_same_v<_AccessProperty, access_property::global>     ? __l2_interleave_normal
          : ::cuda::std::is_same_v<_AccessProperty, access_property::normal>     ? __l2_interleave_normal_demote
@@ -70,7 +70,7 @@ protected:
 
   _CCCL_HIDE_FROM_ABI __annotated_ptr_base() noexcept = default;
 
-  _CCCL_API constexpr __annotated_ptr_base(_AccessProperty) noexcept {}
+  _CCCL_HOST_DEVICE_API constexpr __annotated_ptr_base(_AccessProperty) noexcept {}
 
 #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
@@ -81,7 +81,7 @@ protected:
 
 #endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
-  [[nodiscard]] _CCCL_API constexpr _AccessProperty __get_property() const noexcept
+  [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr _AccessProperty __get_property() const noexcept
   {
     return _AccessProperty{};
   }
@@ -96,7 +96,7 @@ class __annotated_ptr_base<access_property>
 protected:
   uint64_t __prop = static_cast<uint64_t>(access_property{});
 
-  _CCCL_API constexpr __annotated_ptr_base(access_property __property) noexcept
+  _CCCL_HOST_DEVICE_API constexpr __annotated_ptr_base(access_property __property) noexcept
       : __prop{static_cast<uint64_t>(__property)}
   {}
 
@@ -114,7 +114,7 @@ protected:
   }
 #endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
-  [[nodiscard]] _CCCL_API constexpr access_property __get_property() const noexcept
+  [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr access_property __get_property() const noexcept
   {
     return access_property{__prop};
   }
