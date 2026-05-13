@@ -79,9 +79,13 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION // purposefully not using versioning na
   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (assert(false);))
 #else // ^^^ _CCCL_TILE_COMPILATION() ^^^ / vvv !_CCCL_TILE_COMPILATION()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (::__trap();))
-// >>>>>>> END NEW CODE (10e65aca2b)
-  _CCCL_UNREACHABLE();
+// <<<<<<< OLD CODE from dc9e115f13 (35525fd9e2) - COMMENTED OUT
+// // >>>>>>> END NEW CODE (10e65aca2b)
+//   _CCCL_UNREACHABLE();
+// =======
+// >>>>>>> END NEW CODE (35525fd9e2)
 #endif // !_CCCL_TILE_COMPILATION()
+  _CCCL_UNREACHABLE();
 }
 
 #if 0 // Expose once atomic is universally available
