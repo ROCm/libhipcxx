@@ -66,11 +66,15 @@ _CCCL_API inline void __cccl_thread_sleep_for(::cuda::std::chrono::nanoseconds _
 NV_IF_TARGET(
   NV_IS_DEVICE, (
       auto const __step = __ns.count();
-      long long  __now, __start;
+      long long  __now;
       __now = wall_clock64();
-      __start = __now; 
 
-#ifdef _LIBCUDACXX_HIP_USE_FINEGRANULAR_NANOSLEEP        
+#ifdef _LIBCUDACXX_HIP_USE_FINEGRANULAR_NANOSLEEP
+      // Fine-grained polling path needs the start timestamp; the alternate
+      // s_sleep ladder below computes __end up-front and doesn't. Keeping
+      // __start scoped to this branch avoids -Wunused-but-set-variable on
+      // the s_sleep path.
+      long long __start = __now;
       while((__now-__start)*_LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE<__step) {
           __now = wall_clock64();
       }

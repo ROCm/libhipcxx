@@ -434,8 +434,12 @@ public:
     return _Accessor::offset(__p, __i);
   }
 
-  [[nodiscard]] _CCCL_API constexpr bool __detectably_invalid(data_handle_type __p, size_t) const noexcept
+  [[nodiscard]] _CCCL_API constexpr bool
+  __detectably_invalid([[maybe_unused]] data_handle_type __p, size_t) const noexcept
   {
+    // The host arm of NV_IF_ELSE_TARGET reads __p; the device arm returns
+    // 'false' unconditionally. Mark __p [[maybe_unused]] so the device-only
+    // pass doesn't trip -Wunused-parameter.
     NV_IF_ELSE_TARGET(NV_IS_HOST, (return __is_device_accessible_pointer_from_host(__p);), (return false;))
   }
 };

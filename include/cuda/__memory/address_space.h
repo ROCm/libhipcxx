@@ -74,8 +74,13 @@ enum class address_space
   return __v >= 0 && __v < ::cuda::std::to_underlying(address_space::__max);
 }
 
-[[nodiscard]] _CCCL_DEVICE_API inline bool __is_smem_valid_ptr(const void* __ptr) noexcept
+[[nodiscard]] _CCCL_DEVICE_API inline bool __is_smem_valid_ptr([[maybe_unused]] const void* __ptr) noexcept
 {
+  // NV_IF_TARGET below selects between an SM_90+ check that *does* read __ptr
+  // and a fallback that returns 'true' unconditionally; the fallback fires on
+  // every NV pre-SM_90 target AND on every HIP target (where NV_PROVIDES_SM_90
+  // is false). [[maybe_unused]] silences -Wunused-parameter on the
+  // fallback-only paths without removing the name from the signature.
   NV_IF_TARGET(NV_PROVIDES_SM_90, (return __ptr != nullptr;), (return true;));
 }
 

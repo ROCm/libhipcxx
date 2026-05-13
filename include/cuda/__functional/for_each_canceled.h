@@ -236,9 +236,12 @@ _CCCL_DEVICE_API void __for_each_canceled_block_sm100(::dim3 __block_idx, bool _
 
 #  else // ^^^ __cccl_ptx_isa >= 870 ^^^ / vvv __cccl_ptx_isa < 870 vvv
 template <int __ThreadBlockRank = 3, typename __UnaryFunction = void>
-_CCCL_DEVICE_API void __for_each_canceled_block_sm100(::dim3 __block_idx, bool __is_leader, __UnaryFunction __uf)
+_CCCL_DEVICE_API void
+__for_each_canceled_block_sm100(::dim3 __block_idx, [[maybe_unused]] bool __is_leader, __UnaryFunction __uf)
 {
-  // We are compiling for SM100 but PTX 8.7 is not supported, so fall back to just calling the function
+  // We are compiling for SM100 but PTX 8.7 is not supported, so fall back to
+  // just calling the function. __is_leader is only consumed by the PTX 8.7+
+  // path (the SM100 hardware cancel-launch flow); fall back ignores it.
   ::cuda::std::invoke(::cuda::std::move(__uf), __block_idx);
 }
 #  endif // ^^^ __cccl_ptx_isa < 870 ^^^
@@ -255,8 +258,12 @@ _CCCL_DEVICE_API void __for_each_canceled_block_sm100(::dim3 __block_idx, bool _
 //! - All thread block threads shall call this API exactly once.
 //! - Exactly one thread block thread shall call this API with `__is_leader` equals `true`.
 template <int __ThreadBlockRank = 3, typename __UnaryFunction = void>
-_CCCL_DEVICE_API void __for_each_canceled_block(bool __is_leader, __UnaryFunction __uf)
+_CCCL_DEVICE_API void __for_each_canceled_block([[maybe_unused]] bool __is_leader, __UnaryFunction __uf)
 {
+  // __is_leader is only consumed by the SM_100+ arm of NV_DISPATCH_TARGET
+  // below; the NV_ANY_TARGET fallback (which also fires on every HIP target)
+  // doesn't read it. Mark [[maybe_unused]] so the fallback-only paths don't
+  // trip -Wunused-parameter.
   static_assert(__ThreadBlockRank >= 1 && __ThreadBlockRank <= 3, "ThreadBlockRank out-of-range [1, 3].");
   static_assert(::cuda::std::is_invocable_r_v<void, __UnaryFunction, ::dim3>,
                 "__for_each_canceled_block first argument requires an UnaryFunction with signature: void(dim3).\n"
