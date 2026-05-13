@@ -46,6 +46,7 @@
 
 #include <cuda/__ptx/ptx_dot_variants.h>
 #include <cuda/__ptx/ptx_helper_functions.h>
+#include <cuda/std/__bit/bit_cast.h>
 #include <cuda/std/cstdint>
 
 #include <nv/target> // __CUDA_MINIMUM_ARCH__ and friends
@@ -62,29 +63,32 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // pattern; shift amounts >= width return 0. Same rationale as shl.h.
 // Ported from upgrade/3.1_base PTX-on-HIP roadmap
 // (feat/moberste/add_partial_ptx_support_3_1).
+// NOTE(HIP/AMD): convert via cuda::std::bit_cast (well-defined memcpy-style
+// punning) instead of '*reinterpret_cast<...*>' which would alias incompatible
+// types and is undefined behaviour under strict aliasing.
 template <typename _B16, ::cuda::std::enable_if_t<sizeof(_B16) == 2, bool> = true>
 _CCCL_DEVICE static inline _B16 shr(_B16 __a_reg, ::cuda::std::uint32_t __b_reg)
 {
-  const ::cuda::std::uint16_t __a_bits = *reinterpret_cast<const ::cuda::std::uint16_t*>(&__a_reg);
+  const auto __a_bits = ::cuda::std::bit_cast<::cuda::std::uint16_t>(__a_reg);
   const ::cuda::std::uint16_t __dest =
     (__b_reg >= 16u) ? ::cuda::std::uint16_t{0u} : static_cast<::cuda::std::uint16_t>(__a_bits >> __b_reg);
-  return *reinterpret_cast<const _B16*>(&__dest);
+  return ::cuda::std::bit_cast<_B16>(__dest);
 }
 
 template <typename _B32, ::cuda::std::enable_if_t<sizeof(_B32) == 4, bool> = true>
 _CCCL_DEVICE static inline _B32 shr(_B32 __a_reg, ::cuda::std::uint32_t __b_reg)
 {
-  const ::cuda::std::uint32_t __a_bits = *reinterpret_cast<const ::cuda::std::uint32_t*>(&__a_reg);
-  const ::cuda::std::uint32_t __dest   = (__b_reg >= 32u) ? ::cuda::std::uint32_t{0u} : (__a_bits >> __b_reg);
-  return *reinterpret_cast<const _B32*>(&__dest);
+  const auto __a_bits = ::cuda::std::bit_cast<::cuda::std::uint32_t>(__a_reg);
+  const ::cuda::std::uint32_t __dest = (__b_reg >= 32u) ? ::cuda::std::uint32_t{0u} : (__a_bits >> __b_reg);
+  return ::cuda::std::bit_cast<_B32>(__dest);
 }
 
 template <typename _B64, ::cuda::std::enable_if_t<sizeof(_B64) == 8, bool> = true>
 _CCCL_DEVICE static inline _B64 shr(_B64 __a_reg, ::cuda::std::uint32_t __b_reg)
 {
-  const ::cuda::std::uint64_t __a_bits = *reinterpret_cast<const ::cuda::std::uint64_t*>(&__a_reg);
-  const ::cuda::std::uint64_t __dest   = (__b_reg >= 64u) ? ::cuda::std::uint64_t{0u} : (__a_bits >> __b_reg);
-  return *reinterpret_cast<const _B64*>(&__dest);
+  const auto __a_bits = ::cuda::std::bit_cast<::cuda::std::uint64_t>(__a_reg);
+  const ::cuda::std::uint64_t __dest = (__b_reg >= 64u) ? ::cuda::std::uint64_t{0u} : (__a_bits >> __b_reg);
+  return ::cuda::std::bit_cast<_B64>(__dest);
 }
 #endif // _CCCL_HIP_COMPILATION()
 
