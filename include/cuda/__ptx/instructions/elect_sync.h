@@ -60,8 +60,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // NOTE(HIP/AMD): Software emulation of PTX SM_90+ `elect.sync`. Returns
 // true on exactly the lane corresponding to the lowest set bit of
 // (membermask & __activemask()). Slower than the dedicated PTX
-// instruction. Ported from upgrade/3.1_base PTX-on-HIP roadmap
-// (feat/moberste/add_partial_ptx_support_3_1).
+// instruction.
 template <typename = void>
 _CCCL_DEVICE static inline bool elect_sync(const ::cuda::std::uint32_t& __membermask)
 {

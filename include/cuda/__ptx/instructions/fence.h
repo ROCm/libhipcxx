@@ -77,8 +77,6 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // on AMDGCN); not exposed. The proxy fences (fence_proxy_*,
 // fence_mbarrier_init, fence_sync_restrict, ...) are tied to NVIDIA-
 // only proxies (TMA, tensormap, mbarrier) and stay NVIDIA-only.
-// Ported from upgrade/3.1_base PTX-on-HIP roadmap
-// (feat/moberste/add_partial_ptx_support_3_1).
 
 #  if defined(__HIP_DEVICE_COMPILE__)
 #    define _LIBHIPCXX_PTX_HIP_FENCE_BODY(__order)                                                            \

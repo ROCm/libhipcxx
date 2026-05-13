@@ -61,8 +61,6 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // NOTE(HIP/AMD): Software emulation of PTX `shr.b{16,32,64}` (logical
 // right shift). Mirrors the upstream _B16/_B32/_B64 size-templated
 // pattern; shift amounts >= width return 0. Same rationale as shl.h.
-// Ported from upgrade/3.1_base PTX-on-HIP roadmap
-// (feat/moberste/add_partial_ptx_support_3_1).
 // NOTE(HIP/AMD): convert via cuda::std::bit_cast (well-defined memcpy-style
 // punning) instead of '*reinterpret_cast<...*>' which would alias incompatible
 // types and is undefined behaviour under strict aliasing.
