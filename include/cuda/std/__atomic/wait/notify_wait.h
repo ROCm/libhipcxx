@@ -50,7 +50,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 _CCCL_DEVICE inline void __atomic_try_wait_unsupported_before_SM_70__(){};
 
 template <typename _Tp, typename _Sco>
-_CCCL_API inline void
+_CCCL_HOST_DEVICE_API inline void
 __atomic_try_wait_slow(_Tp const volatile* __a, __atomic_underlying_remove_cv_t<_Tp> __val, memory_order __order, _Sco)
 {
   #ifdef __HIP_PLATFORM_AMD__
@@ -63,19 +63,19 @@ __atomic_try_wait_slow(_Tp const volatile* __a, __atomic_underlying_remove_cv_t<
 }
 
 template <typename _Tp, typename _Sco>
-_CCCL_API inline void __atomic_notify_one(_Tp const volatile*, _Sco)
+_CCCL_HOST_DEVICE_API inline void __atomic_notify_one(_Tp const volatile*, _Sco)
 {
   NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST, , NV_ANY_TARGET, __atomic_try_wait_unsupported_before_SM_70__(););
 }
 
 template <typename _Tp, typename _Sco>
-_CCCL_API inline void __atomic_notify_all(_Tp const volatile*, _Sco)
+_CCCL_HOST_DEVICE_API inline void __atomic_notify_all(_Tp const volatile*, _Sco)
 {
   NV_DISPATCH_TARGET(NV_PROVIDES_SM_70, , NV_IS_HOST, , NV_ANY_TARGET, __atomic_try_wait_unsupported_before_SM_70__(););
 }
 
 template <typename _Tp>
-_CCCL_API inline bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp const& __rhs)
+_CCCL_HOST_DEVICE_API inline bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp const& __rhs)
 {
 #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || defined(__HIPCC_RTC__)
   return __lhs == __rhs;
@@ -85,7 +85,7 @@ _CCCL_API inline bool __nonatomic_compare_equal(_Tp const& __lhs, _Tp const& __r
 }
 
 template <typename _Tp, typename _Sco>
-_CCCL_API inline void __atomic_wait(
+_CCCL_HOST_DEVICE_API inline void __atomic_wait(
   _Tp const volatile* __a, __atomic_underlying_remove_cv_t<_Tp> const __val, memory_order __order, _Sco = {})
 {
   for (int __i = 0; __i < _LIBCUDACXX_POLLING_COUNT; ++__i)
