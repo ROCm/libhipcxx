@@ -113,15 +113,15 @@ public:
   barrier(const barrier&)            = delete;
   barrier& operator=(const barrier&) = delete;
 
-  _CCCL_API barrier(::cuda::std::ptrdiff_t __expected,
-                    ::cuda::std::__empty_completion __completion = ::cuda::std::__empty_completion())
+  _CCCL_HOST_DEVICE_API barrier(::cuda::std::ptrdiff_t __expected,
+                                ::cuda::std::__empty_completion __completion = ::cuda::std::__empty_completion())
   {
     static_assert(_LIBCUDACXX_OFFSET_IS_ZERO(barrier<thread_scope_block>, __barrier),
                   "fatal error: bad barrier layout");
     init(this, __expected, __completion);
   }
 
-  _CCCL_API ~barrier()
+  _CCCL_HOST_DEVICE_API ~barrier()
   {
     NV_IF_TARGET(NV_PROVIDES_SM_80,
                  (if (::cuda::device::is_object_from(__barrier, ::cuda::device::address_space::shared)) {
@@ -135,9 +135,10 @@ public:
                     "barrier must not be in other's block shared memory in the cluster");))
   }
 
-  _CCCL_API inline friend void init(barrier* __b,
-                                    ::cuda::std::ptrdiff_t __expected,
-                                    ::cuda::std::__empty_completion = ::cuda::std::__empty_completion())
+  _CCCL_HOST_DEVICE_API inline friend void
+  init(barrier* __b,
+       ::cuda::std::ptrdiff_t __expected,
+       ::cuda::std::__empty_completion = ::cuda::std::__empty_completion())
   {
     NV_IF_TARGET(NV_PROVIDES_SM_80,
                  (if (::cuda::device::is_object_from(__b->__barrier, ::cuda::device::address_space::shared)) {
@@ -207,7 +208,7 @@ private:
 #endif // _CCCL_CUDA_COMPILATION()
 
 public:
-  /*discard*/ _CCCL_API arrival_token arrive(::cuda::std::ptrdiff_t __update = 1)
+  /*discard*/ _CCCL_HOST_DEVICE_API arrival_token arrive(::cuda::std::ptrdiff_t __update = 1)
   {
     _CCCL_ASSERT(__update >= 0, "Arrival count update must be non-negative.");
     NV_DISPATCH_TARGET(
@@ -246,7 +247,7 @@ private:
   }
 #endif // _CCCL_CUDA_COMPILATION()
 
-  [[nodiscard]] _CCCL_API bool __try_wait(arrival_token __token) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait(arrival_token __token) const
   {
     NV_DISPATCH_TARGET(
       NV_PROVIDES_SM_90,
@@ -304,7 +305,8 @@ private:
 #endif // _CCCL_CUDA_COMPILATION()
 
   // Document de drop > uint32_t for __nanosec on public for APIs
-  [[nodiscard]] _CCCL_API bool __try_wait(arrival_token __token, ::cuda::std::chrono::nanoseconds __nanosec) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
+  __try_wait(arrival_token __token, ::cuda::std::chrono::nanoseconds __nanosec) const
   {
     if (__nanosec.count() < 1)
     {
@@ -346,7 +348,7 @@ private:
   }
 #endif // _CCCL_CUDA_COMPILATION()
 
-  [[nodiscard]] _CCCL_API bool __try_wait_parity(bool __phase_parity) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait_parity(bool __phase_parity) const
   {
     NV_DISPATCH_TARGET(
       NV_PROVIDES_SM_90,
@@ -405,7 +407,8 @@ private:
   }
 #endif // _CCCL_CUDA_COMPILATION()
 
-  [[nodiscard]] _CCCL_API bool __try_wait_parity(bool __phase_parity, ::cuda::std::chrono::nanoseconds __nanosec) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
+  __try_wait_parity(bool __phase_parity, ::cuda::std::chrono::nanoseconds __nanosec) const
   {
     if (__nanosec.count() < 1)
     {
@@ -424,7 +427,7 @@ private:
   }
 
 public:
-  _CCCL_API void wait(arrival_token&& __phase) const
+  _CCCL_HOST_DEVICE_API void wait(arrival_token&& __phase) const
   {
     // no need to back off on a barrier in SMEM on SM90+, SYNCS unit is taking care of this
     NV_IF_TARGET(NV_PROVIDES_SM_90,
@@ -439,7 +442,7 @@ public:
       ::cuda::std::__barrier_poll_tester_phase<barrier>(this, ::cuda::std::move(__phase)));
   }
 
-  _CCCL_API void wait_parity(bool __phase_parity) const
+  _CCCL_HOST_DEVICE_API void wait_parity(bool __phase_parity) const
   {
     // no need to back off on a barrier in SMEM on SM90+, SYNCS unit is taking care of this
     NV_IF_TARGET(NV_PROVIDES_SM_90,
@@ -454,7 +457,7 @@ public:
       ::cuda::std::__barrier_poll_tester_parity<barrier>(this, __phase_parity));
   }
 
-  _CCCL_API void arrive_and_wait()
+  _CCCL_HOST_DEVICE_API void arrive_and_wait()
   {
     wait(arrive());
   }
@@ -495,7 +498,7 @@ private:
 #endif // _CCCL_CUDA_COMPILATION()
 
 public:
-  _CCCL_API void arrive_and_drop()
+  _CCCL_HOST_DEVICE_API void arrive_and_drop()
   {
     NV_DISPATCH_TARGET(
       NV_PROVIDES_SM_90,
@@ -507,7 +510,7 @@ public:
       (__barrier.arrive_and_drop();))
   }
 
-  [[nodiscard]] _CCCL_API static constexpr ::cuda::std::ptrdiff_t max() noexcept
+  [[nodiscard]] _CCCL_HOST_DEVICE_API static constexpr ::cuda::std::ptrdiff_t max() noexcept
   {
     return (1 << 20) - 1;
   }
@@ -516,7 +519,7 @@ public:
   //! token to this API, but the __token will only be left in a moved-from state if this function succeeds (i.e., it
   //! returns true).
   template <class _Rep, class _Period>
-  [[nodiscard]] _CCCL_API bool
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
   try_wait_for(arrival_token&& __token, const ::cuda::std::chrono::duration<_Rep, _Period>& __dur)
   {
     auto __nanosec = ::cuda::std::chrono::duration_cast<::cuda::std::chrono::nanoseconds>(__dur);
@@ -528,14 +531,14 @@ public:
   //! token to this API, but the __token will only be left in a moved-from state if this function succeeds (i.e., it
   //! returns true).
   template <class _Clock, class _Duration>
-  [[nodiscard]] _CCCL_API bool
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
   try_wait_until(arrival_token&& __token, const ::cuda::std::chrono::time_point<_Clock, _Duration>& __time)
   {
     return try_wait_for(::cuda::std::move(__token), (__time - _Clock::now()));
   }
 
   template <class _Rep, class _Period>
-  [[nodiscard]] _CCCL_API bool
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
   try_wait_parity_for(bool __phase_parity, const ::cuda::std::chrono::duration<_Rep, _Period>& __dur)
   {
     auto __nanosec = ::cuda::std::chrono::duration_cast<::cuda::std::chrono::nanoseconds>(__dur);
@@ -544,7 +547,7 @@ public:
   }
 
   template <class _Clock, class _Duration>
-  [[nodiscard]] _CCCL_API bool
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
   try_wait_parity_until(bool __phase_parity, const ::cuda::std::chrono::time_point<_Clock, _Duration>& __time)
   {
     return try_wait_parity_for(__phase_parity, (__time - _Clock::now()));
