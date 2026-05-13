@@ -139,6 +139,11 @@ __from_chars_int_generic(const char* __first, const char* __last, _Tp& __value, 
   return {__it, (__overflow) ? errc::result_out_of_range : ((__it == __first) ? errc::invalid_argument : errc{})};
 }
 
+// _LIBCUDACXX_HIPRTC_NOINLINE is private to '__from_chars_int_generic' above;
+// drop it here so the project-internal macro doesn't leak into downstream
+// includes that pick up <cuda/std/charconv>.
+#undef _LIBCUDACXX_HIPRTC_NOINLINE
+
 _CCCL_TEMPLATE(class _Tp)
 _CCCL_REQUIRES(__cccl_is_integer_v<_Tp>)
 [[nodiscard]] _CCCL_API constexpr from_chars_result
