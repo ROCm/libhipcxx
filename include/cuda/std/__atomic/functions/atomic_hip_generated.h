@@ -52,7 +52,7 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __thread_scope_block_tag) {
+static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_block_tag) {
     __threadfence_block();
 }
 
@@ -235,7 +235,7 @@ __device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *, ptrdiff_t, int, __t
     return nullptr;
 }
 
-static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __thread_scope_device_tag) {
+static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_device_tag) {
     __threadfence();
 }
 
@@ -343,7 +343,7 @@ __device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __va
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
-static inline __device__ void __atomic_thread_fence_cuda(int __memorder, __thread_scope_system_tag) {
+static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_system_tag) {
     __threadfence_system();
 }
 
