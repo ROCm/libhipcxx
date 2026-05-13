@@ -127,7 +127,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
  ***********************************************************************/
 
 template <typename _Group, class _Tp, ::cuda::std::size_t _Alignment, thread_scope _Sco, typename _CompF>
-_CCCL_API inline async_contract_fulfillment memcpy_async(
+_CCCL_HOST_DEVICE_API inline async_contract_fulfillment memcpy_async(
   _Group const& __group,
   _Tp* __destination,
   _Tp const* __source,
@@ -140,7 +140,7 @@ _CCCL_API inline async_contract_fulfillment memcpy_async(
 }
 
 template <class _Tp, typename _Size, thread_scope _Sco, typename _CompF>
-_CCCL_API inline async_contract_fulfillment
+_CCCL_HOST_DEVICE_API inline async_contract_fulfillment
 memcpy_async(_Tp* __destination, _Tp const* __source, _Size __size, barrier<_Sco, _CompF>& __barrier)
 {
   _CCCL_ASSERT(::cuda::__memcpy_async_check_pre(__destination, __source, __size), "memcpy_async preconditions unmet");
@@ -148,7 +148,7 @@ memcpy_async(_Tp* __destination, _Tp const* __source, _Size __size, barrier<_Sco
 }
 
 template <typename _Group, class _Tp, thread_scope _Sco, typename _CompF>
-_CCCL_API inline async_contract_fulfillment memcpy_async(
+_CCCL_HOST_DEVICE_API inline async_contract_fulfillment memcpy_async(
   _Group const& __group,
   _Tp* __destination,
   _Tp const* __source,
@@ -160,7 +160,7 @@ _CCCL_API inline async_contract_fulfillment memcpy_async(
 }
 
 template <typename _Group, thread_scope _Sco, typename _CompF>
-_CCCL_API inline async_contract_fulfillment memcpy_async(
+_CCCL_HOST_DEVICE_API inline async_contract_fulfillment memcpy_async(
   _Group const& __group,
   void* __destination,
   void const* __source,
@@ -173,7 +173,7 @@ _CCCL_API inline async_contract_fulfillment memcpy_async(
 }
 
 template <typename _Group, ::cuda::std::size_t _Alignment, thread_scope _Sco, typename _CompF>
-_CCCL_API inline async_contract_fulfillment memcpy_async(
+_CCCL_HOST_DEVICE_API inline async_contract_fulfillment memcpy_async(
   _Group const& __group,
   void* __destination,
   void const* __source,
@@ -186,7 +186,7 @@ _CCCL_API inline async_contract_fulfillment memcpy_async(
 }
 
 template <typename _Size, thread_scope _Sco, typename _CompF>
-_CCCL_API inline async_contract_fulfillment
+_CCCL_HOST_DEVICE_API inline async_contract_fulfillment
 memcpy_async(void* __destination, void const* __source, _Size __size, barrier<_Sco, _CompF>& __barrier)
 {
   _CCCL_ASSERT(::cuda::__memcpy_async_check_pre(__destination, __source, __size), "memcpy_async preconditions unmet");
