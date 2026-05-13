@@ -57,11 +57,12 @@ void print_usage(const char* argv0)
 
 int main(int argc, char** argv)
 {
-  // Tiny ad-hoc CLI: '--hip' (or '-h') as the FIRST argument switches to the
-  // HIP emitter; otherwise we keep the upstream behaviour where argv[1] (if
-  // present) is the output path. Kept deliberately minimal -- adding a
-  // dependency like cxxopts/CLI11 would pull a third-party library into the
-  // codegen tool just for one flag.
+  // Tiny ad-hoc CLI:
+  //   * '--hip'           switches to the HIP emitter
+  //   * '--help' or '-h'  prints the usage banner and exits
+  //   * argv[1]           output path (upstream-compatible behaviour)
+  // Kept deliberately minimal -- adding a dependency like cxxopts/CLI11 would
+  // pull a third-party library into the codegen tool just for one flag.
   bool emit_hip            = false;
   const char* output_path  = nullptr;
 
