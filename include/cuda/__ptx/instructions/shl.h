@@ -65,8 +65,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // on both NVIDIA and HIP. Pure C++ arithmetic, no AMDGCN intrinsic
 // needed. The upstream `__cccl_ptx_isa` for HIP is 0 so the generated
 // PTX bodies above are hidden; we provide HIP equivalents here in the
-// same cuda::ptx namespace. Ported from upgrade/3.1_base PTX-on-HIP
-// roadmap (feat/moberste/add_partial_ptx_support_3_1).
+// same cuda::ptx namespace.
 // NOTE(HIP/AMD): convert via cuda::std::bit_cast (well-defined memcpy-style
 // punning) instead of '*reinterpret_cast<...*>' which would alias incompatible
 // types and is undefined behaviour under strict aliasing.
