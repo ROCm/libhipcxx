@@ -11,7 +11,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,19 @@
 #ifndef _CUDA_PTX
 #define _CUDA_PTX
 
-// NOTE(HIP/AMD): ptx is not supported on AMD hardware
+// NOTE(HIP/AMD): the public umbrella `<cuda/ptx>` is hard-blocked
+// under HIP (see the `#error` immediately below). The individual
+// `cuda/__ptx/instructions/<op>.h` wrapper headers, however, are
+// experimentally enabled for *internal* libhipcxx consumption by
+// being included directly from a small allowlist of headers
+// (e.g. `<cuda/std/__bit/integral.h>`, `<cuda/__bit/bitmask.h>`).
+// Each such wrapper provides a pure software-emulated implementation
+// in a `#if _CCCL_HIP_COMPILATION()` block so the same internal call
+// sites stay byte-identical between CUDA and HIP. Do NOT include
+// those wrappers from external code or from this umbrella; that path
+// remains unsupported on AMD hardware -- the `#error` below enforces
+// that for the umbrella while the per-wrapper allowlist enforces it
+// for individual instruction headers via inclusion-by-internal-only.
 #ifdef __HIP_PLATFORM_AMD__
 #error ptx is not supported on AMD hardware and should not be included
 #endif
