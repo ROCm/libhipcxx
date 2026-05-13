@@ -41,6 +41,7 @@
 // below compile unchanged on HIP.
 #if defined(__HIP_PLATFORM_AMD__)
 #  include <hip/hip_fp16.h>
+#  include <hipcub/hipcub_version.hpp>
 #  include <hipcub/util_type.hpp>
 namespace cub = hipcub;
 #  define CUB_NAMESPACE_BEGIN BEGIN_HIPCUB_NAMESPACE
@@ -374,7 +375,7 @@ CUB_NAMESPACE_BEGIN
 // NOTE(HIP/AMD): hipcub::BaseTraits has 5 template parameters
 // (Category, _PRIMITIVE, _nullptr_TYPE, _UnsignedBits, T) vs the
 // upstream cub::BaseTraits 4 (Category, _PRIMITIVE, _UnsignedBits,
-// T). Insert a literal 'false' for _nullptr_TYPE on HIP.
+// T). Insert a literal 'false' for _nullptr_TYPE on hipCub < 4.4.0.
 //
 // The 'Category' enum (FLOATING_POINT) and the BaseTraits/NumericTraits
 // scaffolding it parameterises were deprecated in hipCub in favour of
@@ -385,7 +386,16 @@ CUB_NAMESPACE_BEGIN
 // two specialisations -- one for old hipCub, one for new. For now we
 // keep using the deprecated path (which still works -- only deprecated,
 // not removed) and suppress the -Wdeprecated-declarations noise narrowly.
-#if defined(__HIP_PLATFORM_AMD__)
+//
+// The 5-arg arity is hipCub-pre-4.4 specific. The upcoming
+// hipCub-cccl-3-0 work (StreamHPC branch
+// 'users/matyas-streamhpc/hipcub-cccl-3-0', tagged VERSION 4.4.0)
+// realigns BaseTraits with upstream cub's 4-arg form, so gate the
+// WAR on HIPCUB_VERSION < 400400 -- once our minimum-supported
+// hipCub crosses 4.4.0 the WAR auto-disables and the upstream
+// specialisation is used instead. The WAR can be deleted entirely
+// when the minimum-supported hipCub stays >= 4.4.0 in CI.
+#if defined(__HIP_PLATFORM_AMD__) && HIPCUB_VERSION < 400400
 _CCCL_SUPPRESS_DEPRECATED_PUSH
 template <>
 struct NumericTraits<half_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, half_t>
