@@ -153,9 +153,20 @@ class __host_accessor : public _Accessor
         // recognise the pointer, fall through to "host"); we get there
         // explicitly via the type enum instead. Managed memory is also
         // host-accessible (unified addressing), hence the third clause.
+        //
+        // The query CAN return non-success (older HIP runtimes return an
+        // error for unregistered host pointers instead of populating .type
+        // = cudaMemoryTypeUnregistered). Treat any failure as 'host-
+        // accessible' to mirror the NV-driver-API arm on the right, which
+        // returns true on '__status != ::cudaSuccess'. Don't ASSERT here --
+        // a stack/heap pointer is a perfectly valid input and shouldn't
+        // tear down the application.
         ::cudaPointerAttributes __ptr_attrib{};
-        _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
-        return __ptr_attrib.type == ::cudaMemoryTypeUnregistered || __ptr_attrib.type == ::cudaMemoryTypeHost
+        const auto __status = ::cudaPointerGetAttributes(&__ptr_attrib, __p1);
+        (void) ::cudaGetLastError(); // clear sticky CUDA error state
+        return __status != ::cudaSuccess
+            || __ptr_attrib.type == ::cudaMemoryTypeUnregistered
+            || __ptr_attrib.type == ::cudaMemoryTypeHost
             || __ptr_attrib.type == ::cudaMemoryTypeManaged;
 #    else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
         ::CUmemorytype __type{};
@@ -298,8 +309,22 @@ class __device_accessor : public _Accessor
       // NOTE(HIP/AMD): see __is_host_accessible_pointer above for rationale
       // -- HIP doesn't expose cuPointerGetAttribute through cuda::__driver,
       // so use the cudaPointerGetAttributes runtime API shim instead.
+      //
+      // Don't assert on non-success: HIP returns an error for unregistered
+      // host pointers on older runtimes. An error here means the runtime
+      // doesn't recognise the pointer; that's NOT device-accessible from
+      // host (so return false). Mirrors the NV-driver-API arm on the right,
+      // which returns true only on '__type == ::CU_MEMORYTYPE_DEVICE' --
+      // status-failure naturally falls through to the trailing 'return true'
+      // there because the function pre-condition is the inverse semantic.
+      // We make that explicit on the HIP arm by returning false on failure.
       ::cudaPointerAttributes __ptr_attrib{};
-      _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
+      const auto __status = ::cudaPointerGetAttributes(&__ptr_attrib, __p1);
+      (void) ::cudaGetLastError(); // clear sticky CUDA error state
+      if (__status != ::cudaSuccess)
+      {
+        return false;
+      }
       return __ptr_attrib.type == ::cudaMemoryTypeDevice || __ptr_attrib.type == ::cudaMemoryTypeManaged;
 #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
       ::CUmemorytype __type{};
