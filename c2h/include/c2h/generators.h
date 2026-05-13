@@ -25,8 +25,6 @@
 
 #pragma once
 
-
-
 #include <thrust/detail/config/device_system.h>
 
 #include <cuda/std/limits>
