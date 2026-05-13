@@ -95,7 +95,11 @@ _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-[[noreturn]] _CCCL_API inline void __throw_format_error([[maybe_unused]] const char* __s)
+// <<<<<<< OLD CODE from 83eb7e3384 (94d81c40fb) - COMMENTED OUT
+// [[noreturn]] _CCCL_API inline void __throw_format_error([[maybe_unused]] const char* __s)
+// =======
+[[noreturn]] _CCCL_HOST_DEVICE_API inline void __throw_format_error(const char* __s)
+// >>>>>>> END NEW CODE (94d81c40fb)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   // __s is consumed by the host arm of NV_IF_ELSE_TARGET; the device arm
