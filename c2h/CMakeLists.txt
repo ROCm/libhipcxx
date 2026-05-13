@@ -41,13 +41,24 @@ endif()
 
 cccl_get_catch2()
 
-# NOTE(HIP/AMD): on HIP the parent libhipcxx CMakeLists pre-defines
-# CCCL::CCCL as an alias for libcudacxx::libcudacxx (the only CCCL
-# component we ship under HIP). Skip the find_package(CCCL) call here
-# -- it would try to find lib/cmake/cccl/cccl-config.cmake which only
-# exists in the full CCCL distribution and transitively pulls CUB +
-# Thrust which we don't have under HIP.
-if (NOT LIBCUDACXX_ENABLE_HIP)
+# NOTE(HIP/AMD): on HIP we don't ship a full CCCL distribution
+# (no CUB / Thrust packages), so find_package(CCCL CONFIG REQUIRED)
+# would fail looking for lib/cmake/cccl/cccl-config.cmake. The only
+# CCCL component we ship is libcudacxx; the parent CMakeLists
+# (CMakeLists.txt:245-249) pre-defines CCCL::CCCL as an alias for
+# libcudacxx::libcudacxx so that subsequent
+# target_link_libraries(... CCCL::CCCL ...) calls in this file resolve
+# correctly. Verify the alias actually exists rather than silently
+# reaching the link line later with a missing target. Once a HIP-aware
+# cccl-config.cmake exists upstream, this whole branch can collapse to
+# the unconditional find_package() below.
+if (LIBCUDACXX_ENABLE_HIP)
+  if (NOT TARGET CCCL::CCCL)
+    message(FATAL_ERROR
+      "CCCL::CCCL alias must be pre-defined by the parent project on HIP "
+      "(see top-level CMakeLists.txt:245-249). Cannot continue without it.")
+  endif()
+else()
   find_package(
     CCCL
     CONFIG
