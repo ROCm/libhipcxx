@@ -43,11 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): hipRTC is clang-based but has no host C++ standard library, so
-// `::std::addressof` is unavailable (the host <memory> include resolves to an
-// empty stub). Exclude it from the builtin branch so it uses the
-// __builtin_addressof-based manual implementation below instead.
-#if (_CCCL_COMPILER(CLANG, >=, 15) || _CCCL_COMPILER(GCC, >=, 12)) && !defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_COMPILER(CLANG, >=, 15) || _CCCL_COMPILER(GCC, >=, 12)
 #  define _CCCL_HAS_BUILTIN_STD_ADDRESSOF() 1
 #else // ^^^ has builtin std::addressof ^^^ / vvv no builtin std::addressof vvv
 #  define _CCCL_HAS_BUILTIN_STD_ADDRESSOF() 0
@@ -58,6 +54,23 @@
 #  undef _CCCL_HAS_BUILTIN_STD_ADDRESSOF
 #  define _CCCL_HAS_BUILTIN_STD_ADDRESSOF() 0
 #endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION()
+
+// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
+// // NOTE(HIP/AMD): hipRTC has no host C++ standard library, so `::std::addressof`
+// // is unavailable (the host <memory> include resolves to an empty stub). Treat
+// // hipRTC like NVCC device compilation and use the __builtin_addressof-based
+// // manual implementation below instead.
+// #if defined(_CCCL_COMPILER_HIPRTC)
+// #  undef _CCCL_HAS_BUILTIN_STD_ADDRESSOF
+// #  define _CCCL_HAS_BUILTIN_STD_ADDRESSOF() 0
+// #endif // _CCCL_COMPILER_HIPRTC
+// =======
+// We cannot use host features if we are building in freestanding
+#if _CCCL_FREESTANDING()
+#  undef _CCCL_HAS_BUILTIN_STD_ADDRESSOF
+#  define _CCCL_HAS_BUILTIN_STD_ADDRESSOF() 0
+#endif // _CCCL_FREESTANDING()
+// >>>>>>> END NEW CODE (e5037ea8b4)
 
 // include minimal std:: headers
 #if _CCCL_HAS_BUILTIN_STD_ADDRESSOF()
