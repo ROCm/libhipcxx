@@ -34,16 +34,12 @@
 #ifndef _CUDA_PTX_HELPER_FUNCTIONS_H_
 #define _CUDA_PTX_HELPER_FUNCTIONS_H_
 
-// NOTE(HIP/AMD): The umbrella <cuda/ptx> header is hard-blocked under HIP
-// (see include/cuda/ptx). Individual cuda/__ptx/instructions/<op>.h wrapper
-// headers are nevertheless experimentally enabled for *internal* libhipcxx
-// use by including them directly from a small allowlist of headers
-// (e.g. <cuda/std/__bit/integral.h>, <cuda/__bit/bitmask.h>). Each such
-// wrapper provides a pure software-emulated implementation in a
-// '#if _CCCL_HIP_COMPILATION()' block so the same internal call sites stay
-// byte-identical between CUDA and HIP. Do NOT include those wrappers from
-// external code or from cuda/ptx; that path remains unsupported on AMD
-// hardware.
+// NOTE(HIP/AMD): the rationale for why the cuda::ptx surface area is
+// hard-blocked on HIP yet individual cuda/__ptx/instructions/<op>.h
+// wrappers are still pulled in by a small set of internal libhipcxx
+// headers lives in <cuda/ptx> (see the NOTE(HIP/AMD) block right
+// above the `#error` for AMDGCN there). Keep it there so it sits
+// next to the actual hard-block.
 
 #include <cuda/std/detail/__config>
 
