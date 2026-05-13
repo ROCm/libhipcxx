@@ -295,15 +295,41 @@ template <::hipPointer_attribute _Attr>
 template <::hipPointer_attribute _Attr>
 using __pointer_attribute_value_type_t = decltype(::cuda::__driver::__pointer_attribute_value_type_t_impl<_Attr>());
 
+// Full-struct query: a single shim that wraps `hipPointerGetAttributes`
+// and returns the entire `hipPointerAttribute_t` to the caller. This is
+// the natural HIP equivalent of CUDA's variadic
+// `cuPointerGetAttributes(...)`/`__pointerGetAttributesNoThrow<_Np>`
+// path -- the HIP runtime always returns every field in one call, so
+// callers that need more than one attribute (e.g. type + device +
+// isManaged) can avoid duplicating the runtime call. Callers that only
+// need a single attribute should keep using the per-attribute templated
+// `__pointerGetAttributeNoThrow<_Attr>` helper just below, which adds
+// the CUDA-side semantic massaging (e.g. collapsing `Unregistered` to
+// `Host` for MEMORY_TYPE).
+//
+// On older ROCm releases this returns `hipErrorInvalidValue` for
+// unregistered host memory (stack/heap/static), so callers must accept
+// that as a non-fatal "unknown pointer" outcome -- matching what they
+// already do for `cudaErrorInvalidValue` on CUDA.
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+__pointerGetAttributesNoThrow(::hipPointerAttribute_t& __result, const void* __ptr) noexcept
+{
+  // Zero-initialise so an early-out (hipErrorInvalidValue) leaves the
+  // type field as hipMemoryTypeUnregistered (= 0) for callers that
+  // choose to inspect __result regardless of the returned status.
+  __result = {};
+  return static_cast<::cudaError_t>(::hipPointerGetAttributes(&__result, __ptr));
+}
+
 template <::hipPointer_attribute _Attr>
 [[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
 __pointerGetAttributeNoThrow(__pointer_attribute_value_type_t<_Attr>& __result, const void* __ptr)
 {
   ::hipPointerAttribute_t __ptr_attrib{};
-  const auto __status = ::hipPointerGetAttributes(&__ptr_attrib, __ptr);
-  if (__status != ::hipSuccess)
+  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__ptr_attrib, __ptr);
+  if (__status != ::cudaSuccess)
   {
-    return static_cast<::cudaError_t>(__status);
+    return __status;
   }
   if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_MEMORY_TYPE)
   {
