@@ -195,8 +195,9 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
 // NOTE(HIP/AMD): HIP has only a single pointer-attribute query
 // (hipPointerGetAttributes) returning the full hipPointerAttribute_t
 // struct, in contrast to CUDA's per-attribute driver-API path. We
-// query it once per call and read the relevant fields. The struct
-// reports:
+// query it once per call (via cuda::__driver::__pointerGetAttributesNoThrow,
+// the HIP shim defined in <amd/driver_api.h>) and read the relevant
+// fields. The struct reports:
 //   * type             : hipMemoryType{Unregistered, Host, Device, Managed, Array}
 //   * device           : owning device for Device/Managed memory
 //   * isManaged        : 1 if hipMallocManaged / __managed__
@@ -209,18 +210,10 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
 // (test/libcudacxx/cuda/memory/is_pointer_accessible.pass.cpp) are
 // gated on _CCCL_CTK_AT_LEAST(12, 2)/(13, 0) which both evaluate to
 // false on HIP, so this is an acceptable subset.
-
-namespace __detail
-{
-[[nodiscard]] _CCCL_HOST_API inline ::hipError_t
-__hip_pointer_get_attributes(::hipPointerAttribute_t& __attr, const void* __p) noexcept
-{
-  // Zero-initialize so that an early-out (hipErrorInvalidValue) leaves
-  // the type field as hipMemoryTypeUnregistered (0).
-  __attr = {};
-  return ::hipPointerGetAttributes(&__attr, __p);
-}
-} // namespace __detail
+//
+// All three queries below funnel through the same driver shim so the
+// runtime entry-point lives in exactly one place; the local helper
+// previously inlined here was promoted to the shim for that reason.
 
 /**
  * @brief Checks if a pointer is a managed pointer.
@@ -236,12 +229,12 @@ _CCCL_HOST_API inline bool is_managed(const void* __p)
     return false;
   }
   ::hipPointerAttribute_t __attr{};
-  const auto __status = __detail::__hip_pointer_get_attributes(__attr, __p);
+  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
   switch (__status)
   {
-    case ::hipSuccess:
+    case ::cudaSuccess:
       return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged;
-    case ::hipErrorInvalidValue:
+    case ::cudaErrorInvalidValue:
       // Unregistered host memory is reported as hipErrorInvalidValue
       // by older ROCm releases (newer releases return hipSuccess with
       // type=hipMemoryTypeUnregistered). In both cases the pointer is
@@ -266,17 +259,17 @@ _CCCL_HOST_API inline bool is_host_accessible(const void* __p)
     return false;
   }
   ::hipPointerAttribute_t __attr{};
-  const auto __status = __detail::__hip_pointer_get_attributes(__attr, __p);
+  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
   switch (__status)
   {
-    case ::hipSuccess:
+    case ::cudaSuccess:
       // Unregistered, plain host, pinned host, and managed memory are
       // all host-accessible.
       return __attr.type == ::hipMemoryTypeUnregistered //
           || __attr.type == ::hipMemoryTypeHost //
           || __attr.type == ::hipMemoryTypeManaged //
           || __attr.isManaged != 0;
-    case ::hipErrorInvalidValue:
+    case ::cudaErrorInvalidValue:
       // Older-ROCm legacy: unregistered host memory reports invalid
       // value. Such a pointer (e.g. stack, global, plain malloc) is
       // host-accessible.
@@ -301,12 +294,12 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
     return false;
   }
   ::hipPointerAttribute_t __attr{};
-  const auto __status = __detail::__hip_pointer_get_attributes(__attr, __p);
-  if (__status == ::hipErrorInvalidValue || (__status == ::hipSuccess && __attr.type == ::hipMemoryTypeUnregistered))
+  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
+  if (__status == ::cudaErrorInvalidValue || (__status == ::cudaSuccess && __attr.type == ::hipMemoryTypeUnregistered))
   {
     return false;
   }
-  if (__status != ::hipSuccess)
+  if (__status != ::cudaSuccess)
   {
     ::cuda::__throw_cuda_error(__status, "is_device_accessible() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
   }
@@ -332,15 +325,12 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
   {
     return true;
   }
-  int __can_access_peer = 0;
-  const auto __peer_status =
-    ::hipDeviceCanAccessPeer(&__can_access_peer, __device.get(), __attr.device);
-  if (__peer_status != ::hipSuccess)
-  {
-    ::cuda::__throw_cuda_error(
-      __peer_status, "is_device_accessible() peer-access query failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
-  }
-  return __can_access_peer != 0;
+  // Peer-access query routed through the driver shim
+  // (cuda::__driver::__deviceCanAccessPeer) so the runtime entry point
+  // is centralised in <amd/driver_api.h>; the shim throws on non-success
+  // so we don't need to repeat the error check here.
+  return ::cuda::__driver::__deviceCanAccessPeer(
+    static_cast<::hipDevice_t>(__device.get()), static_cast<::hipDevice_t>(__attr.device));
 }
 
 #endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
