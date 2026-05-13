@@ -87,9 +87,13 @@ _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-[[noreturn]] _CCCL_API inline void __throw_format_error(const char* __s)
+[[noreturn]] _CCCL_API inline void __throw_format_error([[maybe_unused]] const char* __s)
 {
 #if _CCCL_HAS_EXCEPTIONS()
+  // __s is consumed by the host arm of NV_IF_ELSE_TARGET; the device arm
+  // (and the !_CCCL_HAS_EXCEPTIONS() fallback below) discards it. Mark
+  // [[maybe_unused]] so the device-only / no-exceptions paths don't trip
+  // -Wunused-parameter.
   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw ::cuda::std::format_error(__s);), (::cuda::std::terminate();))
 #else // ^^^ _CCCL_HAS_EXCEPTIONS() ^^^ / vvv !_CCCL_HAS_EXCEPTIONS() vvv
   ::cuda::std::terminate();
