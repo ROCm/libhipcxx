@@ -97,19 +97,17 @@ function(libcudacxx_create_internal_header_test header_name headertest_src)
     endif()
   endif()
 
-  # Create the default target for that file. Under HIP the headertest
-  # TU is configured as .cpp and tagged with LANGUAGE HIP so it goes
-  # through the HIP toolchain (mirrors the host-only helper).
+  # Create the default target for that file. The TU is always written to
+  # disk as '.cu' (see configure_file in libcudacxx_add_internal_header_test
+  # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
+  # association by tagging the source file with LANGUAGE HIP, which routes
+  # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
+  # natively, so no separate '.cpp' shadow file is needed.
   set(internal_headertest_${header_name} verify_${header_name})
-  if (LIBCUDACXX_ENABLE_HIP)
-    set(__libcudacxx_headertest_ext "cpp")
-  else()
-    set(__libcudacxx_headertest_ext "cu")
-  endif()
-  add_library(internal_headertest_${header_name} SHARED "${headertest_src}.${__libcudacxx_headertest_ext}")
+  add_library(internal_headertest_${header_name} SHARED "${headertest_src}.cu")
   if (LIBCUDACXX_ENABLE_HIP)
     set_source_files_properties(
-      "${headertest_src}.${__libcudacxx_headertest_ext}"
+      "${headertest_src}.cu"
       PROPERTIES LANGUAGE HIP
     )
   endif()
@@ -213,21 +211,15 @@ function(libcudacxx_add_internal_header_test header)
   # ${header} contains the "/" from the subfolder, replace by "_" for actual names
   string(REPLACE "/" "_" header_name "${header}")
 
-  # Create the source file for the header target from the template and add the file to the global project.
-  # NOTE(HIP/AMD): under HIP we configure the TU as .cpp so it can be
-  # tagged with LANGUAGE HIP (see libcudacxx_create_internal_header_test).
+  # Create the source file for the header target from the template. The TU is
+  # always written as '.cu' regardless of backend; on HIP the
+  # libcudacxx_create_internal_header_test helper overrides CMake's default
+  # '.cu -> LANGUAGE CUDA' association via set_source_files_properties.
   set(headertest_src "headers/${header_name}")
-  if (LIBCUDACXX_ENABLE_HIP)
-    configure_file(
-      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/header_test.cpp.in"
-      "${headertest_src}.cpp"
-    )
-  else()
-    configure_file(
-      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/header_test.cpp.in"
-      "${headertest_src}.cu"
-    )
-  endif()
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/header_test.cpp.in"
+    "${headertest_src}.cu"
+  )
 
   # Create the default target for that file
   libcudacxx_create_internal_header_test(${header_name} ${headertest_src})
