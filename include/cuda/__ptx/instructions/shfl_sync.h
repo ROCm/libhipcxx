@@ -311,8 +311,8 @@ _CCCL_DEVICE static inline int __hip_shfl_width_from_clamp_segmask(::cuda::std::
 
 template <typename _Tp>
 [[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_idx(
-  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
-  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+  _Tp __data, bool& __pred, [[maybe_unused]] ::cuda::std::uint32_t __lane_idx_offset,
+  [[maybe_unused]] ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
 {
   static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
   (void) __lane_mask;
@@ -339,8 +339,8 @@ shfl_sync_idx(_Tp __data, ::cuda::std::uint32_t __lane_idx_offset,
 
 template <typename _Tp>
 [[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_up(
-  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
-  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+  _Tp __data, bool& __pred, [[maybe_unused]] ::cuda::std::uint32_t __lane_idx_offset,
+  [[maybe_unused]] ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
 {
   static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
   (void) __lane_mask;
@@ -367,8 +367,8 @@ shfl_sync_up(_Tp __data, ::cuda::std::uint32_t __lane_idx_offset,
 
 template <typename _Tp>
 [[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_down(
-  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
-  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+  _Tp __data, bool& __pred, [[maybe_unused]] ::cuda::std::uint32_t __lane_idx_offset,
+  [[maybe_unused]] ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
 {
   static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
   (void) __lane_mask;
@@ -395,8 +395,8 @@ shfl_sync_down(_Tp __data, ::cuda::std::uint32_t __lane_idx_offset,
 
 template <typename _Tp>
 [[nodiscard]] _CCCL_DEVICE static inline _Tp shfl_sync_bfly(
-  _Tp __data, bool& __pred, ::cuda::std::uint32_t __lane_idx_offset,
-  ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
+  _Tp __data, bool& __pred, [[maybe_unused]] ::cuda::std::uint32_t __lane_idx_offset,
+  [[maybe_unused]] ::cuda::std::uint32_t __clamp_segmask, ::cuda::std::uint32_t __lane_mask) noexcept
 {
   static_assert(sizeof(_Tp) == 4, "shfl.sync only accepts 4-byte data types");
   (void) __lane_mask;

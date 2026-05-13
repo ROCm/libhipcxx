@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___HIERARCHY_HIERARCHY_DIMENSIONS_H
 #define _CUDA___HIERARCHY_HIERARCHY_DIMENSIONS_H
 
@@ -275,8 +297,14 @@ struct __hierarchy_extents_helper
 };
 
 template <class _Tp, size_t... _Extents>
-[[nodiscard]] _CCCL_DEVICE constexpr auto __static_index_hint(const dimensions<_Tp, _Extents...>& __dims, ::dim3 __index)
+[[nodiscard]] _CCCL_DEVICE constexpr auto
+__static_index_hint([[maybe_unused]] const dimensions<_Tp, _Extents...>& __dims, ::dim3 __index)
 {
+  // __dims is taken by reference for ADL / consistency with related helpers,
+  // but the body only needs the static '_Extents' from the template param to
+  // shape '_HintedIndexT'; the runtime values from __dims aren't read. Mark
+  // [[maybe_unused]] to keep the signature stable and silence
+  // -Wunused-parameter without dropping the name.
   using _HintedIndexT = dimensions<_Tp, (_Extents == 1 ? 0 : ::cuda::std::dynamic_extent)...>;
   return _HintedIndexT(__index.x, __index.y, __index.z);
 }
