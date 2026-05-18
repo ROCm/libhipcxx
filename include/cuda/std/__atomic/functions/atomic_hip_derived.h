@@ -66,10 +66,18 @@
 //                keep their per-op CAS-loop because of their
 //                load-bearing 'only-CAS-when-changing' optimization
 //                that the upstream pattern does not preserve.
-//   [ ] Phase 5: wrap the file body in _CCCL_BEGIN_NAMESPACE_CUDA_STD
-//                and update consumer references in
-//                cuda/std/__atomic/types/base.h. MEDIUM RISK --
-//                ABI surface change.
+//   [x] Phase 5: wrap the file body in _CCCL_BEGIN_NAMESPACE_CUDA_STD.
+//                All __atomic_*_cuda helpers now live in cuda::std::
+//                instead of global scope. Consumers in
+//                cuda/std/__atomic/types/base.h continue to find
+//                them via in-namespace lookup (they are inside
+//                cuda::std too), so no consumer-side changes are
+//                needed. Previously the cross-namespace lookup
+//                relied on ADL through the __thread_scope_*_tag
+//                argument type (which is in cuda::std); the
+//                in-namespace placement now makes that lookup
+//                ordinary rather than ADL-mediated, which removes
+//                the implicit ADL dependency.
 //   [ ] Phase 6: cleanup; retire this NOTE block.
 //
 // Behaviour is correct at every phase boundary; the divergence is
@@ -96,8 +104,24 @@
 // (using compiler __INT*_TYPE__ builtins and _STDINT_H guards to coexist
 // with system headers).
 #include <cuda/std/cstdint>
+
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
+
+// NOTE(HIP/AMD): the sizeof<=2 CAS-loop specialisation of
+// __atomic_compare_exchange_cuda needs a wider (32-bit) container
+// to host the sub-word CAS. The C names `intptr_t` / `uint32_t`
+// are NOT brought into cuda::std by <cuda/std/cstdint> (which
+// exposes the cuda::std::intptr_t / uint32_t typedefs instead).
+// Bring the bare-name C aliases into the cuda::std namespace via
+// 'using ::intptr_t; using ::uint32_t;' so the existing function
+// body stays byte-identical to the upstream-era spelling. A
+// future Phase-6 cleanup could rewrite the body to use the
+// cuda::std::-qualified typedefs and drop these.
 using ::intptr_t;
 using ::uint32_t;
+
 template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp) <= 2, int>::type = 0>
 [[nodiscard]] bool _CCCL_DEVICE __atomic_compare_exchange_cuda(_Tp volatile *__ptr, _Tp *__expected, const _Tp __desired, bool, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
 
@@ -266,6 +290,10 @@ template<typename _Tp, typename _Sco>
     return __ret;
 }
 
-static inline _CCCL_DEVICE void __atomic_signal_fence_cuda(int) noexcept {
+_CCCL_DEVICE static inline void __atomic_signal_fence_cuda(int) noexcept {
     asm volatile("":::"memory");
 }
+
+_CCCL_END_NAMESPACE_CUDA_STD
+
+#include <cuda/std/__cccl/epilogue.h>
