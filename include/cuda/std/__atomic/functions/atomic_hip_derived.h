@@ -58,11 +58,14 @@
 //                overload via implicit non-vol -> vol qualification.
 //                compare_exchange_n is HIP-specific (not in upstream)
 //                and stays single-overload by intent.
-//   [ ] Phase 4: replace per-op CAS loops with a single generic
+//   [x] Phase 4: replace per-op CAS loops with a single generic
 //                `__atomic_fetch_update_cuda<_Tp, _Fn>` + a
 //                `__cccl_atomic_op_bind<_Tp, _Op>` adapter (matches
-//                upstream's pattern). MEDIUM RISK -- code-structure
-//                refactor; needs c2h atomics test suite re-run.
+//                upstream's pattern). Five ops (add/sub/and/or/xor)
+//                are folded into the generic helper; fetch_{min,max}
+//                keep their per-op CAS-loop because of their
+//                load-bearing 'only-CAS-when-changing' optimization
+//                that the upstream pattern does not preserve.
 //   [ ] Phase 5: wrap the file body in _CCCL_BEGIN_NAMESPACE_CUDA_STD
 //                and update consumer references in
 //                cuda/std/__atomic/types/base.h. MEDIUM RISK --
@@ -73,6 +76,10 @@
 // stylistic, not semantic.
 
 #include <hip/hip_runtime.h>
+// NOTE(HIP/AMD): pulled in for the std::{plus,minus,bit_and,bit_or,
+// bit_xor} functors that the __cccl_atomic_op_bind adapter binds
+// to. Matches the upstream include set in cuda_ptx_derived.h.
+#include <cuda/std/__functional/operations.h>
 #include <cuda/std/__type_traits/enable_if.h>
 // NOTE(HIP/AMD): is_scalar.h transitively pulls in is_pointer.h,
 // is_arithmetic.h (and from there is_integral.h + is_floating_point.h).
@@ -134,15 +141,77 @@ void _CCCL_DEVICE __atomic_exchange_cuda(_Tp* __ptr, _Tp& __old, _Tp __new, int 
     __old = __expected;
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_add_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+// Functor adapter: binds the second operand of a binary op
+// (cuda::std::plus / minus / bit_and / bit_or / bit_xor) so that
+// the generic __atomic_fetch_update_cuda CAS loop below can invoke
+// it as `__op(__old)` and get back `__old OP __val`. One-to-one
+// mirror of upstream's `__cuda_atomic_op_bind` in
+// <cuda_ptx_derived.h>.
+template <typename _Tp, template <typename> class _Op>
+struct __cccl_atomic_op_bind {
+    _Tp __val;
+    [[nodiscard]] _Tp _CCCL_HOST_DEVICE operator()(_Tp __old) const noexcept {
+        return _Op<_Tp>{}(__old, __val);
+    }
+};
+
+// Generic CAS-loop helper: load, apply the functor to the loaded
+// value, CAS the result; on CAS failure re-apply the functor to the
+// freshly observed value and retry. Replaces the seven per-op
+// hand-coded CAS loops (sizeof<=2 path) for the standard fetch_*
+// ops. Mirror of upstream's `__atomic_fetch_update_cuda` in
+// <cuda_ptx_derived.h>.
+template <typename _Tp, typename _Fn, typename _Sco>
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_update_cuda(_Tp volatile* __ptr, const _Fn& __op, int __memorder, _Sco __s) noexcept {
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Tp __desired = __expected + __val;
-    while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
-        __desired = __expected + __val;
+    _Tp __desired = __op(__expected);
+    while (!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s)) {
+        __desired = __op(__expected);
+    }
     return __expected;
 }
 
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_add_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::plus>{static_cast<_Tp>(__val)}, __memorder, __s);
+}
+
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_sub_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::minus>{static_cast<_Tp>(__val)}, __memorder, __s);
+}
+
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_and_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::bit_and>{static_cast<_Tp>(__val)}, __memorder, __s);
+}
+
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_or_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::bit_or>{static_cast<_Tp>(__val)}, __memorder, __s);
+}
+
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_xor_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::bit_xor>{static_cast<_Tp>(__val)}, __memorder, __s);
+}
+
+// NOTE(HIP/AMD): fetch_min / fetch_max keep their per-op CAS-loop
+// implementation rather than going through __atomic_fetch_update_cuda
+// because they carry a load-bearing OPTIMIZATION: the loop only
+// CASes when the proposed value would actually change the stored
+// value (the `while(__desired == __val && ...)` guard). For a hot
+// max/min loop converging on a stable best value, this avoids a
+// CAS per iteration once the stored value is already <= / >= the
+// proposed value. The generic adapter would always CAS, even when
+// no change is needed, so folding these in would be a (small but
+// measurable) perf regression on min/max heavy workloads. Upstream
+// cuda_ptx_derived.h doesn't carry this optimization for its
+// generic adapter path, but their underlying PTX `atom.min/max`
+// instruction is hardware-fast for the common arithmetic types
+// (sizeof >= 4); HIP only hits the CAS-loop fallback for the
+// sizeof<=2 and floating-point arms, where the optimization
+// matters more.
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
 [[nodiscard]] _Tp _CCCL_HOST_DEVICE __atomic_fetch_max_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
@@ -166,46 +235,6 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
         __desired = __expected < __val ? __expected : __val;
     }
 
-    return __expected;
-}
-
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_sub_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
-
-    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Tp __desired = __expected - __val;
-    while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
-        __desired = __expected - __val;
-    return __expected;
-}
-
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_and_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
-
-    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Tp __desired = __expected & __val;
-    while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
-        __desired = __expected & __val;
-    return __expected;
-}
-
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_xor_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
-
-    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Tp __desired = __expected ^ __val;
-    while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
-        __desired = __expected ^ __val;
-    return __expected;
-}
-
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_or_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
-
-    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Tp __desired = __expected | __val;
-    while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
-        __desired = __expected | __val;
     return __expected;
 }
 
