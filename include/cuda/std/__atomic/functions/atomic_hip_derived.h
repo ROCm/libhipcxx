@@ -26,6 +26,35 @@
 
 #pragma once
 
+// NOTE(HIP/AMD): file divergence from upstream. This file is the
+// HIP-only counterpart of upstream's
+//   <cuda/std/__atomic/functions/cuda_ptx_derived.h>
+// (which uses NVPTX inline asm; AMDGPU rejects the NVPTX-specific
+// inline-asm constraints, so we provide a parallel implementation
+// built on HIP's __hip_atomic_* / __atomic_* builtins instead).
+//
+// Because the two files have different paths, upstream PRs that
+// modernise cuda_ptx_derived.h do NOT auto-apply to this file via
+// cherry-pick. As a result, this file's surface still uses the
+// 3.1-era spelling:
+//   * Templates parameter naming `class _Type, class _Scope` rather
+//     than the upstream `typename _Tp, typename _Sco`.
+//   * Function attributes `void __device__ ...` rather than the
+//     upstream `_CCCL_DEVICE_API void ...`.
+//   * Per-size hand-coded CAS-loop specialisations (sizeof<=2 path
+//     below) rather than upstream's generic
+//     `__atomic_fetch_update_cuda` + `__cccl_atomic_op_bind<...>`
+//     adapter pattern.
+//
+// A full port of the upstream modernisation would significantly
+// refactor every function in this file. It is a multi-week effort
+// out of scope for the present PR. Leaving the divergence
+// documented so the next maintainer who picks up the modernisation
+// (likely once the HIP backend stabilises enough that an upstream-
+// shaped cuda_hip_derived.h becomes the long-term plan) has a clear
+// starting point. Behaviour is correct as-is; the divergence is
+// stylistic, not semantic.
+
 #include <hip/hip_runtime.h>
 #include <cuda/std/__type_traits/enable_if.h>
 // NOTE(HIP/AMD): is_scalar.h transitively pulls in is_pointer.h,
