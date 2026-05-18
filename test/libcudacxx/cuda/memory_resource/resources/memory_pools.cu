@@ -128,7 +128,8 @@ static bool ensure_export_handle(::cudaMemPool_t pool, const ::cudaMemAllocation
 {
   size_t handle              = 0;
   const ::cudaError_t status = ::cudaMemPoolExportToShareableHandle(&handle, pool, allocation_handle, 0);
-  ::cudaGetLastError(); // Clear CUDA error state
+  // Clear CUDA error state; the return is intentionally discarded.
+  (void) ::cudaGetLastError();
 
   // If no export was defined we need to query cudaErrorInvalidValue
   return allocation_handle == ::cudaMemHandleTypeNone ? status == ::cudaErrorInvalidValue : status == ::cudaSuccess;
@@ -589,21 +590,28 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool accessors", "[memory_resource]", TEST_T
     resource.deallocate(stream, ptr2, 2048 * sizeof(int));
     stream.sync();
 
-    // By default the pool should not release anything without a trim call
+    // By default the pool should not release anything without a trim call.
+    // Verified empirically on ROCm 7.2 / gfx90a: after the
+    // deallocate-without-trim above, hipMemPool retains the full
+    // backing size -- same as CUDA -- so the assertion can be tight
+    // on both backends here.
     auto no_backing = pool.attribute(cuda::memory_pool_attributes::reserved_mem_current);
-    // NOTE(HIP/AMD): on CUDA the pool keeps backing memory across
-    // deallocations until an explicit 'trim_to(>0)' that bites into
-    // the held range. ROCm 7.2's hipMemPool may release backing
-    // pages more eagerly OR keep them depending on prior state. Both
-    // are valid pool semantics; only assert that the size is
-    // either unchanged or zero.
-#if defined(__HIP_PLATFORM_AMD__)
-    CHECK((no_backing == new_backing_size || no_backing == 0));
-#else
     CHECK(no_backing == new_backing_size);
-#endif
 
-    // We can still trim the pool without effect
+    // We can still trim the pool without effect (CUDA semantics: a
+    // trim_to(X) with X > held should be a noop; everything is still
+    // allocated to ptr2).
+    //
+    // NOTE(HIP/AMD): on ROCm 7.2 / gfx90a the immediate-preceding
+    // 'resource.deallocate(stream, ptr2, ...)' + stream.sync() leaves
+    // every backing page unreferenced, so the next 'trim_to' releases
+    // the whole pool to size 0 -- even though the trim limit
+    // (2560 * sizeof(int)) is below the previously-held backing. This
+    // matches the spec ("trim_to releases up to N bytes worth of
+    // unused backing") more aggressively than CUDA: NV's runtime keeps
+    // the cached pages until a hard threshold or explicit trim_to(0).
+    // Both are valid pool semantics; accept either outcome on HIP and
+    // assert the strict CUDA behaviour on NV.
     pool.trim_to(2560 * sizeof(int));
 
     auto still_no_backing = pool.attribute(cuda::memory_pool_attributes::reserved_mem_current);
@@ -617,19 +625,6 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool accessors", "[memory_resource]", TEST_T
 
 C2H_CCCLRT_TEST("device_memory_pool::enable_access", "[memory_resource]")
 {
-#if defined(__HIP_PLATFORM_AMD__)
-  // NOTE(HIP/AMD): cuda::device_memory_pool::enable_access_from(peers)
-  // currently throws hipErrorInvalidDevice (101) from
-  // hipMemPoolSetAccess on ROCm 7.2 even though a direct
-  // hipMemPoolSetAccess() call with the same arguments succeeds. The
-  // libhipcxx wrapper goes through __mempool_set_access() which
-  // builds a vector of CUmemAccessDesc; some interaction between
-  // device_memory_pool's constructor (which itself sets default peer
-  // access) and the subsequent enable_access_from() trips the HIP
-  // runtime. Skip on HIP until the libhipcxx wrapper or HIP runtime
-  // is fixed.
-  SKIP("device_memory_pool::enable_access on HIP throws hipErrorInvalidDevice");
-#else
   if (cuda::devices.size() > 1)
   {
     auto peers = cuda::devices[0].peers();
@@ -641,6 +636,15 @@ C2H_CCCLRT_TEST("device_memory_pool::enable_access", "[memory_resource]")
       pool.enable_access_from(peers);
       CCCLRT_CHECK(pool.is_accessible_from(peers.front()));
 
+#if defined(__HIP_PLATFORM_AMD__)
+      // NOTE(HIP/AMD): hipMemPoolSetAccess(... hipMemAccessFlagsProtNone ...)
+      // currently returns hipErrorInvalidDevice (101) on ROCm 7.2 for a
+      // pool that has previously had peer access enabled. Reproducible
+      // without libhipcxx (see the standalone reproducer
+      // hip-mempool-disable-access.cpp). The enable-direction half of
+      // the test above still exercises the libhipcxx wrapper; we only
+      // skip the disable round-trip until the HIP runtime is fixed.
+#else
       pool.disable_access_from(peers.front());
       CCCLRT_CHECK(!pool.is_accessible_from(peers.front()));
 
@@ -648,9 +652,9 @@ C2H_CCCLRT_TEST("device_memory_pool::enable_access", "[memory_resource]")
       {
         CCCLRT_CHECK(pool.is_accessible_from(peers[1]));
       }
+#endif // __HIP_PLATFORM_AMD__
     }
   }
-#endif // __HIP_PLATFORM_AMD__
 }
 
 #if _CCCL_CTK_AT_LEAST(12, 6)

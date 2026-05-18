@@ -79,9 +79,24 @@
 // atomic.local.pass.cpp is the only test that requires the SAFE
 // path on HIP and is marked '// UNSUPPORTED: hiprtc' for that
 // reason.
-#if defined(_CCCL_COMPILER_HIPRTC) && !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE)
+//
+// FIXME(HIP/AMD): a future HIPRTC release is expected to fix the
+// underlying AMDGPU codegen bug (the __cuda_is_local lowering tree
+// that COMGR + inline-clang trip on). To narrow the affected ROCm
+// range once a known-good release is identified, drop the version
+// threshold below to the highest still-broken HIP_VERSION. The
+// current value of 999999999 is a sentinel meaning 'always WAR'
+// (HIP_VERSION is encoded as MAJOR*10_000_000 + MINOR*100_000 +
+// PATCH, so 999999999 caps at ROCm 99.x). When the WAR can be
+// retired entirely, also delete the surrounding NOTE block and
+// the 'UNSUPPORTED: hiprtc' line in
+// libcxx/test/std/atomics/atomics.types.generic/atomic.local.pass.cpp.
+#define _LIBHIPCXX_ATOMIC_HIPRTC_WAR_LAST_BROKEN_HIP_VERSION 999999999
+#if defined(_CCCL_COMPILER_HIPRTC) && !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE) \
+  && (!defined(HIP_VERSION) || (HIP_VERSION) <= _LIBHIPCXX_ATOMIC_HIPRTC_WAR_LAST_BROKEN_HIP_VERSION)
 #  define _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
-#endif // _CCCL_COMPILER_HIPRTC && !_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
+#endif // _CCCL_COMPILER_HIPRTC && !_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE && HIP_VERSION-still-broken
+#undef _LIBHIPCXX_ATOMIC_HIPRTC_WAR_LAST_BROKEN_HIP_VERSION
 
 #define _CCCL_ATOMIC_FLAG_TYPE int
 
