@@ -35,24 +35,32 @@
 //
 // Because the two files have different paths, upstream PRs that
 // modernise cuda_ptx_derived.h do NOT auto-apply to this file via
-// cherry-pick. As a result, this file's surface still uses the
-// 3.1-era spelling:
-//   * Templates parameter naming `class _Type, class _Scope` rather
-//     than the upstream `typename _Tp, typename _Sco`.
-//   * Function attributes `void __device__ ...` rather than the
-//     upstream `_CCCL_DEVICE_API void ...`.
-//   * Per-size hand-coded CAS-loop specialisations (sizeof<=2 path
-//     below) rather than upstream's generic
-//     `__atomic_fetch_update_cuda` + `__cccl_atomic_op_bind<...>`
-//     adapter pattern.
+// cherry-pick.
 //
-// A full port of the upstream modernisation would significantly
-// refactor every function in this file. It is a multi-week effort
-// out of scope for the present PR. Leaving the divergence
-// documented so the next maintainer who picks up the modernisation
-// (likely once the HIP backend stabilises enough that an upstream-
-// shaped cuda_hip_derived.h becomes the long-term plan) has a clear
-// starting point. Behaviour is correct as-is; the divergence is
+// Migration to the upstream shape is being done in phases (PR #217
+// thread on atomic_hip_derived.h:77). Phase status:
+//
+//   [x] Phase 1: rename `_Type/_Scope/_Delta` -> `_Tp/_Sco/_Up`;
+//                add [[nodiscard]] to value-returning helpers; add
+//                noexcept everywhere. ZERO RISK -- pure annotations.
+//   [ ] Phase 2: `void __device__` / `_Tp __device__` ->
+//                `_CCCL_DEVICE_API void` / `[[nodiscard]] _CCCL_DEVICE
+//                static _Tp`. LOW RISK -- attribute-only change.
+//   [ ] Phase 3: add the non-volatile overloads of {load,store,
+//                cmpxchg}_n that upstream provides. LOW RISK --
+//                additive.
+//   [ ] Phase 4: replace per-op CAS loops with a single generic
+//                `__atomic_fetch_update_cuda<_Tp, _Fn>` + a
+//                `__cccl_atomic_op_bind<_Tp, _Op>` adapter (matches
+//                upstream's pattern). MEDIUM RISK -- code-structure
+//                refactor; needs c2h atomics test suite re-run.
+//   [ ] Phase 5: wrap the file body in _CCCL_BEGIN_NAMESPACE_CUDA_STD
+//                and update consumer references in
+//                cuda/std/__atomic/types/base.h. MEDIUM RISK --
+//                ABI surface change.
+//   [ ] Phase 6: cleanup; retire this NOTE block.
+//
+// Behaviour is correct at every phase boundary; the divergence is
 // stylistic, not semantic.
 
 #include <hip/hip_runtime.h>
@@ -74,12 +82,12 @@
 #include <cuda/std/cstdint>
 using ::intptr_t;
 using ::uint32_t;
-template<class _Type, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type) <= 2, int>::type = 0>
-bool __device__ __atomic_compare_exchange_cuda(_Type volatile *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, _Scope __s) {
+template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp) <= 2, int>::type = 0>
+[[nodiscard]] bool __device__ __atomic_compare_exchange_cuda(_Tp volatile *__ptr, _Tp *__expected, const _Tp __desired, bool, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
 
     auto const __aligned = (uint32_t*)((intptr_t)__ptr & ~(sizeof(uint32_t) - 1));
     auto const __offset = uint32_t((intptr_t)__ptr & (sizeof(uint32_t) - 1)) * 8;
-    auto const __mask = ((1 << sizeof(_Type)*8) - 1) << __offset;
+    auto const __mask = ((1 << sizeof(_Tp)*8) - 1) << __offset;
 
     uint32_t __old = *__expected << __offset;
     uint32_t __old_value;
@@ -95,35 +103,35 @@ bool __device__ __atomic_compare_exchange_cuda(_Type volatile *__ptr, _Type *__e
     return false;
 }
 
-template<class _Type, class _Scope>
-_Type __device__ __atomic_load_n_cuda(const _Type volatile *__ptr, int __memorder, _Scope __s) {
-    _Type __ret;
+template<typename _Tp, typename _Sco>
+[[nodiscard]] _Tp __device__ __atomic_load_n_cuda(const _Tp volatile *__ptr, int __memorder, _Sco __s) noexcept {
+    _Tp __ret;
     __atomic_load_cuda(__ptr, __ret, __memorder, __s);
     return __ret;
 }
 
-template<class _Type, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
-void __device__ __atomic_exchange_cuda(_Type* __ptr, _Type& __old, _Type __new, int __memorder, _Scope __s) {
+template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+void __device__ __atomic_exchange_cuda(_Tp* __ptr, _Tp& __old, _Tp __new, int __memorder, _Sco __s) noexcept {
 
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __new, true, __memorder, __memorder, __s))
         ;
     __old = __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
-_Type __device__ __atomic_fetch_add_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Type __desired = __expected + __val;
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp __device__ __atomic_fetch_add_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __desired = __expected + __val;
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
         __desired = __expected + __val;
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2 || ::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
-_Type __host__ __device__ __atomic_fetch_max_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Type __desired = __expected > __val ? __expected : __val;
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
+[[nodiscard]] _Tp __host__ __device__ __atomic_fetch_max_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __desired = __expected > __val ? __expected : __val;
 
     while(__desired == __val &&
             !__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s)) {
@@ -133,10 +141,10 @@ _Type __host__ __device__ __atomic_fetch_max_cuda(_Type volatile *__ptr, _Delta 
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2 || ::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
-_Type __host__ __device__ __atomic_fetch_min_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Type __desired = __expected < __val ? __expected : __val;
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
+[[nodiscard]] _Tp __host__ __device__ __atomic_fetch_min_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __desired = __expected < __val ? __expected : __val;
 
     while(__desired == __val &&
             !__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s)) {
@@ -146,70 +154,70 @@ _Type __host__ __device__ __atomic_fetch_min_cuda(_Type volatile *__ptr, _Delta 
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
-_Type __device__ __atomic_fetch_sub_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp __device__ __atomic_fetch_sub_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Type __desired = __expected - __val;
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __desired = __expected - __val;
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
         __desired = __expected - __val;
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
-_Type __device__ __atomic_fetch_and_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp __device__ __atomic_fetch_and_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Type __desired = __expected & __val;
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __desired = __expected & __val;
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
         __desired = __expected & __val;
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
-_Type __device__ __atomic_fetch_xor_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp __device__ __atomic_fetch_xor_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Type __desired = __expected ^ __val;
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __desired = __expected ^ __val;
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
         __desired = __expected ^ __val;
     return __expected;
 }
 
-template<class _Type, class _Delta, class _Scope, typename ::cuda::std::enable_if<sizeof(_Type)<=2, int>::type = 0>
-_Type __device__ __atomic_fetch_or_cuda(_Type volatile *__ptr, _Delta __val, int __memorder, _Scope __s) {
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+[[nodiscard]] _Tp __device__ __atomic_fetch_or_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
-    _Type __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
-    _Type __desired = __expected | __val;
+    _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
+    _Tp __desired = __expected | __val;
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
         __desired = __expected | __val;
     return __expected;
 }
 
-template<class _Type, class _Scope>
-void __device__ __atomic_store_n_cuda(_Type volatile *__ptr, _Type __val, int __memorder, _Scope __s) {
+template<typename _Tp, typename _Sco>
+void __device__ __atomic_store_n_cuda(_Tp volatile *__ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
     __atomic_store_cuda(__ptr, __val, __memorder, __s);
 }
 
-template<class _Type, class _Scope>
-bool __device__ __atomic_compare_exchange_n_cuda(_Type volatile *__ptr, _Type *__expected, _Type __desired, bool __weak, int __success_memorder, int __failure_memorder, _Scope __s) {
+template<typename _Tp, typename _Sco>
+[[nodiscard]] bool __device__ __atomic_compare_exchange_n_cuda(_Tp volatile *__ptr, _Tp *__expected, _Tp __desired, bool __weak, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
     return __atomic_compare_exchange_cuda(__ptr, __expected, __desired, __weak, __success_memorder, __failure_memorder, __s);
 }
 
-template<class _Type, class _Scope>
-_Type __device__ __atomic_exchange_n_cuda(_Type volatile * __ptr, _Type __val, int __memorder, _Scope __s) {
-    _Type __ret;
+template<typename _Tp, typename _Sco>
+[[nodiscard]] _Tp __device__ __atomic_exchange_n_cuda(_Tp volatile * __ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
+    _Tp __ret;
     __atomic_exchange_cuda(__ptr, __ret, __val, __memorder, __s);
     return __ret;
 }
 
-template<class _Type, class _Scope>
-_Type __device__ __atomic_exchange_n_cuda(_Type * __ptr, _Type __val, int __memorder, _Scope __s) {
-    _Type __ret;
+template<typename _Tp, typename _Sco>
+[[nodiscard]] _Tp __device__ __atomic_exchange_n_cuda(_Tp * __ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
+    _Tp __ret;
     __atomic_exchange_cuda(__ptr, __ret, __val, __memorder, __s);
     return __ret;
 }
 
-static inline __device__ void __atomic_signal_fence_cuda(int) {
+static inline __device__ void __atomic_signal_fence_cuda(int) noexcept {
     asm volatile("":::"memory");
 }
