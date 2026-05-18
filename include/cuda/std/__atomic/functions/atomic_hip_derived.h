@@ -52,9 +52,12 @@
 //                the `_CCCL_VISIBILITY_HIDDEN` +
 //                `_CCCL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION` markers
 //                from the API-suffixed macro.)
-//   [ ] Phase 3: add the non-volatile overloads of {load,store,
-//                cmpxchg}_n that upstream provides. LOW RISK --
-//                additive.
+//   [x] Phase 3: add the non-volatile overloads of load_n and
+//                store_n that upstream provides. Pure additions;
+//                existing callers continue to bind to the volatile
+//                overload via implicit non-vol -> vol qualification.
+//                compare_exchange_n is HIP-specific (not in upstream)
+//                and stays single-overload by intent.
 //   [ ] Phase 4: replace per-op CAS loops with a single generic
 //                `__atomic_fetch_update_cuda<_Tp, _Fn>` + a
 //                `__cccl_atomic_op_bind<_Tp, _Op>` adapter (matches
@@ -109,6 +112,12 @@ template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp
     return false;
 }
 
+template<typename _Tp, typename _Sco>
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_load_n_cuda(const _Tp *__ptr, int __memorder, _Sco __s) noexcept {
+    _Tp __ret;
+    __atomic_load_cuda(__ptr, __ret, __memorder, __s);
+    return __ret;
+}
 template<typename _Tp, typename _Sco>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_load_n_cuda(const _Tp volatile *__ptr, int __memorder, _Sco __s) noexcept {
     _Tp __ret;
@@ -200,6 +209,10 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
     return __expected;
 }
 
+template<typename _Tp, typename _Sco>
+void _CCCL_DEVICE __atomic_store_n_cuda(_Tp *__ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
+    __atomic_store_cuda(__ptr, __val, __memorder, __s);
+}
 template<typename _Tp, typename _Sco>
 void _CCCL_DEVICE __atomic_store_n_cuda(_Tp volatile *__ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
     __atomic_store_cuda(__ptr, __val, __memorder, __s);
