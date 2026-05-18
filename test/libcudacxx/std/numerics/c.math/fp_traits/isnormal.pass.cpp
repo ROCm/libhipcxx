@@ -81,7 +81,12 @@ __host__ __device__ constexpr void test_type()
   if constexpr (!cuda::std::is_same_v<T, __nv_fp8_e8m0>)
 #endif // _CCCL_HAS_NVFP8_E8M0
   {
-    // TODO(HIP/AMD): remove this workaround once we can initialize a half with 0 as a constexpr
+    // NOTE(HIP/AMD): on HIP, '__half{}' is not yet usable in a constant expression
+    // (HIP's __half_raw union activation requires the helper below). Build
+    // a +0.0 half via __cccl_make_nvfp16_raw(0); the resulting bit pattern
+    // (0x0000) is IEEE +0.0 and is verified to round-trip across both ROCm
+    // ctor-reads-.data and ctor-reads-.x activation patterns by a
+    // static_assert in <cuda/std/__floating_point/storage.h>.
     if constexpr (cuda::std::is_same_v<T, __half>){
       test_isnormal(__half{__half{cuda::std::__cccl_make_nvfp16_raw(0)}}, false);
     }
