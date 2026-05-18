@@ -88,7 +88,7 @@ __host__ __device__ constexpr void test_type()
     // ctor-reads-.data and ctor-reads-.x activation patterns by a
     // static_assert in <cuda/std/__floating_point/storage.h>.
     if constexpr (cuda::std::is_same_v<T, __half>){
-      test_isnormal(__half{__half{cuda::std::__cccl_make_nvfp16_raw(0)}}, false);
+      test_isnormal(__half{cuda::std::__cccl_make_nvfp16_raw(0)}, false);
     }
     else{
       test_isnormal(T{}, false);
