@@ -26,62 +26,30 @@
 
 #pragma once
 
-// NOTE(HIP/AMD): file divergence from upstream. This file is the
-// HIP-only counterpart of upstream's
+// NOTE(HIP/AMD): HIP-only counterpart of upstream's
 //   <cuda/std/__atomic/functions/cuda_ptx_derived.h>
 // (which uses NVPTX inline asm; AMDGPU rejects the NVPTX-specific
 // inline-asm constraints, so we provide a parallel implementation
 // built on HIP's __hip_atomic_* / __atomic_* builtins instead).
 //
-// Because the two files have different paths, upstream PRs that
-// modernise cuda_ptx_derived.h do NOT auto-apply to this file via
-// cherry-pick.
+// File shape mirrors upstream's <cuda_ptx_derived.h>: same template
+// parameter naming (_Tp/_Sco/_Up), same CCCL portable function-
+// attribute spellings (_CCCL_DEVICE / _CCCL_HOST_DEVICE), same
+// [[nodiscard]] / noexcept surface, same volatile + non-volatile
+// overload set for load_n / store_n, same __atomic_fetch_update_cuda
+// + __cccl_atomic_op_bind adapter pattern for the standard fetch_*
+// ops, same _CCCL_BEGIN_NAMESPACE_CUDA_STD placement. The only
+// remaining intentional divergences are:
 //
-// Migration to the upstream shape is being done in phases (PR #217
-// thread on atomic_hip_derived.h:77). Phase status:
+//   * fetch_{min,max} keep their per-op CAS-loop body because of a
+//     load-bearing 'only-CAS-when-changing' optimization that the
+//     upstream pattern does not preserve. Inline NOTE at those two
+//     functions documents the rationale.
+//   * __atomic_compare_exchange_n_cuda is HIP-only (upstream's PTX
+//     path doesn't need this helper).
 //
-//   [x] Phase 1: rename `_Type/_Scope/_Delta` -> `_Tp/_Sco/_Up`;
-//                add [[nodiscard]] to value-returning helpers; add
-//                noexcept everywhere. ZERO RISK -- pure annotations.
-//   [x] Phase 2: switch bare `__device__` / `__host__ __device__`
-//                spellings to the CCCL portable macros `_CCCL_DEVICE`
-//                / `_CCCL_HOST_DEVICE`. Pure macro rename; the
-//                expanded text is identical. (A future Phase 2.5
-//                may promote `_CCCL_DEVICE` to `_CCCL_DEVICE_API`
-//                where upstream uses the API spelling, picking up
-//                the `_CCCL_VISIBILITY_HIDDEN` +
-//                `_CCCL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION` markers
-//                from the API-suffixed macro.)
-//   [x] Phase 3: add the non-volatile overloads of load_n and
-//                store_n that upstream provides. Pure additions;
-//                existing callers continue to bind to the volatile
-//                overload via implicit non-vol -> vol qualification.
-//                compare_exchange_n is HIP-specific (not in upstream)
-//                and stays single-overload by intent.
-//   [x] Phase 4: replace per-op CAS loops with a single generic
-//                `__atomic_fetch_update_cuda<_Tp, _Fn>` + a
-//                `__cccl_atomic_op_bind<_Tp, _Op>` adapter (matches
-//                upstream's pattern). Five ops (add/sub/and/or/xor)
-//                are folded into the generic helper; fetch_{min,max}
-//                keep their per-op CAS-loop because of their
-//                load-bearing 'only-CAS-when-changing' optimization
-//                that the upstream pattern does not preserve.
-//   [x] Phase 5: wrap the file body in _CCCL_BEGIN_NAMESPACE_CUDA_STD.
-//                All __atomic_*_cuda helpers now live in cuda::std::
-//                instead of global scope. Consumers in
-//                cuda/std/__atomic/types/base.h continue to find
-//                them via in-namespace lookup (they are inside
-//                cuda::std too), so no consumer-side changes are
-//                needed. Previously the cross-namespace lookup
-//                relied on ADL through the __thread_scope_*_tag
-//                argument type (which is in cuda::std); the
-//                in-namespace placement now makes that lookup
-//                ordinary rather than ADL-mediated, which removes
-//                the implicit ADL dependency.
-//   [ ] Phase 6: cleanup; retire this NOTE block.
-//
-// Behaviour is correct at every phase boundary; the divergence is
-// stylistic, not semantic.
+// Future upstream-PR cherry-picks that modernise cuda_ptx_derived.h
+// should now translate near-mechanically into this file.
 
 #include <hip/hip_runtime.h>
 // NOTE(HIP/AMD): pulled in for the std::{plus,minus,bit_and,bit_or,
@@ -109,33 +77,26 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-// NOTE(HIP/AMD): the sizeof<=2 CAS-loop specialisation of
-// __atomic_compare_exchange_cuda needs a wider (32-bit) container
-// to host the sub-word CAS. The C names `intptr_t` / `uint32_t`
-// are NOT brought into cuda::std by <cuda/std/cstdint> (which
-// exposes the cuda::std::intptr_t / uint32_t typedefs instead).
-// Bring the bare-name C aliases into the cuda::std namespace via
-// 'using ::intptr_t; using ::uint32_t;' so the existing function
-// body stays byte-identical to the upstream-era spelling. A
-// future Phase-6 cleanup could rewrite the body to use the
-// cuda::std::-qualified typedefs and drop these.
-using ::intptr_t;
-using ::uint32_t;
-
 template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp) <= 2, int>::type = 0>
 [[nodiscard]] bool _CCCL_DEVICE __atomic_compare_exchange_cuda(_Tp volatile *__ptr, _Tp *__expected, const _Tp __desired, bool, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
 
-    auto const __aligned = (uint32_t*)((intptr_t)__ptr & ~(sizeof(uint32_t) - 1));
-    auto const __offset = uint32_t((intptr_t)__ptr & (sizeof(uint32_t) - 1)) * 8;
+    // sizeof<=2 CAS-loop specialisation: emulate sub-word CAS on top
+    // of a wider 32-bit CAS by aligning the pointer down, masking the
+    // sub-word, and retrying until the unrelated sub-word bits we
+    // observed match. Uses the cuda::std::-qualified typedefs from
+    // <cuda/std/cstdint>; consistent with the rest of the cuda::std
+    // namespace.
+    auto const __aligned = (::cuda::std::uint32_t*)((::cuda::std::intptr_t)__ptr & ~(sizeof(::cuda::std::uint32_t) - 1));
+    auto const __offset = ::cuda::std::uint32_t((::cuda::std::intptr_t)__ptr & (sizeof(::cuda::std::uint32_t) - 1)) * 8;
     auto const __mask = ((1 << sizeof(_Tp)*8) - 1) << __offset;
 
-    uint32_t __old = *__expected << __offset;
-    uint32_t __old_value;
+    ::cuda::std::uint32_t __old = *__expected << __offset;
+    ::cuda::std::uint32_t __old_value;
     while (1) {
         __old_value = (__old & __mask) >> __offset;
         if (__old_value != *__expected)
             break;
-        uint32_t const __attempt = (__old & ~__mask) | (__desired << __offset);
+        ::cuda::std::uint32_t const __attempt = (__old & ~__mask) | (__desired << __offset);
         if (__atomic_compare_exchange_cuda(__aligned, &__old, &__attempt, true, __success_memorder, __failure_memorder, __s))
             return true;
     }
