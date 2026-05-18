@@ -51,6 +51,19 @@ struct UserAtomicType
   }
 };
 
+// NOTE(HIP/AMD): the upstream gate
+//   _CCCL_HOST_COMPILATION() || _CCCL_PTX_ARCH() >= 600
+// defaults the `Scope` template argument to `thread_scope_system`
+// only on platforms that support system-scope atomics: any host
+// pass, and NVPTX sm_60+ (which is when CUDA grew system-scope
+// atomic instructions). On HIP-device every supported AMDGCN
+// target (gfx90a/94x/10/11/12/950) has native system-scope atomics,
+// so add `_CCCL_HIP_COMPILATION()` to the OR-chain to give HIP-device
+// passes the same default. Without it, HIP-device callers
+// instantiating `TestEachIntegralType<...>` would have to spell out
+// the third template argument explicitly (it has no default), which
+// every existing call site does NOT do -- removing the HIP arm
+// here would make the upstream call sites fail to compile under HIP.
 template <template <class, template <typename, typename> class, cuda::thread_scope> class TestFunctor,
           template <typename, typename> class Selector,
           cuda::thread_scope Scope
