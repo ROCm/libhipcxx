@@ -447,14 +447,12 @@ set_tests_properties(
 # per-test executables below are now also enabled under HIP, with
 # a HIP-only skip-list for the *.cu test files that use thrust /
 # cub / cooperative_groups (none of which are wired up in this
-# tree). Tracked as Phase 6.
+# tree).
 #
 # NOTE(HIP/AMD): cccl_get_c2h() pulls add_subdirectory(c2h), and
 # c2h/CMakeLists.txt unconditionally calls cccl_get_catch2(), which
 # CPM-resolves to 'git clone gh:catchorg/Catch2#3.8.1'. That git
-# clone fails in air-gapped CI containers (observed on the ROCm-DS
-# Jenkins job 'libhipcxx/159': 'Build step for catch2 failed: 1
-# c2h/CMakeLists.txt:42 (cccl_get_catch2)'). Provide an opt-out
+# clone fails in air-gapped CI containers. Provide an opt-out
 # 'LIBCUDACXX_ENABLE_C2H_TESTS' (default ON to preserve the existing
 # behaviour) so air-gapped builds can run with
 # '-DLIBCUDACXX_ENABLE_C2H_TESTS=OFF'. The lit test suite (which is
@@ -489,11 +487,10 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_
   )
 
   if (LIBCUDACXX_ENABLE_HIP)
-    # NOTE(HIP/AMD): per-test skip-list. These pull cooperative_groups
-    # directly or depend on upstream-CUDA-only feature surfaces;
-    # enable them only when the corresponding HIP support has landed.
+    # NOTE(HIP/AMD): per-test skip-list. These depend on upstream-CUDA-only
+    # feature surfaces; enable them only when the corresponding HIP support
+    # has landed.
     set(LIBCUDACXX_C2H_HIP_SKIP_LIST
-      # Use cooperative_groups, no AMDGCN equivalent in this tree.
       # Use cuda::device::current_arch_id / current_arch_traits /
       # current_compute_capability which are not yet wired into the
       # libhipcxx HIP bridge (need a HIP-side AMDGCN architecture
