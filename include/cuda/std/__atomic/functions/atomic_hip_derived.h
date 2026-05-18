@@ -43,9 +43,15 @@
 //   [x] Phase 1: rename `_Type/_Scope/_Delta` -> `_Tp/_Sco/_Up`;
 //                add [[nodiscard]] to value-returning helpers; add
 //                noexcept everywhere. ZERO RISK -- pure annotations.
-//   [ ] Phase 2: `void __device__` / `_Tp __device__` ->
-//                `_CCCL_DEVICE_API void` / `[[nodiscard]] _CCCL_DEVICE
-//                static _Tp`. LOW RISK -- attribute-only change.
+//   [x] Phase 2: switch bare `__device__` / `__host__ __device__`
+//                spellings to the CCCL portable macros `_CCCL_DEVICE`
+//                / `_CCCL_HOST_DEVICE`. Pure macro rename; the
+//                expanded text is identical. (A future Phase 2.5
+//                may promote `_CCCL_DEVICE` to `_CCCL_DEVICE_API`
+//                where upstream uses the API spelling, picking up
+//                the `_CCCL_VISIBILITY_HIDDEN` +
+//                `_CCCL_EXCLUDE_FROM_EXPLICIT_INSTANTIATION` markers
+//                from the API-suffixed macro.)
 //   [ ] Phase 3: add the non-volatile overloads of {load,store,
 //                cmpxchg}_n that upstream provides. LOW RISK --
 //                additive.
@@ -83,7 +89,7 @@
 using ::intptr_t;
 using ::uint32_t;
 template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp) <= 2, int>::type = 0>
-[[nodiscard]] bool __device__ __atomic_compare_exchange_cuda(_Tp volatile *__ptr, _Tp *__expected, const _Tp __desired, bool, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
+[[nodiscard]] bool _CCCL_DEVICE __atomic_compare_exchange_cuda(_Tp volatile *__ptr, _Tp *__expected, const _Tp __desired, bool, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
 
     auto const __aligned = (uint32_t*)((intptr_t)__ptr & ~(sizeof(uint32_t) - 1));
     auto const __offset = uint32_t((intptr_t)__ptr & (sizeof(uint32_t) - 1)) * 8;
@@ -104,14 +110,14 @@ template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp
 }
 
 template<typename _Tp, typename _Sco>
-[[nodiscard]] _Tp __device__ __atomic_load_n_cuda(const _Tp volatile *__ptr, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_load_n_cuda(const _Tp volatile *__ptr, int __memorder, _Sco __s) noexcept {
     _Tp __ret;
     __atomic_load_cuda(__ptr, __ret, __memorder, __s);
     return __ret;
 }
 
 template<typename _Tp, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-void __device__ __atomic_exchange_cuda(_Tp* __ptr, _Tp& __old, _Tp __new, int __memorder, _Sco __s) noexcept {
+void _CCCL_DEVICE __atomic_exchange_cuda(_Tp* __ptr, _Tp& __old, _Tp __new, int __memorder, _Sco __s) noexcept {
 
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __new, true, __memorder, __memorder, __s))
@@ -120,7 +126,7 @@ void __device__ __atomic_exchange_cuda(_Tp* __ptr, _Tp& __old, _Tp __new, int __
 }
 
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp __device__ __atomic_fetch_add_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_add_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected + __val;
     while(!__atomic_compare_exchange_cuda(__ptr, &__expected, __desired, true, __memorder, __memorder, __s))
@@ -129,7 +135,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 }
 
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
-[[nodiscard]] _Tp __host__ __device__ __atomic_fetch_max_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_HOST_DEVICE __atomic_fetch_max_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected > __val ? __expected : __val;
 
@@ -142,7 +148,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 }
 
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
-[[nodiscard]] _Tp __host__ __device__ __atomic_fetch_min_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_HOST_DEVICE __atomic_fetch_min_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected < __val ? __expected : __val;
 
@@ -155,7 +161,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 }
 
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp __device__ __atomic_fetch_sub_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_sub_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected - __val;
@@ -165,7 +171,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 }
 
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp __device__ __atomic_fetch_and_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_and_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected & __val;
@@ -175,7 +181,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 }
 
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp __device__ __atomic_fetch_xor_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_xor_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected ^ __val;
@@ -185,7 +191,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 }
 
 template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
-[[nodiscard]] _Tp __device__ __atomic_fetch_or_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_or_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
 
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected | __val;
@@ -195,29 +201,29 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 }
 
 template<typename _Tp, typename _Sco>
-void __device__ __atomic_store_n_cuda(_Tp volatile *__ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
+void _CCCL_DEVICE __atomic_store_n_cuda(_Tp volatile *__ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
     __atomic_store_cuda(__ptr, __val, __memorder, __s);
 }
 
 template<typename _Tp, typename _Sco>
-[[nodiscard]] bool __device__ __atomic_compare_exchange_n_cuda(_Tp volatile *__ptr, _Tp *__expected, _Tp __desired, bool __weak, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
+[[nodiscard]] bool _CCCL_DEVICE __atomic_compare_exchange_n_cuda(_Tp volatile *__ptr, _Tp *__expected, _Tp __desired, bool __weak, int __success_memorder, int __failure_memorder, _Sco __s) noexcept {
     return __atomic_compare_exchange_cuda(__ptr, __expected, __desired, __weak, __success_memorder, __failure_memorder, __s);
 }
 
 template<typename _Tp, typename _Sco>
-[[nodiscard]] _Tp __device__ __atomic_exchange_n_cuda(_Tp volatile * __ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_exchange_n_cuda(_Tp volatile * __ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
     _Tp __ret;
     __atomic_exchange_cuda(__ptr, __ret, __val, __memorder, __s);
     return __ret;
 }
 
 template<typename _Tp, typename _Sco>
-[[nodiscard]] _Tp __device__ __atomic_exchange_n_cuda(_Tp * __ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
+[[nodiscard]] _Tp _CCCL_DEVICE __atomic_exchange_n_cuda(_Tp * __ptr, _Tp __val, int __memorder, _Sco __s) noexcept {
     _Tp __ret;
     __atomic_exchange_cuda(__ptr, __ret, __val, __memorder, __s);
     return __ret;
 }
 
-static inline __device__ void __atomic_signal_fence_cuda(int) noexcept {
+static inline _CCCL_DEVICE void __atomic_signal_fence_cuda(int) noexcept {
     asm volatile("":::"memory");
 }
