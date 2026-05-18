@@ -65,7 +65,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // punning) instead of '*reinterpret_cast<...*>' which would alias incompatible
 // types and is undefined behaviour under strict aliasing.
 template <typename _B16, ::cuda::std::enable_if_t<sizeof(_B16) == 2, bool> = true>
-_CCCL_DEVICE static inline _B16 shr(_B16 __a_reg, ::cuda::std::uint32_t __b_reg)
+[[nodiscard]] _CCCL_API constexpr _B16 shr(_B16 __a_reg, ::cuda::std::uint32_t __b_reg) noexcept
 {
   const auto __a_bits = ::cuda::std::bit_cast<::cuda::std::uint16_t>(__a_reg);
   const ::cuda::std::uint16_t __dest =
@@ -74,7 +74,7 @@ _CCCL_DEVICE static inline _B16 shr(_B16 __a_reg, ::cuda::std::uint32_t __b_reg)
 }
 
 template <typename _B32, ::cuda::std::enable_if_t<sizeof(_B32) == 4, bool> = true>
-_CCCL_DEVICE static inline _B32 shr(_B32 __a_reg, ::cuda::std::uint32_t __b_reg)
+[[nodiscard]] _CCCL_API constexpr _B32 shr(_B32 __a_reg, ::cuda::std::uint32_t __b_reg) noexcept
 {
   const auto __a_bits = ::cuda::std::bit_cast<::cuda::std::uint32_t>(__a_reg);
   const ::cuda::std::uint32_t __dest = (__b_reg >= 32u) ? ::cuda::std::uint32_t{0u} : (__a_bits >> __b_reg);
@@ -82,7 +82,7 @@ _CCCL_DEVICE static inline _B32 shr(_B32 __a_reg, ::cuda::std::uint32_t __b_reg)
 }
 
 template <typename _B64, ::cuda::std::enable_if_t<sizeof(_B64) == 8, bool> = true>
-_CCCL_DEVICE static inline _B64 shr(_B64 __a_reg, ::cuda::std::uint32_t __b_reg)
+[[nodiscard]] _CCCL_API constexpr _B64 shr(_B64 __a_reg, ::cuda::std::uint32_t __b_reg) noexcept
 {
   const auto __a_bits = ::cuda::std::bit_cast<::cuda::std::uint64_t>(__a_reg);
   const ::cuda::std::uint64_t __dest = (__b_reg >= 64u) ? ::cuda::std::uint64_t{0u} : (__a_bits >> __b_reg);
