@@ -63,10 +63,15 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 // cross bit 31; the wrap variant wraps around to bit 0. Pure arithmetic,
 // no AMDGCN intrinsic needed. The upstream `__cccl_ptx_isa` for HIP is 0
 // so the generated PTX bodies above are hidden; we provide HIP equivalents
-// here in the same cuda::ptx namespace.
+// here in the same cuda::ptx namespace. Marked `_CCCL_API constexpr` so
+// the implementation can be parity-verified against hand-computed PTX-
+// manual reference values via `static_assert` (see
+// `test/libcudacxx/cuda/ptx/ptx.hip_emu_bmsk_parity.compile.pass.cpp`).
+// The upstream NV wrappers stay non-constexpr (inline asm); the HIP arm
+// being more permissive does not break call-site compatibility.
 template <typename = void>
-_CCCL_DEVICE static inline ::cuda::std::uint32_t
-bmsk_clamp(::cuda::std::uint32_t __a_reg, ::cuda::std::uint32_t __b_reg)
+[[nodiscard]] _CCCL_API constexpr ::cuda::std::uint32_t
+bmsk_clamp(::cuda::std::uint32_t __a_reg, ::cuda::std::uint32_t __b_reg) noexcept
 {
   const ::cuda::std::uint32_t __start = __a_reg & 31u;
   // Clamp the run-length so the end position never exceeds bit 31.
@@ -88,8 +93,8 @@ bmsk_clamp(::cuda::std::uint32_t __a_reg, ::cuda::std::uint32_t __b_reg)
 }
 
 template <typename = void>
-_CCCL_DEVICE static inline ::cuda::std::uint32_t
-bmsk_wrap(::cuda::std::uint32_t __a_reg, ::cuda::std::uint32_t __b_reg)
+[[nodiscard]] _CCCL_API constexpr ::cuda::std::uint32_t
+bmsk_wrap(::cuda::std::uint32_t __a_reg, ::cuda::std::uint32_t __b_reg) noexcept
 {
   if (__b_reg == 0u)
   {
