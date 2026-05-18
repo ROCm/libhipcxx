@@ -197,6 +197,21 @@ template <class _HalfRaw = __half_raw, enable_if_t<!__cccl_nvfp16_ctor_reads_x_v
   // 'data' and bit_cast back to the 16-bit storage scalar.
   return __builtin_bit_cast(unsigned short, __cccl_nvfp16_extract_helper{__v}.data);
 }
+
+// Lock in the round-trip invariant for value zero across BOTH ROCm
+// activation patterns: __cccl_make_nvfp16_raw(0) -> __half{...} ->
+// __cccl_get_nvfp16_storage() returns 0. This is the property the
+// HIP-only TODO sites in libcxx test/std/numerics/c.math/* rely on
+// to express "a constexpr __half equal to +0.0 without needing the
+// not-yet-constexpr `__half{}` default ctor": the bit pattern 0x0000
+// in IEEE 754 half-precision IS +0.0, and round-tripping through the
+// active union member preserves it on both ROCm <=7.2 (.data path,
+// where __builtin_bit_cast(_Float16, 0u) -> +0.0f16 -> bit_cast back
+// = 0u) and newer ROCm (.x path, where the unsigned short member is
+// stored and read back unchanged). Asserting it at the helper makes
+// the call-site comments at the WAR locations unnecessary.
+static_assert(::cuda::std::__cccl_get_nvfp16_storage(__half{::cuda::std::__cccl_make_nvfp16_raw(0u)}) == 0u,
+              "__cccl_make_nvfp16_raw(0) must round-trip to bit pattern 0 (== IEEE +0.0)");
 #  endif // _CCCL_HIP_COMPILATION()
 #endif // _CCCL_HAS_NVFP16()
 
