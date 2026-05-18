@@ -206,7 +206,7 @@ inline void FormatHipScope(std::ostream& out,
   // -Wunused-parameter without dropping the name (which would diverge from
   // the upstream signature shape).
   out << fmt::format(R"XXX(
-static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, {0}) {{
+static inline _CCCL_DEVICE void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, {0}) {{
     {1}();
 }}
 )XXX",
@@ -215,7 +215,7 @@ static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __
   // load -- gated on sizeof(_Type) > 8 for clang HIP builtin's 64-bit cap.
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, {0}) {{
+static inline _CCCL_DEVICE void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, {0}) {{
     if constexpr (sizeof(_Type) > 8) {{
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
@@ -230,7 +230,7 @@ __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, in
   // store -- gated on sizeof(_Type) > 8 (clang HIP __hip_atomic_store cap).
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, {0}) {{
+static inline _CCCL_DEVICE void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, {0}) {{
     if constexpr (sizeof(_Type) > 8) {{
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
@@ -247,7 +247,7 @@ __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __m
   {
     out << fmt::format(R"XXX(
 template<class _Type>
-__device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool __is_weak, int __success_memorder, int __failure_memorder, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool __is_weak, int __success_memorder, int __failure_memorder, {0}) {{
     if constexpr (sizeof(_Type) > 8) {{
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_* caps at 64-bit)");
@@ -268,7 +268,7 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__e
   {
     out << fmt::format(R"XXX(
 template<class _Type>
-__device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, {0}) {{
     if constexpr (sizeof(_Type) > 8) {{
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_weak caps at 64-bit)");
@@ -286,7 +286,7 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__e
   // exchange -- gated on sizeof(_Type) > 8 (clang HIP __hip_atomic_exchange cap).
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, {0}) {{
+static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, {0}) {{
     if constexpr (sizeof(_Type) > 8) {{
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
@@ -303,7 +303,7 @@ __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Typ
   {
     out << fmt::format(R"XXX(
 template<class _Type>
-__device__ _Type __atomic_fetch_{2}_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_{2}_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {0}) {{
     _Type __ret;
     if (__cuda_fetch_{2}_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_{2}(__ptr, __val, __memorder, {1});
@@ -315,7 +315,7 @@ __device__ _Type __atomic_fetch_{2}_cuda(volatile _Type *__ptr, _Type __val, int
   // fetch_sub: implemented as fetch_add with negated value (HIP has no native fetch_sub builtin)
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {0}) {{
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, {1});
@@ -326,7 +326,7 @@ __device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int
   // pointer fetch_add
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, {0}) {{
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, {1});
 }}
 )XXX",
@@ -338,7 +338,7 @@ __device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __va
   if (has_ptr_fetch_sub)
   {
     out << fmt::format(R"XXX(template<class _Type>
-__device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, {0}) {{
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, {1});
 }}
 )XXX",
@@ -379,7 +379,7 @@ inline void FormatHipScopeUnsupported(std::ostream& out, const std::string& scop
   // '(int, __thread_scope_cluster_tag)' because _Dummy has a default.
   out << fmt::format(R"XXX(
 template <class _Dummy = void>
-static inline __device__ void __atomic_thread_fence_cuda(int, {0}) {{
+static inline _CCCL_DEVICE void __atomic_thread_fence_cuda(int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Dummy>, "{1}");
 }}
 )XXX",
@@ -388,7 +388,7 @@ static inline __device__ void __atomic_thread_fence_cuda(int, {0}) {{
   // load (void)
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ void __atomic_load_cuda(const volatile _Type *, _Type&, int, {0}) {{
+static inline _CCCL_DEVICE void __atomic_load_cuda(const volatile _Type *, _Type&, int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
 }}
 )XXX",
@@ -397,7 +397,7 @@ __device__ void __atomic_load_cuda(const volatile _Type *, _Type&, int, {0}) {{
   // store (void)
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ void __atomic_store_cuda(volatile _Type *, _Type&, int, {0}) {{
+static inline _CCCL_DEVICE void __atomic_store_cuda(volatile _Type *, _Type&, int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
 }}
 )XXX",
@@ -406,7 +406,7 @@ __device__ void __atomic_store_cuda(volatile _Type *, _Type&, int, {0}) {{
   // compare_exchange (bool)
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ bool __atomic_compare_exchange_cuda(volatile _Type *, _Type *, const _Type, bool, int, int, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE bool __atomic_compare_exchange_cuda(volatile _Type *, _Type *, const _Type, bool, int, int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
     return false;
 }}
@@ -416,7 +416,7 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *, _Type *, const 
   // exchange (void)
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ void __atomic_exchange_cuda(volatile _Type*, _Type&, _Type, int, {0}) {{
+static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type*, _Type&, _Type, int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
 }}
 )XXX",
@@ -427,7 +427,7 @@ __device__ void __atomic_exchange_cuda(volatile _Type*, _Type&, _Type, int, {0})
   {
     out << fmt::format(R"XXX(
 template<class _Type>
-__device__ _Type __atomic_fetch_{2}_cuda(volatile _Type *, _Type, int, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_{2}_cuda(volatile _Type *, _Type, int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
     return _Type{{}};
 }}
@@ -441,12 +441,12 @@ __device__ _Type __atomic_fetch_{2}_cuda(volatile _Type *, _Type, int, {0}) {{
   // give the unsupported-scope version full coverage).
   out << fmt::format(R"XXX(
 template<class _Type>
-__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *, ptrdiff_t, int, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_add_cuda(_Type *volatile *, ptrdiff_t, int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
     return nullptr;
 }}
 template<class _Type>
-__device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *, ptrdiff_t, int, {0}) {{
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_sub_cuda(_Type *volatile *, ptrdiff_t, int, {0}) {{
     static_assert(::cuda::std::__always_false_v<_Type>, "{1}");
     return nullptr;
 }}
