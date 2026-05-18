@@ -52,12 +52,12 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_block_tag) {
+static inline _CCCL_DEVICE void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_block_tag) {
     __threadfence_block();
 }
 
 template<class _Type>
-__device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_block_tag) {
+static inline _CCCL_DEVICE void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_block_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
@@ -68,7 +68,7 @@ __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, in
 }
 
 template<class _Type>
-__device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_block_tag) {
+static inline _CCCL_DEVICE void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_block_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
@@ -79,7 +79,7 @@ __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __m
 }
 
 template<class _Type>
-__device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_block_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_weak caps at 64-bit)");
@@ -92,7 +92,7 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__e
 }
 
 template<class _Type>
-__device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_block_tag) {
+static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_block_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
@@ -103,144 +103,144 @@ __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Typ
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template<class _Type>
-__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_block_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_block_tag) {
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
 template <class _Dummy = void>
-static inline __device__ void __atomic_thread_fence_cuda(int, __thread_scope_cluster_tag) {
+static inline _CCCL_DEVICE void __atomic_thread_fence_cuda(int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Dummy>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
 }
 
 template<class _Type>
-__device__ void __atomic_load_cuda(const volatile _Type *, _Type&, int, __thread_scope_cluster_tag) {
+static inline _CCCL_DEVICE void __atomic_load_cuda(const volatile _Type *, _Type&, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
 }
 
 template<class _Type>
-__device__ void __atomic_store_cuda(volatile _Type *, _Type&, int, __thread_scope_cluster_tag) {
+static inline _CCCL_DEVICE void __atomic_store_cuda(volatile _Type *, _Type&, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
 }
 
 template<class _Type>
-__device__ bool __atomic_compare_exchange_cuda(volatile _Type *, _Type *, const _Type, bool, int, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE bool __atomic_compare_exchange_cuda(volatile _Type *, _Type *, const _Type, bool, int, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return false;
 }
 
 template<class _Type>
-__device__ void __atomic_exchange_cuda(volatile _Type*, _Type&, _Type, int, __thread_scope_cluster_tag) {
+static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type*, _Type&, _Type, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_and_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
-    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
-    return _Type{};
-}
-
-template<class _Type>
-__device__ _Type __atomic_fetch_or_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_and_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return _Type{};
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_xor_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_or_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return _Type{};
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_add_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_xor_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return _Type{};
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_max_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return _Type{};
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_min_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_max_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return _Type{};
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_sub_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_min_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return _Type{};
 }
 
 template<class _Type>
-__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *, ptrdiff_t, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *, _Type, int, __thread_scope_cluster_tag) {
+    static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
+    return _Type{};
+}
+
+template<class _Type>
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_add_cuda(_Type *volatile *, ptrdiff_t, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return nullptr;
 }
 template<class _Type>
-__device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *, ptrdiff_t, int, __thread_scope_cluster_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_sub_cuda(_Type *volatile *, ptrdiff_t, int, __thread_scope_cluster_tag) {
     static_assert(::cuda::std::__always_false_v<_Type>, "thread_scope_cluster is not supported on HIP (AMDGCN has no cluster-scope equivalent)");
     return nullptr;
 }
 
-static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_device_tag) {
+static inline _CCCL_DEVICE void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_device_tag) {
     __threadfence();
 }
 
 template<class _Type>
-__device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_device_tag) {
+static inline _CCCL_DEVICE void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_device_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
@@ -251,7 +251,7 @@ __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, in
 }
 
 template<class _Type>
-__device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_device_tag) {
+static inline _CCCL_DEVICE void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_device_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
@@ -262,7 +262,7 @@ __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __m
 }
 
 template<class _Type>
-__device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool, int __success_memorder, int __failure_memorder, __thread_scope_device_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_weak caps at 64-bit)");
@@ -275,7 +275,7 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__e
 }
 
 template<class _Type>
-__device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_device_tag) {
+static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_device_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
@@ -286,69 +286,69 @@ __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Typ
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
 template<class _Type>
-__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_device_tag) {
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 template<class _Type>
-__device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_device_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_device_tag) {
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
-static inline __device__ void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_system_tag) {
+static inline _CCCL_DEVICE void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_system_tag) {
     __threadfence_system();
 }
 
 template<class _Type>
-__device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_system_tag) {
+static inline _CCCL_DEVICE void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, int __memorder, __thread_scope_system_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic load is not supported on HIP (clang HIP __hip_atomic_load caps at 64-bit)");
@@ -359,7 +359,7 @@ __device__ void __atomic_load_cuda(const volatile _Type *__ptr, _Type& __dst, in
 }
 
 template<class _Type>
-__device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_system_tag) {
+static inline _CCCL_DEVICE void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __memorder, __thread_scope_system_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic store is not supported on HIP (clang HIP __hip_atomic_store caps at 64-bit)");
@@ -370,7 +370,7 @@ __device__ void __atomic_store_cuda(volatile _Type *__ptr, _Type& __val, int __m
 }
 
 template<class _Type>
-__device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool __is_weak, int __success_memorder, int __failure_memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__expected, const _Type __desired, bool __is_weak, int __success_memorder, int __failure_memorder, __thread_scope_system_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic compare_exchange is not supported on HIP (clang HIP __hip_atomic_compare_exchange_* caps at 64-bit)");
@@ -386,7 +386,7 @@ __device__ bool __atomic_compare_exchange_cuda(volatile _Type *__ptr, _Type *__e
 }
 
 template<class _Type>
-__device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_system_tag) {
+static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Type __new, int __memorder, __thread_scope_system_tag) {
     if constexpr (sizeof(_Type) > 8) {
         static_assert(::cuda::std::__always_false_v<_Type>,
                       ">64-bit atomic exchange is not supported on HIP (clang HIP __hip_atomic_exchange caps at 64-bit)");
@@ -397,60 +397,60 @@ __device__ void __atomic_exchange_cuda(volatile _Type* __ptr, _Type& __old, _Typ
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
-__device__ _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
 template<class _Type>
-__device__ _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_add_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_system_tag) {
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 template<class _Type>
-__device__ _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_system_tag) {
+[[nodiscard]] static inline _CCCL_DEVICE _Type* __atomic_fetch_sub_cuda(_Type *volatile *__ptr, ptrdiff_t __val, int __memorder, __thread_scope_system_tag) {
     return __hip_atomic_fetch_add(__ptr, -__val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
