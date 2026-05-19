@@ -159,8 +159,18 @@ typedef struct {
 // constants from the HIP runtime API are not available. Provide minimal stub
 // definitions needed by libhipcxx headers (referenced via cuda_*->hip_* macro
 // mappings in include/amd/cuda_runtime.h).
-typedef int hipError_t;
-#define hipSuccess ((hipError_t)0)
+//
+// hipSuccess MUST be a plain enumerator (NOT a '#define' to a parenthesized
+// cast like '((hipError_t)0)'). The cast spelling causes a hard parse error
+// wherever libhipcxx headers reference '::cudaSuccess' on a HIPRTC-reachable
+// code path, because '::' requires an unqualified-id on the right and the
+// expansion '::((hipError_t)0)' is unparseable. Mirroring the real HIP
+// runtime's '<hip/hip_runtime_api.h>:enum hipError_t { hipSuccess = 0, ... }'
+// shape via an enum typedef makes 'hipSuccess' an identifier and lets the
+// upstream '::cudaSuccess' spelling parse unchanged.
+typedef enum hipError_t {
+  hipSuccess = 0,
+} hipError_t;
 typedef enum hipMemoryType {
   hipMemoryTypeUnregistered = 0,
   hipMemoryTypeHost         = 1,
