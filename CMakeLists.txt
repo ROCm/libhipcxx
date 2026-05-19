@@ -144,7 +144,7 @@ function(libhipcxx_path_is_link_like path out_var)
   endif()
 endfunction()
 
-if(WIN32)
+if(WIN32 AND NOT DEFINED THEROCK_TOOLCHAIN_ROOT)
   message(STATUS "Checking ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip for symlink")
   # Delete hip symlink if not already a copy
   libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip" _hip_path_is_link)
