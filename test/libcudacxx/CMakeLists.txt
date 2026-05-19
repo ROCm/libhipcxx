@@ -511,6 +511,28 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_
   set(c2h_all_target "libcudacxx.test.c2h_all")
   add_custom_target(${c2h_all_target})
 
+  # NOTE(HIP/AMD): see the long-form comment inside libcudacxx_add_test()
+  # below for the rationale. Briefly: commit 7b770425d9 extended the strict
+  # cccl warning regime ('-Wall -Wextra -Werror') to the HIP language;
+  # several upstream NVIDIA c2h test sources (which we import verbatim and
+  # don't fork) carry pre-existing low-severity warnings that now hard-fail
+  # the build. We relax exactly four categories on HIP for c2h test
+  # executables only, via this INTERFACE library. It MUST be linked AFTER
+  # libcudacxx.compiler_interface (which carries the '-Wall -Wextra') so
+  # that clang sees the '-Wno-*' flags LATER on the command line and
+  # therefore wins the left-to-right precedence battle. Linking order in
+  # target_link_libraries() is what controls the resulting -W flag order
+  # on the compile command.
+  if (LIBCUDACXX_ENABLE_HIP)
+    add_library(libcudacxx.test.c2h_warning_relaxation INTERFACE)
+    target_compile_options(libcudacxx.test.c2h_warning_relaxation INTERFACE
+      -Wno-unused-parameter
+      -Wno-unused-variable
+      -Wno-unused-value
+      -Wno-sign-compare
+    )
+  endif()
+
   function(libcudacxx_add_test target_name_var source)
     string(REPLACE "/" "." target_name "${source}")
     string(PREPEND target_name "libcudacxx.test.")
@@ -545,6 +567,49 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_
     # maintain a per-test "needs rocthrust" allow-list.
     if (LIBCUDACXX_ENABLE_HIP AND TARGET roc::rocthrust)
       target_link_libraries(${target_name} PRIVATE roc::rocthrust)
+    endif()
+
+    # NOTE(HIP/AMD): the c2h test sources are upstream NVIDIA cccl test
+    # code imported wholesale; we don't maintain a HIP-side fork of them.
+    # libcudacxx.compiler_interface (extended to HIP in commit
+    # 7b770425d9 "cccl warning flags to HIP language") is intentionally
+    # strict for OUR headers (catches HIP-port regressions), but several
+    # of the imported tests carry pre-existing low-severity warnings
+    # that surface as -Werror under that strict regime:
+    #
+    #   * -Wunused-parameter   : ccclrt hierarchy tests parametrise
+    #                            kernels on a 'dims' type and consume
+    #                            only its compile-time properties.
+    #   * -Wunused-variable    : variables declared for the host-side
+    #                            assertions are not referenced from the
+    #                            device-side checks (and vice versa).
+    #   * -Wunused-value       : tests that intentionally ignore the
+    #                            [[nodiscard]] return of '::cudaXxx()'
+    #                            (aliased to hipXxx on HIP) for "best
+    #                            effort" cleanup / error-probe paths.
+    #   * -Wsign-compare       : comparison of CG_GRID_NUM_BLOCKS()
+    #                            (unsigned) vs cuda::grid.count(...)
+    #                            (signed index_type) in the hierarchy
+    #                            tests.
+    #
+    # Relax these four categories on HIP for c2h test executables only.
+    # The libhipcxx headers stay under the full strict warning set; this
+    # opt-out applies strictly to UPSTREAM test code we don't want to
+    # police-edit with cast-noise just to silence per-builder warnings
+    # that aren't in the upstream NV path.
+    #
+    # The -Wno-* options are wired via the INTERFACE library
+    # 'libcudacxx.test.c2h_warning_relaxation' (defined below this
+    # function in the c2h-tests block) and LINKED AFTER
+    # libcudacxx.compiler_interface so that the resulting compile-line
+    # order places these '-Wno-*' flags AFTER the upstream
+    # '-Wall -Wextra' that would otherwise re-enable them. Clang
+    # processes -W flags left-to-right, so order is load-bearing here.
+    if (LIBCUDACXX_ENABLE_HIP AND TARGET libcudacxx.test.c2h_warning_relaxation)
+      target_link_libraries(
+        ${target_name}
+        PRIVATE libcudacxx.test.c2h_warning_relaxation
+      )
     endif()
 
     add_dependencies(${c2h_all_target} ${target_name})
