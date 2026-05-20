@@ -66,37 +66,38 @@
 // atomic.local.pass.cpp (a stack-local cuda::atomic<T> would
 // otherwise trap because AMDGCN has no HW atomics on the private
 // address space). The HIPRTC runtime-compile pipeline (COMGR ->
-// inline-clang -> bitcode link) however chokes on the resulting
-// IR with a backend codegen failure ("V_CMP_NE_U32_e32 0,
+// inline-clang -> bitcode link) historically choked on the
+// resulting IR with a backend codegen failure ("V_CMP_NE_U32_e32 0,
 // $src_shared_base, ..." spam followed by HIPRTC_ERROR_LINKING)
-// for any TU that exercises a wide spread of atomic<T>
+// for any TU that exercised a wide spread of atomic<T>
 // instantiations -- atomic_fetch_min / max, address(_ref) /
-// constness, and compare_exchange_weak{,_explicit} all regress.
+// constness, and compare_exchange_weak{,_explicit} all regressed.
 // Force-enable the UNSAFE knob on the HIPRTC path so
 // __cuda_is_local() short-circuits to false and the SAFE shims
 // degenerate to a single tail-call into the underlying
-// __hip_atomic_* builtin, restoring 7 atomic FAILs to PASS.
-// atomic.local.pass.cpp is the only test that requires the SAFE
-// path on HIP and is marked '// UNSUPPORTED: hiprtc' for that
-// reason.
+// __hip_atomic_* builtin.
 //
-// FIXME(HIP/AMD): a future HIPRTC release is expected to fix the
-// underlying AMDGPU codegen bug (the __cuda_is_local lowering tree
-// that COMGR + inline-clang trip on). To narrow the affected ROCm
-// range once a known-good release is identified, drop the version
-// threshold below to the highest still-broken HIP_VERSION. The
-// current value of 999999999 is a sentinel meaning 'always WAR'
-// (HIP_VERSION is encoded as MAJOR*10_000_000 + MINOR*100_000 +
-// PATCH, so 999999999 caps at ROCm 99.x). When the WAR can be
-// retired entirely, also delete the surrounding NOTE block and
-// the 'UNSUPPORTED: hiprtc' line in
-// libcxx/test/std/atomics/atomics.types.generic/atomic.local.pass.cpp.
-#define _LIBHIPCXX_ATOMIC_HIPRTC_WAR_LAST_BROKEN_HIP_VERSION 999999999
-#if defined(_CCCL_COMPILER_HIPRTC) && !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE) \
-  && (!defined(HIP_VERSION) || (HIP_VERSION) <= _LIBHIPCXX_ATOMIC_HIPRTC_WAR_LAST_BROKEN_HIP_VERSION)
-#  define _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
-#endif // _CCCL_COMPILER_HIPRTC && !_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE && HIP_VERSION-still-broken
-#undef _LIBHIPCXX_ATOMIC_HIPRTC_WAR_LAST_BROKEN_HIP_VERSION
+// The underlying AMDGPU codegen bug is FIXED in ROCm 7.2.3 (hotfix
+// on the otherwise-frozen 7.2 line) and in ROCm 7.13.0 (mainline);
+// on those releases the SAFE path lowers correctly and the WAR is
+// skipped so HIPRTC builds get the same SAFE-path coverage as HIPCC
+// offline. atomic.local.pass.cpp's main() body is wrapped in
+// '#if !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE)' so on still-
+// broken ROCm the test trivially passes (no UNSUPPORTED marker
+// required), and on fixed ROCm it exercises the stack-allocated
+// cuda::atomic<T> path for real.
+//
+// Conservative default: if ROCM_VERSION_* macros are not available
+// the WAR stays active. <amd/amd_utils.h> is pulled in only on the
+// HIPRTC branch and is itself HIPRTC-safe (it drops the
+// <hip/hip_runtime.h> include there and only brings in the
+// lightweight <rocm-core/rocm_version.h>).
+#if defined(_CCCL_COMPILER_HIPRTC) && !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE)
+#  include <amd/amd_utils.h>
+#  if !(LIBHIPCXX_ROCM_VERSION_EQ(7, 2, 3) || LIBHIPCXX_ROCM_VERSION_GE(7, 13, 0))
+#    define _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
+#  endif
+#endif // _CCCL_COMPILER_HIPRTC && !_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE && ROCm-still-broken
 
 #define _CCCL_ATOMIC_FLAG_TYPE int
 
