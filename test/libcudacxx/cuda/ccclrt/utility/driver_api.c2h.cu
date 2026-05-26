@@ -92,27 +92,13 @@ C2H_TEST("Call each driver api", "[utility]")
   CUDART(driver::__streamDestroyNoThrow(stream));
 }
 #else // ^^^ !__HIP_PLATFORM_AMD__ ^^^ / vvv __HIP_PLATFORM_AMD__ vvv
-// NOTE(HIP/AMD): the upstream test exercises CUDA-driver-API
-// invariants that fundamentally do not hold under HIP's
-// primary-context-only model:
-//   * 'hipCtxPopCurrent' on the primary context returns
-//     hipErrorInvalidDevice (the primary cannot be popped off
-//     the stack on HIP).
-//   * 'hipCtxGetCurrent' returns a fresh hipCtx_t wrapper handle
-//     per query (different pointer each time even though the
-//     underlying context is the same), so 'ctx ==
-//     __ctxGetCurrent()' comparisons after a push do not hold.
-//   * 'hipStreamGetCtx' is intentionally not provided -- HIP has
-//     no public equivalent (consumers route through
-//     hipStreamGetDevice instead).
-//   * 'hipDevicePrimaryCtxGetState's "active" flag is sticky once
-//     the runtime has touched the primary context; double-release
-//     does NOT clear it on the same process the way CUDA does.
-// What WE can exercise on HIP is the subset of driver-API helpers
-// that are well-defined regardless of context-stack semantics:
-// device enumeration, version query, primary-ctx retain/release
-// refcounting (modulo activation flag stickiness), and the basic
-// stream lifecycle.
+// NOTE(HIP/AMD): the upstream CUDA-driver-API invariants don't hold
+// under HIP's primary-context-only model (no real ctx-stack pop,
+// fresh hipCtx_t handle per __ctxGetCurrent() query, no stream-ctx
+// API, sticky primary-ctx 'active' flag). The HIP subset below
+// covers what IS well-defined regardless of ctx semantics: device
+// enumeration, version query, primary-ctx retain/release refcount,
+// and the basic stream lifecycle.
 C2H_TEST("Call each driver api (HIP subset)", "[utility]")
 {
   namespace driver = ::cuda::__driver;

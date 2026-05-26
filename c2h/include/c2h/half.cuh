@@ -372,29 +372,14 @@ public:
 
 CUB_NAMESPACE_BEGIN
 
-// NOTE(HIP/AMD): hipcub::BaseTraits has 5 template parameters
-// (Category, _PRIMITIVE, _nullptr_TYPE, _UnsignedBits, T) vs the
-// upstream cub::BaseTraits 4 (Category, _PRIMITIVE, _UnsignedBits,
-// T). Insert a literal 'false' for _nullptr_TYPE on hipCub < 4.4.0.
-//
-// The 'Category' enum (FLOATING_POINT) and the BaseTraits/NumericTraits
-// scaffolding it parameterises were deprecated in hipCub in favour of
-// '<rocprim/type_traits>' (rocprim::traits::define<T>). Migration is a
-// follow-up: the new API is structurally different (per-trait 'using'
-// declarations like is_arithmetic / number_format / float_bit_mask
-// instead of one BaseTraits inheritance) and would require maintaining
-// two specialisations -- one for old hipCub, one for new. For now we
-// keep using the deprecated path (which still works -- only deprecated,
-// not removed) and suppress the -Wdeprecated-declarations noise narrowly.
-//
-// The 5-arg arity is hipCub-pre-4.4 specific. The upcoming
-// hipCub-cccl-3-0 work (StreamHPC branch
-// 'users/matyas-streamhpc/hipcub-cccl-3-0', tagged VERSION 4.4.0)
-// realigns BaseTraits with upstream cub's 4-arg form, so gate the
-// WAR on HIPCUB_VERSION < 400400 -- once our minimum-supported
-// hipCub crosses 4.4.0 the WAR auto-disables and the upstream
-// specialisation is used instead. The WAR can be deleted entirely
-// when the minimum-supported hipCub stays >= 4.4.0 in CI.
+// NOTE(HIP/AMD): hipcub::BaseTraits has a fifth template parameter
+// ('_nullptr_TYPE') on hipCub < 4.4.0; insert a literal 'false' for it
+// and suppress the FLOATING_POINT deprecation narrowly. The 4.4.0
+// realignment (StreamHPC branch users/matyas-streamhpc/hipcub-cccl-3-0)
+// matches upstream cub's 4-arg form, so the WAR auto-disables once the
+// minimum-supported hipCub crosses that version. The longer-term
+// migration is to rocprim::traits::define<T>; deferred until both
+// branches are widely available.
 #if defined(__HIP_PLATFORM_AMD__) && HIPCUB_VERSION < 400400
 _CCCL_SUPPRESS_DEPRECATED_PUSH
 template <>

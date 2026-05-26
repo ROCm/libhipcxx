@@ -60,23 +60,12 @@ void recursive_check_device_setter(int id)
     recursive_check_device_setter(id - 1);
 
 #if !_CCCL_HIP_COMPILATION()
-    // NOTE(HIP/AMD): the entire post-recursion-unwind block of
-    // assertions only applies in the CUDA driver-API stack model.
-    // On HIP:
-    //   * 'count_driver_stack()' is a no-op (no per-thread stack);
-    //   * 'ctx == __ctxGetCurrent()' compares two distinct
-    //     hipCtx_t handles HIP returns per query (see P40 in the
-    //     project memory file);
-    //   * 'cudaGetDevice() == id' after inner unwind doesn't hold:
-    //     hipCtxPopCurrent restores the ctx but the runtime's
-    //     tracked 'current device' is independent state. CUDA's
-    //     CUDART tracks current-device via the context stack;
-    //     HIP's tracks it separately, so the inner setter's exit
-    //     leaves 'current device' wherever the inner ctor pushed
-    //     it.
-    // All three checks are skip-listed on HIP; the post-recursion
-    // assertions reduce to a no-op there. The pre-recursion checks
-    // (cudaGetDevice == id) above DO hold and continue to run.
+    // NOTE(HIP/AMD): the three post-unwind assertions only apply in
+    // the CUDA driver-API stack model. On HIP count_driver_stack is a
+    // no-op, __ctxGetCurrent returns a fresh hipCtx_t per query, and
+    // hipCtxPopCurrent doesn't restore the runtime's 'current device'
+    // (tracked independently of the ctx stack). Pre-recursion check
+    // above (cudaGetDevice == id) DOES hold and keeps running.
     CCCLRT_REQUIRE(test::count_driver_stack() == cuda::devices.size() - id);
     CCCLRT_REQUIRE(ctx == driver::__ctxGetCurrent());
     CUDART(cudaGetDevice(&cudart_id));
