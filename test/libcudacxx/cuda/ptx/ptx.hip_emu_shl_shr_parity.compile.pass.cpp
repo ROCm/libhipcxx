@@ -52,7 +52,17 @@
 // REQUIRES: hipcc
 // UNSUPPORTED: nvcc, nvrtc
 
-#include <cuda/ptx>
+// NOTE(HIP/AMD): the public umbrella <cuda/ptx> hard-errors on AMD
+// (cuda::ptx is an NV-only public API per its file-header NOTE), so
+// route through the individual instruction headers which carry the
+// HIP software-emulated implementations behind a _CCCL_HIP_COMPILATION()
+// gate. Before commit 8657ee7093 the lit harness didn't propagate
+// __HIP_PLATFORM_AMD__=1, so <cuda/ptx> silently compiled through and
+// _CCCL_HIP_COMPILATION() evaluated to 0 (rendering this entire parity
+// test a no-op pass: all the static_asserts below were skipped); the
+// per-op headers are required now that both gates are wired correctly.
+#include <cuda/__ptx/instructions/shl.h>
+#include <cuda/__ptx/instructions/shr.h>
 #include <cuda/std/cstdint>
 
 #if _CCCL_HIP_COMPILATION()
