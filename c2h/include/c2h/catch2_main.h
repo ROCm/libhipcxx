@@ -25,12 +25,15 @@
 
 #pragma once
 
-// NOTE(HIP/AMD): need _CCCL_HIP_COMPILATION() before the thrust gate.
-#include <cuda/std/detail/__config>
-
-#if !_CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): use the compiler-provided __HIP_PLATFORM_AMD__ for the
+// HIP-vs-CUDA discriminator rather than _CCCL_HIP_COMPILATION() so this
+// header doesn't have to pull <cuda/std/detail/__config> just to get the
+// macro. __HIP_PLATFORM_AMD__ is defined automatically by hip-clang /
+// hipcc on the HIP-AMD path, so no library include is needed; mirrors
+// the pattern already used by c2h/bfloat16.cuh and c2h/half.cuh.
+#ifndef __HIP_PLATFORM_AMD__
 #  include <thrust/detail/config/device_system.h>
-#endif // !_CCCL_HIP_COMPILATION()
+#endif // !__HIP_PLATFORM_AMD__
 
 #include <iostream>
 
@@ -42,18 +45,17 @@
 #include <catch2/catch_session.hpp>
 
 // NOTE(HIP/AMD): rocThrust is *optional* under HIP -- the c2h
-// CMakeLists does `find_package(rocthrust QUIET CONFIG)` so a HIP
-// build without rocThrust still compiles the Catch2-only c2h library.
-// That means <thrust/detail/config/device_system.h> may or may not be
+// CMakeLists does `find_package(rocthrust QUIET CONFIG)` so a HIP build
+// without rocThrust still compiles the Catch2-only c2h library. That
+// means <thrust/detail/config/device_system.h> may or may not be
 // available at parse time on HIP, so we can't rely on
 // THRUST_DEVICE_SYSTEM being defined here. Keep the dedicated
-// `_CCCL_HIP_COMPILATION()` arm: HIP always has a (cuda*-aliased-to-
-// hip*) runtime regardless of whether rocThrust is wired up, so
-// `_C2H_HAS_DEVICE_RUNTIME` is unconditionally true on HIP. The
-// runner helper itself routes through cuda* runtime API symbols that
-// are shimmed to hip* by <amd/cuda_runtime.h>; it does not consume
-// thrust.
-#if _CCCL_HIP_COMPILATION()
+// __HIP_PLATFORM_AMD__ arm: HIP always has a (cuda*-aliased-to-hip*)
+// runtime regardless of whether rocThrust is wired up, so
+// `_C2H_HAS_DEVICE_RUNTIME` is unconditionally true on HIP. The runner
+// helper itself routes through cuda* runtime API symbols that are
+// shimmed to hip* by <amd/cuda_runtime.h>; it does not consume thrust.
+#ifdef __HIP_PLATFORM_AMD__
 #  define _C2H_HAS_DEVICE_RUNTIME 1
 #elif THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
 #  define _C2H_HAS_DEVICE_RUNTIME 1
