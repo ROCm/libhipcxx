@@ -239,9 +239,6 @@ template <int __ThreadBlockRank = 3, typename __UnaryFunction = void>
 _CCCL_DEVICE_API void
 __for_each_canceled_block_sm100(::dim3 __block_idx, [[maybe_unused]] bool __is_leader, __UnaryFunction __uf)
 {
-  // We are compiling for SM100 but PTX 8.7 is not supported, so fall back to
-  // just calling the function. __is_leader is only consumed by the PTX 8.7+
-  // path (the SM100 hardware cancel-launch flow); fall back ignores it.
   ::cuda::std::invoke(::cuda::std::move(__uf), __block_idx);
 }
 #  endif // ^^^ __cccl_ptx_isa < 870 ^^^

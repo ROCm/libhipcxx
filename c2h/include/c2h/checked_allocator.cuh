@@ -27,19 +27,9 @@
 
 #include <cuda/std/detail/__config>
 
-// NOTE(HIP/AMD): the thrust-backed checked_cuda_allocator /
-// checked_cuda_memory_resource / checked_host_memory_resource templates
-// at the bottom of this file pull thrust headers that are not currently
-// HIP-portable in libhipcxx (no rocThrust dependency in this tree). The
-// transitive include chain reaches this file through
-// <c2h/catch2_test_helper.h> which is in turn pulled in by every
-// libhipcxx Catch2 test. To unblock c2h-on-HIP without depending on
-// thrust, gate the thrust-using portions under !_CCCL_HIP_COMPILATION();
-// the pure-C++ c2h::detail::* helpers (get_env, memory_info,
-// get_device_memory_limit, get_debug_checked_allocs, get_device_memory,
-// check_free_device_memory, checked_cuda_malloc) stay visible on HIP --
-// they only use the cuda runtime API which is shimmed by
-// <amd/cuda_runtime.h>.
+// NOTE(HIP/AMD): the thrust-backed templates at the bottom of this file
+// aren't HIP-portable in this tree (no rocThrust dep). Gate them off on HIP;
+// the pure-C++ c2h::detail::* helpers stay visible via the cudaRT shim.
 #if !_CCCL_HIP_COMPILATION()
 #  include <thrust/device_allocator.h>
 #  include <thrust/mr/new.h>
@@ -54,10 +44,6 @@
 #include <optional>
 #include <string>
 
-// NOTE(HIP/AMD): under HIP, <cuda_runtime_api.h> doesn't exist on a
-// HIP-only system. The libhipcxx detail/__config header already pulls
-// in <amd/cuda_runtime.h> (which provides the cuda* runtime API shim
-// over the HIP runtime), so we route through it instead.
 #if _CCCL_HIP_COMPILATION()
 #  include <amd/cuda_runtime.h>
 #else
