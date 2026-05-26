@@ -82,35 +82,11 @@ declare -A command_durations
 # Runs a command within a named group, handles the exit status, and prints appropriate messages based on the result.
 # Usage: run_command "Group Name" command [arguments...]
 #
-# NOTE(HIP/AMD): the command is run with 'BASH_ENV=' overridden in the
-# per-command env, AND wrapped in a '(set +u; …)' subshell.  This is a
-# manylinux-CI quirk: ROCm-DS Jenkins jobs (e.g. libhipcxx/{159,164,165})
-# run inside a manylinux container that exports
-# 'BASH_ENV=/env/bash.env' globally, and that file does
-# 'set -euo pipefail'. Bash sources '$BASH_ENV' on startup of every
-# non-interactive shell, so every child bash invocation -- including
-# the bash subscripts that 'git submodule update' runs from CMake's
-# FetchContent / CPM -- ends up with '-u' enabled. The bundled git
-# wrapper scripts (git-sh-i18n, git-sh-setup, ...) however reference
-# unset variables ('$GIT_TEXTDOMAINDIR', '$LONG_USAGE', ...) and abort
-# with rc=1 under '-u', killing the configure step. That is what was
-# failing the Catch2 (and dlpack) git fetch on the air-gapped CI.
-#
-# Defeating it requires *both* halves:
-#   * 'BASH_ENV='  per-command env override prevents the child bash
-#     from re-sourcing /env/bash.env on startup.
-#   * '(set +u; ...)' subshell ensures the immediate command and any
-#     bash subprocesses it spawns *itself* run with '-u' off, even
-#     before the BASH_ENV override has any effect.
-# Empirically, BASH_ENV= alone is enough for our case (verified against
-# a fake /env/bash.env setting -euo pipefail), but keeping the (set +u)
-# wrap is a belt-and-braces measure in case the manylinux env is later
-# extended to also export 'SHELLOPTS' or other flag-carrying vars.
-#
-# This affects ALL run_command invocations -- in practice that is the
-# 'cmake --preset', 'cmake --build', and 'ctest --preset' calls in
-# 'ci/build_common.sh'. Our own shell logic outside the subshell still
-# runs with '-u' on, so we keep the strictness benefit for our own code.
+# NOTE(HIP/AMD): wraps the command in '(set +u; BASH_ENV= ...)' to
+# defeat the manylinux CI's globally-exported 'BASH_ENV=/env/bash.env'
+# that does 'set -euo pipefail' (kills child bash subscripts under
+# '-u' -- the FetchContent / CPM git fetches). See commit 282d2428d4
+# for the full backstory.
 function run_command() {
     local group_name="${1:-}"
     shift
