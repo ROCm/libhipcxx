@@ -138,29 +138,16 @@ class __host_accessor : public _Accessor
       {
         auto __p1 = ::cuda::std::to_address(__p);
 #    if _CCCL_HIP_COMPILATION()
-        // NOTE(HIP/AMD): use the cudaPointerGetAttributes runtime API
-        // (shimmed to hipPointerGetAttributes via include/amd/cuda_runtime.h)
-        // since the cuPointerGetAttribute driver API is not exposed by HIP
-        // through cuda::__driver::__pointerGetAttributeNoThrow. Mirrors the
-        // pattern used in __is_managed_pointer below.
-        //
-        // The Unregistered case is included because cudaPointerGetAttributes
-        // returns 'cudaMemoryTypeUnregistered' for any pointer the runtime
-        // does not know about (stack pointers, statically-allocated globals,
-        // anything from regular new / malloc, ...) -- ALL of which ARE
-        // host-accessible. The CUDA-side path on the right achieves the same
-        // effect via 'status != cudaSuccess' (when the driver does not
-        // recognise the pointer, fall through to "host"); we get there
-        // explicitly via the type enum instead. Managed memory is also
-        // host-accessible (unified addressing), hence the third clause.
-        //
-        // The query CAN return non-success (older HIP runtimes return an
-        // error for unregistered host pointers instead of populating .type
-        // = cudaMemoryTypeUnregistered). Treat any failure as 'host-
-        // accessible' to mirror the NV-driver-API arm on the right, which
-        // returns true on '__status != ::cudaSuccess'. Don't ASSERT here --
-        // a stack/heap pointer is a perfectly valid input and shouldn't
-        // tear down the application.
+        // NOTE(HIP/AMD): cuPointerGetAttribute isn't exposed via
+        // cuda::__driver on HIP, so use the cudaPointerGetAttributes
+        // runtime API shim (mirrors __is_managed_pointer below). The
+        // Unregistered case covers stack / heap / static-data pointers
+        // -- all host-accessible. Tolerate non-success: older HIP
+        // runtimes return an error for unregistered host pointers
+        // (instead of populating .type = cudaMemoryTypeUnregistered),
+        // and a stack/heap pointer is a valid input we shouldn't abort
+        // on. The CUDA arm on the right gets the same fall-through via
+        // 'status != cudaSuccess'.
         ::cudaPointerAttributes __ptr_attrib{};
         const auto __status = ::cudaPointerGetAttributes(&__ptr_attrib, __p1);
         (void) ::cudaGetLastError(); // clear sticky CUDA error state
