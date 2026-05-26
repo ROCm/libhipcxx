@@ -188,6 +188,22 @@ else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
     set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
     set(CMAKE_CUDA_COMPILER_ID "HIPCC")
     set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
+    # NOTE(HIP/AMD): hipcc does NOT predefine '__HIP_PLATFORM_AMD__' /
+    # '__HIP_ROCclr__' on its own (verified via 'hipcc --offload-arch=...
+    # -x hip -dM -E'); the macros are normally added by CMake's HIP
+    # language module on the cccl.c2h / public-header-test paths. The
+    # lit harness doesn't run through that module, so without these
+    # explicit '-D's every '_CCCL_HIP_COMPILATION()'-gated body in
+    # libhipcxx headers (and in HIP-only tests like
+    # 'ptx.hip_emu_bmsk_parity.compile.pass.cpp') silently compiles to a
+    # no-op under lit. Force the defines here so the HIP-arm code paths
+    # actually exercise in lit runs -- pairs with the
+    # ptx.{bmsk,elect.sync,fence,get_sreg,shfl,shl,shr,trap}.compile.pass.cpp
+    # tests enabled on HIP in commit 9521b2f98e.
+    string(
+      APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
+      " -D__HIP_PLATFORM_AMD__=1 -D__HIP_ROCclr__=1"
+    )
   endif()
 endif()
 
