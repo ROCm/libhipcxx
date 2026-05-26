@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,17 +30,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// NOTE(HIP/AMD): AMD does not have a PTX equivalent
-// UNSUPPORTED: hipcc, hiprtc
-
 // UNSUPPORTED: libcpp-has-no-threads
 
 // <cuda/ptx>
 
-#include <cuda/ptx>
+// NOTE(HIP/AMD): on HIP the public umbrella <cuda/ptx> hard-errors
+// (cuda::ptx is an NV-only public API per the design); route through
+// the individual instruction header instead, which carries the HIP
+// software-emulated implementation behind a _CCCL_HIP_COMPILATION()
+// gate.
+#ifdef __HIP_PLATFORM_AMD__
+#  include <cuda/__ptx/instructions/shr.h>
+#else
+#  include <cuda/ptx>
+#endif
 #include <cuda/std/utility>
 
 #include "generated/shr.h"
+
+// NOTE(HIP/AMD): see ptx.shl.compile.pass.cpp -- same pattern. Semantic
+// parity covered by 'ptx.hip_emu_shl_shr_parity.compile.pass.cpp'.
+#if _CCCL_HIP_COMPILATION()
+__global__ void test_shr_hip(void** __fn_ptr)
+{
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<cuda::std::uint16_t (*)(cuda::std::uint16_t, cuda::std::uint32_t)>(cuda::ptx::shr));
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<cuda::std::uint32_t (*)(cuda::std::uint32_t, cuda::std::uint32_t)>(cuda::ptx::shr));
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<cuda::std::uint64_t (*)(cuda::std::uint64_t, cuda::std::uint32_t)>(cuda::ptx::shr));
+}
+#endif // _CCCL_HIP_COMPILATION()
 
 int main(int, char**)
 {

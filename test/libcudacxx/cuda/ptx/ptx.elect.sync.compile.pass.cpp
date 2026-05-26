@@ -30,14 +30,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// UNSUPPORTED: libcpp-has-no-threads, hipcc, hiprtc
+// UNSUPPORTED: libcpp-has-no-threads
 
 // <cuda/ptx>
 
-#include <cuda/ptx>
+// NOTE(HIP/AMD): on HIP the public umbrella <cuda/ptx> hard-errors
+// (cuda::ptx is an NV-only public API per the design); route through
+// the individual instruction header instead, which carries the HIP
+// software-emulated implementation behind a _CCCL_HIP_COMPILATION()
+// gate.
+#ifdef __HIP_PLATFORM_AMD__
+#  include <cuda/__ptx/instructions/elect_sync.h>
+#else
+#  include <cuda/ptx>
+#endif
 #include <cuda/std/utility>
 
 #include "generated/elect_sync.h"
+
+// NOTE(HIP/AMD): the upstream 'generated/elect_sync.h' fn_ptr
+// instantiation is gated on '__cccl_ptx_isa >= 800 && NV_PROVIDES_SM_90'
+// (false on HIP). Force HIP overload instantiation explicitly so this
+// compile.pass.cpp exercises the HIP wrapper in
+// <cuda/__ptx/instructions/elect_sync.h>. The HIP arm is implemented
+// unconditionally (no SM-version gate); semantic is "elect the lowest
+// active lane in (membermask & __activemask())". On wave-64 lanes
+// 32..63 are filtered out by the AND with membermask (uint32_t),
+// preserving PTX 32-lane warp semantics.
+#if _CCCL_HIP_COMPILATION()
+__global__ void test_elect_sync_hip(void** __fn_ptr)
+{
+  *__fn_ptr++ =
+    reinterpret_cast<void*>(static_cast<bool (*)(const cuda::std::uint32_t&)>(cuda::ptx::elect_sync));
+}
+#endif // _CCCL_HIP_COMPILATION()
 
 int main(int, char**)
 {
