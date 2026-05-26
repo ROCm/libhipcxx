@@ -51,13 +51,6 @@
 #  endif
 #endif // TEST_INT128
 
-// NOTE(HIP/AMD): on HIP the upstream-named <cuda_fp16.h> /
-// <cuda_bf16.h> headers do not exist; pull the HIP-named equivalents
-// (which alias __half / __nv_bfloat16 via the libhipcxx HIP bridge)
-// before c2h/half.cuh / c2h/bfloat16.cuh, which include the
-// upstream-named headers themselves. With rocThrust + the HIP fp16
-// bridge in place, c2h/half.cuh / c2h/bfloat16.cuh ARE buildable on
-// HIP (they only pull thrust + cub plus the fp16/bf16 aliases).
 #if TEST_HALF_T()
 #  if _CCCL_HIP_COMPILATION()
 #    include <hip/hip_fp16.h>
