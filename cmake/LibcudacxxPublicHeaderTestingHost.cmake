@@ -26,6 +26,8 @@
 # .inl files are not globbed for, because they are not supposed to be used as public
 # entrypoints.
 
+include(${CMAKE_CURRENT_LIST_DIR}/CCCLC2hHipDeps.cmake)
+
 # Meta target for all configs' header builds:
 add_custom_target(libcudacxx.test.public_headers_host_only)
 
@@ -49,6 +51,24 @@ file(
   "${libcudacxx_SOURCE_DIR}/include/cuda/version"
 )
 
+# NOTE(HIP/AMD): same block-list pattern as
+# cmake/LibcudacxxInternalHeaderTesting.cmake (g17 review on PR #217).
+# The public header sweep includes 'cuda/<X>' surfaces (barrier, latch,
+# semaphore, ...) that are upstream-only as of 2026; drop them up-front
+# so the per-target skip regex inside libcudacxx_create_public_header_test_host
+# isn't needed. There is no allow-list here because no public-header
+# 'cuda/<X>' file under a SKIP_DIRS prefix currently has a HIP fallback.
+if (LIBCUDACXX_ENABLE_HIP)
+  include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
+  libcudacxx_filter_backend_headers(public_headers_host_only
+    BACKEND HIP
+    SKIP_DIRS
+      cuda/barrier cuda/latch cuda/semaphore
+      cuda/annotated_ptr cuda/pipeline cuda/memcpy_async cuda/ptx
+      cuda/std/barrier cuda/std/latch cuda/std/semaphore
+  )
+endif()
+
 set(public_host_header_cxx_compile_options)
 set(public_host_header_cxx_compile_definitions)
 
@@ -58,20 +78,6 @@ if (CCCL_USE_LIBCXX)
 endif()
 
 function(libcudacxx_create_public_header_test_host header_name headertest_src)
-  # NOTE(HIP/AMD): Skip headers without HIP support as of 2026 when
-  # building under HIP.
-  if (LIBCUDACXX_ENABLE_HIP)
-    string(
-      REGEX MATCH
-      "ptx|barrier|latch|semaphore|annotated_ptr|pipeline|memcpy_async"
-      match
-      "${header_name}"
-    )
-    if (match)
-      return()
-    endif()
-  endif()
-
   # Create the default target for that file
   set(public_headers_host_only_${header_name} verify_${header_name})
   add_library(
@@ -114,13 +120,10 @@ function(libcudacxx_create_public_header_test_host header_name headertest_src)
     public_headers_host_only_${header_name}
     PUBLIC libcudacxx.compiler_interface
   )
-  # NOTE(HIP/AMD): under HIP, also link the HIP host runtime.
-  if (LIBCUDACXX_ENABLE_HIP)
-    target_link_libraries(
-      public_headers_host_only_${header_name}
-      PUBLIC hip::host
-    )
-  endif()
+  # NOTE(HIP/AMD): under HIP also attach the HIP host runtime + pthreads.
+  # See cmake/CCCLC2hHipDeps.cmake for the manylinux/glibc < 2.34
+  # rationale on Threads::Threads. No-op on non-HIP builds.
+  cccl_c2h_attach_hip_deps(public_headers_host_only_${header_name})
   add_dependencies(
     libcudacxx.test.public_headers_host_only
     public_headers_host_only_${header_name}
