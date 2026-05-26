@@ -115,7 +115,17 @@ endif()
 
 option(C2H_ENABLE_CURAND "Use CUDA CURAND library in c2h." ${curand_default})
 if (LIBCUDACXX_ENABLE_HIP AND C2H_ENABLE_CURAND)
-  message(FATAL_ERROR "C2H_ENABLE_CURAND is not supported under HIP (no hipRAND wiring in this tree).")
+  # NOTE(HIP/AMD): on HIP the generators*.cu sources that actually call
+  # curand* (via C2H_HAS_CURAND=1) aren't compiled -- cccl.c2h is an
+  # INTERFACE library on HIP (Catch2 framework + helpers only; see the
+  # add_library branch below). So opting in to C2H_ENABLE_CURAND under
+  # HIP is a no-op rather than an error. The ROCm equivalent (hipRAND)
+  # is shipped and supported in /opt/rocm/lib, we just don't wire it
+  # into the Catch2-only c2h slice today. Status-only message so a
+  # cross-backend CI matrix doesn't have to special-case the flag.
+  message(STATUS
+    "C2H_ENABLE_CURAND is a no-op under HIP: c2h is built as Catch2-only "
+    "INTERFACE here and generators*.cu (the curand consumer) is skipped.")
 endif()
 
 # Library sources: under HIP the thrust-heavy generators*.cu translation
@@ -134,6 +144,7 @@ else()
   )
 endif()
 if (LIBCUDACXX_ENABLE_HIP)
+  include(${CMAKE_SOURCE_DIR}/cmake/CCCLC2hHipDeps.cmake)
   target_include_directories(cccl.c2h INTERFACE "${C2H_SOURCE_DIR}/include")
   target_link_libraries(
     cccl.c2h
@@ -141,9 +152,12 @@ if (LIBCUDACXX_ENABLE_HIP)
       CCCL::CCCL
       Catch2::Catch2
       cccl.compiler_interface_cpp17
-      hip::host
-      Threads::Threads
   )
+  # Threads::Threads + hip::host attached via the shared helper -- see
+  # cmake/CCCLC2hHipDeps.cmake for the manylinux/glibc < 2.34 pthread
+  # weak-stub rationale that requires '-pthread' on every HIP test
+  # executable that constructs a 'cuda::device_ref' / 'cuda::stream'.
+  cccl_c2h_attach_hip_deps(cccl.c2h SCOPE INTERFACE)
 else()
   target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
   target_link_libraries(
@@ -178,7 +192,8 @@ if (LIBCUDACXX_ENABLE_HIP)
     catch2_runner.cpp catch2_runner_helper.cu
     PROPERTIES LANGUAGE HIP
   )
-  target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h hip::host Threads::Threads)
+  target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
+  cccl_c2h_attach_hip_deps(cccl.c2h.main SCOPE PUBLIC)
 else()
   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
 endif()

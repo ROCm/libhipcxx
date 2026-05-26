@@ -65,38 +65,41 @@ list(FILTER internal_headers EXCLUDE REGEX "__cuda/*")
 # generated cuda::ptx headers are not standalone
 list(FILTER internal_headers EXCLUDE REGEX "__ptx/instructions/generated")
 
-function(libcudacxx_create_internal_header_test header_name headertest_src)
-  # NOTE(HIP/AMD): Skip headers without HIP support as of 2026 when
-  # building under HIP -- with one carve-out: individual cuda::ptx::*
-  # wrapper headers that ship a HIP software emulation (see the
-  # consolidated NOTE in <cuda/__ptx/ptx_helper_functions.h>) are still
-  # tested standalone so the emulations don't bitrot. Their pure-C++
-  # helper headers (ptx_helper_functions.h, ptx_dot_variants.h) are
-  # also tested.
-  if (LIBCUDACXX_ENABLE_HIP)
-    string(
-      REGEX MATCH
-      "ptx|barrier|latch|semaphore|annotated_ptr|pipeline|memcpy_async"
-      match
-      "${header_name}"
-    )
-    if (match)
-      # NOTE(HIP/AMD): header_name has had '/' replaced with '_' by the
-      # caller (libcudacxx_add_internal_header_test, line 188) so the
-      # carve-out regex works on the underscore form, e.g.
-      # 'cuda___ptx_instructions_shl.h'.
-      string(
-        REGEX MATCH
-        "__ptx_(ptx_helper_functions|ptx_dot_variants)\\.h$|__ptx_instructions_(bmsk|elect_sync|fence|get_sreg|shfl_sync|shl|shr|trap)\\.h$"
-        hip_emul_match
-        "${header_name}"
-      )
-      if (NOT hip_emul_match)
-        return()
-      endif()
-    endif()
-  endif()
+# NOTE(HIP/AMD): under HIP, filter out the upstream feature surfaces that
+# have no HIP-portable implementation as of 2026, then re-add the
+# individual cuda::ptx::* wrappers that DO ship a HIP software emulation
+# (see the consolidated NOTE in <cuda/__ptx/ptx_helper_functions.h>) so
+# the emulations don't bitrot. Block-list / allow-list pattern (per the
+# g17 review feedback on PR #217) -- adding a new upstream header under
+# one of the SKIP_DIRS will surface as a build failure rather than being
+# silently skipped, which makes loss-of-coverage regressions visible.
+if (LIBCUDACXX_ENABLE_HIP)
+  include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
+  libcudacxx_filter_backend_headers(internal_headers
+    BACKEND HIP
+    SKIP_DIRS
+      cuda/__barrier cuda/__latch cuda/__semaphore
+      cuda/__annotated_ptr cuda/__pipeline cuda/__memcpy_async cuda/__ptx
+      # CUDA-only PTX atomic dispatch headers (inline-PTX asm; the HIP
+      # path uses atomic_hip_{generated,derived}.h instead).
+      cuda/std/__atomic/functions/cuda_ptx_generated.h
+      cuda/std/__atomic/functions/cuda_ptx_derived.h
+      cuda/std/__atomic/functions/cuda_ptx_generated_helper.h
+    ALLOWLIST_HEADERS
+      cuda/__ptx/ptx_helper_functions.h
+      cuda/__ptx/ptx_dot_variants.h
+      cuda/__ptx/instructions/bmsk.h
+      cuda/__ptx/instructions/elect_sync.h
+      cuda/__ptx/instructions/fence.h
+      cuda/__ptx/instructions/get_sreg.h
+      cuda/__ptx/instructions/shfl_sync.h
+      cuda/__ptx/instructions/shl.h
+      cuda/__ptx/instructions/shr.h
+      cuda/__ptx/instructions/trap.h
+  )
+endif()
 
+function(libcudacxx_create_internal_header_test header_name headertest_src)
   # Create the default target for that file. The TU is always written to
   # disk as '.cu' (see configure_file in libcudacxx_add_internal_header_test
   # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
