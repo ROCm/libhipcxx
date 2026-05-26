@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,16 +30,63 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// NOTE(HIP/AMD): AMD does not have a PTX equivalent
-// UNSUPPORTED: hipcc, hiprtc
-
 // UNSUPPORTED: libcpp-has-no-threads
 // UNSUPPORTED: clang && !nvcc
 
 // <cuda/ptx>
 
-#include <cuda/ptx>
+// NOTE(HIP/AMD): on HIP the public umbrella <cuda/ptx> hard-errors
+// (cuda::ptx is an NV-only public API per the design); route through
+// the individual instruction header instead, which carries the HIP
+// software-emulated implementation behind a _CCCL_HIP_COMPILATION()
+// gate.
+#ifdef __HIP_PLATFORM_AMD__
+#  include <cuda/__ptx/instructions/shfl_sync.h>
+#else
+#  include <cuda/ptx>
+#endif
 #include <cuda/std/utility>
+
+// NOTE(HIP/AMD): the upstream test_shfl_* bodies below are gated on
+// '__cccl_ptx_isa >= 600 && _CCCL_DEVICE_COMPILATION()'. The first half
+// is false on HIP (PTX-ISA is 0), so the existing assertion blocks
+// compile out cleanly. Force HIP overload instantiation explicitly via
+// a function-pointer block so this compile.pass.cpp exercises the HIP
+// wrappers in <cuda/__ptx/instructions/shfl_sync.h>. Documented
+// HIP-arm divergences (per the file-header NOTE there): on wave-64 the
+// whole-warp (segmask=0x1f) shuffle width is warpSize=64 instead of 32,
+// and the 'pred' out-param is always true (HIP __shfl* implicitly syncs
+// across the active wave -- no per-lane membermask membership info
+// exposed). Runtime parity vs CUDA PTX is tracked as a follow-up
+// (g32 thread, PR #217).
+#if _CCCL_HIP_COMPILATION()
+__global__ void test_shfl_sync_hip(void** __fn_ptr)
+{
+  // Pick uint32_t as the representative 4-byte type ('shfl.sync.b32'
+  // is the only width PTX supports).
+  using __u32 = cuda::std::uint32_t;
+  // shfl_sync_idx: with-pred and without-pred overloads
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, bool&, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_idx));
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_idx));
+  // shfl_sync_up
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, bool&, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_up));
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_up));
+  // shfl_sync_down
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, bool&, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_down));
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_down));
+  // shfl_sync_bfly
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, bool&, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_bfly));
+  *__fn_ptr++ = reinterpret_cast<void*>(
+    static_cast<__u32 (*)(__u32, __u32, __u32, __u32)>(cuda::ptx::shfl_sync_bfly));
+}
+#endif // _CCCL_HIP_COMPILATION()
 
 __host__ __device__ void test_shfl_full_mask()
 {
