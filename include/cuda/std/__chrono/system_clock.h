@@ -89,24 +89,15 @@ public:
           .count())));),
       (return time_point(duration_cast<duration>(nanoseconds(::cuda::ptx::get_sreg_globaltimer())));))
 #else // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv !_CCCL_CUDA_COMPILATION() vvv
-    // NOTE(HIP/AMD): cuda::ptx::get_sreg_globaltimer() is a CUDA PTX intrinsic
-    // with no direct HIP analogue. AMD GPUs do not expose a UNIX timestamp
-    // counter directly. Two HIP device-side paths exist, ported verbatim
-    // from upgrade/3.1_base:
-    //
-    //  - Default (-D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP NOT set):
-    //    Convert wall_clock64() (TSC cycles) using the arch-dependent
-    //    _LIBCUDACXX_HIP_TSC_CLOCKRATE supplied via
-    //    <amd/hip_tsc_clockrate.h>. The resulting time_point is NOT a
-    //    UNIX timestamp.
-    //
-    //  - Experimental opt-in (-D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP set):
-    //    Use the host-initialised offsets in
-    //    cuda::std::chrono::hip_gpu_ext (defined by the user via
-    //    LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS at file scope, populated by
-    //    initialize_amdgpu_sysclock_on_current_device() at runtime) so
-    //    the device-side time_point IS a UNIX timestamp.
-    //    See <amd/hip_chrono_extension.h> for the full opt-in protocol.
+    // NOTE(HIP/AMD): AMD GPUs don't expose a UNIX-timestamp counter,
+    // so emulate cuda::ptx::get_sreg_globaltimer() via two paths:
+    //  - default: wall_clock64() (TSC cycles) scaled by the arch-
+    //    dependent _LIBCUDACXX_HIP_TSC_CLOCKRATE from
+    //    <amd/hip_tsc_clockrate.h>. NOT a UNIX timestamp.
+    //  - opt-in (-D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP): use the
+    //    host-initialised offsets in cuda::std::chrono::hip_gpu_ext
+    //    so the device-side time_point IS a UNIX timestamp. See
+    //    <amd/hip_chrono_extension.h> for the protocol.
     NV_IF_ELSE_TARGET(
       NV_IS_HOST,
       (return time_point(duration_cast<duration>(nanoseconds(

@@ -26,30 +26,19 @@
 
 #pragma once
 
-// NOTE(HIP/AMD): HIP-only counterpart of upstream's
-//   <cuda/std/__atomic/functions/cuda_ptx_derived.h>
-// (which uses NVPTX inline asm; AMDGPU rejects the NVPTX-specific
-// inline-asm constraints, so we provide a parallel implementation
-// built on HIP's __hip_atomic_* / __atomic_* builtins instead).
-//
-// File shape mirrors upstream's <cuda_ptx_derived.h>: same template
-// parameter naming (_Tp/_Sco/_Up), same CCCL portable function-
-// attribute spellings (_CCCL_DEVICE / _CCCL_HOST_DEVICE), same
-// [[nodiscard]] / noexcept surface, same volatile + non-volatile
-// overload set for load_n / store_n, same __atomic_fetch_update_cuda
-// + __cccl_atomic_op_bind adapter pattern for the standard fetch_*
-// ops, same _CCCL_BEGIN_NAMESPACE_CUDA_STD placement. The only
-// remaining intentional divergences are:
-//
-//   * fetch_{min,max} keep their per-op CAS-loop body because of a
-//     load-bearing 'only-CAS-when-changing' optimization that the
-//     upstream pattern does not preserve. Inline NOTE at those two
-//     functions documents the rationale.
-//   * __atomic_compare_exchange_n_cuda is HIP-only (upstream's PTX
-//     path doesn't need this helper).
-//
-// Future upstream-PR cherry-picks that modernise cuda_ptx_derived.h
-// should now translate near-mechanically into this file.
+// NOTE(HIP/AMD): HIP-only counterpart of
+// <cuda/std/__atomic/functions/cuda_ptx_derived.h> (AMDGPU rejects the
+// NVPTX inline-asm constraints, so this file uses __hip_atomic_* /
+// __atomic_* builtins instead). Shape mirrors the upstream file 1:1
+// (template-param naming, attribute spellings, overload set,
+// __atomic_fetch_update_cuda + __cccl_atomic_op_bind pattern) so
+// future upstream cherry-picks translate near-mechanically.
+// Intentional divergences:
+//   * fetch_{min,max} keep their per-op CAS-loop body for an
+//     only-CAS-when-changing optimization upstream's pattern doesn't
+//     preserve (inline NOTE at those functions).
+//   * __atomic_compare_exchange_n_cuda is HIP-only (the PTX path
+//     doesn't need this helper).
 
 #include <hip/hip_runtime.h>
 // NOTE(HIP/AMD): pulled in for the std::{plus,minus,bit_and,bit_or,

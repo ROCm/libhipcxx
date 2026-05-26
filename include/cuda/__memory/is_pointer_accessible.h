@@ -193,27 +193,14 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
 #if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 
 // NOTE(HIP/AMD): HIP has only a single pointer-attribute query
-// (hipPointerGetAttributes) returning the full hipPointerAttribute_t
-// struct, in contrast to CUDA's per-attribute driver-API path. We
-// query it once per call (via cuda::__driver::__pointerGetAttributesNoThrow,
-// the HIP shim defined in <amd/driver_api.h>) and read the relevant
-// fields. The struct reports:
-//   * type             : hipMemoryType{Unregistered, Host, Device, Managed, Array}
-//   * device           : owning device for Device/Managed memory
-//   * isManaged        : 1 if hipMallocManaged / __managed__
-//   * hostPointer/devicePointer : valid host/device aliases for the
-//                        pointer (not used here)
-// HIP does not expose a memory-pool handle or per-pool access flags
-// via hipPointerAttribute_t, so the pool-aware paths from the CUDA
-// implementation are not replicated; the matching pool-related
-// branches in the lit test
-// (test/libcudacxx/cuda/memory/is_pointer_accessible.pass.cpp) are
-// gated on _CCCL_CTK_AT_LEAST(12, 2)/(13, 0) which both evaluate to
-// false on HIP, so this is an acceptable subset.
-//
-// All three queries below funnel through the same driver shim so the
-// runtime entry-point lives in exactly one place; the local helper
-// previously inlined here was promoted to the shim for that reason.
+// (hipPointerGetAttributes), which returns the full
+// hipPointerAttribute_t struct. We query it once per call via
+// cuda::__driver::__pointerGetAttributesNoThrow (the shim in
+// <amd/driver_api.h>) and read .type / .device / .isManaged. There is
+// no memory-pool handle on the HIP struct, so the pool-aware CUDA
+// paths are not replicated; the matching test branches in
+// cuda/memory/is_pointer_accessible.pass.cpp are gated on
+// _CCCL_CTK_AT_LEAST(12, 2)/(13, 0) which both evaluate false on HIP.
 
 /**
  * @brief Checks if a pointer is a managed pointer.
