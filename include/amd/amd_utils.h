@@ -49,10 +49,13 @@
 //
 // The host pass defaults to wave-32 (no __GFX*__ defined); the bodies
 // that consume this macro are __device__-only so this only affects
-// codegen in the device pass.
+// codegen in the device pass. clang predefines '__GFX10__' for every
+// gfx10xx variant (including the gfx101x range that doesn't get the
+// '__GFX10_1__' sub-generation define on older clang releases), so the
+// bare '__GFX10__' check covers the whole RDNA1/2 generation.
 #if defined(__GFX9__)
 #  define _CCCL_HIP_WAVE_SIZE 64
-#elif defined(__GFX10_1__) || defined(__GFX10_3__) || defined(__GFX11__) || defined(__GFX12__)
+#elif defined(__GFX10__) || defined(__GFX11__) || defined(__GFX12__)
 #  define _CCCL_HIP_WAVE_SIZE 32
 #else
 #  define _CCCL_HIP_WAVE_SIZE 32
