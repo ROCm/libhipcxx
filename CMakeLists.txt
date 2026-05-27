@@ -144,47 +144,51 @@ function(libhipcxx_path_is_link_like path out_var)
   endif()
 endfunction()
 
-if(WIN32 AND NOT DEFINED THEROCK_TOOLCHAIN_ROOT)
-  message(STATUS "Checking ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip for symlink")
-  # Delete hip symlink if not already a copy
-  libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip" _hip_path_is_link)
-  if(_hip_path_is_link)
-    file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
-    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
-  endif()
-  # Delete test symlink if not already a copy
-  libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/test" _test_path_is_link)
-  if(_test_path_is_link)
-    file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/test")
-    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/test")
-  endif()
-  # Delete test symlink if not already a copy
-  libhipcxx_path_is_link_like("${CMAKE_CURRENT_SOURCE_DIR}/utils" _utils_path_is_link)
-  if(_utils_path_is_link)
-    file(REMOVE_RECURSE "${CMAKE_CURRENT_SOURCE_DIR}/utils")
-    message(STATUS "Symlink removed: ${CMAKE_CURRENT_SOURCE_DIR}/utils")
-  endif()
-  # Create a copy of cuda as hip folder
-  message(STATUS "Copying cuda folder to hip to allow for hip/cuda aliasing.")
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip")
-  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/include/cuda/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/include/libhipcxx/hip/")
-  # Create a copy of .upstream_test/test as test folder
-  message(STATUS "Copying .upstream_tests/test folder to test.")
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/test")
-  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/test/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/test/")
-  # Create a copy of .upstream_test/utils as utils folder
-  message(STATUS "Copying .upstream_tests/utils folder to utils.")
-  file(MAKE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/utils")
-  file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/.upstream-tests/utils/" DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}/utils/")
-endif()
+# OFF (default): no source-tree modification. On Win32 without
+# LIBHIPCXX_COPY_TO_BUILD this requires working git symlinks in the
+# source checkout (developer mode / core.symlinks=true). ON: legacy
+# in-source fixup.
+option(LIBHIPCXX_WIN32_REMOVE_SRC_SYMLINKS
+  "On Win32, resolve symlinks in the source tree (modifies git-tracked files)." OFF)
 
-# As part of the TheRock testing process, we need the source directory within the build folder
-# since we need to configure, build and run the tests from within the tester using lit.
-# The reason for this is that lit cannot seperately generate binaries in the build step
-# and execute them in the tester but directly executes and deletes any test binaries during the build.
-if(DEFINED THEROCK_TOOLCHAIN_ROOT)
+# ON: copy the source tree into the build folder (TheRock tester needs
+# this to re-configure/build/run lit from the build artifact). On Win32
+# the copy is also the symlink-fixup target when REMOVE_SRC_SYMLINKS is OFF.
+option(LIBHIPCXX_COPY_TO_BUILD
+  "Copy source tree into build folder (set by TheRock; required for the tester pipeline)." OFF)
+
+if(LIBHIPCXX_COPY_TO_BUILD)
+  get_filename_component(_libhipcxx_src_name "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
+  set(_libhipcxx_build_src_copy "${CMAKE_CURRENT_BINARY_DIR}/${_libhipcxx_src_name}")
   file(COPY "${CMAKE_CURRENT_SOURCE_DIR}" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 endif()
+
+# Win32: assemble fixup targets (source, build copy, both, or none).
+set(_libhipcxx_win32_fixup_dirs)
+if(WIN32)
+  if(LIBHIPCXX_WIN32_REMOVE_SRC_SYMLINKS)
+    list(APPEND _libhipcxx_win32_fixup_dirs "${CMAKE_CURRENT_SOURCE_DIR}")
+  endif()
+  if(LIBHIPCXX_COPY_TO_BUILD)
+    list(APPEND _libhipcxx_win32_fixup_dirs "${_libhipcxx_build_src_copy}")
+  endif()
+endif()
+
+foreach(_dir IN LISTS _libhipcxx_win32_fixup_dirs)
+  message(STATUS "Resolving Win32 symlinks in: ${_dir}")
+  foreach(_p "include/libhipcxx/hip" "test" "utils")
+    libhipcxx_path_is_link_like("${_dir}/${_p}" _is_link)
+    if(_is_link)
+      file(REMOVE_RECURSE "${_dir}/${_p}")
+    endif()
+  endforeach()
+  file(MAKE_DIRECTORY "${_dir}/include/libhipcxx/hip")
+  file(COPY "${_dir}/include/cuda/"           DESTINATION "${_dir}/include/libhipcxx/hip/")
+  file(MAKE_DIRECTORY "${_dir}/test")
+  file(COPY "${_dir}/.upstream-tests/test/"   DESTINATION "${_dir}/test/")
+  file(MAKE_DIRECTORY "${_dir}/utils")
+  file(COPY "${_dir}/.upstream-tests/utils/"  DESTINATION "${_dir}/utils/")
+endforeach()
 
 option(LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS "Enable libhip++ tests." ON)
 if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
@@ -216,8 +220,15 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   find_program(LLVM_DEFAULT_EXTERNAL_LIT lit)
   set(LLVM_LIT_ARGS "-sv ${LIT_EXTRA_ARGS}")
 
-  set(libhipcxx_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-  add_subdirectory(test)
+  # On Win32 with the build copy available and no source modification, the
+  # build copy is where the symlinks were resolved.
+  if(WIN32 AND LIBHIPCXX_COPY_TO_BUILD AND NOT LIBHIPCXX_WIN32_REMOVE_SRC_SYMLINKS)
+    set(libhipcxx_SOURCE_DIR "${_libhipcxx_build_src_copy}")
+    add_subdirectory("${libhipcxx_SOURCE_DIR}/test" "${CMAKE_CURRENT_BINARY_DIR}/test")
+  else()
+    set(libhipcxx_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    add_subdirectory(test)
+  endif()
 
   include(AddLLVM)
   get_property(LLVM_LIT_TESTSUITES          GLOBAL PROPERTY LLVM_LIT_TESTSUITES)
