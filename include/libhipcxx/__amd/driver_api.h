@@ -212,12 +212,13 @@ __pointerGetAttributeNoThrow(__pointer_attribute_value_type_t<_Attr>& __result, 
   }
   else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_IS_MANAGED)
   {
-    // NOTE(HIP/AMD): tracked as AIRUNTIME-2114. The HIP runtime does not
-    // currently report `__managed__` global variables as managed. Use the
-    // "devicePointer == hostPointer" heuristic that works for explicitly
-    // `hipMallocManaged()`-allocated memory.
-    __result = (__ptr_attrib.devicePointer != nullptr)
-            && (__ptr_attrib.hostPointer == __ptr_attrib.devicePointer);
+    // Trust isManaged + type tag. `dev==host` would FP on hipHostMalloc/
+    // hipHostRegister(Mapped) (both report type=Host with aliased ptrs);
+    // __managed__ globals report type=Unregistered/null and need a
+    // runtime fix (AIRUNTIME-2114), not a heuristic.
+    __result = (__ptr_attrib.isManaged != 0) //
+            || (__ptr_attrib.type == ::hipMemoryTypeManaged) //
+            || (__ptr_attrib.type == ::hipMemoryTypeUnified);
   }
   else if constexpr (_Attr == ::HIP_POINTER_ATTRIBUTE_DEVICE_POINTER)
   {
@@ -276,9 +277,12 @@ template <::cuda::std::size_t _Np>
         *static_cast<void**>(__results[__i]) = __ptr_attrib.hostPointer;
         break;
       case ::HIP_POINTER_ATTRIBUTE_IS_MANAGED:
-        // Same heuristic as the singular helper (AIRUNTIME-2114).
-        *static_cast<int*>(__results[__i]) =
-          ((__ptr_attrib.devicePointer != nullptr) && (__ptr_attrib.hostPointer == __ptr_attrib.devicePointer)) ? 1 : 0;
+        // See singular helper above for rationale.
+        *static_cast<int*>(__results[__i]) = ((__ptr_attrib.isManaged != 0) //
+                                              || (__ptr_attrib.type == ::hipMemoryTypeManaged) //
+                                              || (__ptr_attrib.type == ::hipMemoryTypeUnified))
+                                             ? 1
+                                             : 0;
         break;
       case ::HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL:
         *static_cast<int*>(__results[__i]) = __ptr_attrib.device;
