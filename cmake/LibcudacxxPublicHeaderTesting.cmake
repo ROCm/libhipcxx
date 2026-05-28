@@ -44,6 +44,20 @@ if ("Clang" STREQUAL "${CMAKE_CUDA_COMPILER_ID}")
   list(FILTER public_headers EXCLUDE REGEX "annotated_ptr")
 endif()
 
+# NOTE(HIP/AMD): same block-list pattern as the internal/host-only
+# sweeps (PR #217 review). New upstream headers under SKIP_DIRS will
+# surface as build failures rather than being silently filtered out.
+if (LIBCUDACXX_ENABLE_HIP)
+  include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
+  libcudacxx_filter_backend_headers(public_headers
+    BACKEND HIP
+    SKIP_DIRS
+      cuda/ptx cuda/barrier cuda/latch cuda/semaphore
+      cuda/annotated_ptr cuda/pipeline cuda/memcpy_async
+      cuda/std/barrier cuda/std/latch cuda/std/semaphore
+  )
+endif()
+
 # We need to handle atomic headers differently as they do not compile on architectures below sm70
 set(architectures_at_least_sm70)
 foreach (item IN LISTS CMAKE_CUDA_ARCHITECTURES)
@@ -53,20 +67,6 @@ foreach (item IN LISTS CMAKE_CUDA_ARCHITECTURES)
 endforeach()
 
 function(libcudacxx_create_public_header_test header_name headertest_src)
-  # NOTE(HIP/AMD): Skip headers without HIP support as of 2026 when
-  # building under HIP.
-  if (LIBCUDACXX_ENABLE_HIP)
-    string(
-      REGEX MATCH
-      "ptx|barrier|latch|semaphore|annotated_ptr|pipeline|memcpy_async"
-      match
-      "${header_name}"
-    )
-    if (match)
-      return()
-    endif()
-  endif()
-
   # Create the default target for that file. The TU is always written to
   # disk as '.cu' (see configure_file in libcudacxx_add_public_header_test
   # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
