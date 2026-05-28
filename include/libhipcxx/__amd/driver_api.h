@@ -55,8 +55,7 @@
 #  include <cuda/std/__type_traits/always_false.h>
 #  include <cuda/std/__type_traits/is_same.h>
 
-#  include <cstddef> // for std::size_t in the deprecated-API replacement helpers
-#  include <cstdint> // for std::intptr_t in __dev_to_ctx / __ctx_to_dev
+#  include <cstddef> // for std::size_t in the mempool / managed-alloc helpers
 
 #  include <cuda/std/__cccl/prologue.h>
 
@@ -105,136 +104,16 @@ _CCCL_HOST_API inline void __deviceGetName(char* __name_out, int __len, int __or
   return __result != 0;
 }
 
-// Primary-context / context management
-//
-// NOTE(HIP/AMD): All of the HIP driver-API context functions are deprecated
-// (see https://rocm.docs.amd.com/projects/HIP/en/latest/reference/deprecated_api_list.html
-// -- the deprecation list includes hipCtxPush/PopCurrent, hipCtxGetCurrent,
-// hipCtxGetDevice, and the entire hipDevicePrimaryCtx* family). The HIP
-// runtime model has moved to "current device per thread" (settable via
-// hipSetDevice/hipGetDevice) and away from the explicit context-stack model
-// CUDA's driver API uses. Calling any of those deprecated entry points
-// generates -Wdeprecated-declarations warnings out of every consumer
-// translation unit that pulls this shim in.
-//
-// To keep the upstream-compatible API surface (cuda::__driver::__primaryCtx*,
-// __ctxPush/Pop, __ctxGetCurrent, __ctxGetDevice -- consumed by
-// __ensure_current_context, __physical_device::__primary_context, and
-// stream_ref) we re-implement each shim on top of the supported
-// hipSetDevice/hipGetDevice pair:
-//
-//   * 'hipCtx_t' is opaque on HIP; we use it as a tagged carrier of the
-//     device id ('reinterpret_cast<hipCtx_t>(intptr_t(dev) + 1)' so the
-//     value is never nullptr -- consumers compare ctxs against nullptr to
-//     mean 'no context pushed').
-//   * The push/pop stack is faked with a thread-local fixed-size array of
-//     hipDevice_t. CUDA's cuCtxPushCurrent semantics are: save the current
-//     context on a per-thread stack, set the new one as current. We
-//     replicate this with the device id instead of an opaque ctx pointer.
-//     A depth of 32 covers any reasonable nesting (the only consumer is
-//     __ensure_current_context, which is always RAII-scoped).
-//   * __primaryCtxRetain / __primaryCtxReleaseNoThrow / __isPrimaryCtxActive
-//     all collapse to 'just operate on the device id'. There is no real
-//     primary context to retain/release on HIP -- the runtime owns the
-//     per-device state implicitly.
-//
-// Consumers see no API change.
-
-namespace __cccl_hip_ctx_detail
-{
-inline constexpr ::std::size_t __stack_max = 32;
-
-struct __ctx_stack
-{
-  ::hipDevice_t __slots[__stack_max]{};
-  ::std::size_t __depth = 0;
-};
-
-[[nodiscard]] inline __ctx_stack& __thread_local_stack() noexcept
-{
-  static thread_local __ctx_stack __s{};
-  return __s;
-}
-
-[[nodiscard]] inline ::hipCtx_t __dev_to_ctx(::hipDevice_t __dev) noexcept
-{
-  // +1 keeps the encoded value non-null even for device 0 (some consumers
-  // -- testing.cuh in particular -- treat a nullptr ctx as 'no context').
-  return reinterpret_cast<::hipCtx_t>(static_cast<::std::intptr_t>(__dev) + 1);
-}
-
-[[nodiscard]] inline ::hipDevice_t __ctx_to_dev(::hipCtx_t __ctx) noexcept
-{
-  return static_cast<::hipDevice_t>(reinterpret_cast<::std::intptr_t>(__ctx) - 1);
-}
-} // namespace __cccl_hip_ctx_detail
-
-[[nodiscard]] _CCCL_HOST_API inline ::hipCtx_t __primaryCtxRetain(::hipDevice_t __dev)
-{
-  // No-op on the deprecated-replacement path: there is no per-device
-  // 'primary context' object to retain in the HIP runtime model. Encode the
-  // device id into the returned ctx so subsequent ctxPush/etc. recover it.
-  return __cccl_hip_ctx_detail::__dev_to_ctx(__dev);
-}
-
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __primaryCtxReleaseNoThrow(::hipDevice_t /*__dev*/)
-{
-  // Mirror of __primaryCtxRetain -- no resource was acquired, nothing to
-  // release. Always succeeds.
-  return ::hipSuccess;
-}
-
-// 'Is the primary context for __dev currently active' is reinterpreted as
-// 'is __dev the calling thread's current device'. This is the closest
-// supported notion in the new HIP runtime model.
-[[nodiscard]] _CCCL_HOST_API inline bool __isPrimaryCtxActive(::hipDevice_t __dev)
-{
-  int __current{};
-  _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query the current device", &__current);
-  return __current == __dev;
-}
-
-// __ctxPush(target_ctx): save the calling thread's current device on our
-// thread-local stack, then make the target's device current. Mirrors
-// cuCtxPushCurrent semantics (per-thread stack, restorable in LIFO order
-// via __ctxPop).
-_CCCL_HOST_API inline void __ctxPush(::hipCtx_t __ctx)
-{
-  auto& __stack = __cccl_hip_ctx_detail::__thread_local_stack();
-  _CCCL_ASSERT(__stack.__depth < __cccl_hip_ctx_detail::__stack_max,
-               "HIP ctx push depth exceeded -- increase __cccl_hip_ctx_detail::__stack_max");
-  int __saved{};
-  _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query current device on ctxPush", &__saved);
-  __stack.__slots[__stack.__depth++] = static_cast<::hipDevice_t>(__saved);
-  _CCCL_TRY_CUDA_API(::hipSetDevice, "Failed to set current device on ctxPush", __cccl_hip_ctx_detail::__ctx_to_dev(__ctx));
-}
-
-// __ctxPop(): pop the previously-current device from our thread-local
-// stack and restore it. Returns the ctx that was current at the moment of
-// the pop (consumers may inspect it; testing.cuh compares it to nullptr).
-_CCCL_HOST_API inline ::hipCtx_t __ctxPop()
-{
-  auto& __stack = __cccl_hip_ctx_detail::__thread_local_stack();
-  _CCCL_ASSERT(__stack.__depth > 0, "HIP ctx pop on empty stack");
-  int __was_current{};
-  _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query current device on ctxPop", &__was_current);
-  ::hipDevice_t __restore = __stack.__slots[--__stack.__depth];
-  _CCCL_TRY_CUDA_API(::hipSetDevice, "Failed to restore device on ctxPop", __restore);
-  return __cccl_hip_ctx_detail::__dev_to_ctx(static_cast<::hipDevice_t>(__was_current));
-}
-
-// __ctxGetCurrent: return a non-null encoded ctx for the current device,
-// or nullptr if there isn't one (no device set yet on this thread).
-// testing.cuh compares the result to nullptr.
-[[nodiscard]] _CCCL_HOST_API inline ::hipCtx_t __ctxGetCurrent()
-{
-  int __current{};
-  if (::hipGetDevice(&__current) != ::hipSuccess)
-  {
-    return ::hipCtx_t{};
-  }
-  return __cccl_hip_ctx_detail::__dev_to_ctx(static_cast<::hipDevice_t>(__current));
-}
+// NOTE(HIP/AMD): the CUDA driver-API context-stack model (cuCtxPush/Pop,
+// cuCtxGetCurrent, cuDevicePrimaryCtx*) has no faithful HIP equivalent --
+// the HIP runtime model is "current device per thread" via
+// hipSetDevice/hipGetDevice with no explicit ctx stack and no refcounted
+// primary-context objects. The corresponding cuda::__driver::__primaryCtx*
+// / __ctxPush/Pop / __ctxGetCurrent / __ctxGetDevice / __isPrimaryCtxActive
+// shims are therefore deliberately NOT provided. Consumers that previously
+// went through those shims (__ensure_current_context, __physical_device,
+// stream_ref) take a HIP-specific code path that calls hipSetDevice /
+// hipGetDevice directly.
 
 // NOTE(HIP/AMD): mirrors upstream cuda::__driver::__getVersion(). HIP
 // returns the driver version as the runtime version on
@@ -244,13 +123,6 @@ _CCCL_HOST_API inline ::hipCtx_t __ctxPop()
   int __result{};
   _CCCL_TRY_CUDA_API(::hipDriverGetVersion, "Failed to get driver version", &__result);
   return __result;
-}
-
-[[nodiscard]] _CCCL_HOST_API inline ::hipDevice_t __ctxGetDevice()
-{
-  int __result{};
-  _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query current device", &__result);
-  return static_cast<::hipDevice_t>(__result);
 }
 
 // Pointer attributes

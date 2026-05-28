@@ -59,22 +59,18 @@ C2H_CCCLRT_TEST("init", "[device]")
   cuda::device_ref dev{0};
   dev.init();
 #if defined(__HIP_PLATFORM_AMD__)
-  // NOTE(HIP/AMD): on CUDA, 'cuda::device_ref::init()' (via
-  // '__primaryCtxRetain') is sufficient to make
-  // 'cuDevicePrimaryCtxGetState' report 'active=1'. On HIP the
-  // 'active' flag is only set after the GPU runtime has actually
-  // *used* the primary context (e.g. an allocation). A bare
-  // 'hipDevicePrimaryCtxRetain' is purely refcounting; so are
-  // 'hipSetDevice' and 'hipDeviceSynchronize'. The smallest no-op
-  // that triggers activation on ROCm 7.2 is a tiny hipMalloc
-  // round-trip. Force one here so the assertion below holds.
-  void* __dummy = nullptr;
-  if (cudaMalloc(&__dummy, 1) == cudaSuccess)
-  {
-    (void) cudaFree(__dummy);
-  }
-#endif // __HIP_PLATFORM_AMD__
+  // NOTE(HIP/AMD): HIP has no faithful equivalent of
+  // 'cuDevicePrimaryCtxGetState'. The shim's previous fake-ctx
+  // helper ('cuda::__driver::__isPrimaryCtxActive') was removed; on
+  // HIP, 'cuda::device_ref::init()' is a no-op (no primary-ctx
+  // retain) and the closest observable on-device-runtime-touched
+  // signal is "the current device equals 0", which holds by default.
+  int __current{};
+  CUDART(cudaGetDevice(&__current));
+  CCCLRT_REQUIRE(__current == 0);
+#else
   CCCLRT_REQUIRE(cuda::__driver::__isPrimaryCtxActive(cuda::__driver::__deviceGet(0)));
+#endif // __HIP_PLATFORM_AMD__
 }
 
 C2H_CCCLRT_TEST("Smoke", "[device]")
