@@ -149,7 +149,7 @@ endfunction()
 # source checkout (developer mode / core.symlinks=true). ON: legacy
 # in-source fixup.
 option(LIBHIPCXX_WIN32_REMOVE_SRC_SYMLINKS
-  "On Win32, resolve symlinks in the source tree (modifies git-tracked files)." OFF)
+  "On Win32, remove symlinks in the source tree and add copy of the target folder instead (modifies git-tracked files)." OFF)
 
 # ON: copy the source tree into the build folder (TheRock tester needs
 # this to re-configure/build/run lit from the build artifact). On Win32
@@ -220,8 +220,8 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   find_program(LLVM_DEFAULT_EXTERNAL_LIT lit)
   set(LLVM_LIT_ARGS "-sv ${LIT_EXTRA_ARGS}")
 
-  # On Win32 with the build copy available and no source modification, the
-  # build copy is where the symlinks were resolved.
+  # On Win32 with the build copy available and no source modification use the build folder
+  # (the build copy has no symlinks but a copy of the target folders).
   if(WIN32 AND LIBHIPCXX_COPY_TO_BUILD AND NOT LIBHIPCXX_WIN32_REMOVE_SRC_SYMLINKS)
     set(libhipcxx_SOURCE_DIR "${_libhipcxx_build_src_copy}")
     add_subdirectory("${libhipcxx_SOURCE_DIR}/test" "${CMAKE_CURRENT_BINARY_DIR}/test")
