@@ -43,9 +43,10 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): __ensure_current_context routes through cuda::__driver
-// helpers (__primaryCtxRetain, __ctxPush/Pop, __ctxGetDevice,
-// __streamGetDevice) which are provided for HIP by include/libhipcxx/__amd/driver_api.h.
+// NOTE(HIP/AMD): on HIP the RAII helper saves the calling thread's
+// hipGetDevice() result and restores it on dtor; the CUDA driver-API ctx
+// stack has no faithful HIP equivalent so the (CUcontext) overload is
+// NV-only. See <libhipcxx/__amd/driver_api.h> for the rationale.
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__device/device_ref.h>
@@ -73,12 +74,18 @@ struct [[maybe_unused]] __ensure_current_context
   //! @throws cuda_error if the context switch fails
   _CCCL_HOST_API explicit __ensure_current_context(device_ref __new_device)
   {
+#  if _CCCL_HIP_COMPILATION()
+    _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query current device", &__saved_device_);
+    _CCCL_TRY_CUDA_API(::hipSetDevice, "Failed to set current device", __new_device.get());
+#  else
     auto __ctx = ::cuda::__physical_devices()[__new_device.get()].__primary_context();
     ::cuda::__driver::__ctxPush(__ctx);
+#  endif
   }
 
+#  if !_CCCL_HIP_COMPILATION()
   //! @brief Construct a new `__ensure_current_context` object and switch to the specified
-  //!        context.
+  //!        context. NV-only -- HIP has no driver-API ctx stack.
   //!
   //! @param ctx The context to switch to
   //!
@@ -87,6 +94,7 @@ struct [[maybe_unused]] __ensure_current_context
   {
     ::cuda::__driver::__ctxPush(__ctx);
   }
+#  endif
 
   //! @brief Construct a new `__ensure_current_context` object and switch to the context
   //!        under which the specified stream was created.
@@ -108,9 +116,18 @@ struct [[maybe_unused]] __ensure_current_context
   //!         during stack unwinding, the program is automatically terminated.
   _CCCL_HOST_API ~__ensure_current_context() noexcept(false)
   {
+#  if _CCCL_HIP_COMPILATION()
+    _CCCL_TRY_CUDA_API(::hipSetDevice, "Failed to restore current device", __saved_device_);
+#  else
     // TODO would it make sense to assert here that we pushed and popped the same thing?
     ::cuda::__driver::__ctxPop();
+#  endif
   }
+
+#  if _CCCL_HIP_COMPILATION()
+private:
+  int __saved_device_{};
+#  endif
 };
 
 _CCCL_END_NAMESPACE_CUDA
