@@ -238,6 +238,64 @@ __pointerGetAttributeNoThrow(__pointer_attribute_value_type_t<_Attr>& __result, 
   return ::hipSuccess;
 }
 
+// Variadic per-attribute query: mirrors `cuPointerGetAttributes(n, attrs[],
+// results[], ptr)`. HIP has no n-ary entry point, so we do one
+// `hipPointerGetAttributes` and project each requested attribute into
+// `__results[i]` (widths per `__pointer_attribute_value_type_t_impl`).
+// Currently unused on HIP (consumer sites in is_pointer_accessible.h are
+// NV-gated; HIP path uses the full-struct overload); kept for surface
+// completeness so future HIP code can call the variadic form.
+template <::cuda::std::size_t _Np>
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __pointerGetAttributesNoThrow(
+  ::hipPointer_attribute (&__attrs)[_Np], void* (&__results)[_Np], const void* __ptr) noexcept
+{
+  ::hipPointerAttribute_t __ptr_attrib{};
+  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__ptr_attrib, __ptr);
+  if (__status != ::cudaSuccess)
+  {
+    return __status;
+  }
+  for (::cuda::std::size_t __i = 0; __i < _Np; ++__i)
+  {
+    if (__results[__i] == nullptr)
+    {
+      continue;
+    }
+    switch (__attrs[__i])
+    {
+      case ::HIP_POINTER_ATTRIBUTE_MEMORY_TYPE:
+        // Match the singular helper's `Unregistered -> Host` collapse so
+        // callers see CUDA-equivalent semantics.
+        *static_cast<::hipMemoryType*>(__results[__i]) =
+          (__ptr_attrib.type == ::hipMemoryTypeUnregistered) ? ::hipMemoryTypeHost : __ptr_attrib.type;
+        break;
+      case ::HIP_POINTER_ATTRIBUTE_DEVICE_POINTER:
+        *static_cast<void**>(__results[__i]) = __ptr_attrib.devicePointer;
+        break;
+      case ::HIP_POINTER_ATTRIBUTE_HOST_POINTER:
+        *static_cast<void**>(__results[__i]) = __ptr_attrib.hostPointer;
+        break;
+      case ::HIP_POINTER_ATTRIBUTE_IS_MANAGED:
+        // Same heuristic as the singular helper (AIRUNTIME-2114).
+        *static_cast<int*>(__results[__i]) =
+          ((__ptr_attrib.devicePointer != nullptr) && (__ptr_attrib.hostPointer == __ptr_attrib.devicePointer)) ? 1 : 0;
+        break;
+      case ::HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL:
+        *static_cast<int*>(__results[__i]) = __ptr_attrib.device;
+        break;
+      case ::HIP_POINTER_ATTRIBUTE_CONTEXT:
+        // HIP has no driver-API ctx stack; report null.
+        *static_cast<::hipCtx_t*>(__results[__i]) = nullptr;
+        break;
+      default:
+        // Unmapped attr (e.g. MEMPOOL_HANDLE -- no HIP equivalent);
+        // leave caller storage untouched (treated as "unknown" upstream).
+        break;
+    }
+  }
+  return ::cudaSuccess;
+}
+
 // Stream management
 
 [[nodiscard]] _CCCL_HOST_API inline ::hipStream_t __streamCreateWithPriority(unsigned __flags, int __priority)
