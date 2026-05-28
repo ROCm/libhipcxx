@@ -220,7 +220,7 @@ _CCCL_HOST_API inline bool is_managed(const void* __p)
   switch (__status)
   {
     case ::cudaSuccess:
-      return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged;
+      return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified;
     case ::cudaErrorInvalidValue:
       // Unregistered host memory is reported as hipErrorInvalidValue
       // by older ROCm releases (newer releases return hipSuccess with
@@ -254,7 +254,7 @@ _CCCL_HOST_API inline bool is_host_accessible(const void* __p)
       // all host-accessible.
       return __attr.type == ::hipMemoryTypeUnregistered //
           || __attr.type == ::hipMemoryTypeHost //
-          || __attr.type == ::hipMemoryTypeManaged //
+          || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified //
           || __attr.isManaged != 0;
     case ::cudaErrorInvalidValue:
       // Older-ROCm legacy: unregistered host memory reports invalid
@@ -291,7 +291,7 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
     ::cuda::__throw_cuda_error(__status, "is_device_accessible() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
   }
   // Managed memory is accessible from every device.
-  if (__attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged)
+  if (__attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified)
   {
     return true;
   }
