@@ -54,7 +54,7 @@
 // runtime regardless of whether rocThrust is wired up, so
 // `_C2H_HAS_DEVICE_RUNTIME` is unconditionally true on HIP. The runner
 // helper itself routes through cuda* runtime API symbols that are
-// shimmed to hip* by <amd/cuda_runtime.h>; it does not consume thrust.
+// shimmed to hip* by <libhipcxx/__amd/cuda_runtime.h>; it does not consume thrust.
 #ifdef __HIP_PLATFORM_AMD__
 #  define _C2H_HAS_DEVICE_RUNTIME 1
 #elif THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA

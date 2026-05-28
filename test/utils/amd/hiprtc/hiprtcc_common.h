@@ -158,7 +158,7 @@ typedef struct {
 // NOTE(HIP/AMD): HIPRTC does not include hip/hip_runtime.h, so types and
 // constants from the HIP runtime API are not available. Provide minimal stub
 // definitions needed by libhipcxx headers (referenced via cuda_*->hip_* macro
-// mappings in include/amd/cuda_runtime.h).
+// mappings in include/libhipcxx/__amd/cuda_runtime.h).
 //
 // hipSuccess MUST be a plain enumerator (NOT a '#define' to a parenthesized
 // cast like '((hipError_t)0)'). The cast spelling causes a hard parse error

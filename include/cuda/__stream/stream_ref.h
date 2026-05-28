@@ -317,7 +317,7 @@ public:
   {
     ::CUdevice __device{};
     // NOTE(HIP/AMD): hipStreamGetCtx is not in the HIP runtime API and
-    // <amd/driver_api.h> intentionally does not provide __streamGetCtx.
+    // <libhipcxx/__amd/driver_api.h> intentionally does not provide __streamGetCtx.
     // Take the CTK 13+ codepath (uses __streamGetDevice directly) under
     // HIP as well.
 #  if _CCCL_CTK_AT_LEAST(13, 0) || _CCCL_HIP_COMPILATION()

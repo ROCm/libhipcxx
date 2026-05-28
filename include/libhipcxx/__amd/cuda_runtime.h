@@ -28,7 +28,7 @@
 // (hipPointerAttribute_t, hipMemoryType, hipError_t, etc.) are provided by the
 // test infrastructure header (test/utils/amd/hiprtc/hiprtcc_common.h) which
 // prepends them to every compiled source.
-#include <amd/amd_utils.h>
+#include <libhipcxx/__amd/amd_utils.h>
 
 #define CUDART_VERSION 0
 
@@ -759,7 +759,7 @@
 // stream_ref.h, ensure_current_context.h, host_device_accessor.h,
 // attributes.h, is_pointer_accessible.h, ...). The corresponding cuXxx
 // function aliases are NOT provided here -- the libhipcxx driver-API
-// wrappers in <amd/driver_api.h> call the HIP runtime / driver API
+// wrappers in <libhipcxx/__amd/driver_api.h> call the HIP runtime / driver API
 // functions directly using their native hipXxx names. Ported from
 // upgrade/3.1.4.
 #ifndef CUcontext
@@ -1016,7 +1016,7 @@
 // expanding to '__hip_fp8_*' below) reach a use site like
 // 'is_same_v<_RawTp, __nv_fp8_e4m3>' in <cuda/std/__type_traits/num_bits.h>.
 // Without this, TUs whose first include is '<cuda/__cccl_config>' (which
-// pulls extended_data_types.h before <amd/cuda_runtime.h>) end up with
+// pulls extended_data_types.h before <libhipcxx/__amd/cuda_runtime.h>) end up with
 // '::__nv_fp8_e4m3' forward-declared instead of '::__hip_fp8_e4m3', and
 // later macro expansion finds an undeclared name. fp4 / fp6 are
 // intentionally NOT pulled in here -- their <hip/hip_fp{4,6}.h> headers
@@ -1024,7 +1024,7 @@
 // /home/moberste/Coding/Reproducer/claude/hip_fp4_fp6_internal_helpers_redefinition.cpp.
 #include <hip/hip_fp8.h>
 // NOTE(HIP/AMD): mark 'inline' to avoid ODR violations when multiple
-// TUs that include <amd/cuda_runtime.h> are linked together (the
+// TUs that include <libhipcxx/__amd/cuda_runtime.h> are linked together (the
 // c2h-on-HIP test executables hit this -- catch2_runner.cpp.o,
 // catch2_runner_helper.cu.o and the per-test .cu.o all otherwise
 // emit their own copy of this function).

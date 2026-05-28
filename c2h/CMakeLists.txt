@@ -180,11 +180,11 @@ endif()
 # The Catch2 runner. Under HIP we tag the .cu file with LANGUAGE HIP so
 # it compiles through hipcc / clang -x hip. catch2_runner_helper.{inl,cu}
 # only uses cuda* runtime API symbols that are shimmed by
-# <amd/cuda_runtime.h>, so no source changes needed.
+# <libhipcxx/__amd/cuda_runtime.h>, so no source changes needed.
 add_library(cccl.c2h.main OBJECT catch2_runner.cpp catch2_runner_helper.cu)
 if (LIBCUDACXX_ENABLE_HIP)
   # NOTE(HIP/AMD): catch2_runner.cpp transitively includes
-  # <amd/cuda_runtime.h> which pulls <hip/hip_runtime.h>. The latter
+  # <libhipcxx/__amd/cuda_runtime.h> which pulls <hip/hip_runtime.h>. The latter
   # uses _Float16 / __bf16 which are HIP-clang specific extensions, so
   # we have to compile the runner through clang -x hip even though
   # the file extension is .cpp.

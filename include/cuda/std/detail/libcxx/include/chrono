@@ -880,7 +880,7 @@ constexpr chrono::year                                  operator ""y(unsigned lo
 
 // NOTE(HIP/AMD): the legacy "support/hip/chrono_hip_extension.h" include
 // has been replaced. The C++20 UNIX-timestamp workaround for system_clock
-// on AMD GPUs now lives at <amd/hip_chrono_extension.h> and is pulled in
+// on AMD GPUs now lives at <libhipcxx/__amd/hip_chrono_extension.h> and is pulled in
 // by <cuda/std/__chrono/system_clock.h> directly under
 // _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP. No action needed here.
 

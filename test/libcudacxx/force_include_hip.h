@@ -26,7 +26,7 @@
 #ifndef LIBCUDACXX_FORCE_INCLUDE_HIP
 #define LIBCUDACXX_FORCE_INCLUDE_HIP
 
-#include <amd/cuda_runtime.h>
+#include <libhipcxx/__amd/cuda_runtime.h>
 // TODO(HIP/AMD): this is a temporary WAR to create leass file modifications.
 // This should be only in the test_macros.h. Unfortunately many tests do not
 // include this header.

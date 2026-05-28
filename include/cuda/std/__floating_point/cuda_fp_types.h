@@ -73,7 +73,7 @@ _CCCL_DIAG_POP
 #if _CCCL_HAS_NVFP8()
 _CCCL_DIAG_PUSH
 // NOTE(HIP/AMD): see __nv_fp16 above; same rationale for __nv_fp8_e4m3,
-// __nv_fp8_e5m2 etc. (aliased to __hip_fp8_* via include/amd/cuda_runtime.h).
+// __nv_fp8_e5m2 etc. (aliased to __hip_fp8_* via include/libhipcxx/__amd/cuda_runtime.h).
 #  if _CCCL_HIP_COMPILATION()
 #    include <hip/hip_fp8.h>
 #  else
@@ -85,7 +85,7 @@ _CCCL_DIAG_POP
 #if _CCCL_HAS_NVFP6()
 _CCCL_DIAG_PUSH
 // NOTE(HIP/AMD): see __nv_fp16 above; same rationale for __nv_fp6_e2m3 /
-// __nv_fp6_e3m2 (aliased to __hip_fp6_* via include/amd/cuda_runtime.h).
+// __nv_fp6_e3m2 (aliased to __hip_fp6_* via include/libhipcxx/__amd/cuda_runtime.h).
 #  if _CCCL_HIP_COMPILATION()
 #    include <hip/hip_fp6.h>
 #  else
@@ -99,7 +99,7 @@ _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_GCC("-Wunused-parameter")
 _CCCL_DIAG_SUPPRESS_MSVC(4100) // unreferenced formal parameter
 // NOTE(HIP/AMD): see __nv_fp16 above; same rationale for __nv_fp4_e2m1
-// (aliased to __hip_fp4_e2m1 via include/amd/cuda_runtime.h).
+// (aliased to __hip_fp4_e2m1 via include/libhipcxx/__amd/cuda_runtime.h).
 #  if _CCCL_HIP_COMPILATION()
 #    include <hip/hip_fp4.h>
 #  else
