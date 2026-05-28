@@ -43,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): mirror the CTK enablement on HIP. The amd/cuda_runtime.h
+// NOTE(HIP/AMD): mirror the CTK enablement on HIP. The libhipcxx/__amd/cuda_runtime.h
 // shim aliases ::cudaMemLocation -> ::hipMemLocation and the
 // ::cudaMemLocationType{Host,Device} enumerators, so the body below
 // compiles unchanged on HIP.

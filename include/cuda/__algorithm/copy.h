@@ -45,7 +45,7 @@
 
 // NOTE(HIP/AMD): mirror the CTK enablement on HIP. The body uses
 // only ::cuda::__driver::__memcpyAsync (already shimmed in
-// <amd/driver_api.h>), ::cuda::stream_ref / device_transform (HIP-
+// <libhipcxx/__amd/driver_api.h>), ::cuda::stream_ref / device_transform (HIP-
 // enabled) and the standard <cuda/std/...> headers -- no
 // CUDA-only types or PTX in the pre-CTK-13 path that HIP takes
 // (see _CCCL_CTK_AT_LEAST(13, 0) branch below).

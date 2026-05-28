@@ -45,7 +45,7 @@
 
 // NOTE(HIP/AMD): invalid_stream_t / invalid_stream / __invalid_stream()
 // only need a valid cudaStream_t typedef. The amd shim aliases
-// ::cudaStream_t to ::hipStream_t via include/amd/cuda_runtime.h so the
+// ::cudaStream_t to ::hipStream_t via include/libhipcxx/__amd/cuda_runtime.h so the
 // definitions below work unchanged under HIP.
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 

@@ -27,7 +27,7 @@
 LIBCUDACXX_HIP_DEFINE_SYSCLOCK_VARS
 
 /*
-* This example tests the workaround described in include/amd/hip_chrono_extension.h,
+* This example tests the workaround described in include/libhipcxx/__amd/hip_chrono_extension.h,
 * which enables UNIX timestamps for HIP on AMD devices (for chrono::system_clock::now()).
 * It needs to be compiled with -std=c++20 support and the compile time flag -D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP.
 */

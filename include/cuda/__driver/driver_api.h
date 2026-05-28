@@ -44,13 +44,13 @@
 #endif // no system header
 
 // NOTE(HIP/AMD): On HIP, route consumers of cuda::__driver::* to the
-// libhipcxx HIP-side shim in <amd/driver_api.h>, which re-implements the
+// libhipcxx HIP-side shim in <libhipcxx/__amd/driver_api.h>, which re-implements the
 // subset of wrappers that upstream libcudacxx code uses (deviceGet,
 // deviceCanAccessPeer, ctxPush/Pop, streamCreateWithPriority, etc.) on
 // top of the HIP runtime/driver API. The CUDA-only body below is then
 // skipped on HIP.
 #if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
-#  include <amd/driver_api.h>
+#  include <libhipcxx/__amd/driver_api.h>
 #endif // _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 
 #if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)

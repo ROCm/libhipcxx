@@ -60,7 +60,7 @@
 // protocol.
 #if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 #  if _CCCL_STD_VER > 2017 && defined(_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP)
-#    include <amd/hip_chrono_extension.h>
+#    include <libhipcxx/__amd/hip_chrono_extension.h>
 #  endif // _CCCL_STD_VER > 2017 && _LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP
 #endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
 
@@ -93,11 +93,11 @@ public:
     // so emulate cuda::ptx::get_sreg_globaltimer() via two paths:
     //  - default: wall_clock64() (TSC cycles) scaled by the arch-
     //    dependent _LIBCUDACXX_HIP_TSC_CLOCKRATE from
-    //    <amd/hip_tsc_clockrate.h>. NOT a UNIX timestamp.
+    //    <libhipcxx/__amd/hip_tsc_clockrate.h>. NOT a UNIX timestamp.
     //  - opt-in (-D_LIBCUDACXX_EXPERIMENTAL_CHRONO_HIP): use the
     //    host-initialised offsets in cuda::std::chrono::hip_gpu_ext
     //    so the device-side time_point IS a UNIX timestamp. See
-    //    <amd/hip_chrono_extension.h> for the protocol.
+    //    <libhipcxx/__amd/hip_chrono_extension.h> for the protocol.
     NV_IF_ELSE_TARGET(
       NV_IS_HOST,
       (return time_point(duration_cast<duration>(nanoseconds(

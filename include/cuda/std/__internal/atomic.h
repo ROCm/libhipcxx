@@ -88,12 +88,12 @@
 // cuda::atomic<T> path for real.
 //
 // Conservative default: if ROCM_VERSION_* macros are not available
-// the WAR stays active. <amd/amd_utils.h> is pulled in only on the
+// the WAR stays active. <libhipcxx/__amd/amd_utils.h> is pulled in only on the
 // HIPRTC branch and is itself HIPRTC-safe (it drops the
 // <hip/hip_runtime.h> include there and only brings in the
 // lightweight <rocm-core/rocm_version.h>).
 #if defined(_CCCL_COMPILER_HIPRTC) && !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE)
-#  include <amd/amd_utils.h>
+#  include <libhipcxx/__amd/amd_utils.h>
 #  if !(LIBHIPCXX_ROCM_VERSION_EQ(7, 2, 3) || LIBHIPCXX_ROCM_VERSION_GE(7, 13, 0))
 #    define _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE
 #  endif

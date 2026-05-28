@@ -341,14 +341,14 @@ class __device_accessor : public _Accessor
     //     space and are indistinguishable from regular `__device__`
     //     globals -- the `is_address_from(..., global)` probe above
     //     therefore already covers every `__constant__` pointer
-    //     (see the long comment in `<amd/amd_utils.h>::__isConstant`
+    //     (see the long comment in `<libhipcxx/__amd/amd_utils.h>::__isConstant`
     //     for the exact AMDGCN rationale: there is no
     //     `__builtin_amdgcn_is_constant` builtin to disambiguate
     //     them, by design);
     //   * `grid_constant` and `cluster_shared` are CUDA-only address
     //     spaces that do not exist on AMDGCN at all; the matching
     //     `__isGridConstant` / `__isClusterShared` stubs in
-    //     `<amd/amd_utils.h>` always return `false`, so dropping the
+    //     `<libhipcxx/__amd/amd_utils.h>` always return `false`, so dropping the
     //     probes loses no positives.
     // Net effect: the set of pointers for which this function returns
     // `true` on HIP is a *strict superset* of the set CUDA classifies

@@ -45,7 +45,7 @@
 #include <string>
 
 #if _CCCL_HIP_COMPILATION()
-#  include <amd/cuda_runtime.h>
+#  include <libhipcxx/__amd/cuda_runtime.h>
 #else
 #  include <cuda_runtime_api.h>
 #endif

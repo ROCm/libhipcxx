@@ -45,7 +45,7 @@
 
 // NOTE(HIP/AMD): mirror the CTK enablement on HIP. The body uses
 // only ::cuda::__driver::__memsetAsync (already shimmed in
-// <amd/driver_api.h>), ::cuda::stream_ref / device_transform (HIP-
+// <libhipcxx/__amd/driver_api.h>), ::cuda::stream_ref / device_transform (HIP-
 // enabled) and the standard <cuda/std/...> headers -- no
 // CUDA-only types or PTX. Compiles unchanged on HIP.
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)

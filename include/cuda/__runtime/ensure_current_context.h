@@ -45,7 +45,7 @@
 
 // NOTE(HIP/AMD): __ensure_current_context routes through cuda::__driver
 // helpers (__primaryCtxRetain, __ctxPush/Pop, __ctxGetDevice,
-// __streamGetDevice) which are provided for HIP by include/amd/driver_api.h.
+// __streamGetDevice) which are provided for HIP by include/libhipcxx/__amd/driver_api.h.
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__device/device_ref.h>
