@@ -44,8 +44,8 @@
 #endif // no system header
 
 // NOTE(HIP/AMD): event_ref wraps cudaEvent_t which is shimmed to
-// hipEvent_t via include/amd/cuda_runtime.h. The cuda::__driver event
-// helpers used here are provided for HIP by include/amd/driver_api.h.
+// hipEvent_t via include/libhipcxx/__amd/cuda_runtime.h. The cuda::__driver event
+// helpers used here are provided for HIP by include/libhipcxx/__amd/driver_api.h.
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__driver/driver_api.h>

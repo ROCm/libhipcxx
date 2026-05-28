@@ -26,7 +26,7 @@
 #ifndef HETEROGENEOUS_HELPERS_H
 #define HETEROGENEOUS_HELPERS_H
 
-#include <amd/cuda_runtime.h>
+#include <libhipcxx/__amd/cuda_runtime.h>
 
 #include <cuda/std/type_traits>
 

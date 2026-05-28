@@ -70,8 +70,11 @@ rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/nv"
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
-rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/amd"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+# Install into '<inc>/libhipcxx/__amd' (not '<inc>/__amd') so the
+# '#include <libhipcxx/__amd/...>' references in the installed cuda/
+# headers resolve against '-I<inc>', matching the source-tree layout.
+rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/libhipcxx/__amd"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/libhipcxx"
   FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE

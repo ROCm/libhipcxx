@@ -183,7 +183,7 @@ namespace libhipcxx
    * failure (printf + __builtin_trap) so callers know the query is
    * unsupported. We don't use _CCCL_VERIFY here because including
    * <cuda/std/__cccl/assert.h> from this file (which is pulled in
-   * very early via <cuda/std/detail/__config> -> <amd/cuda_runtime.h>)
+   * very early via <cuda/std/detail/__config> -> <libhipcxx/__amd/cuda_runtime.h>)
    * baked CCCL_ENABLE_*_ASSERTIONS macros in before lit tests like
    * libcxx/asserts/assert_device_disabled.pass.cpp could '#undef' them.
    * Reintroduce a real implementation once the HIP / AMDGCN toolchain

@@ -35,7 +35,7 @@
 
 // NOTE(HIP/AMD): under HIP, <cuda_runtime_api.h> doesn't exist. The
 // libhipcxx <cuda/std/detail/__config> below transitively pulls
-// <amd/cuda_runtime.h> which provides the cuda* runtime API shim.
+// <libhipcxx/__amd/cuda_runtime.h> which provides the cuda* runtime API shim.
 #if !defined(__HIP_PLATFORM_AMD__)
 #  include <cuda_runtime_api.h>
 // cuda_runtime_api needs to come first

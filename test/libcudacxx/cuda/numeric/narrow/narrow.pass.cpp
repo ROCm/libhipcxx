@@ -33,7 +33,7 @@
 // from `(unsigned) long` / `(unsigned) long long`, nor from each other. The
 // `cuda::narrow` implementation in include/cuda/__numeric/narrow.h dispatches
 // to `__double2half`-style explicit converter helpers in
-// include/amd/cuda_runtime.h to perform a 2-step conversion via `double`/`float`
+// include/libhipcxx/__amd/cuda_runtime.h to perform a 2-step conversion via `double`/`float`
 // in those cases, so this test now builds and passes under hipcc.
 
 #include <cuda/numeric>

@@ -503,7 +503,7 @@ _CCCL_HOST_API inline void __launchHostFunc(::hipStream_t __stream, ::hipHostFn_
 // NOTE(HIP/AMD): memory-pool attribute getter/setter used by
 // <cuda/__memory_resource/memory_resource_base.h>. The CUDA form
 // takes ::CUmemPool_attribute which we alias to ::hipMemPoolAttr in
-// <amd/cuda_runtime.h>.
+// <libhipcxx/__amd/cuda_runtime.h>.
 [[nodiscard]] _CCCL_HOST_API inline size_t
 __mempoolGetAttribute(::hipMemPool_t __pool, ::hipMemPoolAttr __attr)
 {
@@ -524,7 +524,7 @@ __mempoolSetAttribute(::hipMemPool_t __pool, ::hipMemPoolAttr __attr, void* __va
 // <cuda/__memory_resource/memory_resource_base.h>. The CUDA driver API
 // uses CUmemoryPool/CUmemPoolProps/CUmemAccessDesc/CUmemAccess_flags
 // which we alias to hipMemPool_t/hipMemPoolProps/hipMemAccessDesc/
-// hipMemAccessFlags in <amd/cuda_runtime.h>. The HIP runtime API
+// hipMemAccessFlags in <libhipcxx/__amd/cuda_runtime.h>. The HIP runtime API
 // signature matches the upstream cuda::__driver shape exactly for
 // these four entry points.
 [[nodiscard]] _CCCL_HOST_API inline ::cudaError_t

@@ -50,10 +50,10 @@
 
 #include <nv/target> // __CUDA_MINIMUM_ARCH__ and friends
 
-// NOTE(HIP/AMD): include <amd/amd_utils.h> for _CCCL_HIP_WAVE_SIZE used
+// NOTE(HIP/AMD): include <libhipcxx/__amd/amd_utils.h> for _CCCL_HIP_WAVE_SIZE used
 // by the HIP-side lanemask emulations below.
 #if _CCCL_HIP_COMPILATION()
-#  include <amd/amd_utils.h>
+#  include <libhipcxx/__amd/amd_utils.h>
 #endif
 
 #include <cuda/std/__cccl/prologue.h>

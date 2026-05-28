@@ -30,7 +30,7 @@
 #define _CUDA_STD___EXCEPTION_TERMINATE_H
 
 #include <cuda/std/detail/__config>
-#include <amd/amd_utils.h>
+#include <libhipcxx/__amd/amd_utils.h>
 
 #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
 #  pragma GCC system_header

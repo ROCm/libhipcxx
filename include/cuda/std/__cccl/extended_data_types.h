@@ -89,7 +89,7 @@ struct __nv_bfloat162;
 #endif
 
 // NOTE(HIP/AMD): HIP ships <hip/hip_fp8.h> with __hip_fp8_e4m3 / __hip_fp8_e5m2
-// types (and x2/x4 variants); <amd/cuda_runtime.h> aliases them to the
+// types (and x2/x4 variants); <libhipcxx/__amd/cuda_runtime.h> aliases them to the
 // upstream __nv_fp8_e4m3 / __nv_fp8_e5m2 names. The __nv_fp8_e8m0 family
 // is CTK 12.8+ only on NVIDIA and has no HIP analogue; leave it disabled.
 // On gfx942 the OCP fp8 ctors are host-only (HIP_FP8_TYPE_OCP=0 in
@@ -118,7 +118,7 @@ struct __nv_fp8x4_e8m0;
 #endif
 
 // NOTE(HIP/AMD): HIP ships <hip/hip_fp6.h> with __hip_fp6_e2m3 / __hip_fp6_e3m2
-// types; <amd/cuda_runtime.h> aliases them to __nv_fp6_*. NOT enabled on HIP
+// types; <libhipcxx/__amd/cuda_runtime.h> aliases them to __nv_fp6_*. NOT enabled on HIP
 // for now: <hip/hip_fp6.h> and <hip/hip_fp4.h> both define helper functions
 // (e.g. internal::half_to_f16, internal::hipbf16_to_bf16) at the same
 // namespace path with no anonymous-namespace / inline-variable scoping, so

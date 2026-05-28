@@ -51,7 +51,7 @@
 // _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE used by
 // __cccl_time_impl_device() / __cccl_timespec_get_impl_device() are
 // supplied transitively by <cuda/std/detail/__config> ->
-// <amd/hip_tsc_clockrate.h> on HIP.
+// <libhipcxx/__amd/hip_tsc_clockrate.h> on HIP.
 
 #if !_CCCL_COMPILER(NVRTC)
 #  include <time.h>

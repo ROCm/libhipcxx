@@ -35,7 +35,7 @@
 
 // NOTE(HIP/AMD): the upstream-named <cuda_runtime_api.h> does not
 // exist on a HIP-only system; the libhipcxx detail/__config
-// transitively pulls <amd/cuda_runtime.h> which provides the cuda*
+// transitively pulls <libhipcxx/__amd/cuda_runtime.h> which provides the cuda*
 // runtime API shim, so this include is unnecessary on HIP. Gate on
 // __HIP_PLATFORM_AMD__ rather than _CCCL_HIP_COMPILATION() because
 // the latter is only defined after some <cuda/std/...> headers have

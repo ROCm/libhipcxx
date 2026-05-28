@@ -196,7 +196,7 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
 // (hipPointerGetAttributes), which returns the full
 // hipPointerAttribute_t struct. We query it once per call via
 // cuda::__driver::__pointerGetAttributesNoThrow (the shim in
-// <amd/driver_api.h>) and read .type / .device / .isManaged. There is
+// <libhipcxx/__amd/driver_api.h>) and read .type / .device / .isManaged. There is
 // no memory-pool handle on the HIP struct, so the pool-aware CUDA
 // paths are not replicated; the matching test branches in
 // cuda/memory/is_pointer_accessible.pass.cpp are gated on
@@ -314,7 +314,7 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
   }
   // Peer-access query routed through the driver shim
   // (cuda::__driver::__deviceCanAccessPeer) so the runtime entry point
-  // is centralised in <amd/driver_api.h>; the shim throws on non-success
+  // is centralised in <libhipcxx/__amd/driver_api.h>; the shim throws on non-success
   // so we don't need to repeat the error check here.
   return ::cuda::__driver::__deviceCanAccessPeer(
     static_cast<::hipDevice_t>(__device.get()), static_cast<::hipDevice_t>(__attr.device));

@@ -56,7 +56,7 @@ __global__ void test_kernel(const _CCCL_GRID_CONSTANT MyStruct grid_constant_var
     // NOTE(HIP/AMD): AMD GCN does not expose a `__builtin_amdgcn_is_constant`
     // builtin, so `__isConstant` cannot detect `__constant__` global
     // variables on HIP -- they are reported as global memory by the existing
-    // address-space builtins (see <amd/amd_utils.h>). Skip the constant-
+    // address-space builtins (see <libhipcxx/__amd/amd_utils.h>). Skip the constant-
     // address-space assertions on HIP until the HIP runtime / compiler
     // exposes the necessary builtin. Ported from upgrade/3.1.4.
     assert(is_address_from(&constant_var, address_space::constant));
