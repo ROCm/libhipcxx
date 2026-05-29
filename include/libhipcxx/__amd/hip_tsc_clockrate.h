@@ -31,11 +31,10 @@
 //   __GFX10__                     -> 100 MHz, with NDEBUG warning
 //   __GFX11__                     -> 100 MHz, with NDEBUG warning (RDNA3 ISA)
 //   __GFX12__                     -> 100 MHz, with NDEBUG warning (RDNA4 ISA)
-//   unknown                       -> compile error unless
-//                                    _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
-//                                    is defined; macros default to 1
-//                                    to make the resulting timings
-//                                    obviously wrong.
+//   unknown                       -> NDEBUG warning (silenced by
+//                                    _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE);
+//                                    macros default to 1 to make the
+//                                    resulting timings obviously wrong.
 
 #ifndef _AMD_HIP_TSC_CLOCKRATE_H
 #define _AMD_HIP_TSC_CLOCKRATE_H
@@ -102,12 +101,13 @@
 #      define _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE 10
 #    endif
 #  else
-#    ifdef _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
+// Only a warning (not an error) so builds on new/unlisted archs (e.g.
+// gfx13xx) are not blocked -- see ROCm/libhipcxx#22. Set
+// _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE to silence it.
+#    ifndef _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
 #      ifndef NDEBUG
-#        warning Timing-related utility APIs (e.g., chrono) are currently not supported on the current architecture by libhipcxx. Using _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE for these APIs will result in incorrect results (timings).
+#        warning Timing-related utility APIs (e.g., chrono) are currently not supported on the current architecture by libhipcxx. To override this warning, please set the compile-time flag _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
 #      endif
-#    else
-#      error Timing-related utility APIs (e.g., chrono) are currently not supported on the current architecture by libhipcxx. To override this error and proceed with the build, please set the compile-time flag _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
 #    endif
 // Intentionally meaningless values to make the resulting timings clearly wrong.
 #    ifndef _LIBCUDACXX_HIP_TSC_CLOCKRATE
