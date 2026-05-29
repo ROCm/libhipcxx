@@ -213,6 +213,9 @@ template <typename _Tp>
     // upstream improvement to __add_overflow_generic_impl (e.g. a
     // future device-friendly intrinsic-based fast path) is picked up
     // automatically without touching this branch.
+    // TODO(HIP/AMD): provide a device-optimized __add_overflow_device for
+    // AMDGPU (e.g. via __builtin_add_overflow / hardware carry) and call
+    // it here on NV_IS_DEVICE, mirroring the NVPTX path above.
     NV_IF_TARGET(NV_IS_HOST, (return ::cuda::__add_overflow_host(__lhs, __rhs);))
 #endif // !_CCCL_CUDA_COMPILATION()
   }
