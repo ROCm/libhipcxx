@@ -41,17 +41,13 @@ void recursive_check_device_setter(int id)
 {
   int cudart_id;
   cuda::__ensure_current_context setter(cuda::device_ref{id});
-  // NOTE(HIP/AMD): the driver-stack-depth invariant only applies in
-  // the CUDA driver-API context-stack model. HIP exposes a single
-  // primary context per device (no per-thread push/pop stack), so
-  // 'count_driver_stack()' is a no-op on HIP and the depth check
-  // is meaningless. The 'cudaGetDevice() == id' assertion below
-  // still exercises the observable effect of
-  // cuda::__ensure_current_context on HIP (it calls hipSetDevice).
+  // Driver-API ctx-stack invariants only apply on CUDA; the
+  // cudaGetDevice() check below still exercises the observable
+  // effect of __ensure_current_context (hipSetDevice) on HIP.
 #if !_CCCL_HIP_COMPILATION()
   CCCLRT_REQUIRE(test::count_driver_stack() == cuda::devices.size() - id);
-#endif // !_CCCL_HIP_COMPILATION()
   auto ctx = driver::__ctxGetCurrent();
+#endif // !_CCCL_HIP_COMPILATION()
   CUDART(cudaGetDevice(&cudart_id));
   CCCLRT_REQUIRE(cudart_id == id);
 
@@ -60,18 +56,14 @@ void recursive_check_device_setter(int id)
     recursive_check_device_setter(id - 1);
 
 #if !_CCCL_HIP_COMPILATION()
-    // NOTE(HIP/AMD): the three post-unwind assertions only apply in
-    // the CUDA driver-API stack model. On HIP count_driver_stack is a
-    // no-op, __ctxGetCurrent returns a fresh hipCtx_t per query, and
-    // hipCtxPopCurrent doesn't restore the runtime's 'current device'
-    // (tracked independently of the ctx stack). Pre-recursion check
-    // above (cudaGetDevice == id) DOES hold and keeps running.
+    // Post-unwind assertions only apply in the CUDA driver-API stack
+    // model. HIP has no ctx stack; the pre-recursion cudaGetDevice
+    // check above still holds and keeps running.
     CCCLRT_REQUIRE(test::count_driver_stack() == cuda::devices.size() - id);
     CCCLRT_REQUIRE(ctx == driver::__ctxGetCurrent());
     CUDART(cudaGetDevice(&cudart_id));
     CCCLRT_REQUIRE(cudart_id == id);
 #else
-    (void) ctx;
     (void) cudart_id;
 #endif // !_CCCL_HIP_COMPILATION()
   }
