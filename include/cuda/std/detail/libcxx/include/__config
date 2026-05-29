@@ -384,7 +384,7 @@ using char32_t = unsigned int;
 #        ifndef _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
 #          ifndef NDEBUG
 #            warning Timing-related utility APIs (e.g., chrono) are currently not supported on the current architecture by libhipcxx. \
-To override this warning and proceed with the build, please set the compile-time flag _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
+To override this warning, please set the compile-time flag _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
 #          endif
 #        endif
          // This should intentionally make no sense and tell the user that the value is meaningless
