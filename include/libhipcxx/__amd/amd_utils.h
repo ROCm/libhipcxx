@@ -58,6 +58,14 @@
 #elif defined(__GFX10__) || defined(__GFX11__) || defined(__GFX12__)
 #  define _CCCL_HIP_WAVE_SIZE 32
 #else
+// Unknown/unlisted AMDGPU arch: assume wave-32. Warn (device pass only,
+// so host TUs stay quiet) instead of silently assuming, but never error
+// -- builds on new archs must not be blocked (cf. the TSC handling in
+// <libhipcxx/__amd/hip_tsc_clockrate.h>, ROCm/libhipcxx#22). Set
+// _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE to silence it.
+#  if defined(__HIP_DEVICE_COMPILE__) && !defined(_LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE) && !defined(NDEBUG)
+#    warning Wave size for the current AMDGPU architecture is unknown to libhipcxx; assuming 32 lanes. Warp-level PTX emulations may behave incorrectly. To override this warning, please set the compile-time flag _LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE
+#  endif
 #  define _CCCL_HIP_WAVE_SIZE 32
 #endif
 
