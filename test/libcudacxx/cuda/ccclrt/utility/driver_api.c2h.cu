@@ -92,13 +92,11 @@ C2H_TEST("Call each driver api", "[utility]")
   CUDART(driver::__streamDestroyNoThrow(stream));
 }
 #else // ^^^ !__HIP_PLATFORM_AMD__ ^^^ / vvv __HIP_PLATFORM_AMD__ vvv
-// NOTE(HIP/AMD): the upstream CUDA-driver-API invariants don't hold
-// under HIP's primary-context-only model (no real ctx-stack pop,
-// fresh hipCtx_t handle per __ctxGetCurrent() query, no stream-ctx
-// API, sticky primary-ctx 'active' flag). The HIP subset below
-// covers what IS well-defined regardless of ctx semantics: device
-// enumeration, version query, primary-ctx retain/release refcount,
-// and the basic stream lifecycle.
+// NOTE(HIP/AMD): the upstream CUDA-driver-API ctx invariants don't hold
+// under HIP's primary-context-only model, and the ctx/primary-ctx
+// driver shims have no faithful HIP equivalent (removed from the HIP
+// driver_api.h). The HIP subset covers the shims that ARE well-defined:
+// device enumeration, version query, and the basic stream lifecycle.
 C2H_TEST("Call each driver api (HIP subset)", "[utility]")
 {
   namespace driver = ::cuda::__driver;
@@ -109,34 +107,9 @@ C2H_TEST("Call each driver api (HIP subset)", "[utility]")
   // Driver / runtime version is reported.
   CCCLRT_REQUIRE(driver::__getVersion() > 0);
 
-  // Stream lifecycle.
+  // Stream lifecycle round-trips.
   cudaStream_t stream{};
   CUDART(cudaStreamCreate(&stream));
-
-  // After a stream is created the runtime has touched the primary
-  // context, so __ctxGetCurrent reports a non-null wrapper handle.
-  auto ctx = driver::__ctxGetCurrent();
-  CCCLRT_REQUIRE(ctx != nullptr);
-
-  // We can retain + release the primary context (refcount).
-  auto primary_ctx = driver::__primaryCtxRetain(0);
-  CCCLRT_REQUIRE(primary_ctx != nullptr);
-  CCCLRT_REQUIRE(driver::__primaryCtxReleaseNoThrow(0) == cudaSuccess);
-
-  // Force-activate the primary context. ROCm 7.2 does not flip the
-  // 'active' flag from hipStreamCreate or hipDevicePrimaryCtxRetain
-  // alone; only an actual GPU runtime operation does. Use a tiny
-  // hipMalloc/hipFree round-trip.
-  {
-    void* __dummy = nullptr;
-    if (cudaMalloc(&__dummy, 1) == cudaSuccess)
-    {
-      (void) cudaFree(__dummy);
-    }
-  }
-  CCCLRT_REQUIRE(driver::__isPrimaryCtxActive(driver::__deviceGet(0)));
-
-  // Cleanup: the stream lifecycle round-trips.
   CUDART(driver::__streamDestroyNoThrow(stream));
 }
 #endif // __HIP_PLATFORM_AMD__
