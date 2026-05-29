@@ -202,6 +202,35 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
 // cuda/memory/is_pointer_accessible.pass.cpp are gated on
 // _CCCL_CTK_AT_LEAST(12, 2)/(13, 0) which both evaluate false on HIP.
 
+// Shared query for the three is_* helpers below: null-check, run the
+// single HIP pointer-attribute query, and normalize the result so
+// callers can inspect __attr uniformly. Returns false for a null
+// pointer (caller maps that to "not accessible"). The legacy
+// hipErrorInvalidValue (older ROCm reports unregistered host memory --
+// stack/heap/static -- this way; newer releases return hipSuccess with
+// type=hipMemoryTypeUnregistered) is collapsed to the latter, so a
+// successful return always leaves __attr.type meaningful. Throws on any
+// other error, tagging the caller's signature via __fn.
+[[nodiscard]] _CCCL_HOST_API inline bool
+__hip_query_pointer(const void* __p, ::hipPointerAttribute_t& __attr, const char* __fn)
+{
+  if (__p == nullptr)
+  {
+    return false;
+  }
+  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
+  if (__status == ::cudaErrorInvalidValue)
+  {
+    __attr.type = ::hipMemoryTypeUnregistered;
+    return true;
+  }
+  if (__status != ::cudaSuccess)
+  {
+    ::cuda::__throw_cuda_error(__status, "is_pointer_accessible query failed", __fn);
+  }
+  return true;
+}
+
 /**
  * @brief Checks if a pointer is a managed pointer.
  *
@@ -211,25 +240,13 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
 [[nodiscard]]
 _CCCL_HOST_API inline bool is_managed(const void* __p)
 {
-  if (__p == nullptr)
+  ::hipPointerAttribute_t __attr{};
+  if (!::cuda::__hip_query_pointer(__p, __attr, _CCCL_BUILTIN_PRETTY_FUNCTION()))
   {
     return false;
   }
-  ::hipPointerAttribute_t __attr{};
-  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
-  switch (__status)
-  {
-    case ::cudaSuccess:
-      return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified;
-    case ::cudaErrorInvalidValue:
-      // Unregistered host memory is reported as hipErrorInvalidValue
-      // by older ROCm releases (newer releases return hipSuccess with
-      // type=hipMemoryTypeUnregistered). In both cases the pointer is
-      // not managed.
-      return false;
-    default:
-      ::cuda::__throw_cuda_error(__status, "is_managed() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
-  }
+  // Unregistered host memory is not managed.
+  return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified;
 }
 
 /**
@@ -241,29 +258,17 @@ _CCCL_HOST_API inline bool is_managed(const void* __p)
 [[nodiscard]]
 _CCCL_HOST_API inline bool is_host_accessible(const void* __p)
 {
-  if (__p == nullptr)
+  ::hipPointerAttribute_t __attr{};
+  if (!::cuda::__hip_query_pointer(__p, __attr, _CCCL_BUILTIN_PRETTY_FUNCTION()))
   {
     return false;
   }
-  ::hipPointerAttribute_t __attr{};
-  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
-  switch (__status)
-  {
-    case ::cudaSuccess:
-      // Unregistered, plain host, pinned host, and managed memory are
-      // all host-accessible.
-      return __attr.type == ::hipMemoryTypeUnregistered //
-          || __attr.type == ::hipMemoryTypeHost //
-          || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified //
-          || __attr.isManaged != 0;
-    case ::cudaErrorInvalidValue:
-      // Older-ROCm legacy: unregistered host memory reports invalid
-      // value. Such a pointer (e.g. stack, global, plain malloc) is
-      // host-accessible.
-      return true;
-    default:
-      ::cuda::__throw_cuda_error(__status, "is_host_accessible() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
-  }
+  // Unregistered, plain host, pinned host, and managed memory are all
+  // host-accessible.
+  return __attr.type == ::hipMemoryTypeUnregistered //
+      || __attr.type == ::hipMemoryTypeHost //
+      || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified //
+      || __attr.isManaged != 0;
 }
 
 /**
@@ -276,19 +281,16 @@ _CCCL_HOST_API inline bool is_host_accessible(const void* __p)
 [[nodiscard]]
 _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __device)
 {
-  if (__p == nullptr)
-  {
-    return false;
-  }
   ::hipPointerAttribute_t __attr{};
-  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
-  if (__status == ::cudaErrorInvalidValue || (__status == ::cudaSuccess && __attr.type == ::hipMemoryTypeUnregistered))
+  if (!::cuda::__hip_query_pointer(__p, __attr, _CCCL_BUILTIN_PRETTY_FUNCTION()))
   {
     return false;
   }
-  if (__status != ::cudaSuccess)
+  // Unregistered host memory (incl. the legacy invalid-value case) is
+  // not device-accessible.
+  if (__attr.type == ::hipMemoryTypeUnregistered)
   {
-    ::cuda::__throw_cuda_error(__status, "is_device_accessible() failed", _CCCL_BUILTIN_PRETTY_FUNCTION());
+    return false;
   }
   // Managed memory is accessible from every device.
   if (__attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified)
