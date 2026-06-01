@@ -260,6 +260,10 @@ shfl_sync_bfly(_Tp __data, uint32_t __lane_idx_offset, uint32_t __clamp_segmask,
 #endif // __cccl_ptx_isa >= 600
 
 #if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): EXPERIMENTAL -- HIP emulation for specific in-tree
+// consumers only; not bit-exact-verified vs the NVPTX implementation and
+// may change. The public <cuda/ptx> surface stays unsupported on HIP (it
+// #errors); see the consolidated NOTE in <cuda/ptx>.
 // NOTE(HIP/AMD): Software equivalents of PTX `shfl.sync.{idx,up,down,bfly}.b32`,
 // implemented on top of HIP's `__shfl{,_up,_down,_xor}` family.
 //

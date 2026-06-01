@@ -57,6 +57,10 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 #include <cuda/__ptx/instructions/generated/trap.h>
 
 #if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): EXPERIMENTAL -- HIP emulation for specific in-tree
+// consumers only; not bit-exact-verified vs the NVPTX implementation and
+// may change. The public <cuda/ptx> surface stays unsupported on HIP (it
+// #errors); see the consolidated NOTE in <cuda/ptx>.
 // NOTE(HIP/AMD): Software equivalent of PTX `trap`. `__builtin_trap()`
 // emits the AMDGCN s_trap instruction (with a debugger trap code), which
 // halts the wave. Same effect as PTX trap from the user's point of view.
