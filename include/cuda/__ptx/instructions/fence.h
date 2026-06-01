@@ -65,6 +65,10 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 #include <cuda/__ptx/instructions/generated/fence_sync_restrict.h>
 
 #if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): EXPERIMENTAL -- HIP emulation for specific in-tree
+// consumers only; not bit-exact-verified vs the NVPTX implementation and
+// may change. The public <cuda/ptx> surface stays unsupported on HIP (it
+// #errors); see the consolidated NOTE in <cuda/ptx>.
 // NOTE(HIP/AMD): Software equivalents of PTX
 // `fence.{sc,acq_rel,acquire,release}.{cta,gpu,sys}`. Each maps to a
 // single `__builtin_amdgcn_fence(<order>, <scope-string>)`. The scope

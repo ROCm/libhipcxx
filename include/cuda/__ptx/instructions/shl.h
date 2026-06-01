@@ -58,6 +58,10 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 #include <cuda/__ptx/instructions/generated/shl.h>
 
 #if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): EXPERIMENTAL -- HIP emulation for specific in-tree
+// consumers only; not bit-exact-verified vs the NVPTX implementation and
+// may change. The public <cuda/ptx> surface stays unsupported on HIP (it
+// #errors); see the consolidated NOTE in <cuda/ptx>.
 // NOTE(HIP/AMD): Software emulation of PTX `shl.b{16,32,64}` (logical
 // left shift). PTX clamps the shift amount to the bit-width modulo
 // behaviour: shift amounts >= width return 0. Mirror the upstream

@@ -57,6 +57,10 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 #include <cuda/__ptx/instructions/generated/bmsk.h>
 
 #if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): EXPERIMENTAL -- HIP emulation for specific in-tree
+// consumers only; not bit-exact-verified vs the NVPTX implementation and
+// may change. The public <cuda/ptx> surface stays unsupported on HIP (it
+// #errors); see the consolidated NOTE in <cuda/ptx>.
 // NOTE(HIP/AMD): Software emulation of PTX SM_70+ `bmsk.{clamp,wrap}.b32`,
 // which builds a 32-bit mask of `b` consecutive set bits starting at bit
 // position `a` (mod 32). The clamp variant truncates the run when it would

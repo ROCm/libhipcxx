@@ -53,6 +53,10 @@
 // NOTE(HIP/AMD): include <libhipcxx/__amd/amd_utils.h> for _CCCL_HIP_WAVE_SIZE used
 // by the HIP-side lanemask emulations below.
 #if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): EXPERIMENTAL -- HIP emulation for specific in-tree
+// consumers only; not bit-exact-verified vs the NVPTX implementation and
+// may change. The public <cuda/ptx> surface stays unsupported on HIP (it
+// #errors); see the consolidated NOTE in <cuda/ptx>.
 #  include <libhipcxx/__amd/amd_utils.h>
 #endif
 
