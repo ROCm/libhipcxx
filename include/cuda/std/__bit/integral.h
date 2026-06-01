@@ -80,6 +80,10 @@ _CCCL_API constexpr uint32_t __bit_log2(_Tp __t) noexcept
                    (auto __high = ::cuda::ptx::bfind(static_cast<uint64_t>(__t >> 64));
                     return __high == ~uint32_t{0} ? ::cuda::ptx::bfind(static_cast<uint64_t>(__t)) : __high + 64;))
     }
+    // TODO(HIP/AMD): provide an AMDGPU device fast path here (e.g. a
+    // find-leading-bit intrinsic / __builtin_clz) mirroring the NVPTX
+    // ::cuda::ptx::bfind path; for now HIP falls through to the generic
+    // countl_zero-based implementation below.
 #endif // _CCCL_CUDA_COMPILATION()
   }
   return numeric_limits<_Tp>::digits - 1 - ::cuda::std::countl_zero(__t);
