@@ -71,7 +71,15 @@ __device__ inline void ccclrt_require_impl(
            threadIdx.y,
            threadIdx.z,
            condition_text);
+    // NOTE(HIP/AMD): on CUDA '__trap()' is a free function intrinsic;
+    // on HIP/AMDGCN there is no '__trap' free function but
+    // '__builtin_trap()' compiles down to the equivalent s_trap
+    // instruction (clang-hip mode).
+#if defined(__HIP_PLATFORM_AMD__)
+    __builtin_trap();
+#else // ^^^ __HIP_PLATFORM_AMD__ ^^^ / vvv !__HIP_PLATFORM_AMD__ vvv
     __trap();
+#endif // !__HIP_PLATFORM_AMD__
   }
 }
 

@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef __CCCL_DIALECT_H
 #define __CCCL_DIALECT_H
 
@@ -188,7 +210,11 @@
 
 // Fixme: replace the condition with (!_CCCL_DEVICE_COMPILATION())
 // FIXME: Enable this for clang-cuda in a followup
-#if !_CCCL_CUDA_COMPILATION() && !defined(CCCL_DISABLE_LONG_DOUBLE_SUPPORT)
+// NOTE(HIP/AMD): AMDGCN device code has no long double libm (expl/sinl/atan2l/
+// ... are host-only); since clang-hip compiles a __host__ __device__ TU for the
+// device too, disable long double on HIP entirely (matches the upstream intent
+// of the FIXME above and the pre-3.3 _CCCL_HAS_CUDA_COMPILER()-based gate).
+#if !_CCCL_CUDA_COMPILATION() && !_CCCL_HIP_COMPILATION() && !defined(CCCL_DISABLE_LONG_DOUBLE_SUPPORT)
 #  define _CCCL_HAS_LONG_DOUBLE() 1
 #else // ^^^ has long double ^^^ / vvv no long double vvv
 #  define _CCCL_HAS_LONG_DOUBLE() 0

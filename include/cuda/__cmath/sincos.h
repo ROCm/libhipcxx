@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___CMATH_SINCOS_H
 #define _CUDA___CMATH_SINCOS_H
 
@@ -43,11 +65,16 @@
 #endif // _CCCL_HAS_BUILTIN(__builtin_sincosl) || _CCCL_COMPILER(GCC)
 
 // clang-cuda crashes if these builtins are used.
-#if _CCCL_CUDA_COMPILER(CLANG)
+// NOTE(HIP/AMD): clang-hip likewise cannot select the f64/f32 llvm.sincos
+// (llvm.sin/llvm.cos) intrinsics emitted by __builtin_sincos* on AMDGCN
+// ("Cannot select: f64 = fsin"); undef on HIP too so the device path falls
+// back to ::sincos / cuda::std::sin+cos (ocml). Mirrors the undef in
+// <cuda/std/__cmath/{trigonometric,hyperbolic}_functions.h>.
+#if _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 #  undef _CCCL_BUILTIN_SINCOSF
 #  undef _CCCL_BUILTIN_SINCOS
 #  undef _CCCL_BUILTIN_SINCOSL
-#endif // _CCCL_CUDA_COMPILER(CLANG)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 

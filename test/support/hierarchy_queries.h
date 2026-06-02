@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef SUPPORT_HIERARCHY_QUERIES_H
 #define SUPPORT_HIERARCHY_QUERIES_H
 
@@ -32,8 +54,12 @@ __device__ void test_result(cuda::std::extents<IRes, Exts...> res, cuda::std::ex
   }
 }
 
-template <class Level, class... Args>
-__device__ void test_dims(const uint3 exp, const Level& level, Args... args)
+// NOTE(HIP/AMD): templated on the vector type so the built-in dimension
+// variables (e.g. gridDim/blockDim, which are uint3 on CUDA but distinct
+// __hip_builtin_*_t types on HIP) can be passed directly. test_result only
+// uses .x/.y/.z, so this is portable across both backends.
+template <class Vec, class Level, class... Args>
+__device__ void test_dims(const Vec exp, const Level& level, Args... args)
 {
   test_result(level.dims(args...), exp);
   test_result(level.template dims_as<short>(args...), exp);
@@ -75,8 +101,9 @@ __device__ void test_count(const cuda::std::size_t exp, const Level& level, Args
   assert(level.template count_as<unsigned long long>(args...) == static_cast<unsigned long long>(exp));
 }
 
-template <class Level, class... Args>
-__device__ void test_index(const uint3 exp, const Level& level, Args... args)
+// NOTE(HIP/AMD): templated first parameter; see test_dims above.
+template <class Vec, class Level, class... Args>
+__device__ void test_index(const Vec exp, const Level& level, Args... args)
 {
   test_result(level.index(args...), exp);
   test_result(level.template index_as<short>(args...), exp);

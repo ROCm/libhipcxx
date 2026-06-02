@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___HIERARCHY_HIERARCHY_QUERY_RESULT_H
 #define _CUDA___HIERARCHY_HIERARCHY_QUERY_RESULT_H
 
@@ -21,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/std/__concepts/concept_macros.h>
 #  include <cuda/std/__cstddef/types.h>
@@ -140,12 +162,22 @@ struct hierarchy_query_result
   {
     return {static_cast<unsigned long long>(x), static_cast<unsigned long long>(y), static_cast<unsigned long long>(z)};
   }
+
+  // NOTE(HIP/AMD): on CUDA this type becomes constructible into ::dim3 via
+  // dim3(uint3); HIP's ::dim3 has no uint3 constructor, so provide a direct
+  // conversion to ::dim3 on HIP.
+#  if _CCCL_HIP_COMPILATION()
+  _CCCL_API constexpr operator dim3() const noexcept
+  {
+    return dim3{static_cast<unsigned>(x), static_cast<unsigned>(y), static_cast<unsigned>(z)};
+  }
+#  endif // _CCCL_HIP_COMPILATION()
 };
 
 _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #endif // _CUDA___HIERARCHY_HIERARCHY_QUERY_RESULT_H

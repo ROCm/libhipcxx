@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___HIERARCHY_THREAD_LEVEL_H
 #define _CUDA___HIERARCHY_THREAD_LEVEL_H
 
@@ -21,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/__fwd/hierarchy.h>
 #  include <cuda/__hierarchy/hierarchy_query_result.h>
@@ -30,9 +52,9 @@
 #  include <cuda/std/__mdspan/extents.h>
 #  include <cuda/std/__type_traits/is_integer.h>
 
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #    include <cuda/__ptx/instructions/get_sreg.h>
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/std/__cccl/prologue.h>
 
@@ -49,7 +71,7 @@ struct _CCCL_DECLSPEC_EMPTY_BASES thread_level : __native_hierarchy_level_base<t
   using __base_type = __native_hierarchy_level_base<thread_level>;
   using __base_type::extents_as;
 
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
   using __base_type::index_as;
   using __base_type::rank_as;
 
@@ -72,10 +94,17 @@ struct _CCCL_DECLSPEC_EMPTY_BASES thread_level : __native_hierarchy_level_base<t
 
   // interactions with warp level
 
+  // NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but is wave32 or
+  // wave64 depending on the AMD GPU architecture, so use _CCCL_HIP_WAVE_SIZE.
   _CCCL_TEMPLATE(class _Tp)
   _CCCL_REQUIRES(::cuda::std::__cccl_is_integer_v<_Tp>)
+#  if _CCCL_HIP_COMPILATION()
+  [[nodiscard]]
+  _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE> extents_as(const warp_level&) noexcept
+#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
   [[nodiscard]]
   _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, 32> extents_as(const warp_level&) noexcept
+#  endif // !_CCCL_HIP_COMPILATION()
   {
     return {};
   }
@@ -93,7 +122,7 @@ struct _CCCL_DECLSPEC_EMPTY_BASES thread_level : __native_hierarchy_level_base<t
   {
     return static_cast<_Tp>(::cuda::ptx::get_sreg_laneid());
   }
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 };
 
 _CCCL_GLOBAL_CONSTANT thread_level gpu_thread;
@@ -102,6 +131,6 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #endif // _CUDA___HIERARCHY_THREAD_LEVEL_H

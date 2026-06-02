@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // todo: enable with nvrtc
 // UNSUPPORTED: nvrtc
 
@@ -14,6 +36,14 @@
 #include <cuda/std/cstddef>
 #include <cuda/std/mdspan>
 #include <cuda/std/type_traits>
+
+// NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
+// AMD, so the static warp-level extent below must use the wave size.
+#if _CCCL_HIP_COMPILATION()
+#  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
+#else
+#  define TEST_WARP_SIZE 32
+#endif
 
 template <class Level>
 __device__ void test_query_signatures(const Level& level)
@@ -30,7 +60,7 @@ __device__ void test_query_signatures(const Level& level)
 
   // 3. Test cuda::thread_level::extents(x) signature.
   using ExtentsRet = cuda::std::conditional_t<cuda::std::is_same_v<Level, cuda::warp_level>,
-                                              cuda::std::extents<unsigned, 32>,
+                                              cuda::std::extents<unsigned, TEST_WARP_SIZE>,
                                               cuda::std::dims<3, unsigned>>;
   static_assert(cuda::std::is_same_v<ExtentsRet, decltype(cuda::thread_level::extents(level))>);
   static_assert(noexcept(cuda::thread_level::extents(level)));
@@ -58,7 +88,7 @@ __device__ void test_query_as_signatures(const Level& level)
 
   // 2. Test cuda::thread_level::extents(x) signature.
   using ExtentsRet = cuda::std::
-    conditional_t<cuda::std::is_same_v<Level, cuda::warp_level>, cuda::std::extents<T, 32>, cuda::std::dims<3, T>>;
+    conditional_t<cuda::std::is_same_v<Level, cuda::warp_level>, cuda::std::extents<T, TEST_WARP_SIZE>, cuda::std::dims<3, T>>;
   static_assert(cuda::std::is_same_v<ExtentsRet, decltype(cuda::thread_level::extents_as<T>(level))>);
   static_assert(noexcept(cuda::thread_level::extents_as<T>(level)));
 

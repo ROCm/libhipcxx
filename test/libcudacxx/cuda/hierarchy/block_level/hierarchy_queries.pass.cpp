@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // todo: enable with nvrtc
 // UNSUPPORTED: nvrtc
 
@@ -166,6 +188,7 @@ void test_launch(GridExts grid_exts, BlockExts block_exts)
     cuda::make_hierarchy(cuda::grid_dims(grid_dims), cuda::block_dims(block_dims)), grid_exts_dyn, block_exts_dyn);
 }
 
+#if !defined(__HIP_PLATFORM_AMD__) // NOTE(HIP/AMD): cluster launch is NVIDIA-only
 template <class GridExts, class ClusterExts, class BlockExts>
 void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_exts)
 {
@@ -208,26 +231,29 @@ void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_e
     assert(cudaLaunchKernelEx(&config, kernel, hier, grid_exts_dyn, cluster_exts_dyn, block_exts_dyn) == cudaSuccess);
   }
 }
+#endif // !defined(__HIP_PLATFORM_AMD__)
 
 void test()
 {
-  int cc_major{};
+  [[maybe_unused]] int cc_major{};
   assert(cudaDeviceGetAttribute(&cc_major, cudaDevAttrComputeCapabilityMajor, 0) == cudaSuccess);
 
   // thread block clusters require compute capability at least 9.0
-  const bool enable_clusters = cc_major >= 9;
+  [[maybe_unused]] const bool enable_clusters = cc_major >= 9;
 
   test_launch(cuda::std::extents<unsigned, 1, 1, 1>{}, cuda::std::extents<unsigned, 128, 1, 1>{});
   test_launch(cuda::std::extents<unsigned, 128, 1, 1>{}, cuda::std::extents<unsigned, 1, 1, 1>{});
   test_launch(cuda::std::extents<unsigned, 2, 3, 1>{}, cuda::std::extents<unsigned, 4, 2, 1>{});
   test_launch(cuda::std::extents<unsigned, 2, 3, 4>{}, cuda::std::extents<unsigned, 4, 2, 8>{});
 
+#if !defined(__HIP_PLATFORM_AMD__) // NOTE(HIP/AMD): thread-block clusters are NVIDIA-only
   if (enable_clusters)
   {
     test_launch(cuda::std::extents<unsigned, 3, 5, 3>{},
                 cuda::std::extents<unsigned, 4, 2, 1>{},
                 cuda::std::extents<unsigned, 2, 8, 4>{});
   }
+#endif // !defined(__HIP_PLATFORM_AMD__)
 
   assert(cudaDeviceSynchronize() == cudaSuccess);
 }

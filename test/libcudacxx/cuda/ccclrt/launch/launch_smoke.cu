@@ -7,12 +7,42 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
+
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/atomic>
 #include <cuda/launch>
 #include <cuda/memory>
 #include <cuda/stream>
 
-#include <cooperative_groups.h>
+// NOTE(HIP/AMD): on HIP the upstream-named <cooperative_groups.h> does not
+// exist; the HIP equivalent is <hip/hip_cooperative_groups.h>. Both populate
+// "namespace cooperative_groups".
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <hip/hip_cooperative_groups.h>
+#else
+#  include <cooperative_groups.h>
+#endif // !__HIP_PLATFORM_AMD__
 #include <testing.cuh>
 
 #if !_CCCL_CUDA_COMPILER(CLANG)
@@ -297,7 +327,12 @@ struct verify_callable
   __device__ void operator()(Config config)
   {
     static_assert(cuda::gpu_thread.count(cuda::block, config) == 256);
-    CCCLRT_REQUIRE(cuda::block.count(cuda::grid, config) == 4);
+    // NOTE(HIP/AMD): this assertion lives in a __device__-only functor. clang-hip
+    // semantically analyses __device__ bodies in BOTH the host and device passes,
+    // so the host Catch2 REQUIRE (try/catch) is rejected in a __device__ function
+    // regardless of __HIP_DEVICE_COMPILE__. Use the device-side require
+    // unconditionally, matching the other device assertions in this file.
+    CCCLRT_REQUIRE_DEVICE(cuda::block.count(cuda::grid, config) == 4);
     cooperative_groups::this_grid().sync();
   }
 };
