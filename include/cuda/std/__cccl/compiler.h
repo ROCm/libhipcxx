@@ -122,21 +122,23 @@
 #  define _CCCL_COMPILER_NVRTC() (__CUDACC_VER_MAJOR__, __CUDACC_VER_MINOR__)
 #endif
 
-// <<<<<<< OLD CODE from 8b68a86b0a (659bc73808) - COMMENTED OUT
-// #if defined(__HIPCC__)
-// # define _CCCL_COMPILER_HIPCC
-// #endif
-//
-// #if defined(__HIPCC_RTC__)
-// # define _CCCL_COMPILER_HIPRTC
-// #endif
-// =======
+#if defined(__HIPCC__)
+#  define _CCCL_COMPILER_HIPCC
+#endif
+
+#if defined(__HIPCC_RTC__)
+#  define _CCCL_COMPILER_HIPRTC
+#endif
+
+// NOTE(HIP/AMD): hipcc/hiprtc are intentionally excluded here so that
+// _CCCL_CUDA_COMPILATION() retains its strict upstream meaning ("compiling a CUDA
+// translation unit"). HIP support is opted in at each consumer site via
+// "_CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()".
 #if defined(__CUDACC__) || defined(_NVHPC_CUDA)
 #  define _CCCL_CUDA_COMPILATION() 1
 #else // ^^^ compiling .cu file ^^^ / vvv not compiling .cu file vvv
 #  define _CCCL_CUDA_COMPILATION() 0
 #endif // ^^^ not compiling .cu file ^^^
-// >>>>>>> END NEW CODE (659bc73808)
 
 // The CUDA compiler version shares the implementation with the C++ compiler
 #define _CCCL_CUDA_COMPILER_MAKE_VERSION(_MAJOR, _MINOR) _CCCL_COMPILER_MAKE_VERSION(_MAJOR, _MINOR)
@@ -148,38 +150,6 @@
 #define _CCCL_CUDA_COMPILER_NVRTC() _CCCL_VERSION_INVALID()
 
 // Determine the cuda compiler
-// <<<<<<< OLD CODE from 8b68a86b0a (659bc73808) - COMMENTED OUT
-// #if defined(__NVCC__)
-// #  undef _CCCL_CUDA_COMPILER_NVCC
-// #  define _CCCL_CUDA_COMPILER_NVCC() (__CUDACC_VER_MAJOR__, __CUDACC_VER_MINOR__)
-// #elif defined(_NVHPC_CUDA)
-// #  undef _CCCL_CUDA_COMPILER_NVHPC
-// #  define _CCCL_CUDA_COMPILER_NVHPC() _CCCL_COMPILER_NVHPC()
-// #elif defined(__CUDA__) && _CCCL_COMPILER(CLANG)
-// #  undef _CCCL_CUDA_COMPILER_CLANG
-// #  define _CCCL_CUDA_COMPILER_CLANG() _CCCL_COMPILER_CLANG()
-// #elif _CCCL_COMPILER(NVRTC)
-// #  undef _CCCL_CUDA_COMPILER_NVRTC
-// #  define _CCCL_CUDA_COMPILER_NVRTC() _CCCL_COMPILER_NVRTC()
-// #endif // ^^^ _CCCL_COMPILER(NVRTC) ^^^
-//
-// #if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_CUDA_COMPILER(CLANG) || _CCCL_CUDA_COMPILER(NVHPC) || _CCCL_CUDA_COMPILER(NVRTC) \
-//   || defined(_CCCL_COMPILER_HIPCC) || defined(_CCCL_COMPILER_HIPRTC)
-// #  define _CCCL_HAS_CUDA_COMPILER() 1
-// #else // ^^^ has cuda compiler ^^^ / vvv no cuda compiler vvv
-// #  define _CCCL_HAS_CUDA_COMPILER() 0
-// #endif // ^^^ no cuda compiler ^^^
-//
-// // NOTE(HIP/AMD): hipcc/hiprtc are intentionally excluded here so that
-// // _CCCL_CUDA_COMPILATION() retains its strict upstream meaning ("compiling a CUDA
-// // translation unit"). HIP support is opted in at each consumer site via
-// // "_CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()".
-// #if defined(__CUDACC__) || _CCCL_CUDA_COMPILER(NVHPC)
-// #  define _CCCL_CUDA_COMPILATION() 1
-// #else // ^^^ compiling .cu file ^^^ / vvv not compiling .cu file vvv
-// #  define _CCCL_CUDA_COMPILATION() 0
-// #endif // ^^^ not compiling .cu file ^^^
-// =======
 #if _CCCL_CUDA_COMPILATION()
 #  if defined(__NVCC__)
 #    undef _CCCL_CUDA_COMPILER_NVCC
@@ -195,7 +165,6 @@
 #    define _CCCL_CUDA_COMPILER_NVRTC() _CCCL_COMPILER_NVRTC()
 #  endif // ^^^ _CCCL_COMPILER(NVRTC) ^^^
 #endif // _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (659bc73808)
 
 // NOTE(HIP/AMD): mirror of _CCCL_CUDA_COMPILATION() for HIP. True when compiling
 // a HIP translation unit (i.e. __HIP_PLATFORM_AMD__ is defined). Use this at

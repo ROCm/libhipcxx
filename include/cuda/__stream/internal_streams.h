@@ -45,16 +45,7 @@
 
 #if _CCCL_HAS_CTK()
 
-// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
-// // NOTE(HIP/AMD): under HIP, <cuda_runtime_api.h> doesn't exist. The
-// // transitive include of <cuda/std/detail/__config> via
-// // <cuda/__stream/stream.h> already pulls <libhipcxx/__amd/cuda_runtime.h>.
-// #if !defined(__HIP_PLATFORM_AMD__)
-// #  include <cuda_runtime_api.h>
-// #endif // !__HIP_PLATFORM_AMD__
-// =======
 #  include <cuda/__stream/stream.h>
-// >>>>>>> END NEW CODE (1a270882e7)
 
 #  include <cuda/std/__cccl/prologue.h>
 

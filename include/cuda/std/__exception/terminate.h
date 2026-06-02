@@ -53,11 +53,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION // purposefully not using versioning na
 
 [[noreturn]] _CCCL_API inline void __cccl_terminate() noexcept
 {
-// <<<<<<< OLD CODE from 4fc7d590a3 (c4ce3850a4) - COMMENTED OUT
-//   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
-// =======
-  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (::__trap();))
-// >>>>>>> END NEW CODE (c4ce3850a4)
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
   _CCCL_UNREACHABLE();
 }
 

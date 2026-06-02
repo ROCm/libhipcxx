@@ -106,19 +106,6 @@ _CCCL_BEGIN_NAMESPACE_CUDA
   {
     return false;
   }
-// <<<<<<< OLD CODE from 84877729a7 (b22808825c) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-//   // clang-format off
-//   NV_IF_TARGET(NV_IS_DEVICE, (
-//     if (::cuda::device::__internal_is_address_from(__ptr, ::cuda::device::address_space::shared) &&
-//         !::cuda::device::__is_smem_valid_address_range(__ptr, __n))
-//     {
-//       return false;
-//     }
-//   ));
-//   // clang-format on
-// #endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-// =======
   NV_IF_TARGET(NV_IS_DEVICE, ({
                  if (::cuda::device::__internal_is_address_from(__ptr, ::cuda::device::address_space::shared)
                      && !::cuda::device::__is_smem_valid_address_range(__ptr, __n))
@@ -126,7 +113,6 @@ _CCCL_BEGIN_NAMESPACE_CUDA
                    return false;
                  }
                }));
-// >>>>>>> END NEW CODE (b22808825c)
   return (__ptr != nullptr);
 }
 

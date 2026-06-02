@@ -8,35 +8,30 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 006753940d (7034964082) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
+// MIT License
 //
-// #ifndef _CUDA__STREAM_DEVICE_TRANSFORM_H
-// #define _CUDA__STREAM_DEVICE_TRANSFORM_H
-// =======
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA__STREAM_LAUNCH_TRANSFORM_H
 #define _CUDA__STREAM_LAUNCH_TRANSFORM_H
-// >>>>>>> END NEW CODE (7034964082)
 
 #include <cuda/__cccl_config>
 
@@ -48,23 +43,6 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
-// #include <cuda/__stream/stream_ref.h>
-// #include <cuda/__type_traits/is_instantiable_with.h>
-// #include <cuda/std/__memory/addressof.h>
-// #include <cuda/std/__memory/construct_at.h>
-// #include <cuda/std/__new/launder.h>
-// #include <cuda/std/__optional/optional.h>
-// #include <cuda/std/__tuple_dir/ignore.h>
-// #include <cuda/std/__type_traits/decay.h>
-// #include <cuda/std/__type_traits/is_callable.h>
-// #include <cuda/std/__type_traits/is_reference.h>
-// #include <cuda/std/__utility/declval.h>
-// #include <cuda/std/__utility/forward.h>
-// #include <cuda/std/__utility/move.h>
-//
-// #include <cuda/std/__cccl/prologue.h>
-// =======
 #if _CCCL_HAS_CTK()
 
 #  include <cuda/__stream/stream_ref.h>
@@ -81,7 +59,6 @@
 #  include <cuda/std/__utility/move.h>
 
 #  include <cuda/std/__cccl/prologue.h>
-// >>>>>>> END NEW CODE (1a270882e7)
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 namespace __detail

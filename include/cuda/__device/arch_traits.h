@@ -43,17 +43,6 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//
-// #  include <cuda/__device/arch_id.h>
-// #  include <cuda/__device/compute_capability.h>
-// #  include <cuda/__fwd/devices.h>
-// #  include <cuda/std/__exception/cuda_error.h>
-// #  include <cuda/std/__type_traits/always_false.h>
-// #  include <cuda/std/cstdint>
-// #  include <cuda/std/limits>
-// =======
 #include <cuda/__device/arch_id.h>
 #include <cuda/__device/compute_capability.h>
 #include <cuda/__fwd/devices.h>
@@ -61,7 +50,6 @@
 #include <cuda/std/__type_traits/always_false.h>
 #include <cuda/std/cstdint>
 #include <cuda/std/limits>
-// >>>>>>> END NEW CODE (1a270882e7)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -582,10 +570,6 @@ _CCCL_END_NAMESPACE_CUDA_DEVICE
 
 #endif // _CCCL_CUDA_COMPILATION
 
-// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
-// #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-// =======
 #include <cuda/std/__cccl/epilogue.h>
-// >>>>>>> END NEW CODE (1a270882e7)
 
 #endif // _CUDA___DEVICE_ARCH_TRAITS_H

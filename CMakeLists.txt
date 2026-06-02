@@ -1,90 +1,77 @@
-# <<<<<<< OLD CODE from 23063816f0 (3fd8e38e4b) - COMMENTED OUT
-# # Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
-# # Permission is hereby granted, free of charge, to any person obtaining a copy
-# # of this software and associated documentation files (the "Software"), to deal
-# # in the Software without restriction, including without limitation the rights
-# # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# # copies of the Software, and to permit persons to whom the Software is
-# # furnished to do so, subject to the following conditions:
-# # The above copyright notice and this permission notice shall be included in
-# # all copies or substantial portions of the Software.
-# # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# # THE SOFTWARE.
-#
-# # 3.15 is the minimum.
-# # 3.17 for NVC++.
-# # 3.18 for C++17 + CUDA and clang-cuda support.
-# # 3.21 is for HIP
-# cmake_minimum_required(VERSION 3.21)
-#
-# # Determine whether libhipcxx is the top-level project or included into
-# # another project via add_subdirectory().
-# if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}")
-#   set(LIBCUDACXX_TOPLEVEL_PROJECT ON)
-# endif()
-#
-# if (LIBCUDACXX_TOPLEVEL_PROJECT)
-#   cmake_minimum_required(VERSION 3.21)
-# endif()
-#
-# set(PACKAGE_NAME libhipcxx)
-# =======
-if (NOT CCCL_ENABLE_LIBCUDACXX)
-  include(cmake/libcudacxxAddSubdir.cmake)
-  return()
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+# 3.15 is the minimum.
+# 3.17 for NVC++.
+# 3.18 for C++17 + CUDA and clang-cuda support.
+# 3.21 is for HIP
+cmake_minimum_required(VERSION 3.21)
+
+# Determine whether libhipcxx is the top-level project or included into
+# another project via add_subdirectory().
+if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_LIST_DIR}")
+  set(LIBCUDACXX_TOPLEVEL_PROJECT ON)
 endif()
 
-cmake_minimum_required(VERSION 3.21)
-set(PACKAGE_NAME libcudacxx)
-# >>>>>>> END NEW CODE (3fd8e38e4b)
+if (LIBCUDACXX_TOPLEVEL_PROJECT)
+  cmake_minimum_required(VERSION 3.21)
+endif()
+
+set(PACKAGE_NAME libhipcxx)
 set(PACKAGE_VERSION 11.0)
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
-# <<<<<<< OLD CODE from 23063816f0 (3fd8e38e4b) - COMMENTED OUT
-# project(libhipcxx LANGUAGES CXX VERSION 3.0.2)
-#
-# # Expose libcudacxx_SOURCE_DIR / libcudacxx_BINARY_DIR for parity with the
-# # upstream libcudacxx project name; lets all libhipcxx CMake code use the
-# # upstream variable name so vendored cmake/Libcudacxx*.cmake helpers stay
-# # byte-identical. Without the BINARY_DIR alias, code in subdirectories
-# # (notably codegen/CMakeLists.txt) that interpolates ${libcudacxx_BINARY_DIR}
-# # expands to an empty string, which silently produces broken absolute paths
-# # beginning with '/' (e.g. '/codegen/cuda_ptx_generated.h').
-# set(libcudacxx_SOURCE_DIR "${libhipcxx_SOURCE_DIR}")
-# set(libcudacxx_BINARY_DIR "${libhipcxx_BINARY_DIR}")
-#
-# # rocm-cmake contains common cmake code for rocm projects to help
-# # setup and install
-# include(cmake/FindROCMCmake.cmake)
-# include(ROCMSetupVersion)
-# include(ROCMCreatePackage)
-# include(ROCMInstallTargets)
-# # include(ROCMPackageConfigHelpers)
-# # include(ROCMInstallSymlinks)
-# # include(ROCMHeaderWrapper)
-# # include(ROCMCheckTargetIds)
-# # include(ROCMClients)
-# option(libhipcxx_ENABLE_INSTALL_RULES "Enable installation of libcu++" ${LIBCUDACXX_TOPLEVEL_PROJECT})
-# if (libhipcxx_ENABLE_INSTALL_RULES)
-#   include(cmake/libhipcxxInstallRules.cmake)
-# endif()
-#
-# if (NOT LIBCUDACXX_TOPLEVEL_PROJECT)
-#   include(cmake/libhipcxxAddSubdir.cmake)
-#   return()
-# endif()
-#
-# # Must be called in root CMakeLists.txt
-# include(CTest)
-# enable_testing()
-#
-# =======
-# >>>>>>> END NEW CODE (3fd8e38e4b)
+project(libhipcxx LANGUAGES CXX VERSION 3.0.2)
+
+# Expose libcudacxx_SOURCE_DIR / libcudacxx_BINARY_DIR for parity with the
+# upstream libcudacxx project name; lets all libhipcxx CMake code use the
+# upstream variable name so vendored cmake/Libcudacxx*.cmake helpers stay
+# byte-identical. Without the BINARY_DIR alias, code in subdirectories
+# (notably codegen/CMakeLists.txt) that interpolates ${libcudacxx_BINARY_DIR}
+# expands to an empty string, which silently produces broken absolute paths
+# beginning with '/' (e.g. '/codegen/cuda_ptx_generated.h').
+set(libcudacxx_SOURCE_DIR "${libhipcxx_SOURCE_DIR}")
+set(libcudacxx_BINARY_DIR "${libhipcxx_BINARY_DIR}")
+
+# rocm-cmake contains common cmake code for rocm projects to help
+# setup and install
+include(cmake/FindROCMCmake.cmake)
+include(ROCMSetupVersion)
+include(ROCMCreatePackage)
+include(ROCMInstallTargets)
+# include(ROCMPackageConfigHelpers)
+# include(ROCMInstallSymlinks)
+# include(ROCMHeaderWrapper)
+# include(ROCMCheckTargetIds)
+# include(ROCMClients)
+option(libhipcxx_ENABLE_INSTALL_RULES "Enable installation of libcu++" ${LIBCUDACXX_TOPLEVEL_PROJECT})
+if (libhipcxx_ENABLE_INSTALL_RULES)
+  include(cmake/libhipcxxInstallRules.cmake)
+endif()
+
+if (NOT LIBCUDACXX_TOPLEVEL_PROJECT)
+  include(cmake/libhipcxxAddSubdir.cmake)
+  return()
+endif()
+
+# Must be called in root CMakeLists.txt
+include(CTest)
+enable_testing()
+
 # Add codegen module
 option(
   libcudacxx_ENABLE_CODEGEN
@@ -285,30 +272,28 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   add_subdirectory(test)
 endif()
 
-# <<<<<<< OLD CODE from c2bdf97e06 (823b415528) - COMMENTED OUT
-# # Package configuration
-# set(CPACK_DEBIAN_ARCHIVE_TYPE "gnutar")
-#
-# set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.TXT")
-# set(CPACK_RPM_PACKAGE_LICENSE "ASL 2.0 AND MIT")
-#
-# if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
-#   set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-# endif()
-#
-# set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "\${CPACK_PACKAGING_INSTALL_PREFIX}" )
-#
-# rocm_create_package(
-#   NAME libhipcxx
-#   DESCRIPTION "ROCm libhipcxx library"
-#   # FIXME(HIP/AMD): A maintainer string is required
-#   # Set to the following when available:
-#   # MAINTAINER "libhipcxx-maintainer@amd.com"
-#   MAINTAINER "AMD, Inc."
-#   HEADER_ONLY
-# )
-# =======
 if (CCCL_ENABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif()
-# >>>>>>> END NEW CODE (823b415528)
+
+# Package configuration
+set(CPACK_DEBIAN_ARCHIVE_TYPE "gnutar")
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.TXT")
+set(CPACK_RPM_PACKAGE_LICENSE "ASL 2.0 AND MIT")
+
+if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
+  set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+endif()
+
+set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "\${CPACK_PACKAGING_INSTALL_PREFIX}" )
+
+rocm_create_package(
+  NAME libhipcxx
+  DESCRIPTION "ROCm libhipcxx library"
+  # FIXME(HIP/AMD): A maintainer string is required
+  # Set to the following when available:
+  # MAINTAINER "libhipcxx-maintainer@amd.com"
+  MAINTAINER "AMD, Inc."
+  HEADER_ONLY
+)

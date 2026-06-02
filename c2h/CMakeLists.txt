@@ -40,86 +40,65 @@ else()
 endif()
 
 cccl_get_catch2()
-# <<<<<<< OLD CODE from 5bdee904e5 (b0ca1b2dbc) - COMMENTED OUT
-# # <<<<<<< OLD CODE from 25553efa55 (db7afd3e8d) - COMMENTED OUT
-# #
-# # # NOTE(HIP/AMD): on HIP we don't ship a full CCCL distribution
-# # # (no CUB / Thrust packages), so find_package(CCCL CONFIG REQUIRED)
-# # # would fail looking for lib/cmake/cccl/cccl-config.cmake. The only
-# # # CCCL component we ship is libcudacxx; the parent CMakeLists
-# # # (CMakeLists.txt:245-249) pre-defines CCCL::CCCL as an alias for
-# # # libcudacxx::libcudacxx so that subsequent
-# # # target_link_libraries(... CCCL::CCCL ...) calls in this file resolve
-# # # correctly. Verify the alias actually exists rather than silently
-# # # reaching the link line later with a missing target. Once a HIP-aware
-# # # cccl-config.cmake exists upstream, this whole branch can collapse to
-# # # the unconditional find_package() below.
-# # if (LIBCUDACXX_ENABLE_HIP)
-# #   if (NOT TARGET CCCL::CCCL)
-# #     message(FATAL_ERROR
-# #       "CCCL::CCCL alias must be pre-defined by the parent project on HIP "
-# #       "(see top-level CMakeLists.txt:245-249). Cannot continue without it.")
-# #   endif()
-# # else()
-# #   find_package(
-# #     CCCL
-# #     CONFIG
-# #     REQUIRED
-# #     NO_DEFAULT_PATH # Only check the explicit HINTS below:
-# #     HINTS "${CCCL_SOURCE_DIR}/lib/cmake/cccl/"
-# #   )
-# # endif()
-# # =======
-# cccl_get_cccl()
-# # >>>>>>> END NEW CODE (db7afd3e8d)
-#
-# if (LIBCUDACXX_ENABLE_HIP)
-#   find_package(hip REQUIRED)
-#   # NOTE(HIP/AMD): rocThrust 4.x ships under /opt/rocm/lib/cmake/rocthrust
-#   # and provides the 'roc::rocthrust' interface target, which exposes
-#   # the 'thrust::' namespace via Thrust 2.8 with the HIP backend
-#   # selected. Make it OPTIONAL so a HIP install without rocThrust still
-#   # builds the Catch2-only c2h library; consumers (per-test executables)
-#   # that need thrust check 'TARGET roc::rocthrust' before linking and
-#   # otherwise stay out of the build via the LIBCUDACXX_C2H_HIP_SKIP_LIST.
-#   find_package(rocthrust QUIET CONFIG)
-#   if (rocthrust_FOUND)
-#     message(STATUS "Found rocThrust: ${rocthrust_VERSION}")
-#   else()
-#     message(STATUS "rocThrust not found; thrust-using c2h tests will be skip-listed.")
-#   endif()
-#   # NOTE(HIP/AMD): force '-pthread' onto every c2h test executable.
-#   # cuda::__physical_device (in include/cuda/__device/physical_device.h)
-#   # uses 'std::once_flag' on the very first device touch
-#   # (__primary_context, __name, __peers) -- that is, every C2H_CCCLRT_TEST
-#   # that constructs 'cuda::device_ref{0}', 'cuda::stream{...}' or
-#   # '__ensure_current_context'. On glibc < 2.34 (manylinux_2_28 ships
-#   # glibc 2.28) libpthread is still a separate '.so'; libstdc++'s
-#   # 'std::call_once' resolves '__gthread_once' to a weak no-op stub
-#   # when the binary was not linked '-pthread', the stub returns -1, and
-#   # 'call_once' rethrows that as 'std::system_error(-1, generic_category)'
-#   # whose 'what()' is exactly 'Unknown error -1' (== glibc strerror(-1)).
-#   # The callable is *never invoked*, so no HIP API name appears in the
-#   # message, which matched the CCCLRT failure pattern (same source built
-#   # & passing on Ubuntu 22.04 / glibc 2.35 -- where libpthread is folded
-#   # into libc -- and failing only inside the manylinux_2_28 container on
-#   # the same physical host). Propagating Threads::Threads through
-#   # cccl.c2h (INTERFACE) and cccl.c2h.main (PUBLIC) makes every per-test
-#   # executable inherit '-pthread' transitively. NV-only builds are
-#   # unaffected; this is HIP-side only by intention.
-#   set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-#   find_package(Threads REQUIRED)
-# else()
-# =======
-
 # when CCCL is used from the CTK, C2H does not need to be rebuilt when making local changes to CCCL (faster iteration)
 option(C2H_USE_CCCL_FROM_CTK "Use CCCL from the CTK in c2h." OFF)
 
-if (C2H_USE_CCCL_FROM_CTK)
+if (LIBCUDACXX_ENABLE_HIP)
+  # NOTE(HIP/AMD): on HIP we don't ship a full CCCL distribution
+  # (no CUB / Thrust packages), so find_package(CCCL CONFIG REQUIRED)
+  # would fail looking for lib/cmake/cccl/cccl-config.cmake. The only
+  # CCCL component we ship is libcudacxx; the parent CMakeLists
+  # (CMakeLists.txt:245-249) pre-defines CCCL::CCCL as an alias for
+  # libcudacxx::libcudacxx so that subsequent
+  # target_link_libraries(... CCCL::CCCL ...) calls in this file resolve
+  # correctly. Verify the alias actually exists rather than silently
+  # reaching the link line later with a missing target. Once a HIP-aware
+  # cccl-config.cmake exists upstream, this whole branch can collapse to
+  # the unconditional find_package() below.
+  if (NOT TARGET CCCL::CCCL)
+    message(FATAL_ERROR
+      "CCCL::CCCL alias must be pre-defined by the parent project on HIP "
+      "(see top-level CMakeLists.txt:245-249). Cannot continue without it.")
+  endif()
+  find_package(hip REQUIRED)
+  # NOTE(HIP/AMD): rocThrust 4.x ships under /opt/rocm/lib/cmake/rocthrust
+  # and provides the 'roc::rocthrust' interface target, which exposes
+  # the 'thrust::' namespace via Thrust 2.8 with the HIP backend
+  # selected. Make it OPTIONAL so a HIP install without rocThrust still
+  # builds the Catch2-only c2h library; consumers (per-test executables)
+  # that need thrust check 'TARGET roc::rocthrust' before linking and
+  # otherwise stay out of the build via the LIBCUDACXX_C2H_HIP_SKIP_LIST.
+  find_package(rocthrust QUIET CONFIG)
+  if (rocthrust_FOUND)
+    message(STATUS "Found rocThrust: ${rocthrust_VERSION}")
+  else()
+    message(STATUS "rocThrust not found; thrust-using c2h tests will be skip-listed.")
+  endif()
+  # NOTE(HIP/AMD): force '-pthread' onto every c2h test executable.
+  # cuda::__physical_device (in include/cuda/__device/physical_device.h)
+  # uses 'std::once_flag' on the very first device touch
+  # (__primary_context, __name, __peers) -- that is, every C2H_CCCLRT_TEST
+  # that constructs 'cuda::device_ref{0}', 'cuda::stream{...}' or
+  # '__ensure_current_context'. On glibc < 2.34 (manylinux_2_28 ships
+  # glibc 2.28) libpthread is still a separate '.so'; libstdc++'s
+  # 'std::call_once' resolves '__gthread_once' to a weak no-op stub
+  # when the binary was not linked '-pthread', the stub returns -1, and
+  # 'call_once' rethrows that as 'std::system_error(-1, generic_category)'
+  # whose 'what()' is exactly 'Unknown error -1' (== glibc strerror(-1)).
+  # The callable is *never invoked*, so no HIP API name appears in the
+  # message, which matched the CCCLRT failure pattern (same source built
+  # & passing on Ubuntu 22.04 / glibc 2.35 -- where libpthread is folded
+  # into libc -- and failing only inside the manylinux_2_28 container on
+  # the same physical host). Propagating Threads::Threads through
+  # cccl.c2h (INTERFACE) and cccl.c2h.main (PUBLIC) makes every per-test
+  # executable inherit '-pthread' transitively. NV-only builds are
+  # unaffected; this is HIP-side only by intention.
+  set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+  find_package(Threads REQUIRED)
+elseif (C2H_USE_CCCL_FROM_CTK)
   find_package(CUDAToolkit REQUIRED)
 else()
   cccl_get_cccl()
-# >>>>>>> END NEW CODE (b0ca1b2dbc)
   find_package(CUDAToolkit)
 endif()
 
@@ -143,69 +122,46 @@ if (LIBCUDACXX_ENABLE_HIP AND C2H_ENABLE_CURAND)
     "INTERFACE here and generators*.cu (the curand consumer) is skipped.")
 endif()
 
-# <<<<<<< OLD CODE from 23063816f0 (3fd8e38e4b) - COMMENTED OUT
-# # Library sources: under HIP the thrust-heavy generators*.cu translation
-# # units are skipped; the Catch2 framework + helpers are still present
-# # via cccl.c2h.main (catch2_runner.cpp + catch2_runner_helper.cu).
-# if (LIBCUDACXX_ENABLE_HIP)
-#   add_library(cccl.c2h INTERFACE)
-# else()
-#   add_library(
-#     cccl.c2h
-#     STATIC
-#     generators.cu
-#     generators_gen_values.cu
-#     generators_uniform_offsets.cu
-#     generators_vector.cu
-#   )
-# endif()
-# if (LIBCUDACXX_ENABLE_HIP)
-#   include(${CMAKE_SOURCE_DIR}/cmake/CCCLC2hHipDeps.cmake)
-#   target_include_directories(cccl.c2h INTERFACE "${C2H_SOURCE_DIR}/include")
-#   target_link_libraries(
-#     cccl.c2h
-#     INTERFACE #
-#       CCCL::CCCL
-#       Catch2::Catch2
-#       cccl.compiler_interface_cpp17
-#   )
-#   # Threads::Threads + hip::host attached via the shared helper -- see
-#   # cmake/CCCLC2hHipDeps.cmake for the manylinux/glibc < 2.34 pthread
-#   # weak-stub rationale that requires '-pthread' on every HIP test
-#   # executable that constructs a 'cuda::device_ref' / 'cuda::stream'.
-#   cccl_c2h_attach_hip_deps(cccl.c2h SCOPE INTERFACE)
-# else()
-#   target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
-#   target_link_libraries(
-#     cccl.c2h
-#     PUBLIC #
-#       CCCL::CCCL
-#       Catch2::Catch2
-#       cccl.compiler_interface_cpp17
-#   )
-#   cccl_configure_target(cccl.c2h DIALECT 17)
-# endif()
-# =======
-add_library(
-  cccl.c2h
-  STATIC
-  generators.cu
-  generators_gen_values.cu
-  generators_uniform_offsets.cu
-  generators_vector.cu
-)
-target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
-target_link_libraries(
-  cccl.c2h
-  PUBLIC #
-    cccl.compiler_interface
-    Catch2::Catch2
-)
-if (NOT C2H_USE_CCCL_FROM_CTK)
-  target_link_libraries(cccl.c2h PUBLIC CCCL::CCCL)
+# Library sources: under HIP the thrust-heavy generators*.cu translation
+# units are skipped; the Catch2 framework + helpers are still present
+# via cccl.c2h.main (catch2_runner.cu + catch2_runner_helper.cu).
+if (LIBCUDACXX_ENABLE_HIP)
+  add_library(cccl.c2h INTERFACE)
+  include(${CMAKE_SOURCE_DIR}/cmake/CCCLC2hHipDeps.cmake)
+  target_include_directories(cccl.c2h INTERFACE "${C2H_SOURCE_DIR}/include")
+  target_link_libraries(
+    cccl.c2h
+    INTERFACE #
+      CCCL::CCCL
+      Catch2::Catch2
+      cccl.compiler_interface
+  )
+  # Threads::Threads + hip::host attached via the shared helper -- see
+  # cmake/CCCLC2hHipDeps.cmake for the manylinux/glibc < 2.34 pthread
+  # weak-stub rationale that requires '-pthread' on every HIP test
+  # executable that constructs a 'cuda::device_ref' / 'cuda::stream'.
+  cccl_c2h_attach_hip_deps(cccl.c2h SCOPE INTERFACE)
+else()
+  add_library(
+    cccl.c2h
+    STATIC
+    generators.cu
+    generators_gen_values.cu
+    generators_uniform_offsets.cu
+    generators_vector.cu
+  )
+  target_include_directories(cccl.c2h PUBLIC "${C2H_SOURCE_DIR}/include")
+  target_link_libraries(
+    cccl.c2h
+    PUBLIC #
+      cccl.compiler_interface
+      Catch2::Catch2
+  )
+  if (NOT C2H_USE_CCCL_FROM_CTK)
+    target_link_libraries(cccl.c2h PUBLIC CCCL::CCCL)
+  endif()
+  cccl_configure_target(cccl.c2h DIALECT 17)
 endif()
-cccl_configure_target(cccl.c2h DIALECT 17)
-# >>>>>>> END NEW CODE (3fd8e38e4b)
 
 if (C2H_ENABLE_CURAND)
   target_link_libraries(cccl.c2h PRIVATE CUDA::curand)
@@ -214,36 +170,28 @@ elseif (NOT LIBCUDACXX_ENABLE_HIP)
   target_compile_definitions(cccl.c2h PRIVATE C2H_HAS_CURAND=0)
 endif()
 
-# <<<<<<< OLD CODE from de35987c51 (d1887233a4) - COMMENTED OUT
-# # <<<<<<< OLD CODE from 5bdee904e5 (b0ca1b2dbc) - COMMENTED OUT
-# # # The Catch2 runner. Under HIP we tag the .cu file with LANGUAGE HIP so
-# # # it compiles through hipcc / clang -x hip. catch2_runner_helper.{inl,cu}
-# # # only uses cuda* runtime API symbols that are shimmed by
-# # # <libhipcxx/__amd/cuda_runtime.h>, so no source changes needed.
-# # add_library(cccl.c2h.main OBJECT catch2_runner.cpp catch2_runner_helper.cu)
-# # if (LIBCUDACXX_ENABLE_HIP)
-# #   # NOTE(HIP/AMD): catch2_runner.cpp transitively includes
-# #   # <libhipcxx/__amd/cuda_runtime.h> which pulls <hip/hip_runtime.h>. The latter
-# #   # uses _Float16 / __bf16 which are HIP-clang specific extensions, so
-# #   # we have to compile the runner through clang -x hip even though
-# #   # the file extension is .cpp.
-# #   set_source_files_properties(
-# #     catch2_runner.cpp catch2_runner_helper.cu
-# #     PROPERTIES LANGUAGE HIP
-# #   )
-# #   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
-# #   cccl_c2h_attach_hip_deps(cccl.c2h.main SCOPE PUBLIC)
-# # else()
-# #   target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
-# # endif()
-# # =======
-# =======
 set_target_properties(
   cccl.c2h
   PROPERTIES CXX_VISIBILITY_PRESET "default" CUDA_VISIBILITY_PRESET "default"
 )
 
-# >>>>>>> END NEW CODE (d1887233a4)
+# The Catch2 runner. Under HIP we tag the .cu file with LANGUAGE HIP so
+# it compiles through hipcc / clang -x hip. catch2_runner_helper.{inl,cu}
+# only uses cuda* runtime API symbols that are shimmed by
+# <libhipcxx/__amd/cuda_runtime.h>, so no source changes needed.
 add_library(cccl.c2h.main OBJECT catch2_runner.cu catch2_runner_helper.cu)
-target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
-# >>>>>>> END NEW CODE (b0ca1b2dbc)
+if (LIBCUDACXX_ENABLE_HIP)
+  # NOTE(HIP/AMD): catch2_runner.cu transitively includes
+  # <libhipcxx/__amd/cuda_runtime.h> which pulls <hip/hip_runtime.h>. The latter
+  # uses _Float16 / __bf16 which are HIP-clang specific extensions, so
+  # we have to compile the runner through clang -x hip even though
+  # the file extension is .cu.
+  set_source_files_properties(
+    catch2_runner.cu catch2_runner_helper.cu
+    PROPERTIES LANGUAGE HIP
+  )
+  target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
+  cccl_c2h_attach_hip_deps(cccl.c2h.main SCOPE PUBLIC)
+else()
+  target_link_libraries(cccl.c2h.main PUBLIC cccl.c2h)
+endif()

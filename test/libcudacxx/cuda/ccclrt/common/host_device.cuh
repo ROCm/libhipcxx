@@ -96,21 +96,17 @@ void test_host_dev(const Dims& dims, const Lambda& lambda, const Filters&... fil
 
     if constexpr (Dims::has_level(cuda::cluster))
     {
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-// #if defined(__HIP_PLATFORM_AMD__)
-//       // NOTE(HIP/AMD): cluster dimension is a Hopper (sm_90+) NVPTX
-//       // feature; AMDGCN has no equivalent. The HIP runtime does not
-//       // expose 'cudaLaunchAttributeClusterDimension' nor a
-//       // 'clusterDim' member on hipLaunchAttributeValue. The only
-//       // place this branch fires is when the user constructed a
-//       // hierarchy with cuda::cluster_level, which only makes sense
-//       // on Hopper -- on HIP this branch is dead code.
-//       config.numAttrs = 0;
-// #else
-//       dim3 cluster_dims                            = dims.extents(cuda::block, cuda::cluster);
-// =======
+#if defined(__HIP_PLATFORM_AMD__)
+      // NOTE(HIP/AMD): cluster dimension is a Hopper (sm_90+) NVPTX
+      // feature; AMDGCN has no equivalent. The HIP runtime does not
+      // expose 'cudaLaunchAttributeClusterDimension' nor a
+      // 'clusterDim' member on hipLaunchAttributeValue. The only
+      // place this branch fires is when the user constructed a
+      // hierarchy with cuda::cluster_level, which only makes sense
+      // on Hopper -- on HIP this branch is dead code.
+      config.numAttrs = 0;
+#else
       dim3 cluster_dims{cuda::block.dims(cuda::cluster, dims)};
-// >>>>>>> END NEW CODE (8ad18e3528)
       config.attrs[config.numAttrs].id             = cudaLaunchAttributeClusterDimension;
       config.attrs[config.numAttrs].val.clusterDim = {cluster_dims.x, cluster_dims.y, cluster_dims.z};
       config.numAttrs                              = 1;

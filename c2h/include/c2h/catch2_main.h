@@ -91,15 +91,16 @@ int main(int argc, char* argv[])
   }
 
   set_device(device_id);
-// <<<<<<< OLD CODE from 76dd2c49cc (5bfdc304e0) - COMMENTED OUT
-// #  endif // _C2H_HAS_DEVICE_RUNTIME
-//   return session.run();
-// =======
-#  endif // THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
+#  endif // _C2H_HAS_DEVICE_RUNTIME
+#  if defined(__HIP_PLATFORM_AMD__)
+  // NOTE(HIP/AMD): on HIP, cccl.c2h is an INTERFACE library that does not ship the
+  // CUB/Thrust generators*.cu, so init_generator/cleanup_generator are unavailable.
+  return session.run();
+#  else // ^^^ __HIP_PLATFORM_AMD__ ^^^ / vvv !__HIP_PLATFORM_AMD__ vvv
   c2h::detail::init_generator();
   const auto ret = session.run();
   c2h::detail::cleanup_generator();
   return ret;
-// >>>>>>> END NEW CODE (5bfdc304e0)
+#  endif // !__HIP_PLATFORM_AMD__
 }
 #endif // C2H_CONFIG_MAIN

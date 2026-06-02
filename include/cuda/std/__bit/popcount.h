@@ -127,11 +127,7 @@ template <typename _Tp>
 }
 #  endif // !_CCCL_COMPILER(NVRTC)
 
-// <<<<<<< OLD CODE from cad860d58f (671cc3a33d) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-// =======
-#  if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (671cc3a33d)
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 template <typename _Tp>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE int __cccl_popcount_impl_device(_Tp __v) noexcept
 {
@@ -144,11 +140,7 @@ template <typename _Tp>
     return static_cast<int>(::__popcll(__v));
   }
 }
-// <<<<<<< OLD CODE from cad860d58f (671cc3a33d) - COMMENTED OUT
-// #endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-// =======
-#  endif // _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (671cc3a33d)
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 template <typename _Tp>
 [[nodiscard]] _CCCL_API constexpr int __cccl_popcount_impl(_Tp __v) noexcept

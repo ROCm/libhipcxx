@@ -8,38 +8,32 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 4061268863 (123609b1e4) - COMMENTED OUT
-// // // MIT License
-// // //
-// // // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
-// // //
-// // // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // // of this software and associated documentation files (the "Software"), to deal
-// // // in the Software without restriction, including without limitation the rights
-// // // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // // copies of the Software, and to permit persons to whom the Software is
-// // // furnished to do so, subject to the following conditions:
-// // //
-// // // The above copyright notice and this permission notice shall be included in all
-// // // copies or substantial portions of the Software.
-// // //
-// // // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // // SOFTWARE.
-// // =======
-// #include <cuda/launch>
-// // >>>>>>> END NEW CODE (123609b1e4)
-// =======
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/__type_traits/vector_type.h>
 #include <cuda/hierarchy>
 #include <cuda/launch>
 #include <cuda/std/cstddef>
-// >>>>>>> END NEW CODE (8ad18e3528)
 
 #include <iostream>
 
@@ -59,64 +53,57 @@
 
 namespace cg = cooperative_groups;
 
-// <<<<<<< OLD CODE from 9e8e084a8d (0a10a1f035) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-// // #if defined(__HIP_PLATFORM_AMD__)
-// // // NOTE(HIP/AMD): HIP's cooperative_groups::grid_group exposes only
-// // // thread_rank() / is_valid() / sync() / group_dim(), missing the
-// // // CUDA 11.6+ block_rank() / block_index() / num_blocks() /
-// // // dim_blocks() and the corresponding thread_block::dim_threads().
-// // // Provide polyfills that compute these from raw blockIdx / gridDim /
-// // // blockDim built-ins, so the upstream-style kernel below compiles
-// // // and exercises the same correlation against
-// // // cuda::hierarchy::* / cuda::grid / cuda::block expressions on HIP.
-// // namespace
-// // {
-// // __device__ inline unsigned int __cccl_hip_grid_block_rank() noexcept
-// // {
-// //   return blockIdx.x + blockIdx.y * gridDim.x + blockIdx.z * gridDim.x * gridDim.y;
-// // }
-// // __device__ inline dim3 __cccl_hip_grid_block_index() noexcept
-// // {
-// //   return dim3(blockIdx.x, blockIdx.y, blockIdx.z);
-// // }
-// // __device__ inline unsigned long long __cccl_hip_grid_num_blocks() noexcept
-// // {
-// //   return static_cast<unsigned long long>(gridDim.x) * gridDim.y * gridDim.z;
-// // }
-// // __device__ inline dim3 __cccl_hip_grid_dim_blocks() noexcept
-// // {
-// //   return dim3(gridDim.x, gridDim.y, gridDim.z);
-// // }
-// // __device__ inline dim3 __cccl_hip_block_dim_threads() noexcept
-// // {
-// //   return dim3(blockDim.x, blockDim.y, blockDim.z);
-// // }
-// // __device__ inline dim3 __cccl_hip_block_thread_index() noexcept
-// // {
-// //   return dim3(threadIdx.x, threadIdx.y, threadIdx.z);
-// // }
-// // } // namespace
-// // #  define CG_GRID_BLOCK_RANK(g)    __cccl_hip_grid_block_rank()
-// // #  define CG_GRID_BLOCK_INDEX(g)   __cccl_hip_grid_block_index()
-// // #  define CG_GRID_NUM_BLOCKS(g)    __cccl_hip_grid_num_blocks()
-// // #  define CG_GRID_DIM_BLOCKS(g)    __cccl_hip_grid_dim_blocks()
-// // #  define CG_BLOCK_DIM_THREADS(b)  __cccl_hip_block_dim_threads()
-// // #  define CG_BLOCK_THREAD_INDEX(b) __cccl_hip_block_thread_index()
-// // #else
-// // #  define CG_GRID_BLOCK_RANK(g)    (g).block_rank()
-// // #  define CG_GRID_BLOCK_INDEX(g)   (g).block_index()
-// // #  define CG_GRID_NUM_BLOCKS(g)    (g).num_blocks()
-// // #  define CG_GRID_DIM_BLOCKS(g)    (g).dim_blocks()
-// // #  define CG_BLOCK_DIM_THREADS(b)  (b).dim_threads()
-// // #  define CG_BLOCK_THREAD_INDEX(b) (b).thread_index()
-// // #endif // !__HIP_PLATFORM_AMD__
-// // =======
-// using size_t3 = cuda::__vector_type_t<cuda::std::size_t, 3>;
-// // >>>>>>> END NEW CODE (8ad18e3528)
-// =======
+#if defined(__HIP_PLATFORM_AMD__)
+// NOTE(HIP/AMD): HIP's cooperative_groups::grid_group exposes only
+// thread_rank() / is_valid() / sync() / group_dim(), missing the
+// CUDA 11.6+ block_rank() / block_index() / num_blocks() /
+// dim_blocks() and the corresponding thread_block::dim_threads().
+// Provide polyfills that compute these from raw blockIdx / gridDim /
+// blockDim built-ins, so the upstream-style kernel below compiles
+// and exercises the same correlation against
+// cuda::hierarchy::* / cuda::grid / cuda::block expressions on HIP.
+namespace
+{
+__device__ inline unsigned int __cccl_hip_grid_block_rank() noexcept
+{
+  return blockIdx.x + blockIdx.y * gridDim.x + blockIdx.z * gridDim.x * gridDim.y;
+}
+__device__ inline dim3 __cccl_hip_grid_block_index() noexcept
+{
+  return dim3(blockIdx.x, blockIdx.y, blockIdx.z);
+}
+__device__ inline unsigned long long __cccl_hip_grid_num_blocks() noexcept
+{
+  return static_cast<unsigned long long>(gridDim.x) * gridDim.y * gridDim.z;
+}
+__device__ inline dim3 __cccl_hip_grid_dim_blocks() noexcept
+{
+  return dim3(gridDim.x, gridDim.y, gridDim.z);
+}
+__device__ inline dim3 __cccl_hip_block_dim_threads() noexcept
+{
+  return dim3(blockDim.x, blockDim.y, blockDim.z);
+}
+__device__ inline dim3 __cccl_hip_block_thread_index() noexcept
+{
+  return dim3(threadIdx.x, threadIdx.y, threadIdx.z);
+}
+} // namespace
+#  define CG_GRID_BLOCK_RANK(g)    __cccl_hip_grid_block_rank()
+#  define CG_GRID_BLOCK_INDEX(g)   __cccl_hip_grid_block_index()
+#  define CG_GRID_NUM_BLOCKS(g)    __cccl_hip_grid_num_blocks()
+#  define CG_GRID_DIM_BLOCKS(g)    __cccl_hip_grid_dim_blocks()
+#  define CG_BLOCK_DIM_THREADS(b)  __cccl_hip_block_dim_threads()
+#  define CG_BLOCK_THREAD_INDEX(b) __cccl_hip_block_thread_index()
+#else
+#  define CG_GRID_BLOCK_RANK(g)    (g).block_rank()
+#  define CG_GRID_BLOCK_INDEX(g)   (g).block_index()
+#  define CG_GRID_NUM_BLOCKS(g)    (g).num_blocks()
+#  define CG_GRID_DIM_BLOCKS(g)    (g).dim_blocks()
+#  define CG_BLOCK_DIM_THREADS(b)  (b).dim_threads()
+#  define CG_BLOCK_THREAD_INDEX(b) (b).thread_index()
+#endif // !__HIP_PLATFORM_AMD__
 using size_t3 = cuda::vector_type_t<cuda::std::size_t, 3>;
-// >>>>>>> END NEW CODE (0a10a1f035)
 
 struct basic_test_single_dim
 {
@@ -126,29 +113,13 @@ struct basic_test_single_dim
   template <typename DynDims>
   __host__ __device__ void operator()(const DynDims& dims) const
   {
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-//     // device-side require doesn't work with clang-cuda for now
-// // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
-//     // behaviour as clang-cuda -- the device pass parses the body of
-//     // host_device functions and tries to resolve the host-only
-//     // REQUIRE() symbols. Extend the upstream guard to skip the
-//     // device-pass parsing on HIP too.
-// #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
-//     CCCLRT_REQUIRE(dims.extents().x == grid_size * block_size);
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread).x == grid_size * block_size);
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread, cuda::grid).x == grid_size * block_size);
-//     CCCLRT_REQUIRE(dims.count() == grid_size * block_size);
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread) == grid_size * block_size);
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread, cuda::grid) == grid_size * block_size);
-//
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread, cuda::block).x == block_size);
-//     CCCLRT_REQUIRE(dims.extents(cuda::block, cuda::grid).x == grid_size);
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread, cuda::block) == block_size);
-//     CCCLRT_REQUIRE(dims.count(cuda::block, cuda::grid) == grid_size);
-// #endif
-// =======
     // todo: allow this after fixing CCCLRT_REQUIRE with clang-cuda
-#if !_CCCL_CUDA_COMPILER(CLANG)
+    // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
+    // behaviour as clang-cuda -- the device pass parses the body of
+    // host_device functions and tries to resolve the host-only
+    // REQUIRE() symbols. Extend the upstream guard to skip the
+    // device-pass parsing on HIP too.
+#if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::grid, dims).x == grid_size * block_size);
     CCCLRT_REQUIRE(cuda::gpu_thread.count(cuda::grid, dims) == grid_size * block_size);
 
@@ -157,7 +128,6 @@ struct basic_test_single_dim
     CCCLRT_REQUIRE(cuda::gpu_thread.count(cuda::block, dims) == block_size);
     CCCLRT_REQUIRE(cuda::block.count(cuda::grid, dims) == grid_size);
 #endif // !_CCCL_CUDA_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (8ad18e3528)
   }
 
   void run()
@@ -193,32 +163,13 @@ struct basic_test_multi_dim
   template <typename DynDims>
   __host__ __device__ void operator()(const DynDims& dims) const
   {
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-//     // device-side require doesn't work with clang-cuda for now
-// // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
-//     // behaviour as clang-cuda -- the device pass parses the body of
-//     // host_device functions and tries to resolve the host-only
-//     // REQUIRE() symbols. Extend the upstream guard to skip the
-//     // device-pass parsing on HIP too.
-// #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
-//     CCCLRT_REQUIRE(dims.extents() == dim3(32, 12, 4));
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread) == dim3(32, 12, 4));
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread, cuda::grid) == dim3(32, 12, 4));
-//     CCCLRT_REQUIRE(dims.extents().extent(0) == 32);
-//     CCCLRT_REQUIRE(dims.extents().extent(1) == 12);
-//     CCCLRT_REQUIRE(dims.extents().extent(2) == 4);
-//     CCCLRT_REQUIRE(dims.count() == 512 * 3);
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread) == 512 * 3);
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread, cuda::grid) == 512 * 3);
-//
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread, cuda::block) == dim3(2, 3, 4));
-//     CCCLRT_REQUIRE(dims.extents(cuda::block, cuda::grid) == dim3(16, 4, 1));
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread, cuda::block) == 24);
-//     CCCLRT_REQUIRE(dims.count(cuda::block, cuda::grid) == 64);
-// #endif
-// =======
     // todo: allow this after fixing CCCLRT_REQUIRE with clang-cuda
-#if !_CCCL_CUDA_COMPILER(CLANG)
+    // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
+    // behaviour as clang-cuda -- the device pass parses the body of
+    // host_device functions and tries to resolve the host-only
+    // REQUIRE() symbols. Extend the upstream guard to skip the
+    // device-pass parsing on HIP too.
+#if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::grid, dims) == dim3(32, 12, 4));
     CCCLRT_REQUIRE(cuda::gpu_thread.extents(cuda::grid, dims).extent(0) == 32);
     CCCLRT_REQUIRE(cuda::gpu_thread.extents(cuda::grid, dims).extent(1) == 12);
@@ -230,7 +181,6 @@ struct basic_test_multi_dim
     CCCLRT_REQUIRE(cuda::gpu_thread.count(cuda::block, dims) == 24);
     CCCLRT_REQUIRE(cuda::block.count(cuda::grid, dims) == 64);
 #endif // !_CCCL_CUDA_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (8ad18e3528)
   }
 
   void run()
@@ -264,30 +214,13 @@ struct basic_test_mixed
   template <typename DynDims>
   __host__ __device__ void operator()(const DynDims& dims) const
   {
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-//     // device-side require doesn't work with clang-cuda for now
-// // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
-//     // behaviour as clang-cuda -- the device pass parses the body of
-//     // host_device functions and tries to resolve the host-only
-//     // REQUIRE() symbols. Extend the upstream guard to skip the
-//     // device-pass parsing on HIP too.
-// #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
-//     CCCLRT_REQUIRE(dims.extents() == dim3(2048, 4, 2));
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread) == dim3(2048, 4, 2));
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread, cuda::grid) == dim3(2048, 4, 2));
-//     CCCLRT_REQUIRE(dims.extents().extent(0) == 2048);
-//     CCCLRT_REQUIRE(dims.extents().extent(1) == 4);
-//     CCCLRT_REQUIRE(dims.extents().extent(2) == 2);
-//     CCCLRT_REQUIRE(dims.count() == 16 * 1024);
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread) == 16 * 1024);
-//     CCCLRT_REQUIRE(dims.count(cuda::gpu_thread, cuda::grid) == 16 * 1024);
-//
-//     CCCLRT_REQUIRE(dims.extents(cuda::block, cuda::grid) == dim3(8, 4, 2));
-//     CCCLRT_REQUIRE(dims.count(cuda::block, cuda::grid) == 64);
-// #endif
-// =======
     // todo: allow this after fixing CCCLRT_REQUIRE with clang-cuda
-#if !_CCCL_CUDA_COMPILER(CLANG)
+    // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
+    // behaviour as clang-cuda -- the device pass parses the body of
+    // host_device functions and tries to resolve the host-only
+    // REQUIRE() symbols. Extend the upstream guard to skip the
+    // device-pass parsing on HIP too.
+#if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::grid, dims) == dim3(2048, 4, 2));
     CCCLRT_REQUIRE(cuda::gpu_thread.extents(cuda::grid, dims).extent(0) == 2048);
     CCCLRT_REQUIRE(cuda::gpu_thread.extents(cuda::grid, dims).extent(1) == 4);
@@ -297,7 +230,6 @@ struct basic_test_mixed
     CCCLRT_REQUIRE(cuda::block.dims(cuda::grid, dims) == dim3(8, 4, 2));
     CCCLRT_REQUIRE(cuda::block.count(cuda::grid, dims) == 64);
 #endif // !_CCCL_CUDA_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (8ad18e3528)
   }
 
   void run()
@@ -326,25 +258,13 @@ struct basic_test_cluster
   template <typename DynDims>
   __host__ __device__ void operator()(const DynDims& dims) const
   {
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-//     // device-side require doesn't work with clang-cuda for now
-// // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
-//     // behaviour as clang-cuda -- the device pass parses the body of
-//     // host_device functions and tries to resolve the host-only
-//     // REQUIRE() symbols. Extend the upstream guard to skip the
-//     // device-pass parsing on HIP too.
-// #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
-//     CCCLRT_REQUIRE(dims.extents() == dim3(512, 6, 9));
-//     CCCLRT_REQUIRE(dims.count() == 27 * 1024);
-//
-//     CCCLRT_REQUIRE(dims.extents(cuda::block, cuda::grid) == dim3(2, 6, 9));
-//     CCCLRT_REQUIRE(dims.count(cuda::block, cuda::grid) == 108);
-//     CCCLRT_REQUIRE(dims.extents(cuda::cluster, cuda::grid) == dim3(1, 3, 9));
-//     CCCLRT_REQUIRE(dims.extents(cuda::gpu_thread, cuda::cluster) == dim3(512, 2, 1));
-// #endif
-// =======
     // todo: allow this after fixing CCCLRT_REQUIRE with clang-cuda
-#if !_CCCL_CUDA_COMPILER(CLANG)
+    // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
+    // behaviour as clang-cuda -- the device pass parses the body of
+    // host_device functions and tries to resolve the host-only
+    // REQUIRE() symbols. Extend the upstream guard to skip the
+    // device-pass parsing on HIP too.
+#if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::grid, dims) == dim3(512, 6, 9));
     CCCLRT_REQUIRE(cuda::gpu_thread.count(cuda::grid, dims) == 27 * 1024);
 
@@ -353,7 +273,6 @@ struct basic_test_cluster
     CCCLRT_REQUIRE(cuda::cluster.dims(cuda::grid, dims) == dim3(1, 3, 9));
     CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::cluster, dims) == dim3(512, 2, 1));
 #endif // !_CCCL_CUDA_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (8ad18e3528)
   }
 
   void run()
@@ -469,72 +388,21 @@ __global__ void kernel(Hierarchy hierarchy)
   auto grid  = cg::this_grid();
   auto block = cg::this_thread_block();
 
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-// // <<<<<<< OLD CODE from fad64495d1 (4b0036c42b) - COMMENTED OUT
-// //   CCCLRT_REQUIRE_DEVICE(grid.thread_rank() == (cuda::hierarchy::rank(cuda::thread, cuda::grid)));
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_BLOCK_RANK(grid) == (cuda::hierarchy::rank(cuda::block, cuda::grid)));
-// //   CCCLRT_REQUIRE_DEVICE(grid.thread_rank() == cuda::grid.rank(cuda::thread));
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_BLOCK_RANK(grid) == cuda::grid.rank(cuda::block));
-// //
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_BLOCK_INDEX(grid) == (cuda::hierarchy::index(cuda::block, cuda::grid)));
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_BLOCK_INDEX(grid) == cuda::grid.index(cuda::block));
-// //
-// //   CCCLRT_REQUIRE_DEVICE(grid.num_threads() == (cuda::hierarchy::count(cuda::thread, cuda::grid)));
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_NUM_BLOCKS(grid) == (cuda::hierarchy::count(cuda::block, cuda::grid)));
-// //
-// //   CCCLRT_REQUIRE_DEVICE(grid.num_threads() == (cuda::grid.count(cuda::thread)));
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_NUM_BLOCKS(grid) == cuda::grid.count(cuda::block));
-// //
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_DIM_BLOCKS(grid) == (cuda::hierarchy::extents<cuda::block_level, cuda::grid_level>()));
-// //   CCCLRT_REQUIRE_DEVICE(CG_GRID_DIM_BLOCKS(grid) == cuda::grid.extents(cuda::block));
-// // =======
-//   CCCLRT_REQUIRE_DEVICE(grid.thread_rank() == (cuda::hierarchy::rank(cuda::gpu_thread, cuda::grid)));
-//   CCCLRT_REQUIRE_DEVICE(grid.block_rank() == (cuda::hierarchy::rank(cuda::block, cuda::grid)));
-// =======
-// >>>>>>> END NEW CODE (8ad18e3528)
   CCCLRT_REQUIRE_DEVICE(grid.thread_rank() == cuda::gpu_thread.rank(cuda::grid));
   CCCLRT_REQUIRE_DEVICE(grid.block_rank() == cuda::block.rank(cuda::grid));
   CCCLRT_REQUIRE_DEVICE(grid.block_index() == cuda::block.index(cuda::grid));
   CCCLRT_REQUIRE_DEVICE(grid.num_threads() == cuda::gpu_thread.count(cuda::grid));
   CCCLRT_REQUIRE_DEVICE(grid.num_blocks() == cuda::block.count(cuda::grid));
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-//
-//   CCCLRT_REQUIRE_DEVICE(grid.dim_blocks() == (cuda::hierarchy::extents<cuda::block_level, cuda::grid_level>()));
-//   CCCLRT_REQUIRE_DEVICE(grid.dim_blocks() == dim3{cuda::block.dims(cuda::grid)});
-// // >>>>>>> END NEW CODE (4b0036c42b)
-//
-//   CCCLRT_REQUIRE_DEVICE(block.thread_rank() == (cuda::hierarchy::rank<cuda::thread_level, cuda::block_level>()));
-//   CCCLRT_REQUIRE_DEVICE(CG_BLOCK_THREAD_INDEX(block) == (cuda::hierarchy::index<cuda::thread_level, cuda::block_level>()));
-//   CCCLRT_REQUIRE_DEVICE(block.num_threads() == (cuda::hierarchy::count<cuda::thread_level, cuda::block_level>()));
-//   CCCLRT_REQUIRE_DEVICE(CG_BLOCK_DIM_THREADS(block) == (cuda::hierarchy::extents<cuda::thread_level, cuda::block_level>()));
-// =======
   CCCLRT_REQUIRE_DEVICE(grid.dim_blocks() == cuda::block.dims(cuda::grid));
-// >>>>>>> END NEW CODE (8ad18e3528)
 
-// <<<<<<< OLD CODE from fad64495d1 (4b0036c42b) - COMMENTED OUT
-//   CCCLRT_REQUIRE_DEVICE(block.thread_rank() == cuda::block.rank(cuda::thread));
-//   CCCLRT_REQUIRE_DEVICE(CG_BLOCK_THREAD_INDEX(block) == cuda::block.index(cuda::thread));
-//   CCCLRT_REQUIRE_DEVICE(block.num_threads() == cuda::block.count(cuda::thread));
-//   CCCLRT_REQUIRE_DEVICE(CG_BLOCK_DIM_THREADS(block) == cuda::block.extents(cuda::thread));
-//
-//   auto block_index = hierarchy.index(cuda::thread, cuda::block);
-//   CCCLRT_REQUIRE_DEVICE(block_index == CG_BLOCK_THREAD_INDEX(block));
-// =======
   CCCLRT_REQUIRE_DEVICE(block.thread_rank() == cuda::gpu_thread.rank(cuda::block));
   CCCLRT_REQUIRE_DEVICE(block.thread_index() == cuda::gpu_thread.index(cuda::block));
   CCCLRT_REQUIRE_DEVICE(block.num_threads() == cuda::gpu_thread.count(cuda::block));
   CCCLRT_REQUIRE_DEVICE(block.dim_threads() == cuda::gpu_thread.dims(cuda::block));
 
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-//   auto block_index = hierarchy.index(cuda::gpu_thread, cuda::block);
-//   CCCLRT_REQUIRE_DEVICE(block_index == block.thread_index());
-// // >>>>>>> END NEW CODE (4b0036c42b)
-//   auto grid_index = hierarchy.index();
-// =======
   CCCLRT_REQUIRE_DEVICE(block.thread_index() == cuda::gpu_thread.index(cuda::block, hierarchy));
 
   const auto grid_index = cuda::gpu_thread.index_as<unsigned long long>(cuda::grid, hierarchy);
-// >>>>>>> END NEW CODE (8ad18e3528)
   CCCLRT_REQUIRE_DEVICE(
     grid_index.x
     == static_cast<unsigned long long>(CG_GRID_BLOCK_INDEX(grid).x) * CG_BLOCK_DIM_THREADS(block).x + CG_BLOCK_THREAD_INDEX(block).x);
@@ -545,20 +413,9 @@ __global__ void kernel(Hierarchy hierarchy)
     grid_index.z
     == static_cast<unsigned long long>(CG_GRID_BLOCK_INDEX(grid).z) * CG_BLOCK_DIM_THREADS(block).z + CG_BLOCK_THREAD_INDEX(block).z);
 
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-// // <<<<<<< OLD CODE from fad64495d1 (4b0036c42b) - COMMENTED OUT
-// //   CCCLRT_REQUIRE_DEVICE(hierarchy.rank(cuda::block) == CG_GRID_BLOCK_RANK(grid));
-// //   CCCLRT_REQUIRE_DEVICE(hierarchy.rank(cuda::thread, cuda::block) == block.thread_rank());
-// // =======
-//   CCCLRT_REQUIRE_DEVICE(hierarchy.rank(cuda::block) == grid.block_rank());
-//   CCCLRT_REQUIRE_DEVICE(hierarchy.rank(cuda::gpu_thread, cuda::block) == block.thread_rank());
-// // >>>>>>> END NEW CODE (4b0036c42b)
-//   CCCLRT_REQUIRE_DEVICE(hierarchy.rank() == grid.thread_rank());
-// =======
   CCCLRT_REQUIRE_DEVICE(grid.block_rank() == cuda::block.rank(cuda::grid, hierarchy));
   CCCLRT_REQUIRE_DEVICE(block.thread_rank() == cuda::gpu_thread.rank(cuda::block, hierarchy));
   CCCLRT_REQUIRE_DEVICE(grid.thread_rank() == cuda::gpu_thread.rank(cuda::grid, hierarchy));
-// >>>>>>> END NEW CODE (8ad18e3528)
 }
 
 C2H_TEST("Dims queries indexing and ambient hierarchy", "[hierarchy]")
