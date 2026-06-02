@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___HIERARCHY_BLOCK_LEVEL_H
 #define _CUDA___HIERARCHY_BLOCK_LEVEL_H
 
@@ -21,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/__fwd/hierarchy.h>
 #  include <cuda/__hierarchy/hierarchy_query_result.h>
@@ -46,7 +68,7 @@ struct _CCCL_DECLSPEC_EMPTY_BASES block_level : __native_hierarchy_level_base<bl
   using __base_type::count_as;
   using __base_type::extents_as;
 
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
   using __base_type::index_as;
   using __base_type::rank_as;
 
@@ -137,7 +159,7 @@ struct _CCCL_DECLSPEC_EMPTY_BASES block_level : __native_hierarchy_level_base<bl
     const auto __idx  = index_as<_Tp>(__level, __hier_unpacked);
     return static_cast<_Tp>((__idx.z * __dims.y + __idx.y) * __dims.x + __idx.x);
   }
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 };
 
 _CCCL_GLOBAL_CONSTANT block_level block;
@@ -146,6 +168,6 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #endif // _CUDA___HIERARCHY_BLOCK_LEVEL_H

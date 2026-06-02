@@ -314,6 +314,11 @@ template <::cuda::std::size_t _Np>
   return static_cast<::cudaError_t>(::hipStreamDestroy(__stream));
 }
 
+_CCCL_HOST_API inline ::cudaError_t __streamSynchronizeNoThrow(::hipStream_t __stream)
+{
+  return static_cast<::cudaError_t>(::hipStreamSynchronize(__stream));
+}
+
 _CCCL_HOST_API inline void __streamSynchronize(::hipStream_t __stream)
 {
   _CCCL_TRY_CUDA_API(::hipStreamSynchronize, "Failed to synchronize a stream", __stream);
@@ -467,6 +472,18 @@ __mempoolCreateNoThrow(::hipMemPool_t* __pool, ::hipMemPoolProps* __props)
   return static_cast<::cudaError_t>(::hipMemPoolCreate(__pool, __props));
 }
 
+// NOTE(HIP/AMD): the default device memory pool. On HIP _CCCL_HAS_CTK() is
+// false so the upstream code takes the pre-CTK-13 'cuDeviceGetDefaultMemPool'
+// path -> ::cuda::__driver::__deviceGetDefaultMemPool(device). HIP supports it
+// directly via hipDeviceGetDefaultMemPool(hipMemPool_t*, int).
+[[nodiscard]] _CCCL_HOST_API inline ::hipMemPool_t __deviceGetDefaultMemPool(::hipDevice_t __device)
+{
+  ::hipMemPool_t __result = nullptr;
+  _CCCL_TRY_CUDA_API(
+    ::hipDeviceGetDefaultMemPool, "Failed to get default memory pool", &__result, static_cast<int>(__device));
+  return __result;
+}
+
 _CCCL_HOST_API inline void
 __mempoolSetAccess(::hipMemPool_t __pool, ::hipMemAccessDesc* __descs, ::size_t __count)
 {
@@ -544,6 +561,64 @@ _CCCL_HOST_API inline void __mempoolTrimTo(::hipMemPool_t __pool, ::size_t __min
 [[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __freeHostNoThrow(void* __dptr)
 {
   return static_cast<::cudaError_t>(::hipHostFree(__dptr));
+}
+
+// NOTE(HIP/AMD): execution-control wrappers used by <cuda/__launch/*>.
+// CUfunction_attribute -> hipFunction_attribute (see cuda_runtime.h).
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+__functionGetAttributeNoThrow(int& __value, ::hipFunction_attribute __attr, ::hipFunction_t __kernel)
+{
+  return static_cast<::cudaError_t>(::hipFuncGetAttribute(&__value, __attr, __kernel));
+}
+
+// NOTE(HIP/AMD): convert the CUDA-shaped CUlaunchConfig (filled by
+// <cuda/__launch/*>) into a HIP module-launch. hipLaunchConfig_t is not
+// layout-compatible, so we read the fields explicitly. The PRIORITY (hint)
+// and CLUSTER_DIMENSION (Hopper-only) launch attributes have no AMDGCN
+// equivalent and are ignored; COOPERATIVE selects the cooperative launch.
+_CCCL_HOST_API inline void __launchKernel(::CUlaunchConfig& __config, ::hipFunction_t __kernel, void** __args)
+{
+  bool __cooperative = false;
+  for (unsigned int __i = 0; __i < __config.numAttrs; ++__i)
+  {
+    if (__config.attrs[__i].id == ::CU_LAUNCH_ATTRIBUTE_COOPERATIVE)
+    {
+      __cooperative = __config.attrs[__i].value.cooperative != 0;
+    }
+  }
+  if (__cooperative)
+  {
+    _CCCL_TRY_CUDA_API(
+      ::hipModuleLaunchCooperativeKernel,
+      "Failed to launch a cooperative kernel",
+      __kernel,
+      __config.gridDimX,
+      __config.gridDimY,
+      __config.gridDimZ,
+      __config.blockDimX,
+      __config.blockDimY,
+      __config.blockDimZ,
+      __config.sharedMemBytes,
+      __config.hStream,
+      __args);
+  }
+  else
+  {
+    _CCCL_TRY_CUDA_API(
+      ::hipModuleLaunchKernel,
+      "Failed to launch a kernel",
+      __kernel,
+      __config.gridDimX,
+      __config.gridDimY,
+      __config.gridDimZ,
+      __config.blockDimX,
+      __config.blockDimY,
+      __config.blockDimZ,
+      __config.sharedMemBytes,
+      __config.hStream,
+      __args,
+      nullptr);
+  }
 }
 
 _CCCL_END_NAMESPACE_CUDA_DRIVER

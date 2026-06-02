@@ -73,25 +73,36 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND (LIBCUDACX
   )
 
   if (LIBCUDACXX_ENABLE_HIP)
-    # NOTE(HIP/AMD): per-test skip-list. These depend on upstream-CUDA-only
-    # feature surfaces; enable them only when the corresponding HIP support
-    # has landed.
+    # NOTE(HIP/AMD): per-test skip-list (regex/substring patterns matched
+    # against the test source path below). These depend on upstream-CUDA-only
+    # feature surfaces; re-enable them when the corresponding HIP support has
+    # landed.
     set(LIBCUDACXX_C2H_HIP_SKIP_LIST
-      # Use cuda::device::current_arch_id / current_arch_traits /
-      # current_compute_capability which are not yet wired into the
-      # libhipcxx HIP bridge (need a HIP-side AMDGCN architecture
-      # registry).
+      # cuda::device::current_arch_id / current_arch_traits /
+      # current_compute_capability are not yet wired into the libhipcxx HIP
+      # bridge (need a HIP-side AMDGCN architecture registry).
       cuda/ccclrt/device/arch_id.c2h.cu
       cuda/ccclrt/device/arch_traits.c2h.cu
       cuda/ccclrt/device/compute_capability.c2h.cu
+      # launch: host_launch / dynamic_shared_memory / launch_smoke ARE enabled
+      # on HIP (driver launch ported to hipModuleLaunchKernel). Only
+      # configuration.cu is skipped: it is a CUDA-driver launch-config
+      # *replacement* test that also uses hierarchy rank intrinsics not yet on
+      # HIP.
+      cuda/ccclrt/launch/configuration.cu
+      # hierarchy_smoke needs cuda::__vector_type_t (CUDA vector_types.h) + a
+      # dim3 <-> hierarchy_query_result comparison. hierarchy_custom_types IS
+      # enabled (matches 3.2.1).
+      cuda/ccclrt/hierarchy/hierarchy_smoke.cu
+      # containers: cuda::buffer / uninitialized_async_buffer additionally need
+      # <cub/device/device_transform.cuh> ported to hipCUB.
+      cuda/containers/
+      # shared_resource instantiates cuda::__uninitialized_async_buffer (above).
+      cuda/memory_resource/shared_resource.cu
+      # PSTL parallel algorithms (cuda::execution) -- new in 3.3, need a HIP
+      # execution / device_transform port.
+      pstl_
     )
-    # If rocThrust is NOT available, also skip the thrust-using test;
-    # otherwise leave it in the build and link rocThrust to the
-    # per-test executable (handled below).
-    if (NOT rocthrust_FOUND)
-      list(APPEND LIBCUDACXX_C2H_HIP_SKIP_LIST
-        cuda/containers/uninitialized_async_buffer.cu)
-    endif()
   endif()
 
   set(c2h_all_target "libcudacxx.test.c2h_all")
@@ -186,8 +197,14 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND (LIBCUDACX
 
   foreach (test_src IN LISTS test_srcs)
     if (LIBCUDACXX_ENABLE_HIP)
-      list(FIND LIBCUDACXX_C2H_HIP_SKIP_LIST "${test_src}" _skip_idx)
-      if (NOT _skip_idx EQUAL -1)
+      set(_skip_test OFF)
+      foreach (_skip_pat IN LISTS LIBCUDACXX_C2H_HIP_SKIP_LIST)
+        if (test_src MATCHES "${_skip_pat}")
+          set(_skip_test ON)
+          break()
+        endif()
+      endforeach()
+      if (_skip_test)
         message(STATUS "c2h test (HIP skip-list): ${test_src}")
         continue()
       endif()
