@@ -242,7 +242,10 @@ endmacro()
 # air-gapped CI containers (observed on the ROCm-DS Jenkins job
 # 'libhipcxx/155': 'Failed to clone repository ...dlpack...'). Gate the
 # fetch on 'LIBCUDACXX_ENABLE_CUDA' so HIP-only builds skip it entirely.
-if (LIBCUDACXX_ENABLE_CUDA)
+# NOTE(HIP/AMD): 3.3 adds general mdspan<->dlpack conversion tests
+# (cuda/containers/views/mdspan/{mdspan_to_dlpack,dlpack_to_mdspan}) that need
+# the header on HIP too, so also fetch it for HIP builds.
+if (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
   cccl_get_dlpack()
 endif()
 
@@ -402,10 +405,9 @@ endif()
 
 # enable exceptions and assertions in tests
 string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -DCCCL_ENABLE_ASSERTIONS")
-# NOTE(HIP/AMD): dlpack only fetched for CUDA builds (see comment at
-# 'cccl_get_dlpack()' above); skip the include path on HIP-only builds so
-# we don't reference an undefined 'dlpack_SOURCE_DIR'.
-if (LIBCUDACXX_ENABLE_CUDA)
+# NOTE(HIP/AMD): dlpack is now fetched for HIP too (see comment at
+# 'cccl_get_dlpack()' above) for the mdspan<->dlpack conversion tests.
+if (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -I ${dlpack_SOURCE_DIR}/include")
 endif()
 

@@ -129,6 +129,15 @@
 #ifndef CU_DEVICE_ATTRIBUTE_MEMORY_POOLS_SUPPORTED
 #  define CU_DEVICE_ATTRIBUTE_MEMORY_POOLS_SUPPORTED hipDeviceAttributeMemoryPoolsSupported
 #endif
+// NOTE(HIP/AMD): driver-API pointer attribute names used by the mdspan<->dlpack
+// conversions (cuda/__mdspan/mdspan_to_dlpack.h). The HIP array-form
+// cuda::__driver::__pointerGetAttributesNoThrow already maps these.
+#ifndef CUpointer_attribute
+#  define CUpointer_attribute hipPointer_attribute
+#endif
+#ifndef CU_POINTER_ATTRIBUTE_DEVICE_ORDINAL
+#  define CU_POINTER_ATTRIBUTE_DEVICE_ORDINAL HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL
+#endif
 #ifndef cudaDevAttrL2CacheSize
 #  define cudaDevAttrL2CacheSize hipDeviceAttributeL2CacheSize
 #endif
