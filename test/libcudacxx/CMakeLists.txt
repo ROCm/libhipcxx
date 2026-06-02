@@ -84,16 +84,11 @@ if(LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND (LIBCUDACX
       cuda/ccclrt/device/arch_id.c2h.cu
       cuda/ccclrt/device/arch_traits.c2h.cu
       cuda/ccclrt/device/compute_capability.c2h.cu
-      # launch: host_launch / dynamic_shared_memory / launch_smoke ARE enabled
-      # on HIP (driver launch ported to hipModuleLaunchKernel). Only
-      # configuration.cu is skipped: it is a CUDA-driver launch-config
-      # *replacement* test that also uses hierarchy rank intrinsics not yet on
-      # HIP.
-      cuda/ccclrt/launch/configuration.cu
-      # hierarchy_smoke needs cuda::__vector_type_t (CUDA vector_types.h) + a
-      # dim3 <-> hierarchy_query_result comparison. hierarchy_custom_types IS
-      # enabled (matches 3.2.1).
-      cuda/ccclrt/hierarchy/hierarchy_smoke.cu
+      # launch: host_launch / dynamic_shared_memory / launch_smoke /
+      # configuration ARE enabled on HIP (driver launch ported to
+      # hipModuleLaunchKernel; device-side hierarchy queries enabled).
+      # hierarchy_smoke / hierarchy_custom_types are enabled too (cuda::vector_type_t
+      # is now HIP-enabled via <hip/hip_vector_types.h>; matches 3.2.1).
       # containers: cuda::buffer / uninitialized_async_buffer additionally need
       # <cub/device/device_transform.cuh> ported to hipCUB.
       cuda/containers/
