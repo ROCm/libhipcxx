@@ -1,3 +1,25 @@
+# MIT License
+#
+# Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 #
 # find_package(libcudacxx) config file.
 #
@@ -53,35 +75,39 @@ _libcudacxx_declare_interface_alias(libcudacxx::libcudacxx _libcudacxx_libcudacx
 #
 
 if (NOT TARGET libcudacxx::Thrust)
-  if (NOT TARGET Thrust::Thrust)
+  # NOTE(HIP/AMD): the AMD equivalent of NVIDIA Thrust is rocThrust, which
+  # ships the 'roc::rocthrust' target (exposing the 'thrust::' namespace via
+  # the HIP backend). Use it instead of Thrust::Thrust.
+  if (NOT TARGET roc::rocthrust)
     find_package(
-      Thrust
-      ${libcudacxx_VERSION}
+      rocthrust
       CONFIG
       ${quiet_flag}
       ${required}
-      NO_DEFAULT_PATH # Only check the explicit HINTS below:
-      HINTS "${CMAKE_CURRENT_LIST_DIR}/../thrust/"
     )
   endif()
   _libcudacxx_declare_interface_alias(libcudacxx::Thrust _libcudacxx_Thrust)
-  target_link_libraries(_libcudacxx_Thrust INTERFACE Thrust::Thrust)
+  if (TARGET roc::rocthrust)
+    target_link_libraries(_libcudacxx_Thrust INTERFACE roc::rocthrust)
+  endif()
 endif()
 
 if (NOT TARGET libcudacxx::CUB)
-  if (NOT TARGET CUB::CUB)
+  # NOTE(HIP/AMD): the AMD equivalent of NVIDIA CUB is hipCUB, which ships the
+  # 'hip::hipcub' target (exposing the 'cub::' namespace via the HIP backend).
+  # Use it instead of CUB::CUB.
+  if (NOT TARGET hip::hipcub)
     find_package(
-      CUB
-      ${libcudacxx_VERSION}
+      hipcub
       CONFIG
       ${quiet_flag}
       ${required}
-      NO_DEFAULT_PATH # Only check the explicit HINTS below:
-      HINTS "${CMAKE_CURRENT_LIST_DIR}/../cub/"
     )
   endif()
   _libcudacxx_declare_interface_alias(libcudacxx::CUB _libcudacxx_CUB)
-  target_link_libraries(_libcudacxx_CUB INTERFACE CUB::CUB)
+  if (TARGET hip::hipcub)
+    target_link_libraries(_libcudacxx_CUB INTERFACE hip::hipcub)
+  endif()
 endif()
 
 #
