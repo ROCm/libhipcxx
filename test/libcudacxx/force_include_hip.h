@@ -54,7 +54,13 @@
 // __device__-only overloads, so the host side keeps using the standard library.
 #if defined(__HIP_PLATFORM_AMD__)
 #  include <new>
-__device__ inline void* operator new(__SIZE_TYPE__ __size, ::std::align_val_t __align)
+// Replacement global allocation functions must not be 'inline'; returning
+// nullptr on device OOM mirrors clang-hip's own device operator new (it cannot
+// throw), so silence the corresponding diagnostics for this block only.
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wnew-returns-null"
+#  pragma clang diagnostic ignored "-Wnonnull"
+__device__ void* operator new(__SIZE_TYPE__ __size, ::std::align_val_t __align)
 {
     const __SIZE_TYPE__ __a    = static_cast<__SIZE_TYPE__>(__align);
     void* __base               = ::malloc(__size + __a + sizeof(void*));
@@ -65,26 +71,27 @@ __device__ inline void* operator new(__SIZE_TYPE__ __size, ::std::align_val_t __
     reinterpret_cast<void**>(__aligned)[-1] = __base;
     return __aligned;
 }
-__device__ inline void* operator new[](__SIZE_TYPE__ __size, ::std::align_val_t __align)
+__device__ void* operator new[](__SIZE_TYPE__ __size, ::std::align_val_t __align)
 {
     return ::operator new(__size, __align);
 }
-__device__ inline void operator delete(void* __ptr, ::std::align_val_t) noexcept
+__device__ void operator delete(void* __ptr, ::std::align_val_t) noexcept
 {
     if (__ptr != nullptr) { ::free(reinterpret_cast<void**>(__ptr)[-1]); }
 }
-__device__ inline void operator delete(void* __ptr, __SIZE_TYPE__, ::std::align_val_t __align) noexcept
+__device__ void operator delete(void* __ptr, __SIZE_TYPE__, ::std::align_val_t __align) noexcept
 {
     ::operator delete(__ptr, __align);
 }
-__device__ inline void operator delete[](void* __ptr, ::std::align_val_t __align) noexcept
+__device__ void operator delete[](void* __ptr, ::std::align_val_t __align) noexcept
 {
     ::operator delete(__ptr, __align);
 }
-__device__ inline void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t __align) noexcept
+__device__ void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t __align) noexcept
 {
     ::operator delete(__ptr, __align);
 }
+#  pragma clang diagnostic pop
 #endif // defined(__HIP_PLATFORM_AMD__)
 
 #define HIP_CALL(err, ...) \
