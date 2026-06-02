@@ -160,7 +160,13 @@ function(libcudacxx_add_public_headers_host_only header)
 
   # Create the default target for that file
   libcudacxx_create_public_header_test_host(${header_name} ${headertest_src})
-  libcudacxx_create_public_header_test_host_with_ctk(${header_name} ${headertest_src})
+  # NOTE(HIP/AMD): the *_with_ctk variant links CUDA::cudart and exercises
+  # CTK-only headers, neither of which exists on a HIP-only build. Skip
+  # it on HIP (the empty libcudacxx.test.public_headers_host_only_with_ctk
+  # umbrella target stays defined near the top so references still resolve).
+  if (NOT LIBCUDACXX_ENABLE_HIP)
+    libcudacxx_create_public_header_test_host_with_ctk(${header_name} ${headertest_src})
+  endif()
 endfunction()
 
 foreach (header IN LISTS public_headers_host_only)
