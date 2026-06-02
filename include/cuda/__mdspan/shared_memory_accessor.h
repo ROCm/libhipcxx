@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___MDSPAN_SHARED_MEMORY_ACCESSOR_H
 #define _CUDA___MDSPAN_SHARED_MEMORY_ACCESSOR_H
 
@@ -64,18 +86,30 @@ inline constexpr bool is_shared_memory_accessor_v<__shared_memory_accessor<_Acce
  * Shared Memory Accessor
  **********************************************************************************************************************/
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 // TODO: move to a more appropriate place
 [[nodiscard]] _CCCL_DEVICE_API inline ::cuda::std::uint32_t __max_smem_allocation_bytes() noexcept
 {
+#  if _CCCL_HIP_COMPILATION()
+  // NOTE(HIP/AMD): NVPTX exposes %total_smem_size / %dynamic_smem_size special
+  // registers (cuda::ptx::get_sreg_*) that have no AMDGCN equivalent. Use the
+  // static LDS size reported by __builtin_amdgcn_groupstaticsize() in the
+  // device pass; the host pass (parsed for two-pass clang-hip) returns 0.
+#    if defined(__HIP_DEVICE_COMPILE__)
+  return static_cast<::cuda::std::uint32_t>(__builtin_amdgcn_groupstaticsize());
+#    else // ^^^ __HIP_DEVICE_COMPILE__ ^^^ / vvv !__HIP_DEVICE_COMPILE__ vvv
+  return 0;
+#    endif // ^^^ !__HIP_DEVICE_COMPILE__ ^^^
+#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
   const auto __total_smem_size   = ::cuda::ptx::get_sreg_total_smem_size();
   const auto __dynamic_smem_size = ::cuda::ptx::get_sreg_dynamic_smem_size();
   const auto __static_smem_size  = __total_smem_size - __dynamic_smem_size;
   const auto __max_smem_size     = ::max(__static_smem_size, __dynamic_smem_size);
   return __max_smem_size;
+#  endif // !_CCCL_HIP_COMPILATION()
 }
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 template <typename _Accessor>
 class __shared_memory_accessor : public _Accessor

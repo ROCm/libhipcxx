@@ -314,9 +314,9 @@ _CCCL_API constexpr overflow_result<_ActualResult> sub_overflow(const _Lhs __lhs
   // constant expressions, because it doesn't work before nvcc 13.1 and is buggy in 13.1. When compiling C++ source
   // file, we can use it all the time.
 #if defined(_CCCL_BUILTIN_SUB_OVERFLOW)
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
   {
     NV_IF_TARGET(NV_IS_HOST, ({
                    overflow_result<_ActualResult> __result{};
@@ -327,7 +327,7 @@ _CCCL_API constexpr overflow_result<_ActualResult> sub_overflow(const _Lhs __lhs
 #endif // _CCCL_BUILTIN_SUB_OVERFLOW
 
   // Host fallback + device implementation.
-#if _CCCL_CUDA_COMPILATION() || !defined(_CCCL_BUILTIN_SUB_OVERFLOW)
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || !defined(_CCCL_BUILTIN_SUB_OVERFLOW)
   using ::cuda::std::common_type_t;
   using ::cuda::std::is_signed_v;
   using ::cuda::std::is_unsigned_v;

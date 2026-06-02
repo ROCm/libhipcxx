@@ -434,6 +434,96 @@ _CCCL_HOST_API inline bool is_device_accessible(const void* __p, device_ref __de
     static_cast<::hipDevice_t>(__device.get()), static_cast<::hipDevice_t>(__attr.device));
 }
 
+// NOTE(HIP/AMD): nothrow internal variants required by the relocated mdspan
+// accessor checks in <cuda/__mdspan/host_device_accessor.h> (and the
+// cuda/memory/is_pointer_accessible.pass.cpp test). They mirror the public
+// is_* functions above but never throw: any query failure maps to a definite
+// answer rather than propagating an error (matching the CUDA-side
+// __is_*_nothrow contract). The single hipPointerGetAttributes query runs via
+// the NoThrow driver shim; the legacy hipErrorInvalidValue (older ROCm:
+// unregistered host memory) is collapsed to type=Unregistered so the
+// classification matches the throwing path.
+[[nodiscard]] _CCCL_HOST_API inline bool
+__hip_query_pointer_nothrow(const void* __p, ::hipPointerAttribute_t& __attr) noexcept
+{
+  if (__p == nullptr)
+  {
+    return false;
+  }
+  const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
+  if (__status == ::cudaErrorInvalidValue)
+  {
+    __attr.type = ::hipMemoryTypeUnregistered;
+    return true;
+  }
+  return __status == ::cudaSuccess;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline bool __is_managed_nothrow(const void* __p) noexcept
+{
+  ::hipPointerAttribute_t __attr{};
+  if (!::cuda::__hip_query_pointer_nothrow(__p, __attr))
+  {
+    return false;
+  }
+  return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline bool __is_host_accessible_nothrow(const void* __p) noexcept
+{
+  ::hipPointerAttribute_t __attr{};
+  if (!::cuda::__hip_query_pointer_nothrow(__p, __attr))
+  {
+    return false;
+  }
+  return __attr.type == ::hipMemoryTypeUnregistered //
+      || __attr.type == ::hipMemoryTypeHost //
+      || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified //
+      || __attr.isManaged != 0;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline bool __is_device_or_managed_memory(const void* __p) noexcept
+{
+  ::hipPointerAttribute_t __attr{};
+  if (!::cuda::__hip_query_pointer_nothrow(__p, __attr))
+  {
+    return false;
+  }
+  if (__attr.type == ::hipMemoryTypeUnregistered)
+  {
+    return false;
+  }
+  return __attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified
+      || __attr.type == ::hipMemoryTypeDevice;
+}
+
+[[nodiscard]] _CCCL_HOST_API inline bool __is_device_accessible_nothrow(const void* __p, device_ref __device) noexcept
+{
+  ::hipPointerAttribute_t __attr{};
+  if (!::cuda::__hip_query_pointer_nothrow(__p, __attr))
+  {
+    return false;
+  }
+  if (__attr.type == ::hipMemoryTypeUnregistered)
+  {
+    return false;
+  }
+  if (__attr.isManaged != 0 || __attr.type == ::hipMemoryTypeManaged || __attr.type == ::hipMemoryTypeUnified)
+  {
+    return true;
+  }
+  if (__attr.type == ::hipMemoryTypeHost)
+  {
+    return false;
+  }
+  if (__attr.device == __device.get())
+  {
+    return true;
+  }
+  return ::cuda::__driver::__deviceCanAccessPeer(
+    static_cast<::hipDevice_t>(__device.get()), static_cast<::hipDevice_t>(__attr.device));
+}
+
 #endif // _CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
 
 _CCCL_END_NAMESPACE_CUDA
