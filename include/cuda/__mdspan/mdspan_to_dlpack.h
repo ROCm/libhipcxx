@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___MDSPAN_MDSPAN_TO_DLPACK_H
 #define _CUDA___MDSPAN_MDSPAN_TO_DLPACK_H
 
@@ -53,6 +75,16 @@ template <typename _ElementType>
   {
     return ::DLDataType{::kDLBool, 8, 1};
   }
+  //--------------------------------------------------------------------------------------------------------------------
+  // NOTE(HIP/AMD): plain `char` is excluded from __cccl_is_integer (it is a
+  // character type), but HIP's charN decomposes to plain `char` (CUDA's charN
+  // uses signed char, which is covered below). Map it to the matching 8-bit int.
+#  if _CCCL_HIP_COMPILATION()
+  else if constexpr (::cuda::std::is_same_v<_ElementType, char>)
+  {
+    return ::DLDataType{::cuda::std::is_signed_v<char> ? ::kDLInt : ::kDLUInt, 8, 1};
+  }
+#  endif // _CCCL_HIP_COMPILATION()
   //--------------------------------------------------------------------------------------------------------------------
   // Signed integer types
   else if constexpr (::cuda::std::__cccl_is_integer_v<_ElementType>)
@@ -123,7 +155,10 @@ template <typename _ElementType>
   }
   //--------------------------------------------------------------------------------------------------------------------
   // CUDA built-in vector types
-#  if _CCCL_HAS_CTK()
+  // NOTE(HIP/AMD): the vector-type traits (is_vector_type_v / tuple_size /
+  // tuple_element) and the scalar fp types are HIP-enabled, so support the
+  // vector-type -> DLPack conversion on HIP too.
+#  if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   else if constexpr (::cuda::is_vector_type_v<_ElementType> || ::cuda::is_extended_fp_vector_type_v<_ElementType>)
   {
     constexpr ::cuda::std::uint16_t __lanes = ::cuda::std::tuple_size_v<_ElementType>;
@@ -140,7 +175,7 @@ template <typename _ElementType>
       return ::DLDataType{};
     }
   }
-#  endif // _CCCL_HAS_CTK()
+#  endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   //--------------------------------------------------------------------------------------------------------------------
   // Unsupported types
   else
@@ -228,7 +263,7 @@ to_dlpack_tensor(const ::cuda::device_mdspan<_ElementType, _Extents, _Layout, _A
   {
     ::cuda::__throw_cuda_error(__status, "Failed to get device ordinal of a pointer");
   }
-  return ::cuda::__to_dlpack(__mdspan_type{__mdspan}, ::kDLCUDA, __ptr_dev_id);
+  return ::cuda::__to_dlpack(__mdspan_type{__mdspan}, _CCCL_DLPACK_GPU_DEVICE_TYPE, __ptr_dev_id);
 }
 
 template <typename _ElementType, typename _Extents, typename _Layout, typename _Accessor>
@@ -236,7 +271,7 @@ template <typename _ElementType, typename _Extents, typename _Layout, typename _
 to_dlpack_tensor(const ::cuda::managed_mdspan<_ElementType, _Extents, _Layout, _Accessor>& __mdspan)
 {
   using __mdspan_type = ::cuda::std::mdspan<_ElementType, _Extents, _Layout, _Accessor>;
-  return ::cuda::__to_dlpack(__mdspan_type{__mdspan}, ::kDLCUDAManaged, 0);
+  return ::cuda::__to_dlpack(__mdspan_type{__mdspan}, _CCCL_DLPACK_GPU_MANAGED_DEVICE_TYPE, 0);
 }
 
 _CCCL_END_NAMESPACE_CUDA
