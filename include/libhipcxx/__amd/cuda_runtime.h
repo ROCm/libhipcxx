@@ -124,6 +124,11 @@
 #ifndef cudaDevAttrMemoryPoolsSupported
 #  define cudaDevAttrMemoryPoolsSupported hipDeviceAttributeMemoryPoolsSupported
 #endif
+// NOTE(HIP/AMD): driver-API spelling used by cuda::__driver::__deviceGetAttribute
+// (e.g. cuda/memory/is_pointer_accessible). Maps to the same HIP attribute.
+#ifndef CU_DEVICE_ATTRIBUTE_MEMORY_POOLS_SUPPORTED
+#  define CU_DEVICE_ATTRIBUTE_MEMORY_POOLS_SUPPORTED hipDeviceAttributeMemoryPoolsSupported
+#endif
 #ifndef cudaDevAttrL2CacheSize
 #  define cudaDevAttrL2CacheSize hipDeviceAttributeL2CacheSize
 #endif
@@ -793,6 +798,68 @@
 #ifndef CUresult
 #  define CUresult hipError_t
 #endif
+
+// NOTE(HIP/AMD): execution-control / launch types used by <cuda/__launch/*>.
+// CUfunction / cudaFunction_t map directly to hipFunction_t, and the function
+// attribute query maps to hipFuncGetAttribute(hipFunction_attribute).
+#ifndef CUfunction
+#  define CUfunction hipFunction_t
+#endif
+#ifndef cudaFunction_t
+#  define cudaFunction_t hipFunction_t
+#endif
+#ifndef cudaGetFuncBySymbol
+#  define cudaGetFuncBySymbol hipGetFuncBySymbol
+#endif
+#ifndef CUfunction_attribute
+#  define CUfunction_attribute hipFunction_attribute
+#endif
+#ifndef CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES
+#  define CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES HIP_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES
+#endif
+#ifndef CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES
+#  define CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES HIP_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES
+#endif
+
+// NOTE(HIP/AMD): the CUDA driver launch-config aggregate has no layout-
+// compatible HIP type (hipLaunchConfig_t uses .stream/.dynamicSmemBytes and
+// dim3 grid/block), so <cuda/__launch/*> fills a CUDA-shaped CUlaunchConfig
+// that ::cuda::__driver::__launchKernel converts to the HIP module-launch
+// call. Define the CUDA-shaped aggregates here (subset actually used).
+#ifndef _LIBHIPCXX_HAS_CULAUNCHCONFIG
+#  define _LIBHIPCXX_HAS_CULAUNCHCONFIG
+enum CUlaunchAttributeID
+{
+  CU_LAUNCH_ATTRIBUTE_IGNORE            = 0,
+  CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION = 1, // Hopper-only; AMDGCN has no clusters
+  CU_LAUNCH_ATTRIBUTE_COOPERATIVE       = 2,
+  CU_LAUNCH_ATTRIBUTE_PRIORITY          = 3,
+};
+struct CUlaunchAttributeValue
+{
+  struct
+  {
+    unsigned int x, y, z;
+  } clusterDim;
+  int cooperative;
+  int priority;
+};
+struct CUlaunchAttribute
+{
+  CUlaunchAttributeID id;
+  CUlaunchAttributeValue value;
+};
+struct CUlaunchConfig
+{
+  unsigned int gridDimX, gridDimY, gridDimZ;
+  unsigned int blockDimX, blockDimY, blockDimZ;
+  unsigned int sharedMemBytes;
+  hipStream_t hStream;
+  CUlaunchAttribute* attrs;
+  unsigned int numAttrs;
+};
+#endif // _LIBHIPCXX_HAS_CULAUNCHCONFIG
+
 #ifndef CUDA_SUCCESS
 #  define CUDA_SUCCESS hipSuccess
 #endif

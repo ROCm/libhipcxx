@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // todo: enable with nvrtc
 // UNSUPPORTED: nvrtc
 
@@ -18,6 +40,14 @@
 
 #include "hierarchy_queries.h"
 
+// NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
+// AMD, so the static warp-level expectations below must use the wave size.
+#if _CCCL_HIP_COMPILATION()
+#  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
+#else
+#  define TEST_WARP_SIZE 32
+#endif
+
 __device__ void test_thread()
 {
   constexpr cuda::std::size_t dext = cuda::std::dynamic_extent;
@@ -26,7 +56,7 @@ __device__ void test_thread()
   test_dims(uint3{static_cast<unsigned>(warpSize), 1u, 1u}, cuda::gpu_thread, cuda::warp);
   test_dims(blockDim, cuda::gpu_thread, cuda::block);
   {
-    uint3 exp = blockDim;
+    uint3 exp{blockDim.x, blockDim.y, blockDim.z};
     NV_IF_TARGET(NV_PROVIDES_SM_90, ({
                    exp.x *= __clusterDim().x;
                    exp.y *= __clusterDim().y;
@@ -34,19 +64,19 @@ __device__ void test_thread()
                  }))
     test_dims(exp, cuda::gpu_thread, cuda::cluster);
   }
-  test_dims({blockDim.x * gridDim.x, blockDim.y * gridDim.y, blockDim.z * gridDim.z}, cuda::gpu_thread, cuda::grid);
+  test_dims(uint3{blockDim.x * gridDim.x, blockDim.y * gridDim.y, blockDim.z * gridDim.z}, cuda::gpu_thread, cuda::grid);
 
   // 2. Test cuda::gpu_thread.static_dims(x)
-  test_static_dims(ulonglong3{cuda::std::size_t{32}, 1, 1}, cuda::gpu_thread, cuda::warp);
+  test_static_dims(ulonglong3{cuda::std::size_t{TEST_WARP_SIZE}, 1, 1}, cuda::gpu_thread, cuda::warp);
   test_static_dims(ulonglong3{dext, dext, dext}, cuda::gpu_thread, cuda::block);
   test_static_dims(ulonglong3{dext, dext, dext}, cuda::gpu_thread, cuda::cluster);
   test_static_dims(ulonglong3{dext, dext, dext}, cuda::gpu_thread, cuda::grid);
 
   // 3. Test cuda::gpu_thread.extents(x)
-  test_extents(cuda::std::extents<unsigned, 32>{}, cuda::gpu_thread, cuda::warp);
+  test_extents(cuda::std::extents<unsigned, TEST_WARP_SIZE>{}, cuda::gpu_thread, cuda::warp);
   test_extents(cuda::std::dims<3, unsigned>{blockDim.x, blockDim.y, blockDim.z}, cuda::gpu_thread, cuda::block);
   {
-    uint3 exp = blockDim;
+    uint3 exp{blockDim.x, blockDim.y, blockDim.z};
     NV_IF_TARGET(NV_PROVIDES_SM_90, ({
                    exp.x *= __clusterDim().x;
                    exp.y *= __clusterDim().y;
@@ -60,10 +90,10 @@ __device__ void test_thread()
   }
 
   // 4. Test cuda::gpu_thread.count(x)
-  test_count(32, cuda::gpu_thread, cuda::warp);
+  test_count(TEST_WARP_SIZE, cuda::gpu_thread, cuda::warp);
   test_count(cuda::std::size_t{blockDim.z} * blockDim.y * blockDim.x, cuda::gpu_thread, cuda::block);
   {
-    uint3 exp = blockDim;
+    uint3 exp{blockDim.x, blockDim.y, blockDim.z};
     NV_IF_TARGET(NV_PROVIDES_SM_90, ({
                    exp.x *= __clusterDim().x;
                    exp.y *= __clusterDim().y;
@@ -80,7 +110,7 @@ __device__ void test_thread()
   test_index(uint3{cuda::ptx::get_sreg_laneid(), 0, 0}, cuda::gpu_thread, cuda::warp);
   test_index(threadIdx, cuda::gpu_thread, cuda::block);
   {
-    uint3 exp = threadIdx;
+    uint3 exp{threadIdx.x, threadIdx.y, threadIdx.z};
     NV_IF_TARGET(NV_PROVIDES_SM_90, ({
                    exp.x += blockDim.x * __clusterRelativeBlockIdx().x;
                    exp.y += blockDim.y * __clusterRelativeBlockIdx().y;
@@ -130,16 +160,17 @@ __global__ void test_kernel()
 
 void test()
 {
-  int cc_major{};
+  [[maybe_unused]] int cc_major{};
   assert(cudaDeviceGetAttribute(&cc_major, cudaDevAttrComputeCapabilityMajor, 0) == cudaSuccess);
 
   // thread block clusters require compute capability at least 9.0
-  const bool enable_clusters = cc_major >= 9;
+  [[maybe_unused]] const bool enable_clusters = cc_major >= 9;
 
   test_kernel<<<1, 128>>>();
   test_kernel<<<128, 1>>>();
   test_kernel<<<dim3{2, 3}, dim3{4, 2}>>>();
   test_kernel<<<dim3{2, 3, 4}, dim3{4, 2, 8}>>>();
+#if !defined(__HIP_PLATFORM_AMD__) // NOTE(HIP/AMD): thread-block clusters are NVIDIA-only
   if (enable_clusters)
   {
     cudaLaunchAttribute attribute[1]{};
@@ -157,6 +188,7 @@ void test()
     void* pargs[1]{};
     assert(cudaLaunchKernelExC(&config, (const void*) test_kernel, pargs) == cudaSuccess);
   }
+#endif // !defined(__HIP_PLATFORM_AMD__)
 
   assert(cudaDeviceSynchronize() == cudaSuccess);
 }

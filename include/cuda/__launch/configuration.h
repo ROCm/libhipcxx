@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___LAUNCH_CONFIGURATION_H
 #define _CUDA___LAUNCH_CONFIGURATION_H
 
@@ -21,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__driver/driver_api.h>
 #  include <cuda/__hierarchy/hierarchy_dimensions.h>
@@ -270,7 +292,12 @@ public:
     {
       _CCCL_IF_NOT_CONSTEVAL_DEFAULT
       {
+        // NOTE(HIP/AMD): AMDGCN has no dynamic-shared-memory-size special
+        // register; the device-side query is dropped on HIP and the configured
+        // size below is used instead.
+#if !defined(__HIP_PLATFORM_AMD__)
         NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::ptx::get_sreg_dynamic_smem_size();))
+#endif // !__HIP_PLATFORM_AMD__
       }
       return __base_type::__n_ * sizeof(value_type);
     }
@@ -322,6 +349,9 @@ template <class _Tp>
 
   // Since CUDA 12.4, querying CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES requires
   // the function to be loaded.
+  // NOTE(HIP/AMD): HIP eagerly loads kernels and has neither cuFuncLoad nor a
+  // CUDA driver-version concept, so this load step is unnecessary on HIP.
+#if !defined(__HIP_PLATFORM_AMD__)
   if (::cuda::__driver::__version_at_least(12, 4))
   {
     __status = ::cuda::__driver::__functionLoadNoThrow(__kernel);
@@ -330,6 +360,7 @@ template <class _Tp>
       return __status;
     }
   }
+#endif // !__HIP_PLATFORM_AMD__
 
   int __static_smem_size{};
   __status = ::cuda::__driver::__functionGetAttributeNoThrow(
@@ -339,6 +370,10 @@ template <class _Tp>
     return __status;
   }
 
+  // NOTE(HIP/AMD): the MAX_DYNAMIC_SHARED_SIZE_BYTES opt-in below is a NVIDIA
+  // concept; AMDGCN exposes the full LDS without it, so the query and the
+  // setter are dropped on HIP.
+#if !defined(__HIP_PLATFORM_AMD__)
   int __max_dyn_smem_size{};
   __status = ::cuda::__driver::__functionGetAttributeNoThrow(
     __max_dyn_smem_size, ::CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES, __kernel);
@@ -346,6 +381,7 @@ template <class _Tp>
   {
     return __status;
   }
+#endif // !__HIP_PLATFORM_AMD__
 
   const auto __dyn_smem_size = ::cuda::overflow_cast<int>(__opt.size_bytes());
   if (__dyn_smem_size.overflow)
@@ -359,6 +395,7 @@ template <class _Tp>
     return ::cudaErrorInvalidValue;
   }
 
+#if !defined(__HIP_PLATFORM_AMD__)
   if (__max_dyn_smem_size < __dyn_smem_size.value)
   {
     __status = ::cuda::__driver::__functionSetAttributeNoThrow(
@@ -368,6 +405,7 @@ template <class _Tp>
       return __status;
     }
   }
+#endif // !__HIP_PLATFORM_AMD__
 
   __config.sharedMemBytes = static_cast<unsigned>(__dyn_smem_size.value);
   return ::cudaSuccess;
@@ -790,7 +828,7 @@ template <typename Dimensions, typename... Options>
 }
 } // namespace __detail
 
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 template <class _Dims, class... _Opts>
 _CCCL_DEVICE_API decltype(auto) dynamic_shared_memory(const kernel_config<_Dims, _Opts...>& __config) noexcept
@@ -803,12 +841,12 @@ _CCCL_DEVICE_API decltype(auto) dynamic_shared_memory(const kernel_config<_Dims,
   return __opt.__make_view(reinterpret_cast<typename _Opt::value_type*>(__cccl_device_dyn_smem));
 }
 
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #endif // _CUDA___LAUNCH_CONFIGURATION_H
