@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/launch>
 #include <cuda/memory_pool>
 #include <cuda/memory_resource>
@@ -410,6 +432,12 @@ C2H_CCCLRT_TEST("Async memory resource access", "")
       CCCLRT_CHECK(resource.is_accessible_from(peers.front()));
       allocate_and_check_access(resource);
 
+      // NOTE(HIP/AMD): ROCm 7.2's hipMemPoolSetAccess does not support disabling
+      // access (hipMemAccessFlagsProtNone) -- it returns hipErrorInvalidDevice,
+      // so revoking pool peer access is impossible via this API. Enabling access
+      // (read / read-write) is supported, so only the disable_access_from path
+      // is skipped on HIP. This is being worked on in ticket AIRUNTIME-2216.
+#if !_CCCL_HIP_COMPILATION()
       pool.disable_access_from(peers.front());
       CCCLRT_CHECK(!pool.is_accessible_from(peers.front()));
       CCCLRT_CHECK(!resource.is_accessible_from(peers.front()));
@@ -420,6 +448,7 @@ C2H_CCCLRT_TEST("Async memory resource access", "")
       }
 
       pool.disable_access_from(peers);
+#endif // !_CCCL_HIP_COMPILATION()
 
       pool.enable_access_from(peers.front());
       CCCLRT_CHECK(pool.is_accessible_from(peers.front()));
@@ -433,17 +462,24 @@ C2H_CCCLRT_TEST("Async memory resource access", "")
         peers_ext.push_back(cuda::devices[0]);
         pool.enable_access_from(peers_ext);
 
+        pool.enable_access_from(peers_ext.front());
+
+        // NOTE(HIP/AMD): unlike CUDA, a device's default memory pool is not
+        // peer-accessible by default on HIP, and this block does not explicitly
+        // enable peer access on the default pool, so the default-pool peer-access
+        // checks are skipped on HIP. The created-pool peer access (including the
+        // pool's own device above) is exercised on HIP.
+#if !_CCCL_HIP_COMPILATION()
         // Check the resource using the default pool
         cuda::device_memory_pool_ref default_pool_resource = cuda::device_default_memory_pool(cuda::device_ref{0});
         cuda::device_memory_pool_ref another_default_pool_resource =
           cuda::device_default_memory_pool(cuda::device_ref{0});
 
-        pool.enable_access_from(peers_ext.front());
-
         CCCLRT_CHECK(default_pool_resource.is_accessible_from(peers_ext.front()));
         allocate_and_check_access(default_pool_resource);
         CCCLRT_CHECK(another_default_pool_resource.is_accessible_from(peers_ext.front()));
         allocate_and_check_access(another_default_pool_resource);
+#endif // !_CCCL_HIP_COMPILATION()
       }
     }
   }
