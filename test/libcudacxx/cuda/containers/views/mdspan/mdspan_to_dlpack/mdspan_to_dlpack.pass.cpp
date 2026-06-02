@@ -6,6 +6,29 @@
 // SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
+
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // UNSUPPORTED: nvrtc
 
 #include <cuda/mdspan>
@@ -142,7 +165,7 @@ bool test_mdspan_to_dlpack_device()
   auto dlpack_wrapper = cuda::to_dlpack_tensor(md);
   auto dltensor       = dlpack_wrapper.get();
 
-  assert(dltensor.device.device_type == kDLCUDA);
+  assert(dltensor.device.device_type == _CCCL_DLPACK_GPU_DEVICE_TYPE);
   assert(dltensor.device.device_id == 0);
   assert(dltensor.ndim == 2);
   check_datatype(dltensor.dtype, kDLFloat, 32, 1);
@@ -164,7 +187,7 @@ bool test_mdspan_to_dlpack_managed()
   auto dlpack_wrapper = cuda::to_dlpack_tensor(md);
   auto dltensor       = dlpack_wrapper.get();
 
-  assert(dltensor.device.device_type == kDLCUDAManaged);
+  assert(dltensor.device.device_type == _CCCL_DLPACK_GPU_MANAGED_DEVICE_TYPE);
   assert(dltensor.device.device_id == 0);
   assert(dltensor.ndim == 2);
   check_datatype(dltensor.dtype, kDLFloat, 32, 1);
@@ -343,7 +366,7 @@ bool test_mdspan_to_dlpack_extended_fp_and_complex_types()
   return true;
 }
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 bool test_mdspan_to_dlpack_vector_types()
 {
   using list_t = cuda::std::__type_list<
@@ -435,7 +458,6 @@ bool test_mdspan_to_dlpack_vector_types()
   test_fn.call(cuda::std::make_index_sequence<list_t::__size - 1>{});
   return true;
 }
-#endif // _CCCL_HAS_CTK()
 
 bool test_mdspan_to_dlpack_extended_fp_vector_types()
 {
@@ -507,6 +529,7 @@ bool test_mdspan_to_dlpack_extended_fp_vector_types()
   test_fn.call(cuda::std::make_index_sequence<list_t::__size - 1>{});
   return true;
 }
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 int main(int, char**)
 {
@@ -519,9 +542,12 @@ int main(int, char**)
   NV_IF_TARGET(NV_IS_HOST, (assert(test_mdspan_to_dlpack_managed());))
   NV_IF_TARGET(NV_IS_HOST, (assert(test_mdspan_to_dlpack_basic_types());))
   NV_IF_TARGET(NV_IS_HOST, (assert(test_mdspan_to_dlpack_extended_fp_and_complex_types());))
-#if _CCCL_HAS_CTK()
+  // NOTE(HIP/AMD): vector-type -> DLPack conversion is supported on HIP too
+  // (see cuda/__mdspan/mdspan_to_dlpack.h), so widen the guard. Upstream only
+  // wraps the first call; the extended-fp-vector one needs the same guard.
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   NV_IF_TARGET(NV_IS_HOST, (assert(test_mdspan_to_dlpack_vector_types());))
-#endif // _CCCL_HAS_CTK()
   NV_IF_TARGET(NV_IS_HOST, (assert(test_mdspan_to_dlpack_extended_fp_vector_types());))
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   return 0;
 }
