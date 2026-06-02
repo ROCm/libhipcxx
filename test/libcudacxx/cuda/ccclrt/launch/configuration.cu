@@ -8,7 +8,38 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include <cuda.h>
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// NOTE(HIP/AMD): <cuda.h> (the CUDA driver header) does not exist on HIP. The
+// CUlaunchConfig / CUfunction aggregates this test uses are provided directly by
+// the libhipcxx HIP shim. Important: do NOT pull in <cuda/launch> here -- it
+// must be included only *after* _CCCLRT_LAUNCH_CONFIG_TEST is defined below, so
+// that the launch hook (test_launch_kernel_replacement) is actually compiled in.
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <libhipcxx/__amd/cuda_runtime.h>
+#else
+#  include <cuda.h>
+#endif
 
 void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, void* args[]);
 
@@ -254,7 +285,12 @@ C2H_TEST("Configuration combine", "[launch]")
   }
 }
 
-#if !_CCCL_CUDA_COMPILER(CLANG)
+// NOTE(HIP/AMD): like clang-cuda, clang-hip semantically analyses __device__
+// bodies in the host pass too, so a Catch2 REQUIRE (host-only) inside this
+// __host__ __device__ helper is rejected. Exclude this device-query block on
+// HIP just as it is excluded for clang-cuda; the host-only config tests above
+// are still built and run on HIP.
+#if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
 template <typename Config>
 __host__ __device__ void test_queries_on_config(const Config& config)
 {
@@ -298,4 +334,4 @@ C2H_TEST("Queries on config", "[launch]")
   CUDART(cudaGetLastError());
   CUDART(cudaDeviceSynchronize());
 }
-#endif // !_CCCL_CUDA_COMPILER(CLANG)
+#endif // !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()

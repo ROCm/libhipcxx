@@ -103,7 +103,20 @@ __device__ inline dim3 __cccl_hip_block_thread_index() noexcept
 #  define CG_BLOCK_DIM_THREADS(b)  (b).dim_threads()
 #  define CG_BLOCK_THREAD_INDEX(b) (b).thread_index()
 #endif // !__HIP_PLATFORM_AMD__
+
 using size_t3 = cuda::vector_type_t<cuda::std::size_t, 3>;
+
+// NOTE(HIP/AMD): hierarchy_query_result converts to the native 3-component
+// vector type (size_t3 == HIP_vector_type<unsigned long, 3> on HIP), but
+// HIP_vector_type's rank-3 operator== is not usable in a constant expression
+// (its element access is not constexpr). Compare the query result
+// component-wise on HIP, while keeping the upstream vector comparison on CUDA.
+#if _CCCL_HIP_COMPILATION()
+#  define CCCL_STATIC_DIMS_EQ(query, x_, y_, z_) \
+    (((query)[0] == (x_)) && ((query)[1] == (y_)) && ((query)[2] == (z_)))
+#else
+#  define CCCL_STATIC_DIMS_EQ(query, x_, y_, z_) ((query) == size_t3{x_, y_, z_})
+#endif // _CCCL_HIP_COMPILATION()
 
 struct basic_test_single_dim
 {
@@ -127,7 +140,7 @@ struct basic_test_single_dim
     CCCLRT_REQUIRE(cuda::block.dims(cuda::grid, dims).x == grid_size);
     CCCLRT_REQUIRE(cuda::gpu_thread.count(cuda::block, dims) == block_size);
     CCCLRT_REQUIRE(cuda::block.count(cuda::grid, dims) == grid_size);
-#endif // !_CCCL_CUDA_COMPILER(CLANG)
+#endif // !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
   }
 
   void run()
@@ -180,7 +193,7 @@ struct basic_test_multi_dim
     CCCLRT_REQUIRE(cuda::block.dims(cuda::grid, dims) == dim3(16, 4, 1));
     CCCLRT_REQUIRE(cuda::gpu_thread.count(cuda::block, dims) == 24);
     CCCLRT_REQUIRE(cuda::block.count(cuda::grid, dims) == 64);
-#endif // !_CCCL_CUDA_COMPILER(CLANG)
+#endif // !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
   }
 
   void run()
@@ -192,14 +205,14 @@ struct basic_test_multi_dim
     static_assert(cuda::gpu_thread.extents(cuda::grid, dims_multidim).extent(1) == 12);
     static_assert(cuda::gpu_thread.extents(cuda::grid, dims_multidim).extent(2) == 4);
     static_assert(cuda::gpu_thread.count(cuda::grid, dims_multidim) == 512 * 3);
-    static_assert(cuda::gpu_thread.static_dims(cuda::grid, dims_multidim) == size_t3{32, 12, 4});
+    static_assert(CCCL_STATIC_DIMS_EQ(cuda::gpu_thread.static_dims(cuda::grid, dims_multidim), 32, 12, 4));
 
     static_assert(cuda::gpu_thread.dims(cuda::block, dims_multidim) == dim3(2, 3, 4));
     static_assert(cuda::block.dims(cuda::grid, dims_multidim) == dim3(16, 4, 1));
     static_assert(cuda::gpu_thread.count(cuda::block, dims_multidim) == 24);
     static_assert(cuda::block.count(cuda::grid, dims_multidim) == 64);
-    static_assert(cuda::gpu_thread.static_dims(cuda::block, dims_multidim) == size_t3{2, 3, 4});
-    static_assert(cuda::block.static_dims(cuda::grid, dims_multidim) == size_t3{16, 4, 1});
+    static_assert(CCCL_STATIC_DIMS_EQ(cuda::gpu_thread.static_dims(cuda::block, dims_multidim), 2, 3, 4));
+    static_assert(CCCL_STATIC_DIMS_EQ(cuda::block.static_dims(cuda::grid, dims_multidim), 16, 4, 1));
 
     auto dims_multidim_dyn = cuda::make_hierarchy(cuda::block_dims(dim3(2, 3, 4)), cuda::grid_dims(dim3(16, 4, 1)));
 
@@ -229,7 +242,7 @@ struct basic_test_mixed
 
     CCCLRT_REQUIRE(cuda::block.dims(cuda::grid, dims) == dim3(8, 4, 2));
     CCCLRT_REQUIRE(cuda::block.count(cuda::grid, dims) == 64);
-#endif // !_CCCL_CUDA_COMPILER(CLANG)
+#endif // !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
   }
 
   void run()
@@ -272,7 +285,7 @@ struct basic_test_cluster
     CCCLRT_REQUIRE(cuda::block.count(cuda::grid, dims) == 108);
     CCCLRT_REQUIRE(cuda::cluster.dims(cuda::grid, dims) == dim3(1, 3, 9));
     CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::cluster, dims) == dim3(512, 2, 1));
-#endif // !_CCCL_CUDA_COMPILER(CLANG)
+#endif // !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
   }
 
   void run()
@@ -389,16 +402,16 @@ __global__ void kernel(Hierarchy hierarchy)
   auto block = cg::this_thread_block();
 
   CCCLRT_REQUIRE_DEVICE(grid.thread_rank() == cuda::gpu_thread.rank(cuda::grid));
-  CCCLRT_REQUIRE_DEVICE(grid.block_rank() == cuda::block.rank(cuda::grid));
-  CCCLRT_REQUIRE_DEVICE(grid.block_index() == cuda::block.index(cuda::grid));
+  CCCLRT_REQUIRE_DEVICE(CG_GRID_BLOCK_RANK(grid) == cuda::block.rank(cuda::grid));
+  CCCLRT_REQUIRE_DEVICE(CG_GRID_BLOCK_INDEX(grid) == cuda::block.index(cuda::grid));
   CCCLRT_REQUIRE_DEVICE(grid.num_threads() == cuda::gpu_thread.count(cuda::grid));
-  CCCLRT_REQUIRE_DEVICE(grid.num_blocks() == cuda::block.count(cuda::grid));
-  CCCLRT_REQUIRE_DEVICE(grid.dim_blocks() == cuda::block.dims(cuda::grid));
+  CCCLRT_REQUIRE_DEVICE(CG_GRID_NUM_BLOCKS(grid) == cuda::block.count(cuda::grid));
+  CCCLRT_REQUIRE_DEVICE(CG_GRID_DIM_BLOCKS(grid) == cuda::block.dims(cuda::grid));
 
   CCCLRT_REQUIRE_DEVICE(block.thread_rank() == cuda::gpu_thread.rank(cuda::block));
-  CCCLRT_REQUIRE_DEVICE(block.thread_index() == cuda::gpu_thread.index(cuda::block));
+  CCCLRT_REQUIRE_DEVICE(CG_BLOCK_THREAD_INDEX(block) == cuda::gpu_thread.index(cuda::block));
   CCCLRT_REQUIRE_DEVICE(block.num_threads() == cuda::gpu_thread.count(cuda::block));
-  CCCLRT_REQUIRE_DEVICE(block.dim_threads() == cuda::gpu_thread.dims(cuda::block));
+  CCCLRT_REQUIRE_DEVICE(CG_BLOCK_DIM_THREADS(block) == cuda::gpu_thread.dims(cuda::block));
 
   CCCLRT_REQUIRE_DEVICE(block.thread_index() == cuda::gpu_thread.index(cuda::block, hierarchy));
 
@@ -413,7 +426,7 @@ __global__ void kernel(Hierarchy hierarchy)
     grid_index.z
     == static_cast<unsigned long long>(CG_GRID_BLOCK_INDEX(grid).z) * CG_BLOCK_DIM_THREADS(block).z + CG_BLOCK_THREAD_INDEX(block).z);
 
-  CCCLRT_REQUIRE_DEVICE(grid.block_rank() == cuda::block.rank(cuda::grid, hierarchy));
+  CCCLRT_REQUIRE_DEVICE(CG_GRID_BLOCK_RANK(grid) == cuda::block.rank(cuda::grid, hierarchy));
   CCCLRT_REQUIRE_DEVICE(block.thread_rank() == cuda::gpu_thread.rank(cuda::block, hierarchy));
   CCCLRT_REQUIRE_DEVICE(grid.thread_rank() == cuda::gpu_thread.rank(cuda::grid, hierarchy));
 }

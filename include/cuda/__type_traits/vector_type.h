@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA__TYPE_TRAITS_VECTOR_TYPE_H
 #define _CUDA__TYPE_TRAITS_VECTOR_TYPE_H
 
@@ -21,16 +43,20 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/std/__cstddef/types.h>
 #  include <cuda/std/__floating_point/cuda_fp_types.h>
 #  include <cuda/std/__tuple_dir/vector_types.h>
 #  include <cuda/std/__type_traits/is_same.h>
 
-#  if !_CCCL_CUDA_COMPILATION()
+// NOTE(HIP/AMD): the CUDA vector type names (char1, uint3, float4, ...) are
+// provided on HIP by <hip/hip_vector_types.h> as HIP_vector_type<T,N> aliases.
+#  if _CCCL_HIP_COMPILATION()
+#    include <hip/hip_vector_types.h>
+#  elif !_CCCL_CUDA_COMPILATION()
 #    include <vector_types.h>
-#  endif // !_CCCL_CUDA_COMPILATION()
+#  endif // vector type definitions
 
 #  include <cuda/std/__cccl/prologue.h>
 
@@ -39,7 +65,15 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 template <class _Tp, ::cuda::std::size_t _Size>
 [[nodiscard]] _CCCL_API _CCCL_CONSTEVAL auto __cccl_vector_type_t_impl() noexcept
 {
+  // NOTE(HIP/AMD): the element type of HIP's charN is plain `char` (not the
+  // `signed char` used by CUDA), matching the tuple-element specialization in
+  // <cuda/std/__tuple_dir/vector_types.h>. Map `char` -> charN on HIP so that
+  // vector_type_t and scalar_type_t stay consistent.
+#  if _CCCL_HIP_COMPILATION()
+  if constexpr (::cuda::std::is_same_v<_Tp, char>)
+#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
   if constexpr (::cuda::std::is_same_v<_Tp, signed char>)
+#  endif // !_CCCL_HIP_COMPILATION()
   {
     if constexpr (_Size == 1)
     {

@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/std/cstddef>
 #include <cuda/type_traits>
 
@@ -28,10 +50,16 @@ __host__ __device__ void test()
 {
   // 1. Test valid combinations
 
-  test<signed char, 1, char1>();
-  test<signed char, 2, char2>();
-  test<signed char, 3, char3>();
-  test<signed char, 4, char4>();
+  // NOTE(HIP/AMD): HIP's charN element type is plain `char`, not `signed char`.
+#if _CCCL_HIP_COMPILATION()
+  using SChar = char;
+#else
+  using SChar = signed char;
+#endif
+  test<SChar, 1, char1>();
+  test<SChar, 2, char2>();
+  test<SChar, 3, char3>();
+  test<SChar, 4, char4>();
 
   static_assert(cuda::is_vector_type_v<char1>);
   static_assert(cuda::is_vector_type_v<char2>);
@@ -253,7 +281,13 @@ __host__ __device__ void test()
   // 2. Test invalid combinations
 
   test<float, 0, void>();
+  // NOTE(HIP/AMD): HIP's charN element is plain `char`, so `signed char` is the
+  // unmapped scalar here (vs `char` on CUDA, whose charN is `signed char`).
+#if _CCCL_HIP_COMPILATION()
+  test<signed char, 1, void>();
+#else
   test<char, 1, void>();
+#endif
   test<long, 5, void>();
 
   static_assert(!cuda::is_vector_type_v<int>);

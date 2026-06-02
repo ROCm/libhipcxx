@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA__TYPE_TRAITS_IS_VECTOR_TYPE_H
 #define _CUDA__TYPE_TRAITS_IS_VECTOR_TYPE_H
 
@@ -21,11 +43,15 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
-#  if !_CCCL_CUDA_COMPILATION()
+// NOTE(HIP/AMD): the CUDA vector type names (char1, uint3, float4, ...) are
+// provided on HIP by <hip/hip_vector_types.h> as HIP_vector_type<T,N> aliases.
+#  if _CCCL_HIP_COMPILATION()
+#    include <hip/hip_vector_types.h>
+#  elif !_CCCL_CUDA_COMPILATION()
 #    include <vector_types.h>
-#  endif // !_CCCL_CUDA_COMPILATION()
+#  endif // vector type definitions
 
 #  include <cuda/std/__cccl/prologue.h>
 
@@ -229,5 +255,5 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // !_CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 #endif // _CUDA__TYPE_TRAITS_IS_VECTOR_TYPE_H
