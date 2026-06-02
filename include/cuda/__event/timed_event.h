@@ -33,14 +33,6 @@
 #ifndef _CUDA___EVENT_TIMED_EVENT_H
 #define _CUDA___EVENT_TIMED_EVENT_H
 
-// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
-// #if !defined(__HIP_PLATFORM_AMD__)
-// #  include <cuda_runtime_api.h>
-// // cuda_runtime_api needs to come first
-// #endif // !__HIP_PLATFORM_AMD__
-//
-// =======
-// >>>>>>> END NEW CODE (1a270882e7)
 #include <cuda/std/detail/__config>
 
 #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)

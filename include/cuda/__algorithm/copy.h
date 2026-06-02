@@ -52,13 +52,7 @@
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__algorithm/common.h>
-// <<<<<<< OLD CODE from 006753940d (7034964082) - COMMENTED OUT
-// #  include <cuda/__driver/driver_api.h>
-// #  include <cuda/__runtime/ensure_current_context.h>
-// #  include <cuda/__stream/device_transform.h>
-// =======
 #  include <cuda/__stream/launch_transform.h>
-// >>>>>>> END NEW CODE (7034964082)
 #  include <cuda/__stream/stream_ref.h>
 #  include <cuda/std/__concepts/concept_macros.h>
 #  include <cuda/std/mdspan>

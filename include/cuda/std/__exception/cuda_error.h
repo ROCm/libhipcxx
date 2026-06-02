@@ -38,18 +38,10 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from a342ae4ce6 (ac82f7b5b2) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-//
-// #  include <cuda/std/__exception/exception_macros.h>
-// #  include <cuda/std/__exception/terminate.h>
-// #  include <cuda/std/source_location>
-// =======
 #include <cuda/std/__exception/exception_macros.h>
 #include <cuda/std/__exception/msg_storage.h>
 #include <cuda/std/__host_stdlib/stdexcept>
 #include <cuda/std/source_location>
-// >>>>>>> END NEW CODE (ac82f7b5b2)
 
 #if !_CCCL_COMPILER(NVRTC)
 #  include <cstdio>
@@ -59,11 +51,7 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-// <<<<<<< OLD CODE from a342ae4ce6 (ac82f7b5b2) - COMMENTED OUT
-// #  if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-// =======
-#if _CCCL_HAS_CTK()
-// >>>>>>> END NEW CODE (ac82f7b5b2)
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 using __cuda_error_t = ::cudaError_t;
 #else
 using __cuda_error_t = int;
@@ -134,12 +122,6 @@ private:
 
 _CCCL_END_NAMESPACE_CUDA
 
-// <<<<<<< OLD CODE from a342ae4ce6 (ac82f7b5b2) - COMMENTED OUT
-// #  include <cuda/std/__cccl/epilogue.h>
-//
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #include <cuda/std/__cccl/epilogue.h>
-// >>>>>>> END NEW CODE (ac82f7b5b2)
 
 #endif // _CUDA_STD___EXCEPTION_CUDA_ERROR_H

@@ -44,26 +44,18 @@
 
 #include <cuda/std/__exception/terminate.h>
 
-// <<<<<<< OLD CODE from 6679bf087e (6f0f385d4f) - COMMENTED OUT
-// // NOTE(HIP/AMD): Also exclude HIPRTC. Including <stdexcept> here pulls in
-// // libstdc++ <string> -> <bits/char_traits.h> -> <cstdint> -> system <stdint.h>,
-// // which under HIPRTC conflicts with the int_fast*_t / uint_fast*_t aliases
-// // previously defined by cuda/std/cstdint (e.g. int_fast16_t aliased to
-// // int16_t/short in our header vs. long int in glibc's stdint.h).
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  if __cpp_lib_format >= 201907L
-// #    include <format>
-// #  else // ^^^ __cpp_lib_format >= 201907L ^^^ / vvv __cpp_lib_format < 201907L vvv
-// #    include <stdexcept>
-// #  endif // ^^^ __cpp_lib_format < 201907L ^^^
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if __cpp_lib_format >= 201907L
-#  include <format>
-#else // ^^^ __cpp_lib_format >= 201907L ^^^ / vvv __cpp_lib_format < 201907L vvv
-#  include <cuda/std/__host_stdlib/stdexcept>
-#endif // ^^^ __cpp_lib_format < 201907L ^^^
-// >>>>>>> END NEW CODE (6f0f385d4f)
+// NOTE(HIP/AMD): Also exclude HIPRTC. Including <stdexcept> here pulls in
+// libstdc++ <string> -> <bits/char_traits.h> -> <cstdint> -> system <stdint.h>,
+// which under HIPRTC conflicts with the int_fast*_t / uint_fast*_t aliases
+// previously defined by cuda/std/cstdint (e.g. int_fast16_t aliased to
+// int16_t/short in our header vs. long int in glibc's stdint.h).
+#if !defined(_CCCL_COMPILER_HIPRTC)
+#  if __cpp_lib_format >= 201907L
+#    include <format>
+#  else // ^^^ __cpp_lib_format >= 201907L ^^^ / vvv __cpp_lib_format < 201907L vvv
+#    include <cuda/std/__host_stdlib/stdexcept>
+#  endif // ^^^ __cpp_lib_format < 201907L ^^^
+#endif // !defined(_CCCL_COMPILER_HIPRTC)
 
 #include <cuda/std/__cccl/prologue.h>
 

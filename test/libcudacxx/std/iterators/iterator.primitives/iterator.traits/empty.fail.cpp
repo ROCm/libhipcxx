@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -87,47 +87,6 @@ struct NotAnIteratorNoCategory
 int main(int, char**)
 {
   {
-// <<<<<<< OLD CODE from b8a772d6f2 (152c04bcbc) - COMMENTED OUT
-//     typedef cuda::std::iterator_traits<NotAnIteratorEmpty> T;
-//     typedef T::difference_type DT; // expected-error-re {{no type named 'difference_type' in
-//                                    // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::value_type VT; // expected-error-re {{no type named 'value_type' in
-//                               // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::pointer PT; // expected-error-re {{no type named 'pointer' in
-//                            // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::reference RT; // expected-error-re {{no type named 'reference' in
-//                              // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::iterator_category CT; // expected-error-re {{no type named 'iterator_category' in
-//                                      // 'cuda::std::iterator_traits<{{.+}}>}}
-//   }
-//
-//   {
-//     typedef cuda::std::iterator_traits<NotAnIteratorNoDifference> T;
-//     typedef T::difference_type DT; // expected-error-re {{no type named 'difference_type' in
-//                                    // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::value_type VT; // expected-error-re {{no type named 'value_type' in
-//                               // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::pointer PT; // expected-error-re {{no type named 'pointer' in
-//                            // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::reference RT; // expected-error-re {{no type named 'reference' in
-//                              // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::iterator_category CT; // expected-error-re {{no type named 'iterator_category' in
-//                                      // 'cuda::std::iterator_traits<{{.+}}>}}
-//   }
-//
-//   {
-//     typedef cuda::std::iterator_traits<NotAnIteratorNoValue> T;
-//     typedef T::difference_type DT; // expected-error-re {{no type named 'difference_type' in
-//                                    // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::value_type VT; // expected-error-re {{no type named 'value_type' in
-//                               // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::pointer PT; // expected-error-re {{no type named 'pointer' in
-//                            // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::reference RT; // expected-error-re {{no type named 'reference' in
-//                              // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::iterator_category CT; // expected-error-re {{no type named 'iterator_category' in
-//                                      // 'cuda::std::iterator_traits<{{.+}}>}}
-// =======
     using T  = cuda::std::iterator_traits<NotAnIteratorEmpty>;
     using DT = T::difference_type; // expected-error-re {{no type named 'difference_type' in
                                    // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
@@ -167,23 +126,9 @@ int main(int, char**)
                              // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
     using CT = T::iterator_category; // expected-error-re {{no type named 'iterator_category' in
                                      // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
-// >>>>>>> END NEW CODE (152c04bcbc)
   }
 #if TEST_STD_VER <= 2017
   {
-// <<<<<<< OLD CODE from b8a772d6f2 (152c04bcbc) - COMMENTED OUT
-//     typedef cuda::std::iterator_traits<NotAnIteratorNoPointer> T;
-//     typedef T::difference_type DT; // expected-error-re {{no type named 'difference_type' in
-//                                    // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::value_type VT; // expected-error-re {{no type named 'value_type' in
-//                               // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::pointer PT; // expected-error-re {{no type named 'pointer' in
-//                            // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::reference RT; // expected-error-re {{no type named 'reference' in
-//                              // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::iterator_category CT; // expected-error-re {{no type named 'iterator_category' in
-//                                      // 'cuda::std::iterator_traits<{{.+}}>}}
-// =======
     using T  = cuda::std::iterator_traits<NotAnIteratorNoPointer>;
     using DT = T::difference_type; // expected-error-re {{no type named 'difference_type' in
                                    // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
@@ -195,37 +140,9 @@ int main(int, char**)
                              // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
     using CT = T::iterator_category; // expected-error-re {{no type named 'iterator_category' in
                                      // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
-// >>>>>>> END NEW CODE (152c04bcbc)
   }
 #endif
   {
-// <<<<<<< OLD CODE from b8a772d6f2 (152c04bcbc) - COMMENTED OUT
-//     typedef cuda::std::iterator_traits<NotAnIteratorNoReference> T;
-//     typedef T::difference_type DT; // expected-error-re {{no type named 'difference_type' in
-//                                    // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::value_type VT; // expected-error-re {{no type named 'value_type' in
-//                               // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::pointer PT; // expected-error-re {{no type named 'pointer' in
-//                            // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::reference RT; // expected-error-re {{no type named 'reference' in
-//                              // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::iterator_category CT; // expected-error-re {{no type named 'iterator_category' in
-//                                      // 'cuda::std::iterator_traits<{{.+}}>}}
-//   }
-//
-//   {
-//     typedef cuda::std::iterator_traits<NotAnIteratorNoCategory> T;
-//     typedef T::difference_type DT; // expected-error-re {{no type named 'difference_type' in
-//                                    // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::value_type VT; // expected-error-re {{no type named 'value_type' in
-//                               // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::pointer PT; // expected-error-re {{no type named 'pointer' in
-//                            // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::reference RT; // expected-error-re {{no type named 'reference' in
-//                              // 'cuda::std::iterator_traits<{{.+}}>}}
-//     typedef T::iterator_category CT; // expected-error-re {{no type named 'iterator_category' in
-//                                      // 'cuda::std::iterator_traits<{{.+}}>}}
-// =======
     using T  = cuda::std::iterator_traits<NotAnIteratorNoReference>;
     using DT = T::difference_type; // expected-error-re {{no type named 'difference_type' in
                                    // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
@@ -251,7 +168,6 @@ int main(int, char**)
                              // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
     using CT = T::iterator_category; // expected-error-re {{no type named 'iterator_category' in
                                      // 'cuda::std::{{.+}}::iterator_traits<{{.+}}>}}
-// >>>>>>> END NEW CODE (152c04bcbc)
   }
 
   return 0;

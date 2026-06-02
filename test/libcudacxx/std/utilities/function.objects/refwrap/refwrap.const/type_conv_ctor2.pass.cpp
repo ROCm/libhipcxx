@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -90,10 +90,6 @@ __host__ __device__ constexpr bool test()
 int main(int, char**)
 {
   test();
-// <<<<<<< OLD CODE from 665e48f869 (293e038cb0) - COMMENTED OUT
-// #if TEST_STD_VER > 2017 && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-// =======
-// >>>>>>> END NEW CODE (293e038cb0)
   static_assert(test());
 
   return 0;

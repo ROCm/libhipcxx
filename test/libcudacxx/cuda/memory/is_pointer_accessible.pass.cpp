@@ -218,29 +218,25 @@ bool test_multiple_devices()
   cuda::__ensure_current_context ctx1(dev1);
   assert(cuda::__is_device_or_managed_memory(device_ptr0) == true);
   assert(cuda::is_device_accessible(device_ptr0, dev0) == true);
-// <<<<<<< OLD CODE from 01c404526a (e0a95ac08e) - COMMENTED OUT
-// #if !defined(__HIP_PLATFORM_AMD__)
-//   // NOTE(HIP/AMD): on CUDA, cudaMalloc returns memory from the
-//   // default per-device memory pool, and the upstream
-//   // is_device_accessible implementation queries
-//   // CU_POINTER_ATTRIBUTE_MEMPOOL_HANDLE + cuMemPoolGetAccess to
-//   // distinguish "peer-capable" from "peer-access-enabled". On HIP
-//   // hipMalloc'd memory is NOT exposed via a per-device pool handle
-//   // (hipPointerGetAttribute(HIP_POINTER_ATTRIBUTE_MEMPOOL_HANDLE)
-//   // returns hipErrorNotSupported), so the libhipcxx HIP-side
-//   // implementation of cuda::is_device_accessible falls back to
-//   // hipDeviceCanAccessPeer() which only reports peer-access
-//   // *capability*. There is no public HIP API to query whether
-//   // peer access has actually been enabled between two contexts, so
-//   // we cannot distinguish the pre-enable state from the post-enable
-//   // state and skip these specific assertions.
-//   assert(cuda::is_device_accessible(device_ptr0, dev1) == false);
-// #endif // !__HIP_PLATFORM_AMD__
-// =======
   assert(cuda::__is_device_accessible_nothrow(device_ptr0, dev0) == true);
+#if !defined(__HIP_PLATFORM_AMD__)
+  // NOTE(HIP/AMD): on CUDA, cudaMalloc returns memory from the
+  // default per-device memory pool, and the upstream
+  // is_device_accessible implementation queries
+  // CU_POINTER_ATTRIBUTE_MEMPOOL_HANDLE + cuMemPoolGetAccess to
+  // distinguish "peer-capable" from "peer-access-enabled". On HIP
+  // hipMalloc'd memory is NOT exposed via a per-device pool handle
+  // (hipPointerGetAttribute(HIP_POINTER_ATTRIBUTE_MEMPOOL_HANDLE)
+  // returns hipErrorNotSupported), so the libhipcxx HIP-side
+  // implementation of cuda::is_device_accessible falls back to
+  // hipDeviceCanAccessPeer() which only reports peer-access
+  // *capability*. There is no public HIP API to query whether
+  // peer access has actually been enabled between two contexts, so
+  // we cannot distinguish the pre-enable state from the post-enable
+  // state and skip these specific assertions.
   assert(cuda::is_device_accessible(device_ptr0, dev1) == false);
+#endif // !__HIP_PLATFORM_AMD__
   assert(cuda::__is_device_accessible_nothrow(device_ptr0, dev0) == true);
-// >>>>>>> END NEW CODE (e0a95ac08e)
 
   int can_access_peer = 0;
   assert(cudaDeviceCanAccessPeer(&can_access_peer, dev0.get(), dev1.get()) == cudaSuccess);
@@ -248,35 +244,28 @@ bool test_multiple_devices()
   {
     return true;
   }
-// <<<<<<< OLD CODE from da1c60728f (4f809b6633) - COMMENTED OUT
-// #if !defined(__HIP_PLATFORM_AMD__)
-// =======
   assert(cuda::__is_device_or_managed_memory(device_ptr0) == true);
-// >>>>>>> END NEW CODE (4f809b6633)
+#if !defined(__HIP_PLATFORM_AMD__)
   assert(cuda::is_device_accessible(device_ptr0, dev1) == false);
-// <<<<<<< OLD CODE from 01c404526a (e0a95ac08e) - COMMENTED OUT
-// #endif // !__HIP_PLATFORM_AMD__
-//
-//   // NOTE(HIP/AMD): the upstream test calls
-//   // 'cudaDeviceEnablePeerAccess(dev1.get(), 0)' here while the
-//   // current context is already dev1's (set above via
-//   // cuda::__ensure_current_context ctx1(dev1)). That is a self-peer
-//   // enable, which CUDA tolerates silently as a no-op but HIP
-//   // rejects with hipErrorInvalidDevice.
-//   //
-//   // Skip the call entirely on HIP: it is a no-op on CUDA, and the
-//   // following 'is_device_accessible(device_ptr0, dev1) == true'
-//   // assertion succeeds on HIP regardless because libhipcxx's HIP
-//   // implementation of cuda::is_device_accessible returns true for
-//   // any peer-capable pair (it uses hipDeviceCanAccessPeer, which
-//   // reports capability rather than the per-pair enabled state -- see
-//   // is_pointer_accessible.h). Avoiding the call also means no
-//   // peer-access state leaks into test_multiple_devices_from_pool().
-// #if !defined(__HIP_PLATFORM_AMD__)
-// =======
   assert(cuda::__is_device_accessible_nothrow(device_ptr0, dev1) == false);
+#endif // !__HIP_PLATFORM_AMD__
 
-// >>>>>>> END NEW CODE (e0a95ac08e)
+  // NOTE(HIP/AMD): the upstream test calls
+  // 'cudaDeviceEnablePeerAccess(dev1.get(), 0)' here while the
+  // current context is already dev1's (set above via
+  // cuda::__ensure_current_context ctx1(dev1)). That is a self-peer
+  // enable, which CUDA tolerates silently as a no-op but HIP
+  // rejects with hipErrorInvalidDevice.
+  //
+  // Skip the call entirely on HIP: it is a no-op on CUDA, and the
+  // following 'is_device_accessible(device_ptr0, dev1) == true'
+  // assertion succeeds on HIP regardless because libhipcxx's HIP
+  // implementation of cuda::is_device_accessible returns true for
+  // any peer-capable pair (it uses hipDeviceCanAccessPeer, which
+  // reports capability rather than the per-pair enabled state -- see
+  // is_pointer_accessible.h). Avoiding the call also means no
+  // peer-access state leaks into test_multiple_devices_from_pool().
+#if !defined(__HIP_PLATFORM_AMD__)
   assert(cudaDeviceEnablePeerAccess(dev1.get(), 0) == cudaSuccess);
 #endif // !__HIP_PLATFORM_AMD__
   assert(cuda::is_device_accessible(device_ptr0, dev0) == true);
@@ -311,15 +300,9 @@ bool test_multiple_devices_from_pool()
   // for an arbitrary pair of contexts. Cannot distinguish pre/post
   // hipDeviceEnablePeerAccess on a peer-capable system.
   assert(cuda::is_device_accessible(ptr, dev1) == false);
-// <<<<<<< OLD CODE from 01c404526a (e0a95ac08e) - COMMENTED OUT
-// // <<<<<<< OLD CODE from da1c60728f (4f809b6633) - COMMENTED OUT
-// // #endif // !__HIP_PLATFORM_AMD__
-// // =======
-// =======
   assert(cuda::__is_device_accessible_nothrow(ptr, dev1) == false);
-// >>>>>>> END NEW CODE (e0a95ac08e)
+#endif // !__HIP_PLATFORM_AMD__
   assert(cuda::__is_device_or_managed_memory(ptr) == true);
-// >>>>>>> END NEW CODE (4f809b6633)
 
   // NOTE(HIP/AMD): see comment in test_multiple_devices() above --
   // skip the self-peer enable on HIP. The post-enable assertions

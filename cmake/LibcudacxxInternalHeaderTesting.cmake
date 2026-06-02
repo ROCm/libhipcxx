@@ -65,113 +65,76 @@ list(FILTER internal_headers EXCLUDE REGEX "__cuda/*")
 # generated cuda::ptx headers are not standalone
 list(FILTER internal_headers EXCLUDE REGEX "__ptx/instructions/generated")
 
-# <<<<<<< OLD CODE from 8c38351f70 (59ad1b152f) - COMMENTED OUT
-# # NOTE(HIP/AMD): under HIP, filter out the upstream feature surfaces that
-# # have no HIP-portable implementation as of 2026, then re-add the
-# # individual cuda::ptx::* wrappers that DO ship a HIP software emulation
-# # (see the consolidated NOTE in <cuda/__ptx/ptx_helper_functions.h>) so
-# # the emulations don't bitrot. Block-list / allow-list pattern (per the
-# # g17 review feedback on PR #217) -- adding a new upstream header under
-# # one of the SKIP_DIRS will surface as a build failure rather than being
-# # silently skipped, which makes loss-of-coverage regressions visible.
-# if (LIBCUDACXX_ENABLE_HIP)
-#   include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
-#   libcudacxx_filter_backend_headers(internal_headers
-#     BACKEND HIP
-#     SKIP_DIRS
-#       cuda/__barrier cuda/__latch cuda/__semaphore
-#       cuda/__annotated_ptr cuda/__pipeline cuda/__memcpy_async cuda/__ptx
-#       # CUDA-only PTX atomic dispatch headers (inline-PTX asm; the HIP
-#       # path uses atomic_hip_{generated,derived}.h instead).
-#       cuda/std/__atomic/functions/cuda_ptx_generated.h
-#       cuda/std/__atomic/functions/cuda_ptx_derived.h
-#       cuda/std/__atomic/functions/cuda_ptx_generated_helper.h
-#     ALLOWLIST_HEADERS
-#       cuda/__ptx/ptx_helper_functions.h
-#       cuda/__ptx/ptx_dot_variants.h
-#       cuda/__ptx/instructions/bmsk.h
-#       cuda/__ptx/instructions/elect_sync.h
-#       cuda/__ptx/instructions/fence.h
-#       cuda/__ptx/instructions/get_sreg.h
-#       cuda/__ptx/instructions/shfl_sync.h
-#       cuda/__ptx/instructions/shl.h
-#       cuda/__ptx/instructions/shr.h
-#       cuda/__ptx/instructions/trap.h
-#   )
-# =======
-if ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
+# NOTE(HIP/AMD): under HIP, filter out the upstream feature surfaces that
+# have no HIP-portable implementation as of 2026, then re-add the
+# individual cuda::ptx::* wrappers that DO ship a HIP software emulation
+# (see the consolidated NOTE in <cuda/__ptx/ptx_helper_functions.h>) so
+# the emulations don't bitrot. Block-list / allow-list pattern (per the
+# g17 review feedback on PR #217) -- adding a new upstream header under
+# one of the SKIP_DIRS will surface as a build failure rather than being
+# silently skipped, which makes loss-of-coverage regressions visible.
+if (LIBCUDACXX_ENABLE_HIP)
+  include(${CMAKE_CURRENT_LIST_DIR}/LibcudacxxFilterBackendHeaders.cmake)
+  libcudacxx_filter_backend_headers(internal_headers
+    BACKEND HIP
+    SKIP_DIRS
+      cuda/__barrier cuda/__latch cuda/__semaphore
+      cuda/__annotated_ptr cuda/__pipeline cuda/__memcpy_async cuda/__ptx
+      # CUDA-only PTX atomic dispatch headers (inline-PTX asm; the HIP
+      # path uses atomic_hip_{generated,derived}.h instead).
+      cuda/std/__atomic/functions/cuda_ptx_generated.h
+      cuda/std/__atomic/functions/cuda_ptx_derived.h
+      cuda/std/__atomic/functions/cuda_ptx_generated_helper.h
+    ALLOWLIST_HEADERS
+      cuda/__ptx/ptx_helper_functions.h
+      cuda/__ptx/ptx_dot_variants.h
+      cuda/__ptx/instructions/bmsk.h
+      cuda/__ptx/instructions/elect_sync.h
+      cuda/__ptx/instructions/fence.h
+      cuda/__ptx/instructions/get_sreg.h
+      cuda/__ptx/instructions/shfl_sync.h
+      cuda/__ptx/instructions/shl.h
+      cuda/__ptx/instructions/shr.h
+      cuda/__ptx/instructions/trap.h
+  )
+  set(cudart_name hip::device)
+elseif ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
   set(cudart_name NVHPC::CUDART)
 else()
   set(cudart_name CUDA::cudart)
-# >>>>>>> END NEW CODE (59ad1b152f)
 endif()
 
 function(libcudacxx_create_internal_header_test header_name headertest_src)
-# <<<<<<< OLD CODE from 23063816f0 (3fd8e38e4b) - COMMENTED OUT
-#   # Create the default target for that file. The TU is always written to
-#   # disk as '.cu' (see configure_file in libcudacxx_add_internal_header_test
-#   # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
-#   # association by tagging the source file with LANGUAGE HIP, which routes
-#   # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
-#   # natively, so no separate '.cpp' shadow file is needed.
-#   set(internal_headertest_${header_name} verify_${header_name})
-#   add_library(internal_headertest_${header_name} SHARED "${headertest_src}.cu")
-#   if (LIBCUDACXX_ENABLE_HIP)
-#     set_source_files_properties(
-#       "${headertest_src}.cu"
-#       PROPERTIES LANGUAGE HIP
-#     )
-#   endif()
-# =======
-  # Create the default target for that file
+  # Create the default target for that file. The TU is always written to
+  # disk as '.cu' (see configure_file in libcudacxx_add_internal_header_test
+  # below); on HIP we override CMake's default '.cu -> LANGUAGE CUDA'
+  # association by tagging the source file with LANGUAGE HIP, which routes
+  # it through the HIP toolchain. clang's HIP front-end accepts '.cu' files
+  # natively, so no separate '.cpp' shadow file is needed.
   add_library(internal_headertest_${header_name} SHARED "${headertest_src}.cu")
   cccl_configure_target(internal_headertest_${header_name})
-# <<<<<<< OLD CODE from 8c38351f70 (59ad1b152f) - COMMENTED OUT
-# # >>>>>>> END NEW CODE (3fd8e38e4b)
-#   target_include_directories(
-#     internal_headertest_${header_name}
-#     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
-#   )
-# =======
-# >>>>>>> END NEW CODE (59ad1b152f)
+  if (LIBCUDACXX_ENABLE_HIP)
+    set_source_files_properties(
+      "${headertest_src}.cu"
+      PROPERTIES LANGUAGE HIP
+    )
+  endif()
+  target_include_directories(
+    internal_headertest_${header_name}
+    PRIVATE "${libcudacxx_SOURCE_DIR}/include"
+  )
   target_compile_definitions(
     internal_headertest_${header_name}
     PRIVATE _CCCL_HEADER_TEST
   )
-# <<<<<<< OLD CODE from 8c38351f70 (59ad1b152f) - COMMENTED OUT
-#
-#   # Bring in the global CCCL compile definitions
-#   # Link against the right runtime
-#   if (LIBCUDACXX_ENABLE_HIP)
-#     target_link_libraries(
-#       internal_headertest_${header_name}
-#       PUBLIC #
-#         libcudacxx.compiler_interface
-#         hip::device
-#     )
-#   elseif ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
-#     target_link_libraries(
-#       internal_headertest_${header_name}
-#       PUBLIC #
-#         libcudacxx.compiler_interface
-#         NVHPC::CUDART
-#     )
-#   else()
-#     target_link_libraries(
-#       internal_headertest_${header_name}
-#       PUBLIC #
-#         libcudacxx.compiler_interface
-#         CUDA::cudart
-#     )
-#   endif()
-# =======
+  # Bring in the global CCCL compile definitions
+  # Link against the right runtime
   target_link_libraries(
     internal_headertest_${header_name}
     PUBLIC #
       libcudacxx.compiler_interface
       ${cudart_name}
   )
-# >>>>>>> END NEW CODE (59ad1b152f)
 
   # Ensure that if this is an atomic header, we only include the right architectures
   # (CUDA-only; the HIP path skipped these via the regex above).

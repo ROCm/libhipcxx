@@ -78,12 +78,7 @@
 #endif // _LIBCUDACXX_HAS_NO_INCOMPLETE_RANGES
 
 // libcu++ requires host device support for its tests. Until then restrict usage to at least 12.2
-// <<<<<<< OLD CODE from 8b68a86b0a (659bc73808) - COMMENTED OUT
-// #if (_CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2) \
-//   && (_CCCL_HAS_CUDA_COMPILER() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16))) || _CCCL_HIP_COMPILATION()
-// =======
-#if _CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2)
-// >>>>>>> END NEW CODE (659bc73808)
+#if (_CCCL_HAS_NVFP16() && _CCCL_CTK_AT_LEAST(12, 2)) || _CCCL_HIP_COMPILATION()
 #  define _LIBCUDACXX_HAS_NVFP16() 1
 #else
 #  define _LIBCUDACXX_HAS_NVFP16() 0

@@ -65,46 +65,33 @@
 #  define _CCCL_HAS_INT128() 1
 #endif
 
-// <<<<<<< OLD CODE from 8af8026676 (64e508c7d9) - COMMENTED OUT
-// #if _CCCL_HAS_INCLUDE(<cuda_fp16.h>) && (_CCCL_HAS_CTK() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16)) \
-//                       && !defined(CCCL_DISABLE_FP16_SUPPORT) || _CCCL_HIP_COMPILATION()
-// =======
 #if __has_include(<cuda_fp16.h>) && (_CCCL_HAS_CTK() || defined(LIBCUDACXX_ENABLE_HOST_NVFP16)) \
-                      && !defined(CCCL_DISABLE_FP16_SUPPORT)
-// >>>>>>> END NEW CODE (64e508c7d9)
+                      && !defined(CCCL_DISABLE_FP16_SUPPORT) || _CCCL_HIP_COMPILATION()
 #  undef _CCCL_HAS_NVFP16
 #  define _CCCL_HAS_NVFP16() 1
 struct __half;
 struct __half2;
 #endif
 
-// <<<<<<< OLD CODE from 8af8026676 (64e508c7d9) - COMMENTED OUT
-// #if _CCCL_HAS_INCLUDE(<cuda_bf16.h>) && _CCCL_HAS_NVFP16() && !defined(CCCL_DISABLE_BF16_SUPPORT)  || _CCCL_HIP_COMPILATION()
-// =======
-#if __has_include(<cuda_bf16.h>) && _CCCL_HAS_NVFP16() && !defined(CCCL_DISABLE_BF16_SUPPORT)
-// >>>>>>> END NEW CODE (64e508c7d9)
+#if __has_include(<cuda_bf16.h>) && _CCCL_HAS_NVFP16() && !defined(CCCL_DISABLE_BF16_SUPPORT) || _CCCL_HIP_COMPILATION()
 #  undef _CCCL_HAS_NVBF16
 #  define _CCCL_HAS_NVBF16() 1
 struct __nv_bfloat16;
 struct __nv_bfloat162;
 #endif
 
-// <<<<<<< OLD CODE from 8af8026676 (64e508c7d9) - COMMENTED OUT
-// // NOTE(HIP/AMD): HIP ships <hip/hip_fp8.h> with __hip_fp8_e4m3 / __hip_fp8_e5m2
-// // types (and x2/x4 variants); <libhipcxx/__amd/cuda_runtime.h> aliases them to the
-// // upstream __nv_fp8_e4m3 / __nv_fp8_e5m2 names. The __nv_fp8_e8m0 family
-// // is CTK 12.8+ only on NVIDIA and has no HIP analogue; leave it disabled.
-// // On gfx942 the OCP fp8 ctors are host-only (HIP_FP8_TYPE_OCP=0 in
-// // <hip/amd_detail/amd_hip_fp8.h>); FNUZ siblings are not bit-compatible
-// // (different exponent bias, NaN encoding, max value), so disable NVFP8
-// // only on the gfx942 device pass. Host pass and other archs unaffected.
-// #if (_CCCL_HAS_INCLUDE(<cuda_fp8.h>) && _CCCL_HAS_NVFP16() && _CCCL_HAS_NVBF16() \
-//        && !defined(CCCL_DISABLE_NVFP8_SUPPORT)) \
-//     || (_CCCL_HIP_COMPILATION() \
-//         && !(defined(__HIP_DEVICE_COMPILE__) && defined(__gfx942__)))
-// =======
-#if __has_include(<cuda_fp8.h>) && _CCCL_HAS_NVFP16() && _CCCL_HAS_NVBF16() && !defined(CCCL_DISABLE_NVFP8_SUPPORT)
-// >>>>>>> END NEW CODE (64e508c7d9)
+// NOTE(HIP/AMD): HIP ships <hip/hip_fp8.h> with __hip_fp8_e4m3 / __hip_fp8_e5m2
+// types (and x2/x4 variants); <libhipcxx/__amd/cuda_runtime.h> aliases them to the
+// upstream __nv_fp8_e4m3 / __nv_fp8_e5m2 names. The __nv_fp8_e8m0 family
+// is CTK 12.8+ only on NVIDIA and has no HIP analogue; leave it disabled.
+// On gfx942 the OCP fp8 ctors are host-only (HIP_FP8_TYPE_OCP=0 in
+// <hip/amd_detail/amd_hip_fp8.h>); FNUZ siblings are not bit-compatible
+// (different exponent bias, NaN encoding, max value), so disable NVFP8
+// only on the gfx942 device pass. Host pass and other archs unaffected.
+#if (__has_include(<cuda_fp8.h>) && _CCCL_HAS_NVFP16() && _CCCL_HAS_NVBF16() \
+       && !defined(CCCL_DISABLE_NVFP8_SUPPORT)) \
+    || (_CCCL_HIP_COMPILATION() \
+        && !(defined(__HIP_DEVICE_COMPILE__) && defined(__gfx942__)))
 #  undef _CCCL_HAS_NVFP8
 #  define _CCCL_HAS_NVFP8() 1
 struct __nv_fp8_e5m2;
@@ -122,21 +109,16 @@ struct __nv_fp8x4_e8m0;
 #  endif // _CCCL_CTK_AT_LEAST(12, 8)
 #endif
 
-// <<<<<<< OLD CODE from 8af8026676 (64e508c7d9) - COMMENTED OUT
-// // NOTE(HIP/AMD): HIP ships <hip/hip_fp6.h> with __hip_fp6_e2m3 / __hip_fp6_e3m2
-// // types; <libhipcxx/__amd/cuda_runtime.h> aliases them to __nv_fp6_*. NOT enabled on HIP
-// // for now: <hip/hip_fp6.h> and <hip/hip_fp4.h> both define helper functions
-// // (e.g. internal::half_to_f16, internal::hipbf16_to_bf16) at the same
-// // namespace path with no anonymous-namespace / inline-variable scoping, so
-// // including both causes ODR redefinition errors. Re-enable once the HIP
-// // runtime resolves the symbol clash, or when only one of fp6/fp4 is needed
-// // per TU.
-// #if _CCCL_HAS_INCLUDE(<cuda_fp6.h>) && _CCCL_HAS_NVFP8() && !_CCCL_CUDA_COMPILER(NVHPC) \
-//                       && !defined(CCCL_DISABLE_NVFP6_SUPPORT) && !_CCCL_HIP_COMPILATION()
-// =======
+// NOTE(HIP/AMD): HIP ships <hip/hip_fp6.h> with __hip_fp6_e2m3 / __hip_fp6_e3m2
+// types; <libhipcxx/__amd/cuda_runtime.h> aliases them to __nv_fp6_*. NOT enabled on HIP
+// for now: <hip/hip_fp6.h> and <hip/hip_fp4.h> both define helper functions
+// (e.g. internal::half_to_f16, internal::hipbf16_to_bf16) at the same
+// namespace path with no anonymous-namespace / inline-variable scoping, so
+// including both causes ODR redefinition errors. Re-enable once the HIP
+// runtime resolves the symbol clash, or when only one of fp6/fp4 is needed
+// per TU.
 #if __has_include(<cuda_fp6.h>) && _CCCL_HAS_NVFP8() && !_CCCL_CUDA_COMPILER(NVHPC) \
-                      && !defined(CCCL_DISABLE_NVFP6_SUPPORT)
-// >>>>>>> END NEW CODE (64e508c7d9)
+                      && !defined(CCCL_DISABLE_NVFP6_SUPPORT) && !_CCCL_HIP_COMPILATION()
 #  undef _CCCL_HAS_NVFP6
 #  define _CCCL_HAS_NVFP6() 1
 struct __nv_fp6_e3m2;
@@ -148,14 +130,10 @@ struct __nv_fp6x2_e2m3;
 struct __nv_fp6x4_e2m3;
 #endif
 
-// <<<<<<< OLD CODE from 8af8026676 (64e508c7d9) - COMMENTED OUT
-// // NOTE(HIP/AMD): see __nv_fp6 above for why we leave fp4 disabled on HIP
-// // for now (same internal-helper symbol clash with <hip/hip_fp6.h>).
-// #if _CCCL_HAS_INCLUDE(<cuda_fp4.h>) && _CCCL_HAS_NVFP6() && !defined(CCCL_DISABLE_NVFP4_SUPPORT) \
-//                       && !_CCCL_HIP_COMPILATION()
-// =======
-#if __has_include(<cuda_fp4.h>) && _CCCL_HAS_NVFP6() && !defined(CCCL_DISABLE_NVFP4_SUPPORT)
-// >>>>>>> END NEW CODE (64e508c7d9)
+// NOTE(HIP/AMD): see __nv_fp6 above for why we leave fp4 disabled on HIP
+// for now (same internal-helper symbol clash with <hip/hip_fp6.h>).
+#if __has_include(<cuda_fp4.h>) && _CCCL_HAS_NVFP6() && !defined(CCCL_DISABLE_NVFP4_SUPPORT) \
+                      && !_CCCL_HIP_COMPILATION()
 #  undef _CCCL_HAS_NVFP4
 #  define _CCCL_HAS_NVFP4() 1
 struct __nv_fp4_e2m1;
