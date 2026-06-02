@@ -245,7 +245,11 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   if (LIBCUDACXX_ENABLE_HIP AND NOT TARGET CCCL::CCCL)
     include("${libcudacxx_SOURCE_DIR}/lib/cmake/libcudacxx/libcudacxx-config-version.cmake")
     include("${libcudacxx_SOURCE_DIR}/lib/cmake/libcudacxx/libcudacxx-config.cmake")
-    add_library(CCCL::CCCL ALIAS libcudacxx::libcudacxx)
+    # NOTE(HIP/AMD): in 3.2.1+ 'libcudacxx::libcudacxx' is itself an ALIAS, and
+    # CMake forbids aliasing an alias. Create CCCL::CCCL as a real INTERFACE
+    # IMPORTED target that links the alias instead.
+    add_library(CCCL::CCCL INTERFACE IMPORTED GLOBAL)
+    target_link_libraries(CCCL::CCCL INTERFACE libcudacxx::libcudacxx)
   endif()
 
   # libcudacxx_build_compiler_targets() links libcudacxx.compiler_interface
@@ -255,6 +259,16 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   # libcudacxx CMakePresets baseline.
   if (NOT CMAKE_CUDA_STANDARD)
     set(CMAKE_CUDA_STANDARD 17)
+  endif()
+
+  # NOTE(HIP/AMD): cccl_configure_target() is invoked without an explicit
+  # DIALECT for the header-test targets (upstream form), so it falls back to
+  # the global CMAKE_CXX_STANDARD. In the standalone libhipcxx build (no CCCL
+  # parent) that variable is otherwise empty, which makes
+  # set_target_properties(... CXX_STANDARD ${CMAKE_CXX_STANDARD} ...) fail.
+  # Default to the libcudacxx C++17 baseline.
+  if (NOT CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
   endif()
 
   # Create the compiler targets with the common compile flags

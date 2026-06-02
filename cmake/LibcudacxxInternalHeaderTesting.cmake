@@ -31,7 +31,10 @@ add_custom_target(libcudacxx.test.internal_headers)
 
 if ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
   find_package(NVHPC)
-else()
+elseif (NOT LIBCUDACXX_ENABLE_HIP)
+  # NOTE(HIP/AMD): on HIP there is no CUDA Toolkit; cccl_get_cudatoolkit()
+  # does a REQUIRED find_package(CUDAToolkit) that hard-fails. The HIP
+  # internal header tests link hip::device (see cudart_name below) instead.
   cccl_get_cudatoolkit()
 endif()
 
