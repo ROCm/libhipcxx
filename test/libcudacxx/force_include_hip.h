@@ -45,6 +45,48 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// NOTE(HIP/AMD): clang-hip's device runtime provides operator new/delete(size_t)
+// but NOT the C++17 over-aligned variants (operator new/delete with
+// std::align_val_t), so device code that allocates over-aligned types (e.g.
+// std::allocator<T> / std::get_temporary_buffer with an over-aligned T) fails to
+// link on amdgcn. Provide device-side definitions: over-allocate, align the
+// result, and stash the original base pointer immediately before it. These are
+// __device__-only overloads, so the host side keeps using the standard library.
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <new>
+__device__ inline void* operator new(__SIZE_TYPE__ __size, ::std::align_val_t __align)
+{
+    const __SIZE_TYPE__ __a    = static_cast<__SIZE_TYPE__>(__align);
+    void* __base               = ::malloc(__size + __a + sizeof(void*));
+    if (__base == nullptr) { return nullptr; }
+    char* __p                  = static_cast<char*>(__base) + sizeof(void*);
+    const __SIZE_TYPE__ __off  = reinterpret_cast<__SIZE_TYPE__>(__p) & (__a - 1);
+    char* __aligned            = __p + (__off ? (__a - __off) : 0);
+    reinterpret_cast<void**>(__aligned)[-1] = __base;
+    return __aligned;
+}
+__device__ inline void* operator new[](__SIZE_TYPE__ __size, ::std::align_val_t __align)
+{
+    return ::operator new(__size, __align);
+}
+__device__ inline void operator delete(void* __ptr, ::std::align_val_t) noexcept
+{
+    if (__ptr != nullptr) { ::free(reinterpret_cast<void**>(__ptr)[-1]); }
+}
+__device__ inline void operator delete(void* __ptr, __SIZE_TYPE__, ::std::align_val_t __align) noexcept
+{
+    ::operator delete(__ptr, __align);
+}
+__device__ inline void operator delete[](void* __ptr, ::std::align_val_t __align) noexcept
+{
+    ::operator delete(__ptr, __align);
+}
+__device__ inline void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t __align) noexcept
+{
+    ::operator delete(__ptr, __align);
+}
+#endif // defined(__HIP_PLATFORM_AMD__)
+
 #define HIP_CALL(err, ...) \
     do { \
         err = __VA_ARGS__; \
