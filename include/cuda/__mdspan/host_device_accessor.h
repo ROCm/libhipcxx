@@ -132,39 +132,7 @@ class __host_accessor : public _Accessor
 #  if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
     {
-// <<<<<<< OLD CODE from b4d4b3a498 (f15a370917) - COMMENTED OUT
-//       _CCCL_IF_NOT_CONSTEVAL_DEFAULT
-//       {
-//         auto __p1 = ::cuda::std::to_address(__p);
-// #    if _CCCL_HIP_COMPILATION()
-//         // NOTE(HIP/AMD): cuPointerGetAttribute isn't exposed via
-//         // cuda::__driver on HIP, so use the cudaPointerGetAttributes
-//         // runtime API shim (mirrors __is_managed_pointer below). The
-//         // Unregistered case covers stack / heap / static-data pointers
-//         // -- all host-accessible. Tolerate non-success: older HIP
-//         // runtimes return an error for unregistered host pointers
-//         // (instead of populating .type = cudaMemoryTypeUnregistered),
-//         // and a stack/heap pointer is a valid input we shouldn't abort
-//         // on. The CUDA arm on the right gets the same fall-through via
-//         // 'status != cudaSuccess'.
-//         ::cudaPointerAttributes __ptr_attrib{};
-//         const auto __status = ::cudaPointerGetAttributes(&__ptr_attrib, __p1);
-//         (void) ::cudaGetLastError(); // clear sticky CUDA error state
-//         return __status != ::cudaSuccess
-//             || __ptr_attrib.type == ::cudaMemoryTypeUnregistered
-//             || __ptr_attrib.type == ::cudaMemoryTypeHost
-//             || __ptr_attrib.type == ::cudaMemoryTypeManaged;
-// #    else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-//         ::CUmemorytype __type{};
-//         const auto __status =
-//           ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __p1);
-//         return (__status != ::cudaSuccess) || __type == ::CU_MEMORYTYPE_HOST;
-// #    endif // !_CCCL_HIP_COMPILATION()
-//       }
-//       return true;
-// =======
       return ::cuda::__is_host_accessible_nothrow(::cuda::std::to_address(__p));
-// >>>>>>> END NEW CODE (f15a370917)
     }
     else
 #  endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
@@ -297,108 +265,18 @@ class __device_accessor : public _Accessor
   [[nodiscard]] _CCCL_API static bool
   __is_device_accessible_pointer_from_host([[maybe_unused]] __data_handle_type __p) noexcept
   {
-// <<<<<<< OLD CODE from b4d4b3a498 (f15a370917) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
-//     {
-//       auto __p1 = ::cuda::std::to_address(__p);
-// #  if _CCCL_HIP_COMPILATION()
-//       // NOTE(HIP/AMD): see __is_host_accessible_pointer above for rationale
-//       // -- HIP doesn't expose cuPointerGetAttribute through cuda::__driver,
-//       // so use the cudaPointerGetAttributes runtime API shim instead.
-//       //
-//       // Don't assert on non-success: HIP returns an error for unregistered
-//       // host pointers on older runtimes. An error here means the runtime
-//       // doesn't recognise the pointer; that's NOT device-accessible from
-//       // host (so return false). Mirrors the NV-driver-API arm on the right,
-//       // which returns true only on '__type == ::CU_MEMORYTYPE_DEVICE' --
-//       // status-failure naturally falls through to the trailing 'return true'
-//       // there because the function pre-condition is the inverse semantic.
-//       // We make that explicit on the HIP arm by returning false on failure.
-//       ::cudaPointerAttributes __ptr_attrib{};
-//       const auto __status = ::cudaPointerGetAttributes(&__ptr_attrib, __p1);
-//       (void) ::cudaGetLastError(); // clear sticky CUDA error state
-//       if (__status != ::cudaSuccess)
-//       {
-//         return false;
-//       }
-//       return __ptr_attrib.type == ::cudaMemoryTypeDevice || __ptr_attrib.type == ::cudaMemoryTypeManaged;
-// #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-//       ::CUmemorytype __type{};
-//       const auto __status =
-//         ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __p1);
-//       return (__status != ::cudaSuccess) || __type == ::CU_MEMORYTYPE_DEVICE;
-// #  endif // !_CCCL_HIP_COMPILATION()
-//     }
-//     else
-// #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-// =======
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)) || (_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC))
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
     {
       return ::cuda::__is_device_or_managed_memory(::cuda::std::to_address(__p));
     }
     else
-#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (f15a370917)
+#endif // (_CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)) || (_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC))
     {
       return true; // cannot be verified
     }
   }
 
-// <<<<<<< OLD CODE from b4d4b3a498 (f15a370917) - COMMENTED OUT
-// #if _CCCL_DEVICE_COMPILATION()
-//
-//   [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE static constexpr bool
-//   __is_device_accessible_pointer_from_device(__data_handle_type __p) noexcept
-//   {
-//     // NOTE(HIP/AMD): the HIP carve-out here drops the
-//     // `address_space::{constant, grid_constant, cluster_shared}` probes
-//     // from the OR-chain. The reason is *physical*, not heuristic: the
-//     // function answers the question "does this pointer live in any
-//     // device-accessible address space?", and on AMDGCN
-//     //   * `__constant__` globals are placed in the **global** address
-//     //     space and are indistinguishable from regular `__device__`
-//     //     globals -- the `is_address_from(..., global)` probe above
-//     //     therefore already covers every `__constant__` pointer
-//     //     (see the long comment in `<libhipcxx/__amd/amd_utils.h>::__isConstant`
-//     //     for the exact AMDGCN rationale: there is no
-//     //     `__builtin_amdgcn_is_constant` builtin to disambiguate
-//     //     them, by design);
-//     //   * `grid_constant` and `cluster_shared` are CUDA-only address
-//     //     spaces that do not exist on AMDGCN at all; the matching
-//     //     `__isGridConstant` / `__isClusterShared` stubs in
-//     //     `<libhipcxx/__amd/amd_utils.h>` always return `false`, so dropping the
-//     //     probes loses no positives.
-//     // Net effect: the set of pointers for which this function returns
-//     // `true` on HIP is a *strict superset* of the set CUDA classifies
-//     // as device-accessible -- there are no false negatives. What we
-//     // give up is the ability to *distinguish* "constant" from
-//     // "global" via `is_address_from(..., constant)`, but that is the
-//     // contract of `is_address_from`, not of this aggregate-union
-//     // helper. Once AMDGCN grows a `__builtin_amdgcn_is_constant` we
-//     // can drop the `#if` and reinstate the per-space probes; tracked
-//     // alongside the `address_space.pass.cpp` discussion on PR #217.
-//     return ::cuda::device::is_address_from(__p, ::cuda::device::address_space::global)
-//         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::shared)
-// #if !_CCCL_HIP_COMPILATION()
-//         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::constant)
-//         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::grid_constant)
-//         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::cluster_shared)
-// #endif // !_CCCL_HIP_COMPILATION()
-//         || ::cuda::device::is_address_from(__p, ::cuda::device::address_space::local);
-//   }
-//
-// #endif // _CCCL_DEVICE_COMPILATION()
-//
-//   _CCCL_API static constexpr void __check_device_pointer([[maybe_unused]] __data_handle_type __p) noexcept
-//   {
-//     NV_IF_TARGET(NV_IS_HOST,
-//                  (_CCCL_ASSERT(__is_device_accessible_pointer_from_host(__p), "The pointer is not device accessible");))
-//   }
-//
-// =======
-// >>>>>>> END NEW CODE (f15a370917)
 public:
   using offset_policy    = __device_accessor<typename _Accessor::offset_policy>;
   using data_handle_type = __data_handle_type;
@@ -484,15 +362,6 @@ public:
     return _Accessor::offset(__p, __i);
   }
 
-// <<<<<<< OLD CODE from b4d4b3a498 (f15a370917) - COMMENTED OUT
-//   [[nodiscard]] _CCCL_API constexpr bool
-//   __detectably_invalid([[maybe_unused]] data_handle_type __p, size_t) const noexcept
-//   {
-//     // The host arm of NV_IF_ELSE_TARGET reads __p; the device arm returns
-//     // 'false' unconditionally. Mark __p [[maybe_unused]] so the device-only
-//     // pass doesn't trip -Wunused-parameter.
-//     NV_IF_ELSE_TARGET(NV_IS_HOST, (return __is_device_accessible_pointer_from_host(__p);), (return false;))
-// =======
 #if !defined(_CCCL_DISABLE_MDSPAN_ACCESSOR_DETECT_INVALIDITY)
   [[nodiscard]] _CCCL_API constexpr bool
   __detectably_invalid([[maybe_unused]] data_handle_type __p, ::cuda::std::size_t) const noexcept
@@ -506,7 +375,6 @@ public:
       return !__is_valid;
     }
     return true;
-// >>>>>>> END NEW CODE (f15a370917)
   }
 #endif // !defined(_CCCL_DISABLE_MDSPAN_ACCESSOR_DETECT_INVALIDITY)
 };
@@ -531,42 +399,13 @@ class __managed_accessor : public _Accessor
 
   [[nodiscard]] _CCCL_API static constexpr bool __is_managed_pointer([[maybe_unused]] __data_handle_type __p) noexcept
   {
-// <<<<<<< OLD CODE from b4d4b3a498 (f15a370917) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
-//     {
-// #if _CCCL_HIP_COMPILATION()
-//       // NOTE(HIP/AMD): the upstream "devicePointer == hostPointer" heuristic
-//       // works on HIP too — hipMallocManaged() populates both pointers to the
-//       // same address, plain hipMalloc() leaves hostPointer null, and
-//       // unregistered host memory leaves both null. The only HIP-specific gap
-//       // is that __managed__ global variables are currently never reported as
-//       // managed by HIP's hipPointerGetAttributes() (they show up with both
-//       // pointers null), so they can't be used with cuda::managed_mdspan on
-//       // HIP until that is fixed in the HIP runtime.
-//       ::cudaPointerAttributes __ptr_attrib{};
-//       auto __p1 = ::cuda::std::to_address(__p);
-//       _CCCL_ASSERT_CUDA_API(::cudaPointerGetAttributes, "cudaPointerGetAttributes failed", &__ptr_attrib, __p1);
-//       return __ptr_attrib.devicePointer != nullptr && __ptr_attrib.hostPointer == __ptr_attrib.devicePointer;
-// #else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-//       const auto __p1 = ::cuda::std::to_address(__p);
-//       bool __is_managed{};
-//       const auto __status =
-//         ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_IS_MANAGED>(__is_managed, __p1);
-//       return (__status != ::cudaSuccess) || __is_managed;
-// #endif // !_CCCL_HIP_COMPILATION()
-//     }
-//     else
-// #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-// =======
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)) || (_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC))
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
     {
       return ::cuda::__is_managed_nothrow(::cuda::std::to_address(__p));
     }
     else
-#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (f15a370917)
+#endif // (_CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)) || (_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC))
     {
       return true; // cannot be verified
     }

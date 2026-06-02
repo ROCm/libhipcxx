@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -217,13 +217,8 @@ __host__ __device__ constexpr bool test()
     assert(h(2, 2, 2) == 9);
   }
 
-// <<<<<<< OLD CODE from 665e48f869 (293e038cb0) - COMMENTED OUT
-//   // Make sure we don't treat cuda::std::reference_wrapper specially.
-// #if TEST_STD_VER > 2017
-// #  if TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC) // reference_wrapper requires `addressof` which is currently not supported with nvrtc
-// =======
-#if TEST_COMPILER(NVRTC) // reference_wrapper requires `addressof` which is currently not supported with nvrtc
-// >>>>>>> END NEW CODE (293e038cb0)
+  // Make sure we don't treat cuda::std::reference_wrapper specially.
+#if TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC) // reference_wrapper requires `addressof` which is currently not supported with nvrtc
   if (!TEST_IS_CONSTANT_EVALUATED())
 #endif // TEST_COMPILER(NVRTC)
   {

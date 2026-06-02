@@ -50,11 +50,7 @@
 #  include <cuda/std/__utility/unreachable.h>
 #  include <cuda/std/cstdint>
 
-// <<<<<<< OLD CODE from 92ac2bb739 (1a270882e7) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-// =======
 #  include <nv/target>
-// >>>>>>> END NEW CODE (1a270882e7)
 
 #  include <cuda/std/__cccl/prologue.h>
 

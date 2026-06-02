@@ -70,57 +70,30 @@
   _CCCL_END_NAMESPACE_NOVERSION(_NS)
 
 // Standard namespaces with or without versioning
-// <<<<<<< OLD CODE from 34ffb4fea1 (d2f3fa5b49) - COMMENTED OUT
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std {
-// #  define _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_STD } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// // cuda specific namespaces
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_MR _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::mr { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_MR } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::device { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_DEVICE } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_PTX _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::ptx { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_PTX } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::device::experimental { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_DRIVER _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::__driver { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_DRIVER } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// // Namespaces related to <ranges>
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_RANGES _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_STD_RANGES } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_VIEWS _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::ranges::views { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_STD_VIEWS } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// =======
 #define _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION _CCCL_BEGIN_NAMESPACE_NOVERSION(cuda::std)
-#define _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION   _CCCL_END_NAMESPACE_NOVERSION(cuda::std)
+#define _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION   _CCCL_END_NAMESPACE_NOVERSION(cuda::std) namespace hip = cuda;
 #define _CCCL_BEGIN_NAMESPACE_CUDA_STD           _CCCL_BEGIN_NAMESPACE(cuda::std)
-#define _CCCL_END_NAMESPACE_CUDA_STD             _CCCL_END_NAMESPACE(cuda::std)
+#define _CCCL_END_NAMESPACE_CUDA_STD             _CCCL_END_NAMESPACE(cuda::std) namespace hip = cuda;
 
 // cuda specific namespaces
 #define _CCCL_BEGIN_NAMESPACE_CUDA                     _CCCL_BEGIN_NAMESPACE(cuda)
-#define _CCCL_END_NAMESPACE_CUDA                       _CCCL_END_NAMESPACE(cuda)
+#define _CCCL_END_NAMESPACE_CUDA                       _CCCL_END_NAMESPACE(cuda) namespace hip = cuda;
 #define _CCCL_BEGIN_NAMESPACE_CUDA_MR                  _CCCL_BEGIN_NAMESPACE(cuda::mr)
-#define _CCCL_END_NAMESPACE_CUDA_MR                    _CCCL_END_NAMESPACE(cuda::mr)
+#define _CCCL_END_NAMESPACE_CUDA_MR                    _CCCL_END_NAMESPACE(cuda::mr) namespace hip = cuda;
 #define _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE              _CCCL_BEGIN_NAMESPACE(cuda::device)
-#define _CCCL_END_NAMESPACE_CUDA_DEVICE                _CCCL_END_NAMESPACE(cuda::device)
+#define _CCCL_END_NAMESPACE_CUDA_DEVICE                _CCCL_END_NAMESPACE(cuda::device) namespace hip = cuda;
 #define _CCCL_BEGIN_NAMESPACE_CUDA_PTX                 _CCCL_BEGIN_NAMESPACE(cuda::ptx)
-#define _CCCL_END_NAMESPACE_CUDA_PTX                   _CCCL_END_NAMESPACE(cuda::ptx)
+#define _CCCL_END_NAMESPACE_CUDA_PTX                   _CCCL_END_NAMESPACE(cuda::ptx) namespace hip = cuda;
 #define _CCCL_BEGIN_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL _CCCL_BEGIN_NAMESPACE(cuda::device::experimental)
-#define _CCCL_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL   _CCCL_END_NAMESPACE(cuda::device::experimental)
+#define _CCCL_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL   _CCCL_END_NAMESPACE(cuda::device::experimental) namespace hip = cuda;
 #define _CCCL_BEGIN_NAMESPACE_CUDA_DRIVER              _CCCL_BEGIN_NAMESPACE(cuda::__driver)
-#define _CCCL_END_NAMESPACE_CUDA_DRIVER                _CCCL_END_NAMESPACE(cuda::__driver)
+#define _CCCL_END_NAMESPACE_CUDA_DRIVER                _CCCL_END_NAMESPACE(cuda::__driver) namespace hip = cuda;
 
 // Namespaces related to <ranges>
 #define _CCCL_BEGIN_NAMESPACE_CUDA_STD_RANGES _CCCL_BEGIN_NAMESPACE(cuda::std::ranges)
-#define _CCCL_END_NAMESPACE_CUDA_STD_RANGES   _CCCL_END_NAMESPACE(cuda::std::ranges)
+#define _CCCL_END_NAMESPACE_CUDA_STD_RANGES   _CCCL_END_NAMESPACE(cuda::std::ranges) namespace hip = cuda;
 #define _CCCL_BEGIN_NAMESPACE_CUDA_STD_VIEWS  _CCCL_BEGIN_NAMESPACE(cuda::std::ranges::views)
-#define _CCCL_END_NAMESPACE_CUDA_STD_VIEWS    _CCCL_END_NAMESPACE(cuda::std::ranges::views)
-// >>>>>>> END NEW CODE (d2f3fa5b49)
+#define _CCCL_END_NAMESPACE_CUDA_STD_VIEWS    _CCCL_END_NAMESPACE(cuda::std::ranges::views) namespace hip = cuda;
 
 #define _CCCL_BEGIN_NAMESPACE_CPO(_CPO) \
   namespace _CPO                        \
@@ -128,18 +101,6 @@
 #define _CCCL_END_NAMESPACE_CPO }
 
 // Namespaces related to chrono / filesystem
-// <<<<<<< OLD CODE from 34ffb4fea1 (d2f3fa5b49) - COMMENTED OUT
-// #  define _CCCL_BEGIN_NAMESPACE_FILESYSTEM _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std { inline namespace __fs { namespace filesystem { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_FILESYSTEM } } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// // Shorthands for different qualifiers
-// // Namespaces related to execution
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_STD_EXECUTION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda::std::execution { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-//
-// #  define _CCCL_BEGIN_NAMESPACE_CUDA_EXECUTION _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace cuda { namespace execution { inline namespace _LIBCUDACXX_ABI_NAMESPACE {
-// #  define _CCCL_END_NAMESPACE_CUDA_EXECUTION } } } _LIBCUDACXX_PROLOGUE_INCLUDE_CHECK() namespace hip = cuda;
-// =======
 #define _CCCL_BEGIN_NAMESPACE_FILESYSTEM     \
   _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION   \
   inline namespace __fs                      \
@@ -157,11 +118,10 @@
 // Shorthands for different qualifiers
 // Namespaces related to execution
 #define _CCCL_BEGIN_NAMESPACE_CUDA_STD_EXECUTION _CCCL_BEGIN_NAMESPACE(cuda::std::execution)
-#define _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION   _CCCL_END_NAMESPACE(cuda::std::execution)
+#define _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION   _CCCL_END_NAMESPACE(cuda::std::execution) namespace hip = cuda;
 
 #define _CCCL_BEGIN_NAMESPACE_CUDA_EXECUTION _CCCL_BEGIN_NAMESPACE(cuda::execution)
-#define _CCCL_END_NAMESPACE_CUDA_EXECUTION   _CCCL_END_NAMESPACE(cuda::execution)
-// >>>>>>> END NEW CODE (d2f3fa5b49)
+#define _CCCL_END_NAMESPACE_CUDA_EXECUTION   _CCCL_END_NAMESPACE(cuda::execution) namespace hip = cuda;
 
 // Namespace to avoid name collisions with CPOs on clang-16 (see https://godbolt.org/z/9TadonrdM for example)
 #if _CCCL_COMPILER(CLANG, <=, 16)

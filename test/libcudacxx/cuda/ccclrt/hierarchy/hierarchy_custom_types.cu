@@ -64,28 +64,18 @@ struct custom_level_test
   template <typename DynDims>
   __host__ __device__ void operator()(const DynDims& dims) const
   {
-// <<<<<<< OLD CODE from 556fe6c054 (8ad18e3528) - COMMENTED OUT
-//     // device-side require doesn't work with clang-cuda for now
-// // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
-//     // behaviour as clang-cuda -- the device pass parses the body of
-//     // host_device functions and tries to resolve the host-only
-//     // REQUIRE() symbols. Extend the upstream guard to skip the
-//     // device-pass parsing on HIP too.
-// #if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
-//     CCCLRT_REQUIRE(dims.count() == 84 * 1024);
-//     CCCLRT_REQUIRE(dims.count(custom_level(), cuda::grid) == 42);
-//     CCCLRT_REQUIRE(dims.extents() == dim3(42 * 512, 2, 2));
-//     CCCLRT_REQUIRE(dims.extents(custom_level(), cuda::grid) == dim3(42, 1, 1));
-// #endif
-// =======
     // todo: allow this after fixing CCCLRT_REQUIRE with clang-cuda
-#if !_CCCL_CUDA_COMPILER(CLANG)
+    // NOTE(HIP/AMD): clang-hip exhibits the same two-pass parsing
+    // behaviour as clang-cuda -- the device pass parses the body of
+    // host_device functions and tries to resolve the host-only
+    // REQUIRE() symbols. Extend the upstream guard to skip the
+    // device-pass parsing on HIP too.
+#if !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()
     CCCLRT_REQUIRE(cuda::gpu_thread.count(cuda::grid, dims) == 84 * 1024);
     CCCLRT_REQUIRE(custom_level{}.count(cuda::grid, dims) == 42);
     CCCLRT_REQUIRE(cuda::gpu_thread.dims(cuda::grid, dims) == dim3(42 * 512, 2, 2));
     CCCLRT_REQUIRE(custom_level{}.dims(cuda::grid, dims) == dim3(42, 1, 1));
 #endif // !_CCCL_CUDA_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (8ad18e3528)
   }
 
   void run()

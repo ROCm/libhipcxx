@@ -88,15 +88,7 @@
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
 #elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) // There is no host standard library in nvrtc/hiprtc
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) ((void) 0)
-// <<<<<<< OLD CODE from 8af8026676 (64e508c7d9) - COMMENTED OUT
-// // <<<<<<< OLD CODE from e8ef8f253b (f2a909f9b5) - COMMENTED OUT
-// // #elif _CCCL_HAS_INCLUDE(<yvals.h>) && (_CCCL_COMPILER(MSVC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32))) // MSVC uses _STL_VERIFY from <yvals.h>
-// // =======
-// #elif _CCCL_HAS_INCLUDE(<yvals.h>) && _CCCL_OS(WINDOWS) // Windows uses _STL_VERIFY from <yvals.h>
-// // >>>>>>> END NEW CODE (f2a909f9b5)
-// =======
 #elif __has_include(<yvals.h>) && _CCCL_OS(WINDOWS) // Windows uses _STL_VERIFY from <yvals.h>
-// >>>>>>> END NEW CODE (64e508c7d9)
 #  include <yvals.h>
 #  define _CCCL_ASSERT_IMPL_HOST(expression, message) _STL_VERIFY(expression, message)
 #else // ^^^ MSVC, HIPCC, WIN32 ^^^ / vvv !MSVC STL, HIPCC (Linux/glibc) vvv

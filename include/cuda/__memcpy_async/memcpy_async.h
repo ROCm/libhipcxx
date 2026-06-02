@@ -44,18 +44,14 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 6e374c64f1 (9e09c7829a) - COMMENTED OUT
-// // NOTE(HIP/AMD): cuda::aligned_size_t is a pure type-trait template (no
-// // PTX); pulling it in unconditionally so the umbrella <cuda/annotated_ptr>
-// // transitively makes it available on HIP. Upstream's NVIDIA-only consumers
-// // (e.g. test/libcudacxx/cuda/annotated_ptr/utils.h) rely on this transitive
-// // chain and would otherwise fail to compile under HIP.
-// #include <cuda/__memory/aligned_size.h>
-//
-// #if _CCCL_HAS_CUDA_COMPILER()
-// =======
+// NOTE(HIP/AMD): cuda::aligned_size_t is a pure type-trait template (no
+// PTX); pulling it in unconditionally so the umbrella <cuda/annotated_ptr>
+// transitively makes it available on HIP. Upstream's NVIDIA-only consumers
+// (e.g. test/libcudacxx/cuda/annotated_ptr/utils.h) rely on this transitive
+// chain and would otherwise fail to compile under HIP.
+#include <cuda/__memory/aligned_size.h>
+
 #if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (9e09c7829a)
 
 #  include <cuda/__barrier/async_contract_fulfillment.h>
 #  include <cuda/__barrier/barrier.h>
