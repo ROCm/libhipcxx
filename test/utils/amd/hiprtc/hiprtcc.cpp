@@ -205,6 +205,17 @@ ArgPair argHandlers[] = {
      nvrtcArguments.emplace_back("-I" + match[1].str());
      return NORMAL;
    }},
+  {// NOTE(HIP/AMD): forward warning-control flags (-W..., e.g. -Werror,
+   // -Werror=<diag>, -Wno-<diag>) to the runtime compiler. Previously these
+   // were swallowed by the catch-all below and never reached COMGR, so
+   // FORCE_ALL_WARNINGS '.compile.fail' tests (which rely on -Werror to turn a
+   // warning such as clang::lifetimebound's -Wdangling into a hard error) could
+   // never observe the expected compilation failure.
+   std::regex("^-W.*$"),
+   [](const std::smatch& match) {
+     nvrtcArguments.emplace_back(match[0].str());
+     return NORMAL;
+   }},
   {// Throw away remaining arguments
    std::regex("^-.+$"),
    [](const std::smatch& match) {

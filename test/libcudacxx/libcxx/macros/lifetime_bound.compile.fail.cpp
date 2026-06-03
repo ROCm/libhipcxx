@@ -31,14 +31,6 @@
 
 // FORCE_ALL_WARNINGS.
 
-// NOTE(HIP/AMD): this .compile.fail test relies on the clang::lifetimebound
-// -Wdangling diagnostic being escalated to a hard error (via -Werror) so that
-// compilation fails. HIPRTC's COMGR runtime compiler emits -Wdangling but does
-// NOT honor -Werror to turn it into an error, so compilation succeeds and the
-// expected failure cannot be observed. This is a HIPRTC/COMGR driver limitation
-// (NVRTC makes the diagnostic a hard error by default), not a libhipcxx gap.
-// UNSUPPORTED: hiprtc
-
 #include <cuda/std/__cccl/attributes.h>
 
 #include "test_macros.h"
