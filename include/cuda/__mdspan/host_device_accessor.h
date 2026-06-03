@@ -129,13 +129,16 @@ class __host_accessor : public _Accessor
   [[nodiscard]]
   _CCCL_HOST_API static bool __is_host_accessible_pointer([[maybe_unused]] __data_handle_type __p) noexcept
   {
-#  if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+  // NOTE(HIP/AMD): __is_host_accessible_nothrow is a host-runtime query (not
+  // available under HIPRTC's device-only COMGR sandbox), so exclude HIPRTC here
+  // and fall through to the "cannot be verified" path.
+#  if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
     if constexpr (::cuda::std::contiguous_iterator<__data_handle_type>)
     {
       return ::cuda::__is_host_accessible_nothrow(::cuda::std::to_address(__p));
     }
     else
-#  endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+#  endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
     {
       return true; // cannot be verified
     }

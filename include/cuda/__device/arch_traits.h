@@ -527,7 +527,7 @@ template <>
     case arch_id::sm_121a:
       return ::cuda::arch_traits<arch_id::sm_121a>();
     default:
-#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
       ::cuda::__throw_cuda_error(::cudaErrorInvalidValue, "Traits requested for an unknown architecture");
 #else // ^^^ _CCCL_HAS_CTK() ^^^ / vvv !_CCCL_HAS_CTK() vvv
       ::cuda::__throw_cuda_error(/*cudaErrorInvalidValue*/ 1, "Traits requested for an unknown architecture");
