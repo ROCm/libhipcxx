@@ -30,7 +30,7 @@
 // SOFTWARE.
 
 // todo: enable with nvrtc
-// UNSUPPORTED: nvrtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 #include <cuda/hierarchy>
 #include <cuda/std/cassert>

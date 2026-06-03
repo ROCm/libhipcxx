@@ -49,12 +49,12 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
 class __physical_device;
 class device_ref;
 template <::cudaDeviceAttr _Attr>
 struct __dev_attr;
-#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
 
 struct arch_traits_t;
 class compute_capability;

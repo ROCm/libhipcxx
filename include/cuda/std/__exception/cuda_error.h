@@ -43,21 +43,23 @@
 #include <cuda/std/__host_stdlib/stdexcept>
 #include <cuda/std/source_location>
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <cstdio>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): under HIPRTC the COMGR sandbox has no hipError_t, so fall back
+// to the int alias (as NVRTC does via !_CCCL_HAS_CTK()).
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
 using __cuda_error_t = ::cudaError_t;
 #else
 using __cuda_error_t = int;
 #endif
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 namespace __detail
 {
 static char* __format_cuda_error(
@@ -109,7 +111,7 @@ public:
 private:
   __cuda_error_t __status_;
 };
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 [[noreturn]] _CCCL_API inline void __throw_cuda_error(
   [[maybe_unused]] const __cuda_error_t __status,

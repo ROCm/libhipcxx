@@ -120,7 +120,7 @@ __global__ void test_kernel(const _CCCL_GRID_CONSTANT MyStruct grid_constant_var
   }
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 void test()
 {
   MyStruct my_struct{};
@@ -150,7 +150,7 @@ void test()
 #endif // !defined(__HIP_PLATFORM_AMD__)
   assert(cudaDeviceSynchronize() == cudaSuccess);
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 int main(int, char**)
 {
