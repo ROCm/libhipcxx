@@ -133,13 +133,28 @@ void __assert_fail(const char* __assertion, const char* __file, unsigned int __l
 #    define _CCCL_ASSERT_IMPL_DEVICE(expression, message)  \
       _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
       ? (void) 0 : _wassert(_CRT_WIDE(message), __FILEW__, __LINE__)
-#  else
-// NOTE(HIP/AMD): We need to use __assertfail which is defined in hiprtc_runtime, otherwise we get error:
-// note: candidate function not viable: requires 0 arguments, but 5 were provided
+#  elif defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): HIPRTC's __assertfail (hiprtc_runtime) is a 0-arg __device__-only
+// symbol. The 3.3.x backports added host-std-lib iterator helpers (e.g. cuda::next/
+// prev) that use _CCCL_ASSERT in __host__ functions. Under device-only HIPRTC the
+// assert macro always resolves to the device impl (compilation is device-only), so
+// a direct __assertfail() call from a __host__ function fails to type-check, and a
+// preprocessor/NV_IF_TARGET guard can't distinguish host vs device there (single
+// device TU). Use __host__/__device__ overloading instead: device callers fire the
+// real assert (the .runfail tests rely on it), host callers get a no-op.
+extern "C" _CCCL_DEVICE void __assertfail();
+[[maybe_unused]] _CCCL_DEVICE inline void __cccl_hiprtc_assert_fail() noexcept
+{
+  __assertfail();
+}
+[[maybe_unused]] _CCCL_HOST inline void __cccl_hiprtc_assert_fail() noexcept {}
+#    define _CCCL_ASSERT_IMPL_DEVICE(expression, message)    \
+      _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
+      ? (void) 0 : ::__cccl_hiprtc_assert_fail()
+#  else // NVRTC
 #    define _CCCL_ASSERT_IMPL_DEVICE(expression, message)  \
       _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
       ? (void) 0 : __assertfail()
-    // ? (void) 0 : __assertfail(message, __FILE__, __LINE__, __func__, sizeof(char))
 #  endif
 #elif _CCCL_CUDA_COMPILER(NVCC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32)) //! Use __assert_fail to implement device side asserts
 #  if _CCCL_COMPILER(MSVC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32))
