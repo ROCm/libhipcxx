@@ -835,7 +835,9 @@
 // dim3 grid/block), so <cuda/__launch/*> fills a CUDA-shaped CUlaunchConfig
 // that ::cuda::__driver::__launchKernel converts to the HIP module-launch
 // call. Define the CUDA-shaped aggregates here (subset actually used).
-#ifndef _LIBHIPCXX_HAS_CULAUNCHCONFIG
+// NOTE(HIP/AMD): this is a host-only launch path; under HIPRTC (device-only RTC)
+// hipStream_t is not provided by the COMGR sandbox, so skip the block there.
+#if !defined(_LIBHIPCXX_HAS_CULAUNCHCONFIG) && !defined(__HIPCC_RTC__)
 #  define _LIBHIPCXX_HAS_CULAUNCHCONFIG
 enum CUlaunchAttributeID
 {

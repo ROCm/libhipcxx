@@ -46,7 +46,10 @@
 #define _LIBCUDACXX_HAS_MONOTONIC_CLOCK()       0
 #define _LIBCUDACXX_HAS_SPACESHIP_OPERATOR()    0
 
-#if _CCCL_CUDA_COMPILATION() || __cpp_aligned_new < 201606
+// NOTE(HIP/AMD): under HIPRTC (device-only COMGR) <new> is not on the include
+// path, so std::align_val_t is unavailable; disable aligned allocation there
+// just as it is disabled for _CCCL_CUDA_COMPILATION() / NVRTC.
+#if _CCCL_CUDA_COMPILATION() || defined(_CCCL_COMPILER_HIPRTC) || __cpp_aligned_new < 201606
 #  define _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() 0
 #else
 #  define _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() 1
@@ -127,7 +130,7 @@
 
 // Third party libraries
 
-#if __has_include(<dlpack/dlpack.h>) && !_CCCL_COMPILER(NVRTC) && !defined(CCCL_DISABLE_DLPACK)
+#if __has_include(<dlpack/dlpack.h>) && !_CCCL_COMPILER(NVRTC) && !defined(CCCL_DISABLE_DLPACK) && !defined(_CCCL_COMPILER_HIPRTC)
 #  define _CCCL_HAS_DLPACK() 1
 #else // ^^^ has dlpack ^^^ / vvv no dlpack vvv
 #  define _CCCL_HAS_DLPACK() 0
