@@ -1,3 +1,25 @@
+# MIT License
+#
+# Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 include(${CMAKE_SOURCE_DIR}/benchmarks/cmake/CCCLBenchmarkRegistry.cmake)
 
 cccl_get_nvbench_helper()
@@ -8,11 +30,16 @@ if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
   message(FATAL_ERROR "libcu++ benchmarks must be built in release mode.")
 endif()
 
-if (NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+if (NOT LIBCUDACXX_ENABLE_HIP AND NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
   message(
     FATAL_ERROR
     "CMAKE_CUDA_ARCHITECTURES must be set to build libcu++ benchmarks."
   )
+endif()
+# NOTE(HIP/AMD): on HIP the bench .cu files are compiled as HIP for
+# CMAKE_HIP_ARCHITECTURES (set per add_bench below).
+if (LIBCUDACXX_ENABLE_HIP AND NOT DEFINED CMAKE_HIP_ARCHITECTURES)
+  message(FATAL_ERROR "CMAKE_HIP_ARCHITECTURES must be set to build libcu++ benchmarks on HIP.")
 endif()
 
 set(benches_meta_target libcudacxx.all.benches)
@@ -43,6 +70,13 @@ function(add_bench target_name bench_name bench_src)
   set(${target_name} ${bench_target} PARENT_SCOPE)
 
   add_executable(${bench_target} "${bench_src}")
+  if (LIBCUDACXX_ENABLE_HIP)
+    set_source_files_properties("${bench_src}" PROPERTIES LANGUAGE HIP)
+    # nvbench_helper.cuh's device paths make [[nodiscard]] hip* calls whose returns
+    # the upstream CUDA code ignores; don't fail -Werror on that (see nvbench_helper).
+    target_compile_options(${bench_target} PRIVATE
+      $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value -Wno-error=unused-result>)
+  endif()
   cccl_configure_target(${bench_target} DIALECT 17)
   target_link_libraries(
     ${bench_target}
@@ -65,7 +99,10 @@ function(add_bench_dir bench_dir)
     add_bench(base_bench_target ${base_bench_name} "${bench_src}")
     add_dependencies(${benches_meta_target} ${base_bench_target})
     target_compile_definitions(${base_bench_target} PRIVATE TUNE_BASE=1)
-    target_compile_options(${base_bench_target} PRIVATE "--extended-lambda")
+    # --extended-lambda is an nvcc-only flag; clang-HIP supports device lambdas natively.
+    if (NOT LIBCUDACXX_ENABLE_HIP)
+      target_compile_options(${base_bench_target} PRIVATE "--extended-lambda")
+    endif()
     # benchmarking
     register_cccl_benchmark("${bench_name}" "")
   endforeach()
