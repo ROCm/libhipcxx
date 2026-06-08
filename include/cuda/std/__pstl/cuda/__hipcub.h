@@ -33,39 +33,123 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): the libcudacxx PSTL "cuda" backend (cuda/std/__pstl/cuda/*.h)
-// is written against NVIDIA CUB -- it calls ::cub::DeviceReduce / ::cub::DeviceFor
-// and relies on cub/device/*.cuh headers. On HIP we reuse that backend code
-// VERBATIM instead of forking it, using the same trick the c2h test headers use
-// (c2h/include/c2h/half.cuh: `namespace cub = hipcub;`):
-//   * pull hipCUB's device primitives (these provide hipcub::DeviceReduce /
-//     hipcub::DeviceFor with CUB-compatible signatures), and
-//   * alias `namespace cub = ::hipcub` so the unmodified `::cub::Device*` call
-//     sites resolve to hipCUB.
-// The cuda* runtime symbols the backend uses (cudaStream_t, cudaError_t,
-// cudaStreamPerThread, cudaMemcpyAsync, cudaMemcpyDefault, cudaErrorMemoryAllocation)
-// are already HIP-aliased globally via <cuda/std/detail/__config> ->
-// <libhipcxx/__amd/cuda_runtime.h>, and _CCCL_TRY_CUDA_API works on HIP, so the
-// backend bodies need no further changes for these primitives.
+// NOTE(HIP/AMD): the libcudacxx PSTL "cuda" backend (cuda/std/__pstl/cuda/*.h) is
+// written against NVIDIA CUB -- ::cub::Device* and the CUB_NS_QUALIFIER::detail::
+// transform internals. On HIP we reuse that backend code without forking it by
+// providing a curated ::cub namespace that re-exports hipCUB's device algorithms
+// and supplies the few pieces hipCUB does not expose:
+//   * cub::DeviceTransform::Generate  (hipCUB's DeviceTransform has Transform only)
+//   * cub::detail::transform::{requires_stable_address, always_true_predicate,
+//     dispatch}  (CUB-internal; not part of hipCUB's public API)
+// The cuda* runtime symbols (cudaStream_t, cudaError_t, cudaStreamPerThread,
+// cudaMemcpy*) are already hip-aliased globally via <cuda/std/detail/__config> ->
+// <libhipcxx/__amd/cuda_runtime.h>, and _CCCL_TRY_CUDA_API works on HIP.
 //
-// This currently covers the algorithms whose backend maps to DeviceReduce /
-// DeviceFor (reduce, count, count_if, for_each, for_each_n). The transform /
-// generate backends use CUB-internal APIs (cub::detail::transform::dispatch,
-// cub::DeviceTransform::Generate) that hipCUB does not expose; they are retargeted
-// to the public hipcub::DeviceTransform::Transform separately and remain gated off
-// on HIP for now.
+// dispatch()/Generate() are implemented directly over rocprim::transform with a
+// counting+discard iterator and an explicit index op (the same reliable pattern
+// hipCUB uses internally), NOT over hipcub::DeviceTransform::Transform's tuple
+// overload (whose op-argument convention differs from CUB's unpacked one).
 #if _CCCL_HIP_COMPILATION()
 
-#  include <hipcub/device/device_for.hpp>
-#  include <hipcub/device/device_reduce.hpp>
+#  include <hipcub/hipcub.hpp>
 
-// CUB_NS_QUALIFIER is a CUB-only macro (cub/util_namespace.cuh) that hipCUB does
-// not define. Point it at hipcub so any CUB_NS_QUALIFIER:: use resolves on HIP.
+#  include <rocprim/device/device_transform.hpp>
+#  include <rocprim/iterator/counting_iterator.hpp>
+#  include <rocprim/iterator/discard_iterator.hpp>
+#  include <rocprim/types.hpp>
+
+#  include <cuda/__stream/stream_ref.h>
+#  include <cuda/std/__tuple_dir/apply.h>
+
+// CUB_NS_QUALIFIER is a CUB-only macro (cub/util_namespace.cuh). Point it at our
+// curated ::cub namespace so CUB_NS_QUALIFIER::detail::transform::... resolves.
 #  ifndef CUB_NS_QUALIFIER
-#    define CUB_NS_QUALIFIER ::hipcub
+#    define CUB_NS_QUALIFIER ::cub
 #  endif // CUB_NS_QUALIFIER
 
-namespace cub = ::hipcub;
+namespace cub
+{
+// Re-export the hipCUB device algorithms the PSTL backend / benches use as-is.
+using ::hipcub::ArgMax;
+using ::hipcub::ArgMin;
+using ::hipcub::DeviceCopy;
+using ::hipcub::DeviceFor;
+using ::hipcub::DeviceReduce;
+using ::hipcub::DeviceRunLengthEncode;
+
+// hipCUB's DeviceTransform exposes Transform but not Generate; add Generate while
+// inheriting the rest.
+struct DeviceTransform : ::hipcub::DeviceTransform
+{
+  // generate_n.h passes a cuda::stream_ref (matching CUB's Generate(out, n, op, stream));
+  // extract the native HIP stream for rocprim.
+  template <class _OutIt, class _OffsetT, class _GenOp>
+  static hipError_t Generate(_OutIt __out, _OffsetT __count, _GenOp __gen, ::cuda::stream_ref __stream)
+  {
+    return ::rocprim::transform(
+      ::rocprim::counting_iterator<_OffsetT>(0),
+      ::rocprim::discard_iterator(),
+      __count,
+      [__out, __gen] __host__ __device__(_OffsetT __i) mutable {
+        __out[__i] = __gen();
+        return ::rocprim::empty_type{};
+      },
+      __stream.get());
+  }
+};
+
+namespace detail
+{
+namespace transform
+{
+enum class requires_stable_address
+{
+  no,
+  yes
+};
+
+struct always_true_predicate
+{
+  template <class... _As>
+  __host__ __device__ constexpr bool operator()(_As&&...) const noexcept
+  {
+    return true;
+  }
+};
+
+template <class _First, class... _Rest>
+__host__ __device__ _First&& __first_of(_First&& __f, _Rest&&...) noexcept
+{
+  return static_cast<_First&&>(__f);
+}
+
+// out[i] = pred(in0[i], in1[i], ...) ? op(in0[i], in1[i], ...) : in0[i]
+// (CUB transform semantics; always_true_predicate -> plain transform).
+template <requires_stable_address /*unused: rocprim handles addressing*/,
+          class _InTuple,
+          class _OutIt,
+          class _OffsetT,
+          class _Pred,
+          class _Op>
+hipError_t dispatch(_InTuple __inputs, _OutIt __out, _OffsetT __count, _Pred __pred, _Op __op, hipStream_t __stream)
+{
+  return ::cuda::std::apply(
+    [&](auto... __its) {
+      return ::rocprim::transform(
+        ::rocprim::counting_iterator<_OffsetT>(0),
+        ::rocprim::discard_iterator(),
+        __count,
+        [__out, __pred, __op, __its...] __host__ __device__(_OffsetT __i) mutable {
+          __out[__i] = __pred(__its[__i]...) ? __op(__its[__i]...) : __first_of(__its[__i]...);
+          return ::rocprim::empty_type{};
+        },
+        __stream);
+    },
+    __inputs);
+}
+} // namespace transform
+} // namespace detail
+} // namespace cub
 
 #endif // _CCCL_HIP_COMPILATION()
 
