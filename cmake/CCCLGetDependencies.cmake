@@ -140,12 +140,16 @@ set(
 )
 mark_as_advanced(CCCL_NVBENCH_SHA)
 
-# NOTE(HIP/AMD): NVBench is CUDA-only; the HIP port is hipBench
-# (github.com/ROCm/hipbench). It bundles its OWN libhipcxx via CPM, so
-# add_subdirectory'ing it here would create a second libcudacxx::libcudacxx target
-# and collide with ours. Instead we consume a PRE-BUILT hipBench tree through
-# IMPORTED targets (nvbench::nvbench -> libnvbench.so, nvbench::main -> main.cu).
-# Build hipBench once with:
+# NOTE(HIP/AMD): NVBench is CUDA-only; the HIP port is hipBench, from the public
+# repo github.com/ROCm/hipbench. These benchmarks use the HIP exec-tag API
+# (nvbench::exec_tag::gpu / no_batch), which currently lives on the 'amd-develop'
+# branch -- verified to build+run all benches. The 'main' and 'release/rocmds-25.10'
+# branches are too old (no nvbench::exec_tag::gpu) and do NOT work yet.
+# hipBench bundles its OWN libhipcxx via CPM, so add_subdirectory'ing it here would
+# create a second libcudacxx::libcudacxx target and collide with ours. Instead we
+# consume a PRE-BUILT hipBench tree through IMPORTED targets (nvbench::nvbench ->
+# libnvbench.so, nvbench::main -> nvbench/main.{cu,hip}). Build hipBench once with:
+#   git clone -b amd-develop https://github.com/ROCm/hipbench <hipBench>
 #   cmake -GNinja -S <hipBench> -B <hipBench>/build -DCMAKE_BUILD_TYPE=Release \
 #         -DCMAKE_HIP_ARCHITECTURES=${CMAKE_HIP_ARCHITECTURES} && ninja -C <hipBench>/build nvbench
 set(CCCL_HIPBENCH_ROOT  "" CACHE PATH "hipBench source tree (HIP NVBench port); defaults to <repo>/../hipBench")
@@ -163,8 +167,8 @@ macro(cccl_get_nvbench)
     if (NOT EXISTS "${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so")
       message(FATAL_ERROR
         "hipBench not built at '${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so'. "
-        "Clone ROCm/hipbench to '${CCCL_HIPBENCH_ROOT}' and build the 'nvbench' "
-        "target, or set -DCCCL_HIPBENCH_ROOT / -DCCCL_HIPBENCH_BUILD.")
+        "Clone github.com/ROCm/hipbench to '${CCCL_HIPBENCH_ROOT}' and build the "
+        "'nvbench' target, or set -DCCCL_HIPBENCH_ROOT / -DCCCL_HIPBENCH_BUILD.")
     endif()
     if (NOT TARGET nvbench::nvbench)
       add_library(nvbench::nvbench SHARED IMPORTED GLOBAL)
@@ -173,9 +177,15 @@ macro(cccl_get_nvbench)
         INTERFACE_INCLUDE_DIRECTORIES "${CCCL_HIPBENCH_ROOT};${CCCL_HIPBENCH_BUILD}")
     endif()
     if (NOT TARGET nvbench::main)
-      # nvbench::main is the benchmark entry point (nvbench/main.cu) the benches link.
-      add_library(cccl.nvbench.main STATIC "${CCCL_HIPBENCH_ROOT}/nvbench/main.cu")
-      set_source_files_properties("${CCCL_HIPBENCH_ROOT}/nvbench/main.cu" PROPERTIES LANGUAGE HIP)
+      # nvbench::main is the benchmark entry point the benches link. hipBench has
+      # carried this source as both nvbench/main.cu and (newer) nvbench/main.hip;
+      # accept whichever the checked-out revision provides.
+      set(_cccl_nvbench_main "${CCCL_HIPBENCH_ROOT}/nvbench/main.cu")
+      if (NOT EXISTS "${_cccl_nvbench_main}")
+        set(_cccl_nvbench_main "${CCCL_HIPBENCH_ROOT}/nvbench/main.hip")
+      endif()
+      add_library(cccl.nvbench.main STATIC "${_cccl_nvbench_main}")
+      set_source_files_properties("${_cccl_nvbench_main}" PROPERTIES LANGUAGE HIP)
       target_link_libraries(cccl.nvbench.main PUBLIC nvbench::nvbench)
       add_library(nvbench::main ALIAS cccl.nvbench.main)
     endif()
