@@ -1,9 +1,56 @@
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
 #include <cub/thread/thread_operators.cuh>
 
 #include <thrust/device_vector.h>
 #include <thrust/execution_policy.h>
+
+// NOTE(HIP/AMD): rocThrust reports THRUST_DEVICE_SYSTEM_HIP, but every
+// THRUST_DEVICE_SYSTEM_CUDA-guarded path in this header is correct on HIP too:
+// the cuda* runtime calls are hip-shimmed (<libhipcxx/__amd/cuda_runtime.h>),
+// thrust::cuda::par is provided by rocThrust, and cuda::mr/stream come from
+// libhipcxx. Rather than widening the ~11 individual guards (a large cherry-pick
+// conflict surface against upstream), present THRUST_DEVICE_SYSTEM as CUDA for the
+// body of THIS header only and restore it at the end (see pop_macro at EOF). No
+// thrust/cub headers are included past this point in this file, so the override
+// cannot leak into rocThrust's own backend dispatch.
+#if defined(__HIP_PLATFORM_AMD__) && (THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_HIP)
+#  pragma push_macro("THRUST_DEVICE_SYSTEM")
+#  undef THRUST_DEVICE_SYSTEM
+#  define THRUST_DEVICE_SYSTEM THRUST_DEVICE_SYSTEM_CUDA
+#  define NVBENCH_HELPER_HIP_FORCED_CUDA_DEVICE_SYSTEM 1
+// The CUDA-only paths reference thrust::cuda::par; rocThrust exposes the
+// equivalent execution policy as thrust::hip::par (the generic
+// <thrust/execution_policy.h> above already pulled the HIP system, and the
+// thrust::cuda system header is unusable here as it needs real CUB). Alias the
+// namespace so the unchanged thrust::cuda::par call sites resolve.
+namespace thrust
+{
+namespace cuda = hip;
+} // namespace thrust
+#endif
 
 #include <cuda/std/cmath>
 #include <cuda/std/complex>
@@ -686,3 +733,10 @@ auto policy(caching_allocator_t&, nvbench::launch&)
 }
 #endif
 } // namespace
+
+// NOTE(HIP/AMD): restore rocThrust's real THRUST_DEVICE_SYSTEM (see push_macro
+// near the top of this header).
+#if defined(NVBENCH_HELPER_HIP_FORCED_CUDA_DEVICE_SYSTEM)
+#  undef NVBENCH_HELPER_HIP_FORCED_CUDA_DEVICE_SYSTEM
+#  pragma pop_macro("THRUST_DEVICE_SYSTEM")
+#endif
