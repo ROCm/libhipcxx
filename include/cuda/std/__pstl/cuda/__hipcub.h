@@ -59,7 +59,9 @@
 #  include <rocprim/types.hpp>
 
 #  include <cuda/__stream/stream_ref.h>
+#  include <cuda/std/__iterator/iterator_traits.h>
 #  include <cuda/std/__tuple_dir/apply.h>
+#  include <cuda/std/__type_traits/is_same.h>
 
 // CUB_NS_QUALIFIER is a CUB-only macro (cub/util_namespace.cuh). Point it at our
 // curated ::cub namespace so CUB_NS_QUALIFIER::detail::transform::... resolves.
@@ -140,7 +142,30 @@ hipError_t dispatch(_InTuple __inputs, _OutIt __out, _OffsetT __count, _Pred __p
         ::rocprim::discard_iterator(),
         __count,
         [__out, __pred, __op, __its...] __host__ __device__(_OffsetT __i) mutable {
-          __out[__i] = __pred(__its[__i]...) ? __op(__its[__i]...) : __first_of(__its[__i]...);
+          // Materialize each input to its VALUE type before calling op/pred: thrust
+          // device iterators yield proxy references (device_reference<T>), but CUB
+          // passes values to the op/predicate -- passing the proxy would deduce the
+          // op/pred template parameter as device_reference<T> and break code like
+          // static_cast<T>(x).
+          auto __get = [__i](auto __it) {
+            return static_cast<::cuda::std::iter_value_t<decltype(__it)>>(__it[__i]);
+          };
+          // For plain transform (always_true_predicate) the pass-through branch is
+          // dead; omit it so op's result type need not be compatible with the input
+          // (e.g. transform<In->Out>). For a real predicate use if/else (not ?:) so
+          // the two branches need no common type.
+          if constexpr (::cuda::std::is_same_v<_Pred, always_true_predicate>)
+          {
+            __out[__i] = __op(__get(__its)...);
+          }
+          else if (__pred(__get(__its)...))
+          {
+            __out[__i] = __op(__get(__its)...);
+          }
+          else
+          {
+            __out[__i] = __first_of(__get(__its)...);
+          }
           return ::rocprim::empty_type{};
         },
         __stream);
