@@ -21,13 +21,12 @@
 // SOFTWARE.
 
 // HIP compat shim: forward this NVIDIA CUB header to hipCUB so the unmodified
-// upstream benchmark / nvbench_helper sources compile on HIP (see
-// cmake/hip_bench_compat/README.md). Aliasing namespace cub = hipcub makes the
-// `cub::` call sites resolve. Only the CUB headers the benches include are mirrored.
+// upstream benchmark / nvbench_helper sources compile on HIP (see README.md).
 #pragma once
 #include <hipcub/hipcub.hpp>
-// NVIDIA CUB transitively makes <cuda/functional> (cuda::proclaims_copyable_arguments,
-// cuda::maximum, ...) visible to its includers; hipCUB does not, and
-// nvbench_helper.cuh relies on it. Pull it here so the upstream source is unchanged.
+// Real CUB makes <cuda/functional> (cuda::proclaims_copyable_arguments, ...) visible
+// transitively; hipCUB does not, and nvbench_helper.cuh relies on it.
 #include <cuda/functional>
-namespace cub = hipcub;
+// Provides the curated ::cub namespace (re-exports hipCUB + adds the pieces hipCUB
+// lacks: cub::DeviceTransform::Generate and cub::detail::transform::*).
+#include <cuda/std/__pstl/cuda/__hipcub.h>
