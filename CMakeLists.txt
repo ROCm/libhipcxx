@@ -201,7 +201,17 @@ if(DEFINED THEROCK_TOOLCHAIN_ROOT)
 endif()
 
 option(LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS "Enable libcu++ tests." ON)
-if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
+# NOTE(HIP/AMD): the CCCL dependency infrastructure set up in this block
+# (cccl_build_compiler_targets, CCCLGetDependencies' cccl_get_* macros,
+# CCCL_{SOURCE,BINARY}_DIR, CCCL::CCCL, the dialect defaults and
+# libcudacxx_build_compiler_targets) is required by BOTH the libcu++ tests AND
+# the benchmarks (benchmarks/cmake/CCCLBenchmarkRegistry.cmake calls
+# cccl_get_cudatoolkit(), nvbench_helper/ calls cccl_get_nvbench()/_cub()/...).
+# In an upstream CCCL build the parent project provides it; libhipcxx is
+# standalone, so set it up whenever tests OR benchmarks are enabled. The
+# test-only pieces (header-testing helpers + add_subdirectory(test)) remain
+# guarded on LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS below.
+if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS OR CCCL_ENABLE_BENCHMARKS)
   enable_testing()
 
   # Pull in the CCCL infrastructure that our Libcudacxx*.cmake helpers
@@ -275,15 +285,17 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
   include(cmake/LibcudacxxBuildCompilerTargets.cmake)
   libcudacxx_build_compiler_targets()
 
-  # Test all public and internal headers. The upstream helpers below
-  # are HIP-aware (they tag the configured TUs with LANGUAGE HIP and
-  # apply a HIP-side skip list when LIBCUDACXX_ENABLE_HIP is set), so
-  # they can be included unconditionally for both CUDA and HIP builds.
-  include(cmake/LibcudacxxInternalHeaderTesting.cmake)
-  include(cmake/LibcudacxxPublicHeaderTesting.cmake)
-  include(cmake/LibcudacxxPublicHeaderTestingHost.cmake)
+  if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS)
+    # Test all public and internal headers. The upstream helpers below
+    # are HIP-aware (they tag the configured TUs with LANGUAGE HIP and
+    # apply a HIP-side skip list when LIBCUDACXX_ENABLE_HIP is set), so
+    # they can be included unconditionally for both CUDA and HIP builds.
+    include(cmake/LibcudacxxInternalHeaderTesting.cmake)
+    include(cmake/LibcudacxxPublicHeaderTesting.cmake)
+    include(cmake/LibcudacxxPublicHeaderTestingHost.cmake)
 
-  add_subdirectory(test)
+    add_subdirectory(test)
+  endif()
 endif()
 
 if (CCCL_ENABLE_BENCHMARKS)
