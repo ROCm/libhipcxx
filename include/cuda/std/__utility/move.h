@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___UTILITY_MOVE_H
 #define _CUDA_STD___UTILITY_MOVE_H
 
@@ -39,6 +61,15 @@
 #  define _CCCL_HAS_BUILTIN_STD_MOVE() 1
 #endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION()
 
+// NOTE(HIP/AMD): hipRTC has no host C++ standard library, so the clang>=15
+// branch above must not bring in `::std::move` (there is no host `<utility>`
+// to include). Treat hipRTC like NVRTC and fall back to the manual template
+// `move` implementation below.
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  undef _CCCL_HAS_BUILTIN_STD_MOVE
+#  define _CCCL_HAS_BUILTIN_STD_MOVE() 0
+#endif // _CCCL_COMPILER_HIPRTC
+
 #if _CCCL_COMPILER(CLANG, >=, 15)
 #  define _CCCL_HAS_BUILTIN_STD_MOVE_IF_NOEXCEPT() 1
 #else // ^^^ has builtin std::move_if_noexcept ^^^ / vvv no builtin std::move_if_noexcept vvv
@@ -51,13 +82,20 @@
 #  define _CCCL_HAS_BUILTIN_STD_MOVE_IF_NOEXCEPT() 0
 #endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION()
 
+// NOTE(HIP/AMD): hipRTC has no host C++ standard library, so do not bring in
+// `::std::move_if_noexcept`; use the manual template implementation below.
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  undef _CCCL_HAS_BUILTIN_STD_MOVE_IF_NOEXCEPT
+#  define _CCCL_HAS_BUILTIN_STD_MOVE_IF_NOEXCEPT() 0
+#endif // _CCCL_COMPILER_HIPRTC
+
 // include minimal std:: headers, nvcc in device mode doesn't need the std:: header
 #if _CCCL_HAS_BUILTIN_STD_MOVE() || _CCCL_HAS_BUILTIN_STD_MOVE_IF_NOEXCEPT()
 #  if _CCCL_HOST_STD_LIB(LIBSTDCXX) && __has_include(<bits/move.h>)
 #    include <bits/move.h>
 #  elif _CCCL_HOST_STD_LIB(LIBCXX) && __has_include(<__utility/move.h>)
 #    include <__utility/move.h> // includes std::move_if_noexcept, too
-#  elif !_CCCL_COMPILER(NVRTC)
+#  elif !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <utility> under hipRTC
 #    include <utility>
 #  endif
 #endif // _CCCL_HAS_BUILTIN_STD_MOVE() || _CCCL_HAS_BUILTIN_STD_MOVE_IF_NOEXCEPT()
