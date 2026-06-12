@@ -53,6 +53,13 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
+// NOTE(HIP/AMD): glibc's C <math.h> (pulled in transitively by the HIP runtime
+// under hipRTC) defines isfinite as a function-like macro that would corrupt the
+// cuda::std::isfinite definitions below. Undefine it here (after all includes).
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  undef isfinite
+#endif // _CCCL_COMPILER_HIPRTC
+
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 #if _CCCL_CHECK_BUILTIN(builtin_isfinite) || _CCCL_COMPILER(GCC) || _CCCL_COMPILER(NVRTC, >, 12, 2)
