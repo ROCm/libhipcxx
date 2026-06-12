@@ -70,10 +70,9 @@ struct timespec
   ::time_t tv_sec;
   long tv_nsec;
 };
-
-#  if defined(_CCCL_COMPILER_HIPRTC)
-using clock_t = long long int;
-#  endif // _CCCL_COMPILER_HIPRTC
+// NOTE(HIP/AMD): clock_t is already provided in the global namespace by the HIP
+// runtime headers under hipRTC, so it is not defined here (the `using ::clock_t`
+// below picks it up).
 #endif // _CCCL_COMPILER(NVRTC)
 
 #include <cuda/std/__cccl/prologue.h>

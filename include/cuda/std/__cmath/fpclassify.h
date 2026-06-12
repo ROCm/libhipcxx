@@ -54,6 +54,14 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
+// NOTE(HIP/AMD): glibc's C <math.h>, pulled in transitively by the HIP runtime
+// headers under hipRTC, defines fpclassify as a function-like macro that would
+// corrupt the cuda::std::fpclassify definitions below. Undefine it here (after
+// all includes) so our definitions are used. FP_* numeric constants are kept.
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  undef fpclassify
+#endif // _CCCL_COMPILER_HIPRTC
+
 #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 #  ifndef FP_NAN
 #    define FP_NAN 0

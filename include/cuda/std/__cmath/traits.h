@@ -58,6 +58,19 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
+// NOTE(HIP/AMD): glibc's C <math.h> (pulled in transitively by the HIP runtime
+// under hipRTC) defines the floating-point comparison helpers as function-like
+// macros that would corrupt the cuda::std definitions below. Undefine them here
+// (after all includes).
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  undef isgreater
+#  undef isgreaterequal
+#  undef isless
+#  undef islessequal
+#  undef islessgreater
+#  undef isunordered
+#endif // _CCCL_COMPILER_HIPRTC
+
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // isgreater
