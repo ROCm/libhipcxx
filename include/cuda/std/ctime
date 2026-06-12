@@ -53,7 +53,12 @@
 // supplied transitively by <cuda/std/detail/__config> ->
 // <libhipcxx/__amd/hip_tsc_clockrate.h> on HIP.
 
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): Under hipRTC, including host <time.h> drags in host <stddef.h>
+// on the JIT include path, which redefines max_align_t / byte (already provided
+// by cuda::std's <cstddef>) and breaks compilation. Treat hipRTC like NVRTC:
+// define the C time types we need manually instead of pulling in host <time.h>.
+// clock_t (which the NVRTC path gets from the runtime) is declared here for HIP.
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <time.h>
 #else
 #  define TIME_UTC 1
@@ -65,6 +70,10 @@ struct timespec
   ::time_t tv_sec;
   long tv_nsec;
 };
+
+#  if defined(_CCCL_COMPILER_HIPRTC)
+using clock_t = long long int;
+#  endif // _CCCL_COMPILER_HIPRTC
 #endif // _CCCL_COMPILER(NVRTC)
 
 #include <cuda/std/__cccl/prologue.h>
