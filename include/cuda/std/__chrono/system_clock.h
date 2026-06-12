@@ -47,9 +47,9 @@
 #include <cuda/std/__chrono/time_point.h>
 #include <cuda/std/ctime>
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <chrono> under hipRTC
 #  include <chrono>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 // NOTE(HIP/AMD): C++20 UNIX-timestamp opt-in workaround for system_clock on
 // AMD GPUs. The extension header declares cuda::std::chrono::hip_gpu_ext::
