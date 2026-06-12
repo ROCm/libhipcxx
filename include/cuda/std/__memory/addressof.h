@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___MEMORY_ADDRESSOF_H
 #define _CUDA_STD___MEMORY_ADDRESSOF_H
 
@@ -32,6 +54,15 @@
 #  undef _CCCL_HAS_BUILTIN_STD_ADDRESSOF
 #  define _CCCL_HAS_BUILTIN_STD_ADDRESSOF() 0
 #endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION()
+
+// NOTE(HIP/AMD): hipRTC has no host C++ standard library, so `::std::addressof`
+// is unavailable (the host <memory> include resolves to an empty stub). Treat
+// hipRTC like NVCC device compilation and use the __builtin_addressof-based
+// manual implementation below instead.
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  undef _CCCL_HAS_BUILTIN_STD_ADDRESSOF
+#  define _CCCL_HAS_BUILTIN_STD_ADDRESSOF() 0
+#endif // _CCCL_COMPILER_HIPRTC
 
 // include minimal std:: headers
 #if _CCCL_HAS_BUILTIN_STD_ADDRESSOF()
