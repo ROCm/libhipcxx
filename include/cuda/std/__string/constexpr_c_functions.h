@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___STRING_CONSTEXPR_C_FUNCTIONS_H
 #define _CUDA_STD___STRING_CONSTEXPR_C_FUNCTIONS_H
 
@@ -26,9 +48,9 @@
 #include <cuda/std/__type_traits/remove_const.h>
 #include <cuda/std/climits>
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 #  include <cstring>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -47,7 +69,7 @@ __cccl_strcpy_impl_constexpr(_CharT* _CCCL_RESTRICT __dst, const _CharT* _CCCL_R
   return __dst;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _CharT>
 _CCCL_HIDE_FROM_ABI _CCCL_HOST _CharT*
 __cccl_strcpy_impl_host(_CharT* _CCCL_RESTRICT __dst, const _CharT* _CCCL_RESTRICT __src) noexcept
@@ -61,7 +83,7 @@ __cccl_strcpy_impl_host(_CharT* _CCCL_RESTRICT __dst, const _CharT* _CCCL_RESTRI
     return ::cuda::std::__cccl_strcpy_impl_constexpr(__dst, __src);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _CharT>
 _CCCL_API constexpr _CharT* __cccl_strcpy(_CharT* _CCCL_RESTRICT __dst, const _CharT* _CCCL_RESTRICT __src) noexcept
@@ -94,7 +116,7 @@ __cccl_strncpy_impl_constexpr(_CharT* _CCCL_RESTRICT __dst, const _CharT* _CCCL_
   return __dst;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _CharT>
 _CCCL_HIDE_FROM_ABI _CCCL_HOST _CharT*
 __cccl_strncpy_impl_host(_CharT* _CCCL_RESTRICT __dst, const _CharT* _CCCL_RESTRICT __src, size_t __n) noexcept
@@ -109,7 +131,7 @@ __cccl_strncpy_impl_host(_CharT* _CCCL_RESTRICT __dst, const _CharT* _CCCL_RESTR
     return ::cuda::std::__cccl_strncpy_impl_constexpr(__dst, __src, __n);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _CharT>
 _CCCL_API constexpr _CharT*
@@ -135,7 +157,7 @@ template <class _CharT>
   return __len;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _CharT>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST size_t __cccl_strlen_impl_host(const _CharT* __ptr) noexcept
 {
@@ -148,7 +170,7 @@ template <class _CharT>
     return ::cuda::std::__cccl_strlen_impl_constexpr(__ptr);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _CharT>
 [[nodiscard]] _CCCL_API constexpr size_t __cccl_strlen(const _CharT* __ptr) noexcept
@@ -180,7 +202,7 @@ template <class _CharT>
   return (static_cast<_UCharT>(*__lhs) < static_cast<_UCharT>(*__rhs)) ? -1 : 1;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _CharT>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST int
 __cccl_strcmp_impl_host(const _CharT* __lhs, const _CharT* __rhs) noexcept
@@ -194,7 +216,7 @@ __cccl_strcmp_impl_host(const _CharT* __lhs, const _CharT* __rhs) noexcept
     return ::cuda::std::__cccl_strcmp_impl_constexpr(__lhs, __rhs);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _CharT>
 [[nodiscard]] _CCCL_API constexpr int __cccl_strcmp(const _CharT* __lhs, const _CharT* __rhs) noexcept
@@ -232,7 +254,7 @@ __cccl_strncmp_impl_constexpr(const _CharT* __lhs, const _CharT* __rhs, size_t _
   return 0;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _CharT>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST int
 __cccl_strncmp_impl_host(const _CharT* __lhs, const _CharT* __rhs, size_t __n) noexcept
@@ -246,7 +268,7 @@ __cccl_strncmp_impl_host(const _CharT* __lhs, const _CharT* __rhs, size_t __n) n
     return ::cuda::std::__cccl_strncmp_impl_constexpr(__lhs, __rhs, __n);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _CharT>
 [[nodiscard]] _CCCL_API constexpr int __cccl_strncmp(const _CharT* __lhs, const _CharT* __rhs, size_t __n) noexcept
@@ -274,7 +296,7 @@ template <class _CharT>
   return __ptr;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _CharT>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST _CharT* __cccl_strchr_impl_host(_CharT* __ptr, _CharT __c) noexcept
 {
@@ -289,7 +311,7 @@ template <class _CharT>
     return ::cuda::std::__cccl_strchr_impl_constexpr<_CharT>(__ptr, __c);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _CharT>
 [[nodiscard]] _CCCL_API constexpr _CharT* __cccl_strchr(_CharT* __ptr, _CharT __c) noexcept
@@ -323,7 +345,7 @@ template <class _CharT>
   return __last;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _CharT>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST _CharT* __cccl_strrchr_impl_host(_CharT* __ptr, _CharT __c) noexcept
 {
@@ -338,7 +360,7 @@ template <class _CharT>
     return ::cuda::std::__cccl_strrchr_impl_constexpr<_CharT>(__ptr, __c);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _CharT>
 [[nodiscard]] _CCCL_API constexpr _CharT* __cccl_strrchr(_CharT* __ptr, _CharT __c) noexcept
@@ -366,7 +388,7 @@ template <class _Tp>
   return nullptr;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _Tp>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST _Tp* __cccl_memchr_impl_host(_Tp* __ptr, _Tp __c, size_t __n) noexcept
 {
@@ -380,7 +402,7 @@ template <class _Tp>
     return ::cuda::std::__cccl_memchr_impl_constexpr<_Tp>(__ptr, __c, __n);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _Tp>
 [[nodiscard]] _CCCL_API constexpr _Tp* __cccl_memchr(_Tp* __ptr, _Tp __c, size_t __n) noexcept
@@ -419,14 +441,14 @@ template <class _Tp>
   return __dst_copy;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _Tp>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST _Tp*
 __cccl_memmove_impl_host(_Tp* __dst, const _Tp* __src, size_t __n) noexcept
 {
   return reinterpret_cast<_Tp*>(::memmove(__dst, __src, __n * sizeof(_Tp)));
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _Tp>
 _CCCL_API constexpr _Tp* __cccl_memmove(_Tp* __dst, const _Tp* __src, size_t __n) noexcept
@@ -462,7 +484,7 @@ __cccl_memcmp_impl_constexpr(const _Tp* __lhs, const _Tp* __rhs, size_t __n) noe
   return 0;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _Tp>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST int
 __cccl_memcmp_impl_host(const _Tp* __lhs, const _Tp* __rhs, size_t __n) noexcept
@@ -476,7 +498,7 @@ __cccl_memcmp_impl_host(const _Tp* __lhs, const _Tp* __rhs, size_t __n) noexcept
     return ::cuda::std::__cccl_memcmp_impl_constexpr(__lhs, __rhs, __n);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _Tp>
 [[nodiscard]] _CCCL_API constexpr int __cccl_memcmp(const _Tp* __lhs, const _Tp* __rhs, size_t __n) noexcept
@@ -507,14 +529,14 @@ __cccl_memcpy_impl_constexpr(_Tp* _CCCL_RESTRICT __dst, const _Tp* _CCCL_RESTRIC
   return __dst_copy;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _Tp>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST _Tp*
 __cccl_memcpy_impl_host(_Tp* _CCCL_RESTRICT __dst, const _Tp* _CCCL_RESTRICT __src, size_t __n) noexcept
 {
   return reinterpret_cast<_Tp*>(::memcpy(__dst, __src, __n * sizeof(_Tp)));
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _Tp>
 _CCCL_API constexpr _Tp* __cccl_memcpy(_Tp* _CCCL_RESTRICT __dst, const _Tp* _CCCL_RESTRICT __src, size_t __n) noexcept
@@ -544,7 +566,7 @@ template <class _Tp>
   return __ptr_copy;
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 template <class _Tp>
 [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_HOST _Tp* __cccl_memset_impl_host(_Tp* __ptr, _Tp __c, size_t __n) noexcept
 {
@@ -557,7 +579,7 @@ template <class _Tp>
     return ::cuda::std::__cccl_memset_impl_constexpr(__ptr, __c, __n);
   }
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _Tp>
 _CCCL_API constexpr _Tp* __cccl_memset(_Tp* __ptr, _Tp __c, size_t __n) noexcept

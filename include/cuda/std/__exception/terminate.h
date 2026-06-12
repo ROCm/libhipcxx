@@ -40,9 +40,14 @@
 #  pragma system_header
 #endif // no system header
 
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): Under hipRTC __cccl_terminate() takes the device branch
+// (libhipcxx::__trap()), so host <stdlib.h> (for ::exit) is unused. Including it
+// here would pull in host <stddef.h>/<bits/stdint-intn.h> on the JIT include
+// path and cause max_align_t / byte / int64_t redefinition conflicts. Skip it
+// under hipRTC, like NVRTC.
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <stdlib.h>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 
