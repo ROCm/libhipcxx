@@ -62,7 +62,9 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-#if _CCCL_COMPILER(NVRTC)
+#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): host <cstddef> is not included under hipRTC, so ::max_align_t
+// is not in the global namespace; define it like NVRTC.
 using max_align_t = long double;
 #else // ^^^ _CCCL_COMPILER(NVRTC) ^^^ / vvv !_CCCL_COMPILER(NVRTC) vvv
 // Re-use the compiler's <stddef.h> max_align_t where possible.
