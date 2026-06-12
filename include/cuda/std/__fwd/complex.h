@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___FWD_COMPLEX_H
 #define _CUDA_STD___FWD_COMPLEX_H
 
@@ -50,10 +72,10 @@ template <class _Tp>
 inline constexpr bool __is_std_complex_v<volatile _Tp> = __is_std_complex_v<_Tp>;
 template <class _Tp>
 inline constexpr bool __is_std_complex_v<const volatile _Tp> = __is_std_complex_v<_Tp>;
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host ::std::complex under hipRTC
 template <class _Tp>
 inline constexpr bool __is_std_complex_v<::std::complex<_Tp>> = true;
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 // __is_cuda_std_complex_v
 
