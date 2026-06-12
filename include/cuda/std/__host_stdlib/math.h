@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___HOST_STDLIB_MATH_H
 #define _CUDA_STD___HOST_STDLIB_MATH_H
 
@@ -21,7 +43,12 @@
 #  pragma system_header
 #endif // no system header
 
-#if !_CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): hipRTC has no host C++ standard library; the only <math.h> on
+// the include path is the C header (which defines the math functions as macros).
+// Pulling it in here would both fail the C++-compatibility check below and clash
+// with cuda::std's own device math. Treat hipRTC like NVRTC and skip the host
+// <math.h> include and the macro check entirely.
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <math.h>
 
 // Standard C++ library comes with it's own <math.h> C++ compatible header. However, if the include paths are jumbled,
@@ -44,6 +71,6 @@
       "libcu++ requires the C++ compatibility <math.h> header, not the C <math.h> header. Please, check your include paths."
 #  endif // math functions defined as macros
 
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 #endif // _CUDA_STD___HOST_STDLIB_MATH_H
