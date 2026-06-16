@@ -49,9 +49,13 @@
 #include <cuda/std/__type_traits/is_integral.h>
 #include <cuda/std/limits>
 
-#if defined(_CCCL_HIP_COMPILER)
+// NOTE(HIP/AMD): under HIPRTC the host <math.h> is unavailable (no compiler
+// builtin-include dir in the comgr sandbox) and pulls in libstdc++/glibc headers
+// that fail to compile. The fabs/etc. impls below use __builtin_* so host
+// <math.h> is not needed; guard it out for the RTC path.
+#if defined(_CCCL_HIP_COMPILER) && !defined(__HIPCC_RTC__)
 #  include <math.h>
-#endif // defined(_CCCL_HIP_COMPILER)
+#endif // defined(_CCCL_HIP_COMPILER) && !defined(__HIPCC_RTC__)
 
 #include <cuda/std/__cccl/prologue.h>
 
