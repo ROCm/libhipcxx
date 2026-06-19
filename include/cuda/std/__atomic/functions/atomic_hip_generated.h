@@ -36,6 +36,7 @@
 
 #include <cuda/std/__type_traits/always_false.h>
 #include <cuda/std/__type_traits/enable_if.h>
+#include <cuda/std/__type_traits/is_floating_point.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/__type_traits/is_unsigned.h>
 
@@ -117,7 +118,7 @@ template<class _Type>
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
-template<class _Type>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
@@ -138,7 +139,7 @@ template<class _Type>
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
-template<class _Type>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
@@ -300,7 +301,7 @@ template<class _Type>
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
-template<class _Type>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
@@ -321,7 +322,7 @@ template<class _Type>
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
-template<class _Type>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
@@ -411,7 +412,7 @@ template<class _Type>
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
-template<class _Type>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
@@ -432,7 +433,7 @@ template<class _Type>
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
-template<class _Type>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
