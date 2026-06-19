@@ -145,12 +145,19 @@ template <typename _Tp, typename _Fn, typename _Sco>
     return __expected;
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+// NOTE(HIP/AMD): the type condition includes is_floating_point (not just
+// sizeof<=2). The native __hip_atomic_fetch_add lowers `double` to the hardware
+// FP64 atomic (global_atomic_add_f64), which is SILENTLY DROPPED on managed
+// (hipMallocManaged) memory on gfx90a/ROCm 7.2 -- e.g. a hash-groupby SUM/MEAN
+// of doubles returns 0. Routing floating-point add/sub through the CAS loop
+// (__atomic_fetch_update_cuda), exactly as fetch_max/fetch_min already do for
+// FP, is correct on both device and managed memory.
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_add_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::plus>{static_cast<_Tp>(__val)}, __memorder, __s);
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_sub_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::minus>{static_cast<_Tp>(__val)}, __memorder, __s);
 }

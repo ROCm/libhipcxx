@@ -99,6 +99,7 @@ inline void FormatHipHeader(std::ostream& out)
 
 #include <cuda/std/__type_traits/always_false.h>
 #include <cuda/std/__type_traits/enable_if.h>
+#include <cuda/std/__type_traits/is_floating_point.h>
 #include <cuda/std/__type_traits/is_signed.h>
 #include <cuda/std/__type_traits/is_unsigned.h>
 
@@ -165,14 +166,25 @@ inline void FormatHipScope(std::ostream& out,
   std::string fetch_ops_body;
   for (const char* op : {"and", "or", "xor", "add", "max", "min"})
   {
+    // NOTE(HIP/AMD): exclude floating-point from the native fetch_add path. The
+    // native __hip_atomic_fetch_add lowers `double` to the hardware FP64 atomic
+    // (global_atomic_add_f64), which is silently dropped on managed
+    // (hipMallocManaged) memory. Floating-point add/sub are instead served by
+    // the CAS-loop overloads in atomic_hip_derived.h (gated sizeof<=2 ||
+    // is_floating_point), which are correct on both device and managed memory.
+    const std::string tmpl =
+      (std::string(op) == "add")
+        ? "template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>"
+        : "template<class _Type>";
     fetch_ops_body += fmt::format(R"XXX(
-template<class _Type>
+{tmpl}
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_{op}_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {scope_tag}) {{
     _Type __ret;
     if (__cuda_fetch_{op}_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_{op}(__ptr, __val, __memorder, {scope_macro});
 }}
 )XXX",
+                                  fmt::arg("tmpl", tmpl),
                                   fmt::arg("op", op),
                                   fmt::arg("scope_tag", scope_tag),
                                   fmt::arg("scope_macro", scope_macro));
@@ -248,7 +260,7 @@ static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _T
     }}
 }}
 {fetch_ops_body}
-template<class _Type>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {scope_tag}) {{
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
