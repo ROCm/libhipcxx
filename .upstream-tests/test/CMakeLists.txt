@@ -65,6 +65,7 @@ endif()
 if (LIBCUDACXX_TEST_WITH_NVRTC)
   # TODO: Use project properties to get path to binary.
   # Should also set up dependency on the project when NVRTC is enabled
+  set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/nvidia/nvrtc/nvrtcc")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
   set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "True")
@@ -75,7 +76,9 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
 elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
   # TODO: Use project properties to get path to binary.
   # Should also set up dependency on the project when NVRTC is enabled
-  set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+  # HIPRTC is the AMD runtime; use the same HIP_PLATFORM-based compiler
+  # selection as the offline compilation path below.
+  set(CMAKE_CUDA_COMPILER_ID "AMDCLANG")
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
@@ -107,10 +110,18 @@ else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
     set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
   elseif(LIBCUDACXX_ENABLE_HIP)
     set(LIBCUDACXX_FORCE_INCLUDE "-include ${libhipcxx_SOURCE_DIR}/test/force_include_hip.h")
-    #temporary workaround until we've found a way to make cmake find hipcc
-    set(LIBCUDACXX_CUDA_COMPILER "${HIP_HIPCC_EXECUTABLE}")
+    # Select compiler based on HIP_PLATFORM env var, mirroring hipcc's own
+    # platform detection logic. HIP_PLATFORM=nvidia uses nvcc; everything
+    # else (including the default unset case) uses amdclang++ directly.
+    if("$ENV{HIP_PLATFORM}" STREQUAL "nvidia" OR "$ENV{HIP_PLATFORM}" STREQUAL "nvcc")
+      find_program(NVCC_EXECUTABLE nvcc REQUIRED)
+      set(LIBCUDACXX_CUDA_COMPILER "${NVCC_EXECUTABLE}")
+      set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
+    else()
+      set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CXX_COMPILER}")
+      set(CMAKE_CUDA_COMPILER_ID "AMDCLANG")
+    endif()
     set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
-    set(CMAKE_CUDA_COMPILER_ID "HIPCC")
     set(LIBCUDACXX_CUDA_TEST_WITH_NVRTC "False")
     set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
     set(LIBCUDACXX_TEST_COMPILER_FLAGS "-DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE")
@@ -168,7 +179,7 @@ elseif (${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVHPC")
     " -stdpar")
 endif()
 
-if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "HIPCC")
+if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
   message(STATUS "libhipcxx_SOURCE_DIR: ${libhipcxx_SOURCE_DIR}" )
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
 #    "${LIBCUDACXX_TEST_COMPILER_FLAGS} \
