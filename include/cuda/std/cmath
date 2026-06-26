@@ -79,10 +79,10 @@
 #include <cuda/std/limits>
 #include <cuda/std/version>
 
-#if _CCCL_COMPILER(NVRTC)
+#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 #  define INFINITY ::cuda::std::numeric_limits<float>::infinity()
 #  define NAN      ::cuda::std::numeric_limits<float>::quiet_NaN()
-#endif // _CCCL_COMPILER(NVRTC)
+#endif // _CCCL_COMPILER(NVRTC) || _CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 
