@@ -43,15 +43,21 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): Under HIPRTC there is no host C++ standard library on the
-// include path (cudf's JIT compiles device code with -nostdinc++; only the
-// ROCm/runtime headers are reachable), so host <initializer_list> is not found
-// and `::std::initializer_list` would be undefined. `std::initializer_list` is
-// a compiler-magic type: clang recognises it as long as it is declared in
-// namespace std with exactly a {const T*, size} layout (its own resource
-// <initializer_list> only declares it). Declare the minimal template here so
-// the `using ::std::initializer_list` below works (Internal issue #72).
+// NOTE(HIP/AMD): Under HIPRTC with -nostdinc++ (e.g., cudf JIT), the host C++
+// standard library is not on the include path, so <initializer_list> is not found
+// and `::std::initializer_list` would be undefined. However, when HIPRTC is used
+// WITHOUT -nostdinc++ (e.g., lit tests), the system <initializer_list> IS available
+// and should be used to avoid redefinition errors.
+//
+// Strategy: Check if <initializer_list> is available. If yes, use it; if no (nostdinc++),
+// provide our own minimal implementation. `std::initializer_list` is a compiler-magic
+// type that clang recognizes with {const T*, size} layout in namespace std.
 #if defined(_CCCL_COMPILER_HIPRTC)
+#  if __has_include(<initializer_list>)
+// System <initializer_list> is available: use it (non-nostdinc++ case)
+#    include <initializer_list>
+#  else
+// System <initializer_list> NOT available (nostdinc++ case): provide minimal implementation
 namespace std
 {
 template <class _Ep>
@@ -92,6 +98,7 @@ public:
   }
 };
 } // namespace std
+#  endif // __has_include(<initializer_list>)
 #elif !_CCCL_COMPILER(NVRTC)
 // On the host (and hipcc host pass) include the system <initializer_list> so we
 // share the same definition as system headers.
