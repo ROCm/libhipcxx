@@ -50,6 +50,14 @@
 #else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
 #  include <cuda/std/climits>
 
+// NOTE(HIP/AMD): Under HIPRTC with -nostdinc++ (e.g., cudf JIT), the host C++
+// standard library is not on the include path, so <cstdint> is not found.
+// However, when HIPRTC is used WITHOUT -nostdinc++ (e.g., lit tests), the system
+// <cstdint> IS available and should be used to avoid redefinition errors.
+//
+// Strategy: Check if <cstdint> is available. If yes, use it; if no (nostdinc++),
+// provide our own fixed-width integer type definitions.
+//
 // NOTE(HIP/AMD): Under HIPRTC the fixed-width integer types must match HIP's
 // device types (<hip/amd_detail/host_defines.h> __hip_internal::), where the
 // 64-bit types are 'long long' / 'unsigned long long' -- NOT glibc's 'long'.
@@ -62,6 +70,11 @@
 // 8/16/32-bit. See libhipcxx issue #104 / #304 and commit 49afdcfeb5 for the
 // related __hip_internal-based workaround in the atomic code.
 #  if defined(_CCCL_COMPILER_HIPRTC)
+#    if __has_include(<cstdint>)
+// System <cstdint> is available: use it (non-nostdinc++ case)
+#      include <cstdint>
+#    else
+// System <cstdint> NOT available (nostdinc++ case): provide fixed-width types matching HIP
 using int8_t   = __INT8_TYPE__;
 using int16_t  = __INT16_TYPE__;
 using int32_t  = __INT32_TYPE__;
@@ -70,6 +83,7 @@ using uint8_t  = __UINT8_TYPE__;
 using uint16_t = __UINT16_TYPE__;
 using uint32_t = __UINT32_TYPE__;
 using uint64_t = unsigned long long; // match __hip_internal::uint64_t
+#    endif // __has_include(<cstdint>)
 #  elif defined(__INT8_TYPE__) && defined(__INT16_TYPE__) && defined(__INT32_TYPE__) \
    && defined(__INT64_TYPE__) && defined(__UINT8_TYPE__) && defined(__UINT16_TYPE__) \
    && defined(__UINT32_TYPE__) && defined(__UINT64_TYPE__)
@@ -102,7 +116,11 @@ using uint64_t = unsigned long long;
 // "type alias redefinition" conflicts. The compiler's __INT_FAST*_TYPE__
 // builtins don't always match what glibc actually uses (e.g., builtin says
 // short for int_fast16_t, but glibc uses long), so we can't rely on them.
-#  if !defined(_STDINT_H)
+//
+// Also skip defining these types when we included system <cstdint> above
+// (HIPRTC with __has_include(<cstdint>) == true), since it will have already
+// defined them.
+#  if !defined(_STDINT_H) && !(defined(_CCCL_COMPILER_HIPRTC) && __has_include(<cstdint>))
 using int_fast8_t = int8_t;
 #    if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
 // NOTE(HIP/AMD): Windows defines int_fast16_t as int, not int16_t (short)
