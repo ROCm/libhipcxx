@@ -135,10 +135,10 @@ using __nothrow_queryable_with_t _CCCL_NODEBUG_ALIAS =
 template <class _Ty>
 extern _Ty __unwrap_ref;
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 template <class _Ty>
 extern _Ty& __unwrap_ref<::std::reference_wrapper<_Ty>>;
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
 
 template <class _Ty>
 extern _Ty& __unwrap_ref<reference_wrapper<_Ty>>;
