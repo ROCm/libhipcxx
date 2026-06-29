@@ -51,6 +51,11 @@
 // cuda/__utility/__basic_any/semiregular.h fail with "no matching
 // 'operator new' function for non-allocating placement new expression;
 // include <new>". Trigger the include on HIP as well.
+// NOTE(HIP/AMD): For HIPRTC, the ROCm clang headers at
+// /opt/rocm/lib/llvm/lib/clang/22/include/cuda_wrappers/new provide
+// __device__ operator new/delete implementations using device malloc/free,
+// which allows code using dynamic memory (like cuda::std::seed_seq) to
+// compile and link in HIPRTC JIT environments.
 #if _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 #  include <new>
 #endif // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
