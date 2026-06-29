@@ -105,11 +105,7 @@ using uint64_t = unsigned long long;
 // "type alias redefinition" conflicts. The compiler's __INT_FAST*_TYPE__
 // builtins don't always match what glibc actually uses (e.g., builtin says
 // short for int_fast16_t, but glibc uses long), so we can't rely on them.
-//
-// Also skip defining these types when we included system <stdint.h> above
-// (HIPRTC with __has_include(<stdint.h>) == true), since it will have already
-// defined them.
-#  if !defined(_STDINT_H) && !(defined(_CCCL_COMPILER_HIPRTC) && __has_include(<stdint.h>))
+#  if !defined(_STDINT_H)
 using int_fast8_t = int8_t;
 #    if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
 // NOTE(HIP/AMD): Windows defines int_fast16_t as int, not int16_t (short)
