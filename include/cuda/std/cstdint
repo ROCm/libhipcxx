@@ -70,20 +70,9 @@
 // 8/16/32-bit. See libhipcxx issue #104 / #304 and commit 49afdcfeb5 for the
 // related __hip_internal-based workaround in the atomic code.
 #  if defined(_CCCL_COMPILER_HIPRTC)
-#    if __has_include(<cstdint>)
-// System <cstdint> is available: use it (non-nostdinc++ case)
-#      include <cstdint>
-#    else
-// System <cstdint> NOT available (nostdinc++ case): provide fixed-width types matching HIP
-using int8_t   = __INT8_TYPE__;
-using int16_t  = __INT16_TYPE__;
-using int32_t  = __INT32_TYPE__;
-using int64_t  = signed long long; // match __hip_internal::int64_t
-using uint8_t  = __UINT8_TYPE__;
-using uint16_t = __UINT16_TYPE__;
-using uint32_t = __UINT32_TYPE__;
-using uint64_t = unsigned long long; // match __hip_internal::uint64_t
-#    endif // __has_include(<cstdint>)
+// NOTE(HIP/AMD): Always include system <stdint.h> for HIPRTC to match upgrade/3.3.4_enable
+// and provide proper runtime setup for dynamic memory allocation (needed by seed_seq).
+#    include <stdint.h>
 #  elif defined(__INT8_TYPE__) && defined(__INT16_TYPE__) && defined(__INT32_TYPE__) \
    && defined(__INT64_TYPE__) && defined(__UINT8_TYPE__) && defined(__UINT16_TYPE__) \
    && defined(__UINT32_TYPE__) && defined(__UINT64_TYPE__)
@@ -117,10 +106,10 @@ using uint64_t = unsigned long long;
 // builtins don't always match what glibc actually uses (e.g., builtin says
 // short for int_fast16_t, but glibc uses long), so we can't rely on them.
 //
-// Also skip defining these types when we included system <cstdint> above
-// (HIPRTC with __has_include(<cstdint>) == true), since it will have already
+// Also skip defining these types when we included system <stdint.h> above
+// (HIPRTC with __has_include(<stdint.h>) == true), since it will have already
 // defined them.
-#  if !defined(_STDINT_H) && !(defined(_CCCL_COMPILER_HIPRTC) && __has_include(<cstdint>))
+#  if !defined(_STDINT_H) && !(defined(_CCCL_COMPILER_HIPRTC) && __has_include(<stdint.h>))
 using int_fast8_t = int8_t;
 #    if defined(_WIN32) && defined(__HIP_PLATFORM_AMD__)
 // NOTE(HIP/AMD): Windows defines int_fast16_t as int, not int16_t (short)
