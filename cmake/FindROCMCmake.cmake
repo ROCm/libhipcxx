@@ -30,32 +30,57 @@ if(NOT ROCM_PATH)
   set(ROCM_PATH /opt/rocm)
 endif()
 
-find_package(ROCM 0.7.3 CONFIG QUIET PATHS ${ROCM_PATH} /opt/rocm)
-if(NOT ROCM_FOUND)
-  set(rocm_cmake_tag "master" CACHE STRING "rocm-cmake tag to download")
-  set(rocm_cmake_url "https://github.com/RadeonOpenCompute/rocm-cmake/archive/${rocm_cmake_tag}.zip")
-  set(rocm_cmake_path "${PROJECT_EXTERN_DIR}/rocm-cmake-${rocm_cmake_tag}")
-  set(rocm_cmake_archive "${rocm_cmake_path}.zip")
-  file(DOWNLOAD "${rocm_cmake_url}" "${rocm_cmake_archive}" STATUS status LOG log)
+# Security fix (SEC-00337, SEC-00392): Use secure auto-download with pinned
+# commit SHA and hash verification instead of mutable 'master' branch.
+#
+# The previous implementation downloaded and executed unverified code from a mutable
+# Git ref, enabling build-time RCE via:
+# - Compromised upstream repository
+# - MITM attacks (no TLS_VERIFY enforcement)
+# - Tag/branch retargeting
+#
+# New approach (based on rocthrust):
+# - Checks for pre-installed rocm-cmake first
+# - Falls back to FetchContent with pinned commit SHA + URL hash verification
+# - Can be disabled with -DDEPENDENCIES_FORCE_DOWNLOAD=OFF
 
-  list(GET status 0 status_code)
-  list(GET status 1 status_string)
+if(NOT DEPENDENCIES_FORCE_DOWNLOAD)
+  # Try new package name first (ROCm 6.4+), fall back to old name
+  find_package(ROCmCMakeBuildTools 0.7.3 CONFIG QUIET PATHS ${ROCM_PATH} /opt/rocm)
+  if(NOT ROCmCMakeBuildTools_FOUND)
+    find_package(ROCM 0.7.3 CONFIG QUIET PATHS ${ROCM_PATH} /opt/rocm)
+    set(ROCmCMakeBuildTools_FOUND ${ROCM_FOUND})
+  endif()
+endif()
 
-  if(status_code EQUAL 0)
-    message(STATUS "downloading... done")
+if(NOT ROCmCMakeBuildTools_FOUND)
+  message(STATUS "ROCm CMake not found. Fetching from pinned release rocm-7.2.4...")
+
+  # We don't want to consume the build and test targets of ROCm CMake.
+  # CMake 3.18+ allows omitting them even though there's a CMakeLists.txt in source root.
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+    set(SOURCE_SUBDIR_ARG SOURCE_SUBDIR "DISABLE ADDING TO BUILD")
   else()
-    message(FATAL_ERROR "error: downloading\n'${rocm_cmake_url}' failed
-    status_code: ${status_code}
-    status_string: ${status_string}
-    log: ${log}\n")
+    set(SOURCE_SUBDIR_ARG)
   endif()
 
-  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzvf "${rocm_cmake_archive}"
-    WORKING_DIRECTORY ${PROJECT_EXTERN_DIR})
-  execute_process( COMMAND ${CMAKE_COMMAND} -DCMAKE_INSTALL_PREFIX=${PROJECT_EXTERN_DIR}/rocm-cmake .
-    WORKING_DIRECTORY ${PROJECT_EXTERN_DIR}/rocm-cmake-${rocm_cmake_tag} )
-  execute_process( COMMAND ${CMAKE_COMMAND} --build rocm-cmake-${rocm_cmake_tag} --target install
-    WORKING_DIRECTORY ${PROJECT_EXTERN_DIR})
-
-  find_package( ROCM 0.7.3 REQUIRED CONFIG PATHS ${PROJECT_EXTERN_DIR}/rocm-cmake )
+  include(FetchContent)
+  FetchContent_Declare(
+    rocm-cmake
+    # Use URL with hash verification for maximum security
+    URL https://github.com/ROCm/rocm-cmake/archive/refs/tags/rocm-7.2.4.tar.gz
+    URL_HASH SHA256=e7a28cb4baf8afbc21204d37e132dae7e12b2d980a2600948fe35cc4d8ac8087
+    # Backup: Git with immutable commit SHA (comment out URL lines to use this)
+    # GIT_REPOSITORY https://github.com/ROCm/rocm-cmake.git
+    # GIT_TAG        5f38353474569d57c23732f61b5371505a0ba790  # rocm-7.2.4 commit SHA
+    # GIT_SHALLOW    TRUE
+    ${SOURCE_SUBDIR_ARG}
+  )
+  FetchContent_MakeAvailable(rocm-cmake)
+  find_package(ROCmCMakeBuildTools CONFIG REQUIRED NO_DEFAULT_PATH PATHS "${rocm-cmake_SOURCE_DIR}")
+else()
+  # Already found via pre-installed version
+  if(NOT ROCmCMakeBuildTools_FOUND)
+    find_package(ROCM 0.7.3 CONFIG REQUIRED PATHS ${ROCM_PATH} /opt/rocm)
+  endif()
 endif()
