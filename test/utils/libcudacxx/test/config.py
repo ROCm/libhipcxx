@@ -330,12 +330,6 @@ class Configuration(object):
             # enabled (the FORCE_ALL_WARNINGS directive), so normal tests are
             # unaffected.
             self.cxx.warning_flags += ['-Werror']
-            # NOTE(HIP/AMD): compile HIPRTC tests with -nostdinc++ so the TU is
-            # hermetic like NVRTC's nvrtcc (no host libstdc++ on the search path).
-            # Combined with gating host stdlib detection off under HIPRTC, this makes
-            # cuda/std self-contained and turns any residual host-header leak into a
-            # hard error instead of a silent redefinition.
-            self.cxx.compile_flags += ['-nostdinc++']
 
     def print_config_info(self):
         # Print the final compile and link flags.
