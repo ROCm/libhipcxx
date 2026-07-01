@@ -72,8 +72,16 @@ using ::max_align_t;
 #endif // _CCCL_COMPILER(NVRTC)
 
 using nullptr_t = decltype(nullptr);
+#if defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): host <cstddef> is not included under hipRTC and, unlike NVRTC's
+// nvcc, the driver does not predefine ::ptrdiff_t/::size_t. Define them from the
+// compiler builtins so cuda::std has them without pulling host headers.
+using ptrdiff_t = __PTRDIFF_TYPE__;
+using size_t    = __SIZE_TYPE__;
+#else // ^^^ _CCCL_COMPILER_HIPRTC ^^^ / vvv !_CCCL_COMPILER_HIPRTC vvv
 using ::ptrdiff_t;
 using ::size_t;
+#endif // _CCCL_COMPILER_HIPRTC
 
 _CCCL_END_NAMESPACE_CUDA_STD
 
