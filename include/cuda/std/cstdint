@@ -70,9 +70,21 @@
 // 8/16/32-bit. See libhipcxx issue #104 / #304 and commit 49afdcfeb5 for the
 // related __hip_internal-based workaround in the atomic code.
 #  if defined(_CCCL_COMPILER_HIPRTC)
-// NOTE(HIP/AMD): Always include system <stdint.h> for HIPRTC to match upgrade/3.3.4_enable
-// and provide proper runtime setup for dynamic memory allocation (needed by seed_seq).
-#    include <stdint.h>
+// NOTE(HIP/AMD): Under HIPRTC -- for BOTH cudf's jitify JIT and libhipcxx's own lit
+// tests -- define the fixed-width integer aliases locally, with the 64-bit ones as
+// 'long long' to match HIP's device types (__hip_internal::int64_t). We deliberately
+// do NOT pull host <stdint.h>: at cudf's runtime JIT the system <stdint.h> typedefs
+// int64_t = long (via <bits/stdint-intn.h>), which clashes with cudf/types.hpp's
+// global '::int64_t = __hip_internal::int64_t' (= long long). This mirrors the
+// long-standing amd-integration behavior and needs no consumer-specific macro.
+using int8_t   = signed char;
+using int16_t  = signed short;
+using int32_t  = signed int;
+using int64_t  = signed long long;
+using uint8_t  = unsigned char;
+using uint16_t = unsigned short;
+using uint32_t = unsigned int;
+using uint64_t = unsigned long long;
 #  elif defined(__INT8_TYPE__) && defined(__INT16_TYPE__) && defined(__INT32_TYPE__) \
    && defined(__INT64_TYPE__) && defined(__UINT8_TYPE__) && defined(__UINT16_TYPE__) \
    && defined(__UINT32_TYPE__) && defined(__UINT64_TYPE__)

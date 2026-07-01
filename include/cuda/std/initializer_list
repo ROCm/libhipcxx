@@ -43,9 +43,57 @@
 #  pragma system_header
 #endif // no system header
 
-#if !_CCCL_COMPILER(NVRTC)
-// On the host (and hipcc host pass) include the system <initializer_list> so we
-// share the same definition as system headers.
+#if defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): Under HIPRTC -- for BOTH cudf's jitify JIT and libhipcxx's own lit
+// tests -- declare the minimal compiler-magic std::initializer_list locally so
+// `using ::std::initializer_list` below resolves. HIPRTC has no builtin
+// std::initializer_list and (under cudf's -nostdinc++) no system <initializer_list>;
+// clang accepts this declaration as long as it lives in namespace std with exactly a
+// {const T*, size} layout. This mirrors the long-standing amd-integration behavior
+// and needs no consumer-specific macro.
+namespace std
+{
+template <class _Ep>
+class initializer_list
+{
+  const _Ep* __begin_;
+  decltype(sizeof(int)) __size_;
+
+  _CCCL_API constexpr initializer_list(const _Ep* __b, decltype(sizeof(int)) __s) noexcept
+      : __begin_(__b)
+      , __size_(__s)
+  {}
+
+public:
+  using value_type      = _Ep;
+  using reference       = const _Ep&;
+  using const_reference = const _Ep&;
+  using size_type       = decltype(sizeof(int));
+  using iterator        = const _Ep*;
+  using const_iterator  = const _Ep*;
+
+  _CCCL_API constexpr initializer_list() noexcept
+      : __begin_(nullptr)
+      , __size_(0)
+  {}
+
+  [[nodiscard]] _CCCL_API constexpr size_type size() const noexcept
+  {
+    return __size_;
+  }
+  [[nodiscard]] _CCCL_API constexpr const _Ep* begin() const noexcept
+  {
+    return __begin_;
+  }
+  [[nodiscard]] _CCCL_API constexpr const _Ep* end() const noexcept
+  {
+    return __begin_ + __size_;
+  }
+};
+} // namespace std
+#elif !_CCCL_COMPILER(NVRTC)
+// On the host (and hipcc host pass, and libhipcxx's HIPRTC CI) include the system
+// <initializer_list> so we share the same definition as system headers.
 #  include <initializer_list>
 #else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
 #  if !defined(__NV_BUILTIN_INITIALIZER_LIST)
