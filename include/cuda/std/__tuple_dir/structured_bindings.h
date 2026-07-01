@@ -40,14 +40,16 @@
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 // Fetch utility to get primary template for ::std::tuple_size necessary for the specialization of
 // ::std::tuple_size<cuda::std::tuple> to enable structured bindings.
 // See https://github.com/NVIDIA/libcudacxx/issues/316
-// NOTE(HIP/AMD): Also needed under HIPRTC since libstdc++ provides std::tuple_size
-// and our partial specializations need its primary template to be declared.
+// NOTE(HIP/AMD): Under HIPRTC we keep the translation unit self-contained (no host
+// libstdc++ headers) -- pulling system <utility> here dragged in <initializer_list>/
+// <stdint.h> and clashed with our HIPRTC-local std definitions. The primary
+// ::std::tuple_size/tuple_element templates are declared locally for HIPRTC below.
 #  include <utility>
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #include <cuda/__fwd/complex.h>
 #include <cuda/std/__fwd/array.h>
