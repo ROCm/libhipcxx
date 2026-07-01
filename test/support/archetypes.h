@@ -1,4 +1,4 @@
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,6 +20,13 @@
 
 #include <cuda/std/cassert>
 #include <cuda/std/type_traits>
+
+#if defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): archetypes use std::initializer_list ctors. NVRTC provides
+// std::initializer_list as a builtin; HIPRTC does not, so pull in the
+// libhipcxx declaration (which lives in namespace std under HIPRTC).
+#  include <cuda/std/initializer_list>
+#endif // _CCCL_COMPILER_HIPRTC
 
 #include "test_macros.h"
 #include "test_workarounds.h"

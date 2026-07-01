@@ -43,14 +43,19 @@
 #  pragma system_header
 #endif // no system header
 
-#if defined(_CCCL_COMPILER_HIPRTC)
-// NOTE(HIP/AMD): Under HIPRTC -- for BOTH cudf's jitify JIT and libhipcxx's own lit
-// tests -- declare the minimal compiler-magic std::initializer_list locally so
-// `using ::std::initializer_list` below resolves. HIPRTC has no builtin
-// std::initializer_list and (under cudf's -nostdinc++) no system <initializer_list>;
-// clang accepts this declaration as long as it lives in namespace std with exactly a
-// {const T*, size} layout. This mirrors the long-standing amd-integration behavior
-// and needs no consumer-specific macro.
+#if defined(_CCCL_COMPILER_HIPRTC) && __has_include(<initializer_list>)
+// NOTE(HIP/AMD): Under HIPRTC WITHOUT -nostdinc++ (e.g. libhipcxx's own lit tests), the
+// system <initializer_list> is on the include path. Prefer it so we share the exact same
+// std::initializer_list definition as any leaked system headers and avoid "redefinition of
+// 'initializer_list'" errors. Mirrors how NVRTC's hermeticity makes __has_include(<version>)
+// naturally false there (see cuda/std/version) -- HIPRTC gates on __has_include instead.
+#  include <initializer_list>
+#elif defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): Under HIPRTC WITH -nostdinc++ (e.g. cudf's jitify JIT) there is no system
+// <initializer_list> and HIPRTC has no builtin std::initializer_list, so declare the minimal
+// compiler-magic type locally so `using ::std::initializer_list` below resolves. clang accepts
+// this as long as it lives in namespace std with exactly a {const T*, size} layout. This
+// mirrors the long-standing amd-integration behavior and needs no consumer-specific macro.
 namespace std
 {
 template <class _Ep>
