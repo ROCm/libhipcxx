@@ -183,12 +183,19 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
   message(STATUS "libhipcxx_SOURCE_DIR: ${libhipcxx_SOURCE_DIR}" )
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
 #    "${LIBCUDACXX_TEST_COMPILER_FLAGS} \
-    " ${LIBCUDACXX_FORCE_INCLUDE}" 
+    " ${LIBCUDACXX_FORCE_INCLUDE}"
     " -I${CMAKE_SOURCE_DIR}/include"
     " -I${libhipcxx_SOURCE_DIR}/include"
     " -I${libhipcxx_SOURCE_DIR}/include/libhipcxx"
 #    " CACHE INTERNAL "Flags for libcxx testing."
   )
+  # hipcc used to add the HIP runtime library automatically; with amdclang++
+  # we must link it explicitly.
+  get_target_property(_amdhip64_loc hip::amdhip64 LOCATION)
+  cmake_path(GET _amdhip64_loc PARENT_PATH _hip_lib_dir)
+  string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS
+    " -L${_hip_lib_dir}"
+    " -lamdhip64")
 endif()
 
 set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${CMAKE_HIP_ARCHITECTURES}")
