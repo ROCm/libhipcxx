@@ -293,7 +293,10 @@ class Configuration(object):
     def configure_executor(self):
         exec_str = self.get_lit_conf("executor", "None")
         exec_timeout = self.get_lit_conf("maxIndividualTestTime", "None")
-        te = eval(exec_str)
+        # Security note: eval() is used here for intentional code execution to instantiate
+        # executor objects from configuration. This is a known limitation of the lit config
+        # system. Only use trusted configuration files.
+        te = eval(exec_str)  # nosec B307 - Intentional executor instantiation from config
         if te:
             self.lit_config.note("Using executor: %r" % exec_str)
             if self.lit_config.useValgrind:

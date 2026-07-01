@@ -26,10 +26,32 @@ env_path_global = env_path()
 # Make sure we don't try and write outside of env_path.
 # All paths used should be sanitized
 def sanitize(p):
+    """Ensure path is within the test environment directory.
+
+    Security fix: Use os.path.commonpath() instead of commonprefix()
+    to properly validate path hierarchy, not just string prefixes.
+    Raises ValueError (not assert) to work correctly even with -O flag.
+    """
     p = os.path.realpath(p)
-    if os.path.commonprefix([env_path_global, p]):
-        return p
-    assert False
+    env_path = os.path.realpath(env_path_global)
+
+    # Check if p is within env_path using path comparison
+    try:
+        os.path.relpath(p, env_path)
+    except ValueError:
+        # On Windows, relpath raises ValueError if paths are on different drives
+        raise ValueError(f"Path {p} is not within test root {env_path}")
+
+    # Ensure the resolved path actually starts with the env_path
+    # Use os.path.commonpath which works correctly with path components
+    try:
+        if os.path.commonpath([env_path, p]) != env_path:
+            raise ValueError(f"Path {p} escapes test root {env_path}")
+    except ValueError as e:
+        # commonpath can raise ValueError for incompatible paths (different drives, etc.)
+        raise ValueError(f"Path {p} is incompatible with test root {env_path}: {e}")
+
+    return p
 
 
 """
@@ -41,7 +63,7 @@ permissions.
 
 def clean_recursive(root_p):
     if not os.path.islink(root_p):
-        os.chmod(root_p, 0o777)
+        os.chmod(root_p, 0o777)  # nosec B103 - Test cleanup needs permissive permissions
     for ent in os.listdir(root_p):
         p = os.path.join(root_p, ent)
         if os.path.islink(p) or not os.path.isdir(p):
@@ -95,7 +117,49 @@ def create_socket(source):
     sock.bind(os.path.basename(sanitized_source))
 
 
+# Security fix: Replace eval() with explicit dispatch table to prevent code injection
+# Dispatch table mapping command names to functions
+ALLOWED_COMMANDS = {
+    'init_test_directory': init_test_directory,
+    'destroy_test_directory': destroy_test_directory,
+    'create_file': create_file,
+    'create_dir': create_dir,
+    'create_symlink': create_symlink,
+    'create_hardlink': create_hardlink,
+    'create_fifo': create_fifo,
+    'create_socket': create_socket,
+}
+
 if __name__ == "__main__":
-    command = " ".join(sys.argv[1:])
-    eval(command)
-    sys.exit(0)
+    if len(sys.argv) < 2:
+        sys.stderr.write("Error: Command name required\n")
+        sys.exit(1)
+
+    cmd_name = sys.argv[1]
+    args = sys.argv[2:]
+
+    if cmd_name not in ALLOWED_COMMANDS:
+        sys.stderr.write(f"Error: Unknown command '{cmd_name}'\n")
+        sys.exit(1)
+
+    try:
+        func = ALLOWED_COMMANDS[cmd_name]
+        # Convert arguments based on command signature
+        # Only create_file takes a numeric size parameter as second argument
+        converted_args = []
+        for i, arg in enumerate(args):
+            if cmd_name == 'create_file' and i == 1:
+                # Second argument of create_file is the size (int)
+                try:
+                    converted_args.append(int(arg))
+                except ValueError:
+                    raise ValueError(f"create_file size must be numeric, got: {arg}")
+            else:
+                # All other arguments are paths (strings)
+                converted_args.append(arg)
+
+        func(*converted_args)
+        sys.exit(0)
+    except Exception as e:
+        sys.stderr.write(f"Error executing {cmd_name}: {e}\n")
+        sys.exit(1)

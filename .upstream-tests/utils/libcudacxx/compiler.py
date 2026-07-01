@@ -23,6 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import ast
 import os
 import platform
 
@@ -425,7 +426,8 @@ class CXXCompiler(object):
             )
             version = None
             try:
-                version = eval(out)
+                # Security: Use ast.literal_eval instead of eval to prevent code injection
+                version = ast.literal_eval(out)
             except Exception:
                 pass
 

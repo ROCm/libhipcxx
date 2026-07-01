@@ -119,12 +119,12 @@ struct scoped_test_env
   scoped_test_env()
       : test_root(random_env_path())
   {
-    fs_helper_run(fs_make_cmd("init_test_directory", test_root));
+    fs_helper_run("init_test_directory", {test_root.native()});
   }
 
   ~scoped_test_env()
   {
-    fs_helper_run(fs_make_cmd("destroy_test_directory", test_root));
+    fs_helper_run("destroy_test_directory", {test_root.native()});
   }
 
   scoped_test_env(scoped_test_env const&)            = delete;
@@ -195,7 +195,7 @@ struct scoped_test_env
   std::string create_dir(std::string filename)
   {
     filename = sanitize_path(std::move(filename));
-    fs_helper_run(fs_make_cmd("create_dir", filename));
+    fs_helper_run("create_dir", {filename});
     return filename;
   }
 
@@ -203,7 +203,7 @@ struct scoped_test_env
   {
     source = sanitize_path(std::move(source));
     to     = sanitize_path(std::move(to));
-    fs_helper_run(fs_make_cmd("create_symlink", source, to));
+    fs_helper_run("create_symlink", {source, to});
     return to;
   }
 
@@ -211,14 +211,14 @@ struct scoped_test_env
   {
     source = sanitize_path(std::move(source));
     to     = sanitize_path(std::move(to));
-    fs_helper_run(fs_make_cmd("create_hardlink", source, to));
+    fs_helper_run("create_hardlink", {source, to});
     return to;
   }
 
   std::string create_fifo(std::string file)
   {
     file = sanitize_path(std::move(file));
-    fs_helper_run(fs_make_cmd("create_fifo", file));
+    fs_helper_run("create_fifo", {file});
     return file;
   }
 
@@ -228,7 +228,7 @@ struct scoped_test_env
   std::string create_socket(std::string file)
   {
     file = sanitize_path(std::move(file));
-    fs_helper_run(fs_make_cmd("create_socket", file));
+    fs_helper_run("create_socket", {file});
     return file;
   }
 #  endif
@@ -259,36 +259,41 @@ private:
     return p;
   }
 
-  static inline std::string make_arg(std::string const& arg)
+  // Security fix: Properly escape shell arguments to prevent injection
+  // Replaces single quotes with '\'' for POSIX shell escaping
+  static inline std::string shell_escape(std::string const& arg)
   {
-    return "'" + arg + "'";
+    std::string escaped;
+    for (char c : arg)
+    {
+      if (c == '\'')
+      {
+        escaped += "'\\''"; // End quote, escaped quote, start quote
+      }
+      else
+      {
+        escaped += c;
+      }
+    }
+    return "'" + escaped + "'";
   }
 
-  static inline std::string make_arg(std::size_t arg)
-  {
-    return std::to_string(arg);
-  }
-
-  template <class T>
-  static inline std::string fs_make_cmd(std::string const& cmd_name, T const& arg)
-  {
-    return cmd_name + "(" + make_arg(arg) + ")";
-  }
-
-  template <class T, class U>
-  static inline std::string fs_make_cmd(std::string const& cmd_name, T const& arg1, U const& arg2)
-  {
-    return cmd_name + "(" + make_arg(arg1) + ", " + make_arg(arg2) + ")";
-  }
-
-  static inline void fs_helper_run(std::string const& raw_cmd)
+  // Helper to run filesystem commands via Python helper script
+  // Security fix: Changed from eval-based to command dispatch with proper escaping
+  static inline void fs_helper_run(std::string const& cmd_name, std::vector<std::string> const& args)
   {
     // check that the fs test root in the environment matches what we were
     // compiled with.
     static bool checked = checkDynamicTestRoot();
     ((void) checked);
+
     std::string cmd = LIBCXX_FILESYSTEM_DYNAMIC_TEST_HELPER;
-    cmd += " \"" + raw_cmd + "\"";
+    cmd += " " + shell_escape(cmd_name);
+    for (const auto& arg : args)
+    {
+      cmd += " " + shell_escape(arg);
+    }
+
     int ret = std::system(cmd.c_str());
     assert(ret == 0);
   }

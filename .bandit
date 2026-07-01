@@ -1,0 +1,48 @@
+# Bandit configuration for libhipcxx security scanning
+# Added to prevent code injection vulnerabilities like SEC-00752
+
+# Skip no tests
+skips: []
+
+# Check severity levels: low, medium, high
+severity: medium
+
+# Confidence levels: low, medium, high
+confidence: medium
+
+# Specific tests to run (B307 is eval usage)
+tests:
+  - B102  # exec_used
+  - B103  # set_bad_file_permissions
+  - B108  # hardcoded_tmp_directory
+  - B201  # flask_debug_true
+  - B301  # pickle
+  - B302  # marshal
+  - B303  # md5
+  - B304  # ciphers
+  - B305  # cipher_modes
+  - B306  # mktemp_q
+  - B307  # eval
+  - B308  # mark_safe
+  - B310  # urllib_urlopen
+  - B311  # random
+  - B312  # telnetlib
+  - B313  # xml_bad_cElementTree
+  - B314  # xml_bad_ElementTree
+  - B315  # xml_bad_expatreader
+  - B316  # xml_bad_expatbuilder
+  - B317  # xml_bad_sax
+  - B318  # xml_bad_minidom
+  - B319  # xml_bad_pulldom
+  - B321  # ftplib
+  - B323  # unverified_context
+  - B324  # hashlib_new_insecure_functions
+
+# Paths to scan
+paths:
+  - .upstream-tests/
+
+# Exclude patterns (use relative paths without leading slash)
+exclude_dirs:
+  - .git
+  - __pycache__
