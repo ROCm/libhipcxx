@@ -75,7 +75,7 @@ _CCCL_BEGIN_NAMESPACE_STD
 template <class _Tp>
 struct tuple_size;
 
-#if _CCCL_COMPILER(NVRTC)
+#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 
 template <class _Tp>
 struct tuple_size<
@@ -104,7 +104,7 @@ struct tuple_size<
 template <size_t _Ip, class _Tp>
 struct tuple_element;
 
-#if _CCCL_COMPILER(NVRTC)
+#if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 template <size_t _Ip, class _Tp>
 struct tuple_element<_Ip, const _Tp>
 {
