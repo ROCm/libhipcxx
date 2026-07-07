@@ -80,6 +80,15 @@ static_assert(!HasMakeUniqueForOverwrite<Foo[], cuda::std::size_t, int>, "");
 
 // template<class T, class... Args>
 //   unspecified make_unique_for_overwrite(Args&&...) = delete;
+// NOTE(HIP/AMD): clang 23 regressed SFINAE handling of deleted functions -- selecting
+// the deleted T[N] overload while forming the _CCCL_REQUIRES_EXPR detection escapes the
+// immediate context as a hard error ("call to deleted function") instead of being a
+// substitution failure, so these detection checks fail to compile. Reported upstream
+// (LLVM). clang 24 might already include the fix, but this is not yet confirmed -- it is
+// unclear whether the behavior changes for 24. The gate deactivates only clang 23 and
+// re-enables on clang >= 24; if a future clang 24 still has the bug, this needs
+// revisiting. clang <= 22 evaluates these correctly. See #305.
+#if !(TEST_COMPILER(CLANG, >=, 23) && TEST_COMPILER(CLANG, <, 24))
 static_assert(!HasMakeUniqueForOverwrite<int[2]>, "");
 static_assert(!HasMakeUniqueForOverwrite<int[2], cuda::std::size_t>, "");
 static_assert(!HasMakeUniqueForOverwrite<int[2], int>, "");
@@ -88,6 +97,7 @@ static_assert(!HasMakeUniqueForOverwrite<Foo[2]>, "");
 static_assert(!HasMakeUniqueForOverwrite<Foo[2], cuda::std::size_t>, "");
 static_assert(!HasMakeUniqueForOverwrite<Foo[2], int>, "");
 static_assert(!HasMakeUniqueForOverwrite<Foo[2], int, int>, "");
+#endif // clang 23 deleted-function SFINAE regression (LLVM), fixed expected in clang 24
 
 struct WithDefaultConstructor
 {
