@@ -277,14 +277,16 @@ public:
 CUB_NAMESPACE_BEGIN
 
 // NOTE(HIP/AMD): see matching note in c2h/half.cuh -- hipcub's
-// BaseTraits has an extra _nullptr_TYPE parameter on hipCub < 4.4.0,
+// BaseTraits has an extra _nullptr_TYPE parameter on hipCub <= 4.4.0,
 // and the entire FLOATING_POINT / BaseTraits / NumericTraits
 // scaffolding is now deprecated in favour of '<rocprim/type_traits>'.
 // Same suppression rationale as half.cuh and same hipCub-version
-// gate (HIPCUB_VERSION < 400400; the StreamHPC
+// gate (HIPCUB_VERSION <= 400400; the shipped ROCm hipCub reports
+// 400400 while still carrying the 5-arg BaseTraits, so the gate
+// includes 400400 itself. The StreamHPC
 // 'users/matyas-streamhpc/hipcub-cccl-3-0' branch realigns BaseTraits
-// with upstream cub's 4-arg form starting at hipCub 4.4.0).
-#if defined(__HIP_PLATFORM_AMD__) && HIPCUB_VERSION < 400400
+// with upstream cub's 4-arg form after hipCub 4.4.0).
+#if defined(__HIP_PLATFORM_AMD__) && HIPCUB_VERSION <= 400400
 _CCCL_SUPPRESS_DEPRECATED_PUSH
 template <>
 struct NumericTraits<bfloat16_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, bfloat16_t>
