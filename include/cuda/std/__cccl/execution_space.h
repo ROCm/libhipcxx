@@ -49,6 +49,21 @@
 #  define _CCCL_HOST_DEVICE
 #endif // !CUDA/HIP compilation
 
+// NOTE(HIP/AMD): clang 23 (ROCm 7.13) made class-template deduction guides
+// execution-space agnostic and now rejects CUDA/HIP target attributes on them
+// ("use of CUDA/HIP target attributes on deduction guides is deprecated",
+// -Wdeprecated-attributes, an error under -Werror). Earlier clang (e.g. ROCm
+// 7.2's clang 22) still requires __host__ __device__ on a deduction guide for it
+// to be usable from __host__ __device__ code. Prefix deduction guides with this
+// macro instead of _CCCL_HOST_DEVICE: it is empty on affected clang and
+// _CCCL_HOST_DEVICE everywhere else. Remove once the minimum-supported ROCm
+// clang is >= 23. See rocm-llvm-maxnum-snan-bug.md's sibling notes.
+#if _CCCL_HIP_COMPILATION() && _CCCL_COMPILER(CLANG, >=, 23)
+#  define _CCCL_CTAD_HOST_DEVICE
+#else // ^^^ deduction-guide attributes rejected ^^^ / vvv attributes required ^^^
+#  define _CCCL_CTAD_HOST_DEVICE _CCCL_HOST_DEVICE
+#endif // deduction-guide target attributes required
+
 // Global variables of non builtin types are only device accessible if they are marked as `__device__`
 #if _CCCL_DEVICE_COMPILATION() && !_CCCL_CUDA_COMPILER(NVHPC)
 #  define _CCCL_GLOBAL_VARIABLE _CCCL_DEVICE

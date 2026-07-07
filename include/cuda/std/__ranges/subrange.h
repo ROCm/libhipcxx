@@ -7,6 +7,29 @@
 // SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES.
 //
 //===----------------------------------------------------------------------===//
+
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___RANGES_SUBRANGE_H
 #define _CUDA_STD___RANGES_SUBRANGE_H
 
@@ -391,16 +414,16 @@ public:
 
 _CCCL_TEMPLATE(class _Iter, class _Sent)
 _CCCL_REQUIRES(input_or_output_iterator<_Iter> _CCCL_AND sentinel_for<_Sent, _Iter>)
-_CCCL_HOST_DEVICE subrange(_Iter, _Sent) -> subrange<_Iter, _Sent>;
+_CCCL_CTAD_HOST_DEVICE subrange(_Iter, _Sent) -> subrange<_Iter, _Sent>;
 
 _CCCL_TEMPLATE(class _Iter, class _Sent)
 _CCCL_REQUIRES(input_or_output_iterator<_Iter> _CCCL_AND sentinel_for<_Sent, _Iter>)
-_CCCL_HOST_DEVICE subrange(_Iter, _Sent, make_unsigned_t<iter_difference_t<_Iter>>)
+_CCCL_CTAD_HOST_DEVICE subrange(_Iter, _Sent, make_unsigned_t<iter_difference_t<_Iter>>)
   -> subrange<_Iter, _Sent, subrange_kind::sized>;
 
 _CCCL_TEMPLATE(class _Range)
 _CCCL_REQUIRES(borrowed_range<_Range>)
-_CCCL_HOST_DEVICE subrange(_Range&&)
+_CCCL_CTAD_HOST_DEVICE subrange(_Range&&)
   -> subrange<iterator_t<_Range>,
               sentinel_t<_Range>,
               (sized_range<_Range> || sized_sentinel_for<sentinel_t<_Range>, iterator_t<_Range>>)
@@ -409,7 +432,7 @@ _CCCL_HOST_DEVICE subrange(_Range&&)
 
 _CCCL_TEMPLATE(class _Range)
 _CCCL_REQUIRES(borrowed_range<_Range>)
-_CCCL_HOST_DEVICE subrange(_Range&&, make_unsigned_t<range_difference_t<_Range>>)
+_CCCL_CTAD_HOST_DEVICE subrange(_Range&&, make_unsigned_t<range_difference_t<_Range>>)
   -> subrange<iterator_t<_Range>, sentinel_t<_Range>, subrange_kind::sized>;
 
 // Not _CCCL_TEMPLATE because we need to forward declare them
