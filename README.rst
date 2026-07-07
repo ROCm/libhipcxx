@@ -230,7 +230,7 @@ requirements.
 System Software
 ~~~~~~~~~~~~~~~
 
-Currently, libhipcxx is tested only for `ROCm <https://rocm.docs.amd.com/en/latest/>`_ 7.2.0.
+Currently, libhipcxx is tested only for `ROCm <https://rocm.docs.amd.com/en/latest/>`_ 7.2.3.
 
 C++ Dialects
 ~~~~~~~~~~~~
@@ -258,9 +258,9 @@ Device Architectures
 
 Libhipcxx supports the following AMD device architectures:
 
--  gfx90a (MI210 + MI250)
--  gfx942 (MI300)
--  gfx950 (MI355)
+-  gfx90a (MI210X, MI250)
+-  gfx942 (MI300X, MI325X)
+-  gfx950 (MI355X)
 
 
 RDNA architectures have only experimental support.
