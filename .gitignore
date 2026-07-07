@@ -55,6 +55,7 @@ __pycache__/
 # Python virtual environments
 venv/
 venv_*/
+.venv/
 env/
 .env/
 
