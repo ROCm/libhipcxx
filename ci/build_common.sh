@@ -153,10 +153,10 @@ print_environment_details() {
   echo "Current commit is:"
   git log -1 || echo "Not a repository"
 
-  if command -v rocm-smi &> /dev/null; then
-    rocm-smi
+  if command -v amd-smi &> /dev/null; then
+    amd-smi
   else
-    echo "rocm-smi not found"
+    echo "amd-smi not found"
   fi
 
   if command -v cmake &> /dev/null; then
@@ -175,7 +175,7 @@ print_environment_details() {
 }
 
 fail_if_no_gpu() {
-    if ! rocm-smi &> /dev/null; then
+    if ! amd-smi &> /dev/null; then
         echo "Error: No AMD GPU detected. Please ensure you have an AMD GPU installed and the drivers are properly configured." >&2
         exit 1
     fi
