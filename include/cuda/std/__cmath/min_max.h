@@ -147,9 +147,18 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
 // GCC builtins do not treat NaN properly
 #  if _CCCL_COMPILER(GCC)
           NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::std::__with_builtin_fmax(__x, __y);))
-#  else // ^^^ _CCCL_COMPILER(GCC) ^^^ / vvv !_CCCL_COMPILER(GCC)
+#  elif _CCCL_HIP_COMPILATION()
+          // NOTE(HIP/AMD): __builtin_fmax lowers to llvm.maxnum, which the LLVM
+          // LangRef permits to return NaN when an operand is a signaling NaN, so on
+          // ROCm clang fmax(x, sNaN) can yield NaN instead of x (see
+          // rocm-llvm-maxnum-snan-bug.md). The deterministic C23 __builtin_fmaximum_num
+          // would fix that, but it is unreliable on some shipped ROCm clang snapshots
+          // (ROCm 7.2 / clang 22.0.0git miscomputes even non-NaN cases like
+          // fmin(x, +0)). Fall through to the local isnan implementation below, which
+          // is correct on every clang version -- same treatment as the GCC branch.
+#  else // ^^^ _CCCL_COMPILER(GCC)/HIP ^^^ / vvv other compilers ^^^
           return ::cuda::std::__with_builtin_fmax(__x, __y);
-#  endif // !_CCCL_COMPILER(GCC)
+#  endif // other compilers
         }
 #endif // _CCCL_USE_BUILTIN_FMAX
       }
@@ -270,9 +279,14 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
 // GCC builtins do not treat NaN properly
 #  if _CCCL_COMPILER(GCC)
           NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::std::__with_builtin_fmin(__x, __y);))
-#  else // ^^^ _CCCL_COMPILER(GCC) ^^^ / vvv !_CCCL_COMPILER(GCC)
+#  elif _CCCL_HIP_COMPILATION()
+          // NOTE(HIP/AMD): see __with_builtin_fmax note above -- llvm.minnum may
+          // return NaN for a signaling-NaN operand, and __builtin_fminimum_num is
+          // unreliable on some ROCm clang snapshots. Fall through to the local isnan
+          // implementation below (correct on every clang version).
+#  else // ^^^ _CCCL_COMPILER(GCC)/HIP ^^^ / vvv other compilers ^^^
           return ::cuda::std::__with_builtin_fmin(__x, __y);
-#  endif // !_CCCL_COMPILER(GCC)
+#  endif // other compilers
         }
 #endif // _CCCL_USE_BUILTIN_FMAX
       }
