@@ -373,14 +373,16 @@ public:
 CUB_NAMESPACE_BEGIN
 
 // NOTE(HIP/AMD): hipcub::BaseTraits has a fifth template parameter
-// ('_nullptr_TYPE') on hipCub < 4.4.0; insert a literal 'false' for it
-// and suppress the FLOATING_POINT deprecation narrowly. The 4.4.0
+// ('_nullptr_TYPE') on hipCub <= 4.4.0; insert a literal 'false' for it
+// and suppress the FLOATING_POINT deprecation narrowly. The 4-arg
 // realignment (StreamHPC branch users/matyas-streamhpc/hipcub-cccl-3-0)
-// matches upstream cub's 4-arg form, so the WAR auto-disables once the
-// minimum-supported hipCub crosses that version. The longer-term
+// matches upstream cub's form, so the WAR auto-disables once the
+// minimum-supported hipCub crosses that version. Note the shipped ROCm
+// hipCub still reports HIPCUB_VERSION 400400 while carrying the 5-arg
+// BaseTraits, so the gate includes 400400 itself. The longer-term
 // migration is to rocprim::traits::define<T>; deferred until both
 // branches are widely available.
-#if defined(__HIP_PLATFORM_AMD__) && HIPCUB_VERSION < 400400
+#if defined(__HIP_PLATFORM_AMD__) && HIPCUB_VERSION <= 400400
 _CCCL_SUPPRESS_DEPRECATED_PUSH
 template <>
 struct NumericTraits<half_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, half_t>
