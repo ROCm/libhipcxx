@@ -54,7 +54,13 @@
 
 #include "test_macros.h"
 
-TEST_GLOBAL_VARIABLE int device_ptr1[]      = {1, 2, 3, 4};
+// NOTE(HIP/AMD): TEST_GLOBAL_VARIABLE expands to _CCCL_GLOBAL_VARIABLE which is
+// __device__ only in the device-compilation pass and empty in the host pass.
+// hipGetSymbolAddress (called via cudaGetSymbolAddress on HIP) requires a symbol
+// that is __device__-annotated in the host pass; using TEST_GLOBAL_VARIABLE causes
+// it to fail with hipErrorInvalidDeviceSymbol. Use an explicit __device__ declaration
+// instead so the symbol is registered with the HIP runtime on both passes.
+__device__ int device_ptr1[]      = {1, 2, 3, 4};
 // NOTE(HIP/AMD): hipPointerGetAttributes does not recognize
 // '__managed__' globals as managed memory -- it reports
 // them as type=hipMemoryTypeUnregistered with isManaged=0 (verified

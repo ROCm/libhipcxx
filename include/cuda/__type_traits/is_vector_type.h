@@ -218,6 +218,33 @@ inline constexpr bool is_vector_type_v<::double4> = true;
 template <>
 inline constexpr bool is_vector_type_v<::dim3> = true;
 
+// NOTE(HIP/AMD): __half2 and __nv_bfloat162 are vector types on both CUDA and HIP
+// (vector_size_v<__half2> == 2 on the CTK path). Mirror that here for parity.
+#    if _CCCL_HAS_NVFP16()
+template <>
+inline constexpr bool is_vector_type_v<::__half2> = true;
+#    endif // _CCCL_HAS_NVFP16()
+
+#    if _CCCL_HAS_NVBF16()
+template <>
+inline constexpr bool is_vector_type_v<::__nv_bfloat162> = true;
+#    endif // _CCCL_HAS_NVBF16()
+
+// NOTE(HIP/AMD): HIP ships __hip_fp8x2_e4m3/__hip_fp8x4_e4m3/__hip_fp8x2_e5m2/
+// __hip_fp8x4_e5m2 in <hip/hip_fp8.h>; <libhipcxx/__amd/cuda_runtime.h> aliases
+// them to the upstream __nv_fp8x* names. These are vector types analogous to
+// __half2 / __nv_bfloat162 (vector_size_v<__nv_fp8x2_e4m3> == 2 on the CTK path).
+#    if _CCCL_HAS_NVFP8()
+template <>
+inline constexpr bool is_vector_type_v<::__nv_fp8x2_e4m3> = true;
+template <>
+inline constexpr bool is_vector_type_v<::__nv_fp8x4_e4m3> = true;
+template <>
+inline constexpr bool is_vector_type_v<::__nv_fp8x2_e5m2> = true;
+template <>
+inline constexpr bool is_vector_type_v<::__nv_fp8x4_e5m2> = true;
+#    endif // _CCCL_HAS_NVFP8()
+
 template <class _Tp>
 using is_vector_type = ::cuda::std::bool_constant<is_vector_type_v<_Tp>>;
 
@@ -225,6 +252,13 @@ using is_vector_type = ::cuda::std::bool_constant<is_vector_type_v<_Tp>>;
 
 template <class _Tp>
 inline constexpr bool is_extended_fp_vector_type_v = false;
+// NOTE(HIP/AMD): strip cv qualifiers so const/volatile specializations work.
+template <class _Tp>
+inline constexpr bool is_extended_fp_vector_type_v<const _Tp> = is_extended_fp_vector_type_v<_Tp>;
+template <class _Tp>
+inline constexpr bool is_extended_fp_vector_type_v<volatile _Tp> = is_extended_fp_vector_type_v<_Tp>;
+template <class _Tp>
+inline constexpr bool is_extended_fp_vector_type_v<const volatile _Tp> = is_extended_fp_vector_type_v<_Tp>;
 
 #    if _CCCL_HAS_NVFP16()
 template <>
@@ -235,6 +269,23 @@ inline constexpr bool is_extended_fp_vector_type_v<::__half2> = true;
 template <>
 inline constexpr bool is_extended_fp_vector_type_v<::__nv_bfloat162> = true;
 #    endif // _CCCL_HAS_NVBF16()
+
+// NOTE(HIP/AMD): HIP ships __hip_fp8x2_e4m3/__hip_fp8x4_e4m3/__hip_fp8x2_e5m2/
+// __hip_fp8x4_e5m2 in <hip/hip_fp8.h>; <libhipcxx/__amd/cuda_runtime.h> aliases
+// them to the upstream __nv_fp8x* names. Add is_extended_fp_vector_type_v
+// specializations so that __data_type_to_dlpack<> can decompose them into their
+// scalar element type via tuple_size_v / tuple_element_t (defined in
+// cuda/std/__tuple_dir/vector_types.h, guarded by _CCCL_HAS_NVFP8()).
+#    if _CCCL_HAS_NVFP8()
+template <>
+inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x2_e4m3> = true;
+template <>
+inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x4_e4m3> = true;
+template <>
+inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x2_e5m2> = true;
+template <>
+inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x4_e5m2> = true;
+#    endif // _CCCL_HAS_NVFP8()
 
 template <class _Tp>
 using is_extended_fp_vector_type = ::cuda::std::bool_constant<is_extended_fp_vector_type_v<_Tp>>;

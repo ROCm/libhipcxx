@@ -45,6 +45,12 @@
 
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
+// NOTE(HIP/AMD): _CCCL_HIP_WAVE_SIZE gives the compile-time wave/warp size
+// (64 on GFX9, 32 on RDNA). It matches the divisor used in queries/extents.h.
+#  if _CCCL_HIP_COMPILATION()
+#    include <libhipcxx/__amd/amd_utils.h>
+#  endif
+
 #  include <cuda/__cmath/ceil_div.h>
 #  include <cuda/__fwd/hierarchy.h>
 #  include <cuda/__hierarchy/hierarchy_query_result.h>
@@ -125,7 +131,12 @@ struct __index_query_native<warp_level, block_level>
   [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call() noexcept
   {
     const auto __thread_rank = (threadIdx.z * blockDim.y + threadIdx.y) * blockDim.x + threadIdx.x;
+#if _CCCL_HIP_COMPILATION()
+    // NOTE(HIP/AMD): divide by the wavefront size (64 on GFX9, 32 on RDNA).
+    return {static_cast<_Tp>(__thread_rank / _CCCL_HIP_WAVE_SIZE), 0, 0};
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
     return {static_cast<_Tp>(__thread_rank / 32), 0, 0};
+#endif // !_CCCL_HIP_COMPILATION()
   }
 };
 
@@ -232,7 +243,15 @@ struct __index_query<warp_level, _Level>
     const auto __thread_idx = __index_query<thread_level, block_level>::template __call<unsigned>(__hier);
     const auto __thread_rank =
       (__thread_idx.z * __block_exts.extent(1) + __thread_idx.y) * __block_exts.extent(0) + __thread_idx.x;
-    const auto __warp_rank = __thread_rank / 32;
+    // NOTE(HIP/AMD): __wave_size is the wavefront size (64 on GFX9, 32 on RDNA)
+    // on HIP and the literal 32 on NVIDIA. It matches the divisor used in
+    // queries/extents.h so warp rank and warp count stay consistent.
+#if _CCCL_HIP_COMPILATION()
+    constexpr unsigned __wave_size = _CCCL_HIP_WAVE_SIZE;
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
+    constexpr unsigned __wave_size = 32;
+#endif // !_CCCL_HIP_COMPILATION()
+    const auto __warp_rank = __thread_rank / __wave_size;
 
     if constexpr (::cuda::std::is_same_v<_Level, block_level>)
     {
@@ -241,7 +260,7 @@ struct __index_query<warp_level, _Level>
     else
     {
       const auto __thread_count = __block_exts.extent(0) * __block_exts.extent(1) * __block_exts.extent(2);
-      const auto __warp_count   = ::cuda::ceil_div(__thread_count, 32);
+      const auto __warp_count   = ::cuda::ceil_div(__thread_count, __wave_size);
       const auto __next_idx     = __index_query<block_level, _Level>::template __call<_Tp>(__hier);
       return {static_cast<_Tp>(__next_idx.x * __warp_count + __warp_rank), __next_idx.y, __next_idx.z};
     }

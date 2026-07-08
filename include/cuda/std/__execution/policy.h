@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___EXECUTION_POLICY_H
 #define _CUDA_STD___EXECUTION_POLICY_H
 
@@ -20,7 +42,10 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#  if _CCCL_HIP_COMPILATION() // HIP: __call_or is otherwise pulled in via the CUDA pstl backend (gated off on HIP)
+#    include <cuda/__functional/call_or.h>
+#  endif // _CCCL_HIP_COMPILATION()
 #  include <cuda/__memory_resource/any_resource.h>
 #  include <cuda/__memory_resource/get_memory_resource.h>
 #  include <cuda/__memory_resource/properties.h>
@@ -28,7 +53,7 @@
 #  include <cuda/__stream/get_stream.h>
 #  include <cuda/__stream/stream.h>
 #  include <cuda/__stream/stream_ref.h>
-#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
 #include <cuda/std/__bit/has_single_bit.h>
 #include <cuda/std/__concepts/concept_macros.h>
 #include <cuda/std/__execution/env.h>
@@ -73,7 +98,7 @@ struct __execution_policy_base : env<__unwrap_reference_t<_Envs>...>
   //! Forwards queries to the env
   using env<__unwrap_reference_t<_Envs>...>::query;
 
-#if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
   //! @brief create a new policy with additional environments attached
   template <class _Env, size_t... _Indices>
   [[nodiscard]] _CCCL_HOST_API constexpr __execution_policy_base<_Policy, _Env, _Envs...>
@@ -168,7 +193,7 @@ struct __execution_policy_base : env<__unwrap_reference_t<_Envs>...>
                     ::cuda::std::make_index_sequence<sizeof...(_Envs)>());
     }
   }
-#endif // _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
 };
 
 using sequenced_policy = __execution_policy_base<static_cast<uint32_t>(__execution_policy::__sequenced)>;
