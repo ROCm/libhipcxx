@@ -102,22 +102,39 @@ function(
     )
   endforeach()
 
+  # NOTE(HIP/AMD): we also mirror the cxx warning/diagnostic flags onto
+  # COMPILE_LANGUAGE:HIP so the libcudacxx / libhipcxx HIP test surface (header
+  # tests, c2h tests) is built with -Wall / -Wextra / -Werror too -- otherwise
+  # regressions caught on the NV side land silently on the HIP side, invisible
+  # until someone injects 'CMAKE_HIP_FLAGS' and the latent warnings flood out.
+  #
+  # BUT the cxx flags were validated against CMAKE_CXX_COMPILER via
+  # append_option_if_available() -> check_cxx_compiler_flag(). That host compiler
+  # may be GCC while the HIP compiler is clang, so GCC-only flags (e.g.
+  # -Walloc-zero, -Wtsan) pass the cxx check yet make `clang -x hip` fail under
+  # -Werror,-Wunknown-warning-option. So only mirror a flag to HIP when the HIP
+  # compiler itself accepts it (check_compiler_flag detects the "unknown warning
+  # option" diagnostic and returns false).
+  if (LIBCUDACXX_ENABLE_HIP)
+    include(CheckCompilerFlag)
+  endif()
   foreach (cxx_option IN LISTS cxx_compile_options)
-    # NOTE(HIP/AMD): also emit the option for COMPILE_LANGUAGE:HIP. clang's
-    # HIP front-end accepts the same -W*-style warning flags as plain C++,
-    # but without this generator expression the entire libcudacxx /
-    # libhipcxx HIP test surface (header tests, c2h tests) compiles without
-    # -Wall / -Wextra / -Werror -- regressions that would have been caught
-    # immediately on the NV side land silently on the HIP side. The
-    # asymmetry is invisible until someone explicitly injects 'CMAKE_HIP_FLAGS'
-    # at configure time, at which point the latent warnings flood out.
     target_compile_options(
       ${interface_target}
       INTERFACE
         $<$<COMPILE_LANGUAGE:CXX>:${cxx_option}>
         $<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:-Xcompiler=${cxx_option}>
-        $<$<COMPILE_LANGUAGE:HIP>:${cxx_option}>
     )
+    if (LIBCUDACXX_ENABLE_HIP)
+      string(MAKE_C_IDENTIFIER "HIP_FLAG_${cxx_option}" _cccl_hip_flag_var)
+      check_compiler_flag(HIP "${cxx_option}" ${_cccl_hip_flag_var})
+      if (${_cccl_hip_flag_var})
+        target_compile_options(
+          ${interface_target}
+          INTERFACE $<$<COMPILE_LANGUAGE:HIP>:${cxx_option}>
+        )
+      endif()
+    endif()
   endforeach()
 
   # NOTE(HIP/AMD): HIP-specific warning relaxations, emitted AFTER the mirrored
