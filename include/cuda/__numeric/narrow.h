@@ -75,59 +75,47 @@ struct narrowing_error : ::std::runtime_error
 };
 #endif // _CCCL_HAS_EXCEPTIONS()
 
-// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
-// [[noreturn]] _CCCL_API inline void __throw_narrowing_error()
-// {
-// #if _CCCL_HAS_EXCEPTIONS()
-//   NV_IF_ELSE_TARGET(NV_IS_HOST, (throw narrowing_error{};), (::cuda::std::terminate();))
-// #else // ^^^ _CCCL_HAS_EXCEPTIONS() ^^^ / vvv !_CCCL_HAS_EXCEPTIONS() vvv
-//   ::cuda::std::terminate();
-// #endif // !_CCCL_HAS_EXCEPTIONS()
-// }
-//
-// #if _CCCL_HIP_COMPILATION()
-// // NOTE(HIP/AMD): __hip_bfloat16 / __half on HIP do not have direct constructors
-// // from `(unsigned) long` / `(unsigned) long long`, nor between each other;
-// // `is_constructible_v<__hip_bfloat16, long>` etc. are false. All half-precision
-// // types do support construction from / conversion to `double`, so we use
-// // `double` as a pivot when the direct construction is unavailable. The reverse
-// // direction (half-precision -> integer) is already covered by the `operator T()`
-// // member overloads on the half-precision types.
-// // Tracked: ROCM-23887.
-// template <class _To, class _From>
-// inline constexpr bool __narrow_needs_double_pivot_v =
-//   !::cuda::std::is_constructible_v<_To, _From>
-//   && (::cuda::std::is_same_v<_To, __nv_bfloat16> || ::cuda::std::is_same_v<_To, __half>);
-//
-// template <class _To, class _From>
-// inline constexpr bool __narrow_is_constructible_v =
-//   ::cuda::std::is_constructible_v<_To, _From> || __narrow_needs_double_pivot_v<_To, _From>;
-//
-// template <class _To, class _From>
-// [[nodiscard]] _CCCL_API constexpr _To __narrow_construct(_From __from)
-// {
-//   if constexpr (::cuda::std::is_constructible_v<_To, _From>)
-//   {
-//     return static_cast<_To>(__from);
-//   }
-//   else
-//   {
-//     return static_cast<_To>(static_cast<double>(__from));
-//   }
-// }
-// #else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-// template <class _To, class _From>
-// inline constexpr bool __narrow_is_constructible_v = ::cuda::std::is_constructible_v<_To, _From>;
-//
-// template <class _To, class _From>
-// [[nodiscard]] _CCCL_API constexpr _To __narrow_construct(_From __from)
-// {
-//   return static_cast<_To>(__from);
-// }
-// #endif // !_CCCL_HIP_COMPILATION()
-//
-// =======
-// >>>>>>> END NEW CODE (332e134db7)
+#if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): __hip_bfloat16 / __half on HIP do not have direct constructors
+// from `(unsigned) long` / `(unsigned) long long`, nor between each other;
+// `is_constructible_v<__hip_bfloat16, long>` etc. are false. All half-precision
+// types do support construction from / conversion to `double`, so we use
+// `double` as a pivot when the direct construction is unavailable. The reverse
+// direction (half-precision -> integer) is already covered by the `operator T()`
+// member overloads on the half-precision types.
+// Tracked: ROCM-23887.
+template <class _To, class _From>
+inline constexpr bool __narrow_needs_double_pivot_v =
+  !::cuda::std::is_constructible_v<_To, _From>
+  && (::cuda::std::is_same_v<_To, __nv_bfloat16> || ::cuda::std::is_same_v<_To, __half>);
+
+template <class _To, class _From>
+inline constexpr bool __narrow_is_constructible_v =
+  ::cuda::std::is_constructible_v<_To, _From> || __narrow_needs_double_pivot_v<_To, _From>;
+
+template <class _To, class _From>
+[[nodiscard]] _CCCL_API constexpr _To __narrow_construct(_From __from)
+{
+  if constexpr (::cuda::std::is_constructible_v<_To, _From>)
+  {
+    return static_cast<_To>(__from);
+  }
+  else
+  {
+    return static_cast<_To>(static_cast<double>(__from));
+  }
+}
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
+template <class _To, class _From>
+inline constexpr bool __narrow_is_constructible_v = ::cuda::std::is_constructible_v<_To, _From>;
+
+template <class _To, class _From>
+[[nodiscard]] _CCCL_API constexpr _To __narrow_construct(_From __from)
+{
+  return static_cast<_To>(__from);
+}
+#endif // !_CCCL_HIP_COMPILATION()
+
 //! Uses static_cast to cast a value \p __from to type \p _To and checks whether the value has changed. \p _To needs
 //! to be constructible from \p _From and vice versa, and \p implement operator!=. Throws \ref narrowing_error in host
 //! code and traps in device code if the value has changed. Modelled after `gsl::narrow`. See also the C++ Core

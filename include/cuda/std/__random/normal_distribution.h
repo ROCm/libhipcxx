@@ -42,9 +42,6 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 2afca5fc89 (79196f3321) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #include <cuda/std/__cmath/logarithms.h>
 #include <cuda/std/__cmath/roots.h>
 #include <cuda/std/__host_stdlib/istream>
@@ -53,14 +50,6 @@
 #include <cuda/std/__random/is_valid.h>
 #include <cuda/std/__random/uniform_real_distribution.h>
 
-// <<<<<<< OLD CODE from bac969089b (e6325e93c3) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC)
-// // >>>>>>> END NEW CODE (79196f3321)
-// #  include <ios>
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-//
-// =======
-// >>>>>>> END NEW CODE (e6325e93c3)
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
@@ -206,11 +195,7 @@ public:
   }
 #endif // _CCCL_STD_VER <= 2017
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
   template <class _CharT, class _Traits>
   friend ::std::basic_ostream<_CharT, _Traits>&
   operator<<(::std::basic_ostream<_CharT, _Traits>& __os, const normal_distribution& __x)
@@ -257,11 +242,7 @@ public:
     __is.flags(__flags);
     return __is;
   }
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 };
 
 _CCCL_END_NAMESPACE_CUDA_STD

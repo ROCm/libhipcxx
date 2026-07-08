@@ -364,31 +364,25 @@ _CCCL_HOST_API inline timed_event::timed_event(stream_ref __stream, event_flags 
   record(__stream);
 }
 
-// <<<<<<< OLD CODE from b05a857845 (f20e019420) - COMMENTED OUT
-// // NOTE(HIP/AMD): hipStreamGetCtx is not in the HIP runtime API. Under
-// // HIP, route through __streamGetDevice + the device-ref overload of
-// // __ensure_current_context to set the primary context of the stream's
-// // owning device.
-// #if _CCCL_HIP_COMPILATION()
-// _CCCL_HOST_API inline __ensure_current_context::__ensure_current_context(stream_ref __stream)
-//     : __ensure_current_context(device_ref{
-//         ::cuda::__driver::__cudevice_to_ordinal(::cuda::__driver::__streamGetDevice(__stream.get()))})
-// {}
-// #else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-// =======
+// NOTE(HIP/AMD): hipStreamGetCtx is not in the HIP runtime API. Under
+// HIP, route through __streamGetDevice + the device-ref overload of
+// __ensure_current_context to set the primary context of the stream's
+// owning device.
 // Hide from Doxygen — __ensure_current_context is an internal symbol excluded by EXCLUDE_SYMBOLS.
 #  ifndef _CCCL_DOXYGEN_INVOKED
-// >>>>>>> END NEW CODE (f20e019420)
+#    if _CCCL_HIP_COMPILATION()
+_CCCL_HOST_API inline __ensure_current_context::__ensure_current_context(stream_ref __stream)
+    : __ensure_current_context(device_ref{
+        ::cuda::__driver::__cudevice_to_ordinal(::cuda::__driver::__streamGetDevice(__stream.get()))})
+{}
+#    else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
 _CCCL_HOST_API inline __ensure_current_context::__ensure_current_context(stream_ref __stream)
 {
   auto __ctx = __driver::__streamGetCtx(__stream.get());
   ::cuda::__driver::__ctxPush(__ctx);
 }
-// <<<<<<< OLD CODE from b05a857845 (f20e019420) - COMMENTED OUT
-// #endif // !_CCCL_HIP_COMPILATION()
-// =======
+#    endif // !_CCCL_HIP_COMPILATION()
 #  endif // !_CCCL_DOXYGEN_INVOKED
-// >>>>>>> END NEW CODE (f20e019420)
 
 _CCCL_END_NAMESPACE_CUDA
 

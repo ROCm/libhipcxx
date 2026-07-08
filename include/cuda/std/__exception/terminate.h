@@ -40,28 +40,18 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 7c099f6aec (10e65aca2b) - COMMENTED OUT
-// // NOTE(HIP/AMD): Under hipRTC __cccl_terminate() takes the device branch
-// // (libhipcxx::__trap()), so host <stdlib.h> (for ::exit) is unused. Including it
-// // here would pull in host <stddef.h>/<bits/stdint-intn.h> on the JIT include
-// // path and cause max_align_t / byte / int64_t redefinition conflicts. Skip it
-// // under hipRTC, like NVRTC.
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #if _CCCL_TILE_COMPILATION()
 #  include <cuda/std/cassert>
-#endif // !_CCCL_TILE_COMPILATION()
+#endif // _CCCL_TILE_COMPILATION()
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC)
-// // >>>>>>> END NEW CODE (10e65aca2b)
-// #  include <stdlib.h>
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
+// NOTE(HIP/AMD): Under hipRTC __cccl_terminate() takes the device branch
+// (libhipcxx::__trap()), so host <stdlib.h> (for ::exit) is unused. Including it
+// here would pull in host <stddef.h>/<bits/stdint-intn.h> on the JIT include
+// path and cause max_align_t / byte / int64_t redefinition conflicts. Skip it
+// under hipRTC, like NVRTC.
 #if _CCCL_HOSTED()
 #  include <stdlib.h>
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -72,18 +62,14 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION // purposefully not using versioning na
 
 [[noreturn]] _CCCL_API inline void __cccl_terminate() noexcept
 {
-// <<<<<<< OLD CODE from 7c099f6aec (10e65aca2b) - COMMENTED OUT
-//   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
-// =======
 #if _CCCL_TILE_COMPILATION()
   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (assert(false);))
 #else // ^^^ _CCCL_TILE_COMPILATION() ^^^ / vvv !_CCCL_TILE_COMPILATION()
+#  if _CCCL_HIP_COMPILATION()
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
+#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (::__trap();))
-// <<<<<<< OLD CODE from dc9e115f13 (35525fd9e2) - COMMENTED OUT
-// // >>>>>>> END NEW CODE (10e65aca2b)
-//   _CCCL_UNREACHABLE();
-// =======
-// >>>>>>> END NEW CODE (35525fd9e2)
+#  endif // !_CCCL_HIP_COMPILATION()
 #endif // !_CCCL_TILE_COMPILATION()
   _CCCL_UNREACHABLE();
 }

@@ -73,13 +73,8 @@ public:
   {};
   struct persisting
   {
-// <<<<<<< OLD CODE from 87d689e057 (33abdef3d5) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//     [[nodiscard]] _CCCL_API constexpr operator ::cudaAccessProperty() const noexcept
-// =======
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::cudaAccessProperty() const noexcept
-// >>>>>>> END NEW CODE (33abdef3d5)
     {
       return ::cudaAccessProperty::cudaAccessPropertyPersisting;
     }
@@ -87,13 +82,8 @@ public:
   };
   struct streaming
   {
-// <<<<<<< OLD CODE from 87d689e057 (33abdef3d5) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//     [[nodiscard]] _CCCL_API constexpr operator ::cudaAccessProperty() const noexcept
-// =======
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::cudaAccessProperty() const noexcept
-// >>>>>>> END NEW CODE (33abdef3d5)
     {
       return ::cudaAccessProperty::cudaAccessPropertyStreaming;
     }
@@ -101,13 +91,8 @@ public:
   };
   struct normal
   {
-// <<<<<<< OLD CODE from 87d689e057 (33abdef3d5) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//     [[nodiscard]] _CCCL_API constexpr operator ::cudaAccessProperty() const noexcept
-// =======
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
     [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::cudaAccessProperty() const noexcept
-// >>>>>>> END NEW CODE (33abdef3d5)
     {
       return ::cudaAccessProperty::cudaAccessPropertyNormal;
     }

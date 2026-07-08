@@ -54,13 +54,6 @@
 #include <cuda/std/__utility/declval.h>
 #include <cuda/std/__utility/pod_tuple.h>
 
-// <<<<<<< OLD CODE from 098e8b6f4b (80084e5cce) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <functional> under hipRTC
-// #  include <functional> // IWYU pragma: keep for ::std::reference_wrapper
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-//
-// =======
-// >>>>>>> END NEW CODE (80084e5cce)
 //! @file env.h
 //! @brief Provides utilities for querying and managing environments, an unordered
 //! collection of key/value pairs.
@@ -262,11 +255,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_DECLSPEC_EMPTY_BASES prop : _Query
 #endif // !_CCCL_HAS_ATTRIBUTE_NO_UNIQUE_ADDRESS()
 
 template <class _Query, class _Value>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE prop(_Query, _Value) -> prop<_Query, _Value>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES prop(_Query, _Value) -> prop<_Query, _Value>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 //! @brief A variadic template structure representing an environment.
 //!
@@ -339,11 +328,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT env
 };
 
 template <class... _Envs>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE env(_Envs...) -> env<__unwrap_reference_t<_Envs>...>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES env(_Envs...) -> env<__unwrap_reference_t<_Envs>...>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 // Partial specialization for no env because NVCC segfaults trying to compile `__tuple<>`
 template <>

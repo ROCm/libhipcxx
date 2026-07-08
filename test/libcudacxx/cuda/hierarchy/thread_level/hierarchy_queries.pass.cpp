@@ -7,40 +7,33 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 62028ff6bf (5b85fe8f16) - COMMENTED OUT
-// // <<<<<<< OLD CODE from a8b8e0984a (98ec5e3d4f) - COMMENTED OUT
-// // // MIT License
-// // //
-// // // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
-// // //
-// // // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // // of this software and associated documentation files (the "Software"), to deal
-// // // in the Software without restriction, including without limitation the rights
-// // // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // // copies of the Software, and to permit persons to whom the Software is
-// // // furnished to do so, subject to the following conditions:
-// // //
-// // // The above copyright notice and this permission notice shall be included in all
-// // // copies or substantial portions of the Software.
-// // //
-// // // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // // SOFTWARE.
-// //
-// // // todo: enable with nvrtc
-// // // UNSUPPORTED: nvrtc, hiprtc
-// //
-// // =======
-// // >>>>>>> END NEW CODE (98ec5e3d4f)
-// =======
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// todo: enable with nvrtc
+// UNSUPPORTED: nvrtc, hiprtc
 // UNSUPPORTED: enable-tile
 // error: accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code
 
-// >>>>>>> END NEW CODE (5b85fe8f16)
 #include "hierarchy_queries.h"
 
 #include <cuda/hierarchy>
@@ -50,6 +43,14 @@
 #include <cuda/std/type_traits>
 
 #include "test_macros.h"
+
+// NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
+// AMD, so the static warp-level expectations below must use the wave size.
+#if _CCCL_HIP_COMPILATION()
+#  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
+#else
+#  define TEST_WARP_SIZE 32
+#endif
 
 template <class Hierarchy, class GridExts, class ClusterExts, class BlockExts>
 TEST_DEVICE_FUNC void test_thread(
@@ -73,7 +74,7 @@ TEST_DEVICE_FUNC void test_thread(
   }
 
   // 2. Test cuda::gpu_thread.static_dims(x, hier)
-  test_static_dims(ulonglong3{cuda::std::size_t{32}, 1, 1}, cuda::gpu_thread, cuda::warp, hier);
+  test_static_dims(ulonglong3{cuda::std::size_t{TEST_WARP_SIZE}, 1, 1}, cuda::gpu_thread, cuda::warp, hier);
   test_static_dims(ulonglong3{BlockExts::static_extent(0), BlockExts::static_extent(1), BlockExts::static_extent(2)},
                    cuda::gpu_thread,
                    cuda::block,
@@ -96,7 +97,7 @@ TEST_DEVICE_FUNC void test_thread(
   }
 
   // 3. Test cuda::gpu_thread.extents(x)
-  test_extents(cuda::std::extents<unsigned, 32>{}, cuda::gpu_thread, cuda::warp, hier);
+  test_extents(cuda::std::extents<unsigned, TEST_WARP_SIZE>{}, cuda::gpu_thread, cuda::warp, hier);
   test_extents(block_exts, cuda::gpu_thread, cuda::block, hier);
   {
     uint3 dims{blockDim.x, blockDim.y, blockDim.z};
@@ -131,7 +132,7 @@ TEST_DEVICE_FUNC void test_thread(
   test_static_count(cuda::gpu_thread, cuda::grid, hier);
 
   // 5. Test cuda::gpu_thread.count(x, hier)
-  test_count(32, cuda::gpu_thread, cuda::warp, hier);
+  test_count(TEST_WARP_SIZE, cuda::gpu_thread, cuda::warp, hier);
   test_count(cuda::std::size_t{blockDim.z} * blockDim.y * blockDim.x, cuda::gpu_thread, cuda::block, hier);
   {
     uint3 exp{blockDim.x, blockDim.y, blockDim.z};

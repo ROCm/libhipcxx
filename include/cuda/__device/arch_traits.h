@@ -534,16 +534,11 @@ template <>
 #undef _CCCL_ARCH_TRAITS_FOR_CASE
 #undef _CCCL_ARCH_TRAITS_FOR_SPECIFIC_CASE
     default:
-// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
-// #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
-//       ::cuda::__throw_cuda_error(::cudaErrorInvalidValue, "Traits requested for an unknown architecture");
-// =======
-#if _CCCL_HAS_CTK()
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
       _CCCL_THROW(::cuda::cuda_error, ::cudaErrorInvalidValue, "Traits requested for an unknown architecture");
-// >>>>>>> END NEW CODE (332e134db7)
-#else // ^^^ _CCCL_HAS_CTK() ^^^ / vvv !_CCCL_HAS_CTK() vvv
+#else // ^^^ (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC) ^^^ / vvv else vvv
       _CCCL_THROW(::cuda::cuda_error, /*cudaErrorInvalidValue*/ 1, "Traits requested for an unknown architecture");
-#endif // ^^^ !_CCCL_HAS_CTK() ^^^
+#endif // ^^^ !(_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) || defined(_CCCL_COMPILER_HIPRTC) ^^^
   }
 }
 

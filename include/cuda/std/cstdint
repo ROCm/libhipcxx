@@ -45,13 +45,13 @@
 
 #include <cuda/std/version>
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-# =======
+// NOTE(HIP/AMD): HIPRTC needs custom integer type definitions (not system <cstdint>).
 #if _CCCL_HOSTED()
-# >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <cstdint>
-#elif _CCCL_COMPILER(NVRTC)
+// NOTE(HIP/AMD): mirror the NVRTC custom-defines branch for HIPRTC -- HIPRTC also
+// lacks a usable system <cstdint> (see the detailed notes below), so it must take
+// this fallback path rather than the hosted <cstdint> include above.
+#elif _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 #  include <cuda/std/climits>
 
 // NOTE(HIP/AMD): Under HIPRTC with -nostdinc++, the host C++
@@ -226,7 +226,7 @@ using uintptr_t = uint64_t;
 
 #  define INTMAX_C(X)  ((::intmax_t) (X))
 #  define UINTMAX_C(X) ((::uintmax_t) (X))
-#endif // ^^^ _CCCL_COMPILER(NVRTC)
+#endif // ^^^ _CCCL_COMPILER(NVRTC) || _CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 

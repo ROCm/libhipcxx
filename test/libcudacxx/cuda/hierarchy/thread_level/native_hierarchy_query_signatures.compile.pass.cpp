@@ -7,56 +7,47 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 62028ff6bf (5b85fe8f16) - COMMENTED OUT
-// // <<<<<<< OLD CODE from a8b8e0984a (98ec5e3d4f) - COMMENTED OUT
-// // // MIT License
-// // //
-// // // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
-// // //
-// // // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // // of this software and associated documentation files (the "Software"), to deal
-// // // in the Software without restriction, including without limitation the rights
-// // // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // // copies of the Software, and to permit persons to whom the Software is
-// // // furnished to do so, subject to the following conditions:
-// // //
-// // // The above copyright notice and this permission notice shall be included in all
-// // // copies or substantial portions of the Software.
-// // //
-// // // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // // SOFTWARE.
-// //
-// // // todo: enable with nvrtc
-// // // UNSUPPORTED: nvrtc
-// //
-// // =======
-// // >>>>>>> END NEW CODE (98ec5e3d4f)
-// =======
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// todo: enable with nvrtc
+// UNSUPPORTED: nvrtc
 // UNSUPPORTED: enable-tile
 // error: accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code
 
-// >>>>>>> END NEW CODE (5b85fe8f16)
 #include <cuda/hierarchy>
 #include <cuda/std/cstddef>
 #include <cuda/std/mdspan>
 #include <cuda/std/type_traits>
 
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// // NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
-// // AMD, so the static warp-level extent below must use the wave size.
-// #if _CCCL_HIP_COMPILATION()
-// #  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
-// #else
-// #  define TEST_WARP_SIZE 32
-// #endif
-// =======
 #include "test_macros.h"
-// >>>>>>> END NEW CODE (5214850b75)
+
+// NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
+// AMD, so the static warp-level extent below must use the wave size.
+#if _CCCL_HIP_COMPILATION()
+#  define TEST_WARP_SIZE _CCCL_HIP_WAVE_SIZE
+#else
+#  define TEST_WARP_SIZE 32
+#endif
 
 template <class Level>
 TEST_DEVICE_FUNC void test_query_signatures(const Level& level)

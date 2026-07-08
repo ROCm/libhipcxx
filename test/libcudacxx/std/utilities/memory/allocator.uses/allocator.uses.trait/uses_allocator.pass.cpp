@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -44,12 +44,12 @@ struct B
   using allocator_type = int;
 };
 
-#if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 struct C
 {
   static int allocator_type;
 };
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 
 struct D
 {
@@ -85,9 +85,9 @@ int main(int, char**)
   test<false, A, cuda::std::allocator<int>>();
   test<false, B, cuda::std::allocator<int>>();
   test<true, B, double>();
-#if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   test<false, C, decltype(C::allocator_type)>();
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   test<false, D, decltype(D::allocator_type)>();
 #if !TEST_COMPILER(GCC) // E::allocator_type is private
   test<false, E, int>();
@@ -97,22 +97,13 @@ int main(int, char**)
 #if defined(_LIBCUDACXX_HAS_VECTOR)
   static_assert((cuda::std::uses_allocator<cuda::std::vector<int>, cuda::std::allocator<int>>::value));
 #endif // _LIBCUDACXX_HAS_VECTOR
-// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
-//   static_assert((!cuda::std::uses_allocator<A, cuda::std::allocator<int>>::value), "");
-//   static_assert((!cuda::std::uses_allocator<B, cuda::std::allocator<int>>::value), "");
-//   static_assert((cuda::std::uses_allocator<B, double>::value), "");
-// #if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-//   static_assert((!cuda::std::uses_allocator<C, decltype(C::allocator_type)>::value), "");
-//   static_assert((!cuda::std::uses_allocator<D, decltype(D::allocator_type)>::value), "");
-// =======
   static_assert((!cuda::std::uses_allocator<A, cuda::std::allocator<int>>::value));
   static_assert((!cuda::std::uses_allocator<B, cuda::std::allocator<int>>::value));
   static_assert((cuda::std::uses_allocator<B, double>::value));
-#if !TEST_COMPILER(NVRTC)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   static_assert((!cuda::std::uses_allocator<C, decltype(C::allocator_type)>::value));
   static_assert((!cuda::std::uses_allocator<D, decltype(D::allocator_type)>::value));
-// >>>>>>> END NEW CODE (ac28a5deba)
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 #if !TEST_COMPILER(GCC) // E::allocator_type is private
   static_assert((!cuda::std::uses_allocator<E, int>::value));
 #endif // !TEST_COMPILER(GCC)

@@ -92,11 +92,7 @@ struct strided_slice
 };
 
 template <class _OffsetType, class _ExtentType, class _StrideType>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE strided_slice(_OffsetType, _ExtentType, _StrideType)
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES strided_slice(_OffsetType, _ExtentType, _StrideType)
-// >>>>>>> END NEW CODE (5a016e2713)
   -> strided_slice<_OffsetType, _ExtentType, _StrideType>;
 
 template <typename>

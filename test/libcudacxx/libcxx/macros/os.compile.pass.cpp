@@ -31,9 +31,6 @@
 
 #include <cuda/std/__cccl/os.h>
 
-// <<<<<<< OLD CODE from cf7bcfc6be (4790c6d706) - COMMENTED OUT
-// #if !defined(__CUDACC_RTC__) && !defined(__HIPCC_RTC__)
-// =======
 // Define these macros to a true value. This tests that CCCL_OS(FOO) is resilient against
 // macro-expansion in case the user defines FOO, because if CCCL_OS() expands the macro, then
 // the below assertions should fire.
@@ -141,8 +138,7 @@
 #  endif // CCCL_OS(QNX)
 #endif // __APPLE__
 
-#if !defined(__CUDACC_RTC__)
-// >>>>>>> END NEW CODE (4790c6d706)
+#if !defined(__CUDACC_RTC__) && !defined(__HIPCC_RTC__)
 #  if _CCCL_OS(WINDOWS)
 #    include <windows.h>
 #  endif

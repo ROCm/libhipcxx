@@ -49,30 +49,23 @@
 #  include <cuda/__ptx/instructions/get_sreg.h>
 #endif // _CCCL_CUDA_COMPILATION()
 
-# <<<<<<< OLD CODE from 99414cfb4c (30ef996b42) - COMMENTED OUT
-# // NOTE(HIP/AMD): _LIBCUDACXX_HIP_TSC_CLOCKRATE /
-# // _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE used by
-# // __cccl_time_impl_device() / __cccl_timespec_get_impl_device() are
-# // supplied transitively by <cuda/std/detail/__config> ->
-# // <libhipcxx/__amd/hip_tsc_clockrate.h> on HIP.
-#
-# // NOTE(HIP/AMD): Under hipRTC, including host <time.h> drags in host <stddef.h>
-# // on the JIT include path, which redefines max_align_t / byte (already provided
-# // by cuda::std's <cstddef>) and breaks compilation. Treat hipRTC like NVRTC:
-# // define the C time types we need manually instead of pulling in host <time.h>.
-# // clock_t (which the NVRTC path gets from the runtime) is declared here for HIP.
-# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-# #  include <time.h>
-# #else
-# =======
+// NOTE(HIP/AMD): _LIBCUDACXX_HIP_TSC_CLOCKRATE /
+// _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE used by
+// __cccl_time_impl_device() / __cccl_timespec_get_impl_device() are
+// supplied transitively by <cuda/std/detail/__config> ->
+// <libhipcxx/__amd/hip_tsc_clockrate.h> on HIP.
+
+// NOTE(HIP/AMD): Under hipRTC, including host <time.h> drags in host <stddef.h>
+// on the JIT include path, which redefines max_align_t / byte (already provided
+// by cuda::std's <cstddef>) and breaks compilation. Under the new upstream model,
+// __host_stdlib/time.h is only included when not freestanding, and _CCCL_FREESTANDING()
+// is true for hipRTC (no host stdlib), so the problematic include is skipped automatically.
 #include <cuda/std/__cccl/prologue.h>
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# #if _CCCL_COMPILER(NVRTC)
-# # >>>>>>> END NEW CODE (30ef996b42)
-# =======
+// NOTE(HIP/AMD): clock_t is already provided in the global namespace by the HIP
+// runtime headers under hipRTC, so _CCCL_HOSTJIT() (which is false for hipRTC)
+// correctly skips the clock_t definition here (the `using ::clock_t` below picks it up).
 #if _CCCL_FREESTANDING()
-# >>>>>>> END NEW CODE (e5037ea8b4)
 #  define TIME_UTC 1
 
 #  if _CCCL_HOSTJIT()
@@ -85,14 +78,7 @@ struct timespec
   ::time_t tv_sec;
   long tv_nsec;
 };
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# // NOTE(HIP/AMD): clock_t is already provided in the global namespace by the HIP
-# // runtime headers under hipRTC, so it is not defined here (the `using ::clock_t`
-# // below picks it up).
-# #endif // _CCCL_COMPILER(NVRTC)
-# =======
 #endif // _CCCL_FREESTANDING()
-# >>>>>>> END NEW CODE (e5037ea8b4)
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
@@ -105,26 +91,31 @@ using ::timespec;
 
 [[nodiscard]] _CCCL_API inline clock_t clock() noexcept
 {
-# <<<<<<< OLD CODE from c4b61fe81c (1d189d4d6f) - COMMENTED OUT
-#   NV_IF_ELSE_TARGET(
-#     NV_IS_HOST,
-#     (return ::clock();),
-# #if _CCCL_HIP_COMPILATION()
-#     // NOTE(HIP/AMD): use clock64() (per-CU performance counter, raw cycles)
-#     // rather than wall_clock64() (TSC) so the unit semantics match NVIDIA's
-#     // get_sreg_clock64() — both return per-multiprocessor cycle counts.
-#     (return static_cast<clock_t>(clock64());))
-# #else
-#     (return static_cast<clock_t>(::cuda::ptx::get_sreg_clock64());))
-# #endif
-# =======
 #if _CCCL_HOSTJIT() // host-side `clock` is not supported in freestanding
   NV_IF_ELSE_TARGET(
-    NV_IS_HOST, (::cuda::std::terminate();), (return static_cast<clock_t>(::cuda::ptx::get_sreg_clock64());))
+    NV_IS_HOST,
+    (::cuda::std::terminate();),
+#  if _CCCL_HIP_COMPILATION()
+    // NOTE(HIP/AMD): use clock64() (per-CU performance counter, raw cycles)
+    // rather than wall_clock64() (TSC) so the unit semantics match NVIDIA's
+    // get_sreg_clock64() — both return per-multiprocessor cycle counts.
+    (return static_cast<clock_t>(clock64());))
+#  else
+    (return static_cast<clock_t>(::cuda::ptx::get_sreg_clock64());))
+#  endif
 #else // ^^^ _CCCL_HOSTJIT() ^^^ / vvv !_CCCL_HOSTJIT() vvv
-  NV_IF_ELSE_TARGET(NV_IS_HOST, (return ::clock();), (return static_cast<clock_t>(::cuda::ptx::get_sreg_clock64());))
+  NV_IF_ELSE_TARGET(
+    NV_IS_HOST,
+    (return ::clock();),
+#  if _CCCL_HIP_COMPILATION()
+    // NOTE(HIP/AMD): use clock64() (per-CU performance counter, raw cycles)
+    // rather than wall_clock64() (TSC) so the unit semantics match NVIDIA's
+    // get_sreg_clock64() — both return per-multiprocessor cycle counts.
+    (return static_cast<clock_t>(clock64());))
+#  else
+    (return static_cast<clock_t>(::cuda::ptx::get_sreg_clock64());))
+#  endif
 #endif // !_CCCL_HOSTJIT()
-# >>>>>>> END NEW CODE (1d189d4d6f)
 }
 
 // difftime
@@ -136,13 +127,8 @@ using ::timespec;
 
 // time
 
-# <<<<<<< OLD CODE from 99414cfb4c (30ef996b42) - COMMENTED OUT
-# #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-# [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE time_t __cccl_time_impl_device(time_t* __v) noexcept
-# =======
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 [[nodiscard]] _CCCL_DEVICE_API inline time_t __cccl_time_impl_device(time_t* __v) noexcept
-# >>>>>>> END NEW CODE (30ef996b42)
 {
 #  if defined(__HIP_DEVICE_COMPILE__)
   // NOTE(HIP/AMD): wall_clock64() returns TSC cycles, not nanoseconds. The TSC
@@ -180,13 +166,8 @@ _CCCL_API inline time_t time(time_t* __v) noexcept
 
 // timespec_get
 
-# <<<<<<< OLD CODE from 99414cfb4c (30ef996b42) - COMMENTED OUT
-# #  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-# [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE int __cccl_timespec_get_impl_device(timespec* __ts, int __base) noexcept
-# =======
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 [[nodiscard]] _CCCL_DEVICE_API inline int __cccl_timespec_get_impl_device(timespec* __ts, int __base) noexcept
-# >>>>>>> END NEW CODE (30ef996b42)
 {
   if (__ts == nullptr || __base != TIME_UTC)
   {

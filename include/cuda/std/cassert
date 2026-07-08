@@ -43,13 +43,10 @@
 #  pragma system_header
 #endif // no system header
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# // NOTE(HIP/AMD): We need to keep the include otherwise we get undefined symbol errors
-# // Internal issue #72. Once issue is fixed we should enable the guard
-# #if !_CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# =======
+// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC, so <cassert> stays included on
+// the HIPRTC path -- this is deliberate; dropping it produced undefined-symbol
+// errors in the fork. Only NVRTC (freestanding) skips it.
 #if _CCCL_HOSTED()
-# >>>>>>> END NEW CODE (e5037ea8b4)
 #  include <cassert>
 #endif // _CCCL_HOSTED()
 #endif // _CUDA_STD_CASSERT

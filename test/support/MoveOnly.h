@@ -37,15 +37,11 @@ class MoveOnly
   int data_;
 
 public:
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// // NOTE(HIP/AMD): Issue #146.
-// #if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
-//   __attribute__((optnone)) 
-// #endif
-//   __host__ __device__ constexpr MoveOnly(int data = 1)
-// =======
+  // NOTE(HIP/AMD): Issue #146.
+#if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
+  __attribute__((optnone))
+#endif
   TEST_FUNC constexpr MoveOnly(int data = 1)
-// >>>>>>> END NEW CODE (5214850b75)
       : data_(data)
   {}
 
@@ -57,15 +53,11 @@ public:
   {
     x.data_ = 0;
   }
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// // NOTE(HIP/AMD): Issue #146.
-// #if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
-//   __attribute__((optnone)) 
-// #endif
-//   __host__ __device__ constexpr MoveOnly& operator=(MoveOnly&& x)
-// =======
+  // NOTE(HIP/AMD): Issue #146.
+#if defined(__HIP_PLATFORM_AMD__) && defined(_CCCL_COMPILER_HIPRTC)
+  __attribute__((optnone))
+#endif
   TEST_FUNC constexpr MoveOnly& operator=(MoveOnly&& x)
-// >>>>>>> END NEW CODE (5214850b75)
   {
     data_   = x.data_;
     x.data_ = 0;

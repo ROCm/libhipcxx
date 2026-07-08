@@ -251,11 +251,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT __tuple<_Tp0, _Tp1, _Tp2, _Tp3, _Tp4, _Tp5,
 };
 
 template <class... _Ts>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE __tuple(_Ts...) -> __tuple<_Ts...>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES __tuple(_Ts...) -> __tuple<_Ts...>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 //
 // __apply(fn, tuple, extra...)
@@ -414,11 +410,7 @@ struct __pair
 };
 
 template <class _First, class _Second>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE __pair(_First, _Second) -> __pair<_First, _Second>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES __pair(_First, _Second) -> __pair<_First, _Second>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 //
 // __tuple_size_v

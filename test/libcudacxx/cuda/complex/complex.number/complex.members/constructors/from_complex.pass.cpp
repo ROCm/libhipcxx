@@ -41,15 +41,9 @@
 #include <cuda/std/type_traits>
 #include <cuda/std/utility>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  include <complex>
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
 #if _CCCL_HOSTED()
 #  include <complex>
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include "test_macros.h"
 
@@ -103,21 +97,13 @@ TEST_FUNC void test_types()
   test_cccl_types<T, U>();
   static_assert(test_cccl_types<T, U>());
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
   // std::complex is not required to support other than standard floating-point types
   if constexpr (cuda::std::__is_std_fp_v<T>)
   {
     NV_IF_TARGET(NV_IS_HOST, (test_constructor_from_complex<T>(std::complex<U>{U(1), U(2)});))
   }
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 }
 
 template <class T>

@@ -39,100 +39,72 @@ else()
   project(C2H LANGUAGES CXX CUDA)
 endif()
 
-# <<<<<<< OLD CODE from f17cf0067f (5c6dd87a64) - COMMENTED OUT
-# cccl_get_catch2()
-# # when CCCL is used from the CTK, C2H does not need to be rebuilt when making local changes to CCCL (faster iteration)
-# option(C2H_USE_CCCL_FROM_CTK "Use CCCL from the CTK in c2h." OFF)
-#
-# if (LIBCUDACXX_ENABLE_HIP)
-#   # NOTE(HIP/AMD): on HIP we don't ship a full CCCL distribution
-#   # (no CUB / Thrust packages), so find_package(CCCL CONFIG REQUIRED)
-#   # would fail looking for lib/cmake/cccl/cccl-config.cmake. The only
-#   # CCCL component we ship is libcudacxx; the parent CMakeLists
-#   # (CMakeLists.txt:245-249) pre-defines CCCL::CCCL as an alias for
-#   # libcudacxx::libcudacxx so that subsequent
-#   # target_link_libraries(... CCCL::CCCL ...) calls in this file resolve
-#   # correctly. Verify the alias actually exists rather than silently
-#   # reaching the link line later with a missing target. Once a HIP-aware
-#   # cccl-config.cmake exists upstream, this whole branch can collapse to
-#   # the unconditional find_package() below.
-#   if (NOT TARGET CCCL::CCCL)
-#     message(FATAL_ERROR
-#       "CCCL::CCCL alias must be pre-defined by the parent project on HIP "
-#       "(see top-level CMakeLists.txt:245-249). Cannot continue without it.")
-#   endif()
-#   find_package(hip REQUIRED)
-#   # NOTE(HIP/AMD): rocThrust 4.x ships under /opt/rocm/lib/cmake/rocthrust
-#   # and provides the 'roc::rocthrust' interface target, which exposes
-#   # the 'thrust::' namespace via Thrust 2.8 with the HIP backend
-#   # selected. Make it OPTIONAL so a HIP install without rocThrust still
-#   # builds the Catch2-only c2h library; consumers (per-test executables)
-#   # that need thrust check 'TARGET roc::rocthrust' before linking and
-#   # otherwise stay out of the build via the LIBCUDACXX_C2H_HIP_SKIP_LIST.
-#   find_package(rocthrust QUIET CONFIG)
-#   if (rocthrust_FOUND)
-#     message(STATUS "Found rocThrust: ${rocthrust_VERSION}")
-#   else()
-#     message(STATUS "rocThrust not found; thrust-using c2h tests will be skip-listed.")
-#   endif()
-#   # NOTE(HIP/AMD): force '-pthread' onto every c2h test executable.
-#   # cuda::__physical_device (in include/cuda/__device/physical_device.h)
-#   # uses 'std::once_flag' on the very first device touch
-#   # (__primary_context, __name, __peers) -- that is, every C2H_CCCLRT_TEST
-#   # that constructs 'cuda::device_ref{0}', 'cuda::stream{...}' or
-#   # '__ensure_current_context'. On glibc < 2.34 (manylinux_2_28 ships
-#   # glibc 2.28) libpthread is still a separate '.so'; libstdc++'s
-#   # 'std::call_once' resolves '__gthread_once' to a weak no-op stub
-#   # when the binary was not linked '-pthread', the stub returns -1, and
-#   # 'call_once' rethrows that as 'std::system_error(-1, generic_category)'
-#   # whose 'what()' is exactly 'Unknown error -1' (== glibc strerror(-1)).
-#   # The callable is *never invoked*, so no HIP API name appears in the
-#   # message, which matched the CCCLRT failure pattern (same source built
-#   # & passing on Ubuntu 22.04 / glibc 2.35 -- where libpthread is folded
-#   # into libc -- and failing only inside the manylinux_2_28 container on
-#   # the same physical host). Propagating Threads::Threads through
-#   # cccl.c2h (INTERFACE) and cccl.c2h.main (PUBLIC) makes every per-test
-#   # executable inherit '-pthread' transitively. NV-only builds are
-#   # unaffected; this is HIP-side only by intention.
-#   set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-#   find_package(Threads REQUIRED)
-# elseif (C2H_USE_CCCL_FROM_CTK)
-#   find_package(CUDAToolkit REQUIRED)
-# else()
-# =======
 # when CCCL is used from the CTK, C2H does not need to be rebuilt when making local changes to CCCL (faster iteration)
 option(C2H_USE_CCCL_FROM_CTK "Use CCCL from the CTK in c2h." OFF)
 
 # Get dependencies.
 cccl_get_catch2()
-if (NOT C2H_USE_CCCL_FROM_CTK)
-# >>>>>>> END NEW CODE (5c6dd87a64)
-  cccl_get_cccl()
+if (LIBCUDACXX_ENABLE_HIP)
+  # NOTE(HIP/AMD): on HIP we don't ship a full CCCL distribution
+  # (no CUB / Thrust packages), so find_package(CCCL CONFIG REQUIRED)
+  # would fail looking for lib/cmake/cccl/cccl-config.cmake. The only
+  # CCCL component we ship is libcudacxx; the parent CMakeLists
+  # (CMakeLists.txt:245-249) pre-defines CCCL::CCCL as an alias for
+  # libcudacxx::libcudacxx so that subsequent
+  # target_link_libraries(... CCCL::CCCL ...) calls in this file resolve
+  # correctly. Verify the alias actually exists rather than silently
+  # reaching the link line later with a missing target. Once a HIP-aware
+  # cccl-config.cmake exists upstream, this whole branch can collapse to
+  # the unconditional find_package() below.
+  if (NOT TARGET CCCL::CCCL)
+    message(FATAL_ERROR
+      "CCCL::CCCL alias must be pre-defined by the parent project on HIP "
+      "(see top-level CMakeLists.txt:245-249). Cannot continue without it.")
+  endif()
+  find_package(hip REQUIRED)
+  # NOTE(HIP/AMD): rocThrust 4.x ships under /opt/rocm/lib/cmake/rocthrust
+  # and provides the 'roc::rocthrust' interface target, which exposes
+  # the 'thrust::' namespace via Thrust 2.8 with the HIP backend
+  # selected. Make it OPTIONAL so a HIP install without rocThrust still
+  # builds the Catch2-only c2h library; consumers (per-test executables)
+  # that need thrust check 'TARGET roc::rocthrust' before linking and
+  # otherwise stay out of the build via the LIBCUDACXX_C2H_HIP_SKIP_LIST.
+  find_package(rocthrust QUIET CONFIG)
+  if (rocthrust_FOUND)
+    message(STATUS "Found rocThrust: ${rocthrust_VERSION}")
+  else()
+    message(STATUS "rocThrust not found; thrust-using c2h tests will be skip-listed.")
+  endif()
+  # NOTE(HIP/AMD): force '-pthread' onto every c2h test executable.
+  # cuda::__physical_device (in include/cuda/__device/physical_device.h)
+  # uses 'std::once_flag' on the very first device touch
+  # (__primary_context, __name, __peers) -- that is, every C2H_CCCLRT_TEST
+  # that constructs 'cuda::device_ref{0}', 'cuda::stream{...}' or
+  # '__ensure_current_context'. On glibc < 2.34 (manylinux_2_28 ships
+  # glibc 2.28) libpthread is still a separate '.so'; libstdc++'s
+  # 'std::call_once' resolves '__gthread_once' to a weak no-op stub
+  # when the binary was not linked '-pthread', the stub returns -1, and
+  # 'call_once' rethrows that as 'std::system_error(-1, generic_category)'
+  # whose 'what()' is exactly 'Unknown error -1' (== glibc strerror(-1)).
+  # The callable is *never invoked*, so no HIP API name appears in the
+  # message, which matched the CCCLRT failure pattern (same source built
+  # & passing on Ubuntu 22.04 / glibc 2.35 -- where libpthread is folded
+  # into libc -- and failing only inside the manylinux_2_28 container on
+  # the same physical host). Propagating Threads::Threads through
+  # cccl.c2h (INTERFACE) and cccl.c2h.main (PUBLIC) makes every per-test
+  # executable inherit '-pthread' transitively. NV-only builds are
+  # unaffected; this is HIP-side only by intention.
+  set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+  find_package(Threads REQUIRED)
+else()
+  if (NOT C2H_USE_CCCL_FROM_CTK)
+    cccl_get_cccl()
+  endif()
+  cccl_get_cudatoolkit()
 endif()
-cccl_get_cudatoolkit()
 
-# <<<<<<< OLD CODE from f17cf0067f (5c6dd87a64) - COMMENTED OUT
-# set(curand_default OFF)
-# if (CUDA_curand_LIBRARY AND NOT LIBCUDACXX_ENABLE_HIP)
-#   set(curand_default ON)
-# endif()
-#
-# option(C2H_ENABLE_CURAND "Use CUDA CURAND library in c2h." ${curand_default})
-# if (LIBCUDACXX_ENABLE_HIP AND C2H_ENABLE_CURAND)
-#   # NOTE(HIP/AMD): on HIP the generators*.cu sources that actually call
-#   # curand* (via C2H_HAS_CURAND=1) aren't compiled -- cccl.c2h is an
-#   # INTERFACE library on HIP (Catch2 framework + helpers only; see the
-#   # add_library branch below). So opting in to C2H_ENABLE_CURAND under
-#   # HIP is a no-op rather than an error. The ROCm equivalent (hipRAND)
-#   # is shipped and supported in /opt/rocm/lib, we just don't wire it
-#   # into the Catch2-only c2h slice today. Status-only message so a
-#   # cross-backend CI matrix doesn't have to special-case the flag.
-#   message(STATUS
-#     "C2H_ENABLE_CURAND is a no-op under HIP: c2h is built as Catch2-only "
-#     "INTERFACE here and generators*.cu (the curand consumer) is skipped.")
-# =======
 set(has_curand OFF)
-if (TARGET CUDA::curand)
+if (TARGET CUDA::curand AND NOT LIBCUDACXX_ENABLE_HIP)
   set(has_curand ON)
 endif()
 
@@ -140,12 +112,25 @@ option(C2H_ENABLE_CURAND "Use CUDA CURAND library in c2h." ${has_curand})
 
 # Disable C2H_ENABLE_CURAND if cuRAND is unavailable.
 if (C2H_ENABLE_CURAND AND NOT has_curand)
-  message(
-    WARNING
-    "C2H_ENABLE_CURAND is requested, but CUDA::curand is unavailable. Disabling."
-  )
+  # NOTE(HIP/AMD): on HIP the generators*.cu sources that actually call
+  # curand* (via C2H_HAS_CURAND=1) aren't compiled -- cccl.c2h is an
+  # INTERFACE library on HIP (Catch2 framework + helpers only; see the
+  # add_library branch below). So opting in to C2H_ENABLE_CURAND under
+  # HIP is a no-op rather than an error. The ROCm equivalent (hipRAND)
+  # is shipped and supported in /opt/rocm/lib, we just don't wire it
+  # into the Catch2-only c2h slice today. Status-only message so a
+  # cross-backend CI matrix doesn't have to special-case the flag.
+  if (LIBCUDACXX_ENABLE_HIP)
+    message(STATUS
+      "C2H_ENABLE_CURAND is a no-op under HIP: c2h is built as Catch2-only "
+      "INTERFACE here and generators*.cu (the curand consumer) is skipped.")
+  else()
+    message(
+      WARNING
+      "C2H_ENABLE_CURAND is requested, but CUDA::curand is unavailable. Disabling."
+    )
+  endif()
   set(C2H_ENABLE_CURAND OFF)
-# >>>>>>> END NEW CODE (5c6dd87a64)
 endif()
 
 # Library sources: under HIP the thrust-heavy generators*.cu translation

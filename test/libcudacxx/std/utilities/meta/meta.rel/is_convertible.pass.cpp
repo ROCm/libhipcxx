@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -164,15 +164,9 @@ int main(int, char**)
   static_assert((!cuda::std::is_convertible<Array, volatile Array&>::value));
 #endif // !_LIBCUDACXX_USE_IS_CONVERTIBLE_FALLBACK
 
-// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
-//   static_assert((cuda::std::is_convertible<Array, Array&&>::value), "");
-//   static_assert((cuda::std::is_convertible<Array, const Array&&>::value), "");
-// #if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-// =======
   static_assert((cuda::std::is_convertible<Array, Array&&>::value));
   static_assert((cuda::std::is_convertible<Array, const Array&&>::value));
-#if !TEST_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (ac28a5deba)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   // No idea why this fails under NVRTC.
   // TODO: File a compiler bug
   static_assert((cuda::std::is_convertible<Array, volatile Array&&>::value));
@@ -218,13 +212,8 @@ int main(int, char**)
   static_assert((!cuda::std::is_convertible<const Array&, char*>::value));
   static_assert((cuda::std::is_convertible<const Array&, const char*>::value));
 
-// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
-//   static_assert((cuda::std::is_convertible<Array, StringType>::value), "");
-// #if !TEST_COMPILER(MSVC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-// =======
   static_assert((cuda::std::is_convertible<Array, StringType>::value));
-#if !TEST_COMPILER(MSVC) && !TEST_COMPILER(NVRTC)
-// >>>>>>> END NEW CODE (ac28a5deba)
+#if !TEST_COMPILER(MSVC) && !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   // TODO: Investigate why this is failing.
   static_assert((cuda::std::is_convertible<char (&)[], StringType>::value));
 #endif // !TEST_COMPILER(MSVC) && !TEST_COMPILER(NVRTC)

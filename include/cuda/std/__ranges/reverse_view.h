@@ -176,11 +176,7 @@ public:
 };
 
 template <class _Range>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE reverse_view(_Range&&) -> reverse_view<::cuda::std::ranges::views::all_t<_Range>>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES reverse_view(_Range&&) -> reverse_view<::cuda::std::ranges::views::all_t<_Range>>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 template <class _Tp>
 inline constexpr bool enable_borrowed_range<reverse_view<_Tp>> = enable_borrowed_range<_Tp>;

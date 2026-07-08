@@ -49,17 +49,14 @@
 #  include <cuda/std/__type_traits/integral_constant.h>
 #  include <cuda/std/__type_traits/is_same.h>
 
-// <<<<<<< OLD CODE from cfac2f6346 (521ff4297e) - COMMENTED OUT
-// // NOTE(HIP/AMD): the CUDA vector type names (char1, uint3, float4, ...) are
-// // provided on HIP by <hip/hip_vector_types.h> as HIP_vector_type<T,N> aliases.
-// #  if _CCCL_HIP_COMPILATION()
-// #    include <hip/hip_vector_types.h>
-// #  elif !_CCCL_CUDA_COMPILATION()
-// #    include <vector_types.h>
-// #  endif // vector type definitions
-//
-// =======
-// >>>>>>> END NEW CODE (521ff4297e)
+// NOTE(HIP/AMD): the CUDA vector type names (char1, uint3, float4, ...) are
+// provided on HIP by <hip/hip_vector_types.h> as HIP_vector_type<T,N> aliases.
+#  if _CCCL_HIP_COMPILATION()
+#    include <hip/hip_vector_types.h>
+#  elif !_CCCL_CUDA_COMPILATION()
+#    include <vector_types.h>
+#  endif // vector type definitions
+
 #  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
@@ -67,177 +64,15 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 // vector_type
 
 template <class _Tp, ::cuda::std::size_t _Size>
-// <<<<<<< OLD CODE from cfac2f6346 (521ff4297e) - COMMENTED OUT
-// [[nodiscard]] _CCCL_API _CCCL_CONSTEVAL auto __cccl_vector_type_t_impl() noexcept
-// {
-//   // NOTE(HIP/AMD): the element type of HIP's charN is plain `char` (not the
-//   // `signed char` used by CUDA), matching the tuple-element specialization in
-//   // <cuda/std/__tuple_dir/vector_types.h>. Map `char` -> charN on HIP so that
-//   // vector_type_t and scalar_type_t stay consistent.
-// #  if _CCCL_HIP_COMPILATION()
-//   if constexpr (::cuda::std::is_same_v<_Tp, char>)
-// #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-//   if constexpr (::cuda::std::is_same_v<_Tp, signed char>)
-// #  endif // !_CCCL_HIP_COMPILATION()
-//   {
-//     if constexpr (_Size == 1)
-//     {
-//       return ::char1{};
-//     }
-//     else if constexpr (_Size == 2)
-//     {
-//       return ::char2{};
-//     }
-//     else if constexpr (_Size == 3)
-//     {
-//       return ::char3{};
-//     }
-//     else if constexpr (_Size == 4)
-//     {
-//       return ::char4{};
-//     }
-//     else
-//     {
-//       return;
-//     }
-//   }
-//   else if constexpr (::cuda::std::is_same_v<_Tp, unsigned char>)
-//   {
-//     if constexpr (_Size == 1)
-//     {
-//       return ::uchar1{};
-//     }
-//     else if constexpr (_Size == 2)
-//     {
-//       return ::uchar2{};
-//     }
-//     else if constexpr (_Size == 3)
-//     {
-//       return ::uchar3{};
-//     }
-//     else if constexpr (_Size == 4)
-//     {
-//       return ::uchar4{};
-//     }
-//     else
-//     {
-//       return;
-//     }
-//   }
-//   else if constexpr (::cuda::std::is_same_v<_Tp, short>)
-//   {
-//     if constexpr (_Size == 1)
-//     {
-//       return ::short1{};
-//     }
-//     else if constexpr (_Size == 2)
-//     {
-//       return ::short2{};
-//     }
-//     else if constexpr (_Size == 3)
-//     {
-//       return ::short3{};
-//     }
-//     else if constexpr (_Size == 4)
-//     {
-//       return ::short4{};
-//     }
-//     else
-//     {
-//       return;
-//     }
-//   }
-//   else if constexpr (::cuda::std::is_same_v<_Tp, unsigned short>)
-//   {
-//     if constexpr (_Size == 1)
-//     {
-//       return ::ushort1{};
-//     }
-//     else if constexpr (_Size == 2)
-//     {
-//       return ::ushort2{};
-//     }
-//     else if constexpr (_Size == 3)
-//     {
-//       return ::ushort3{};
-//     }
-//     else if constexpr (_Size == 4)
-//     {
-//       return ::ushort4{};
-//     }
-//     else
-//     {
-//       return;
-//     }
-//   }
-//   else if constexpr (::cuda::std::is_same_v<_Tp, int>)
-//   {
-//     if constexpr (_Size == 1)
-//     {
-//       return ::int1{};
-//     }
-//     else if constexpr (_Size == 2)
-//     {
-//       return ::int2{};
-//     }
-//     else if constexpr (_Size == 3)
-//     {
-//       return ::int3{};
-//     }
-//     else if constexpr (_Size == 4)
-//     {
-//       return ::int4{};
-//     }
-//     else
-//     {
-//       return;
-//     }
-//   }
-//   else if constexpr (::cuda::std::is_same_v<_Tp, unsigned>)
-//   {
-//     if constexpr (_Size == 1)
-//     {
-//       return ::uint1{};
-//     }
-//     else if constexpr (_Size == 2)
-//     {
-//       return ::uint2{};
-//     }
-//     else if constexpr (_Size == 3)
-//     {
-//       return ::uint3{};
-//     }
-//     else if constexpr (_Size == 4)
-//     {
-//       return ::uint4{};
-//     }
-//     else
-//     {
-//       return;
-//     }
-//   }
-//   else if constexpr (::cuda::std::is_same_v<_Tp, long>)
-//   {
-//     if constexpr (_Size == 1)
-//     {
-//       return ::long1{};
-//     }
-//     else if constexpr (_Size == 2)
-//     {
-//       return ::long2{};
-//     }
-//     else if constexpr (_Size == 3)
-//     {
-//       return ::long3{};
-//     }
-//     else if constexpr (_Size == 4)
-//     {
-// =======
 struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type
 {
   using type = void;
 };
 
+// NOTE(HIP/AMD): the element type of HIP's charN is plain `char` (not the
+// `signed char` used by CUDA), matching the tuple-element specialization in
+// <cuda/std/__tuple_dir/vector_types.h>. Map `char` -> charN on HIP so that
+// vector_type_t and scalar_type_t stay consistent.
 template <>
 struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<signed char, 1>
 {
@@ -258,6 +93,29 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<signed char, 4>
 {
   using type = ::char4;
 };
+
+#  if _CCCL_HIP_COMPILATION()
+template <>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<char, 1>
+{
+  using type = ::char1;
+};
+template <>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<char, 2>
+{
+  using type = ::char2;
+};
+template <>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<char, 3>
+{
+  using type = ::char3;
+};
+template <>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<char, 4>
+{
+  using type = ::char4;
+};
+#  endif // _CCCL_HIP_COMPILATION()
 
 template <>
 struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<unsigned char, 1>
@@ -382,7 +240,6 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<long, 3>
 template <>
 struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<long, 4>
 {
-// >>>>>>> END NEW CODE (521ff4297e)
 #  if _CCCL_CTK_AT_LEAST(13, 0)
   using type = ::long4_32a;
 #  else // ^^^ _CCCL_CTK_AT_LEAST(13, 0) ^^^ / vvv _CCCL_CTK_BELOW(13, 0) vvv

@@ -63,17 +63,16 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 template <class _Tp>
 [[nodiscard]] _CCCL_API inline _Tp* get_device_address(_Tp& __device_object)
 {
-// <<<<<<< OLD CODE from 32ae5dd161 (f10906c3c2) - COMMENTED OUT
-//   NV_IF_ELSE_TARGET(
-//     NV_IS_DEVICE,
-//     (return ::cuda::std::addressof(__device_object);),
-//     (void* __device_ptr = nullptr; _CCCL_TRY_CUDA_API(
-//        ::hipGetSymbolAddress,
-//        "failed to call cudaGetSymbolAddress in cuda::get_device_address",
-//        &__device_ptr,
-//        __device_object);
-//      return static_cast<_Tp*>(__device_ptr);))
-// =======
+#  if _CCCL_HIP_COMPILATION()
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (return ::cuda::std::addressof(__device_object);), ({
+                      void* __device_ptr = nullptr; //
+                      _CCCL_TRY_CUDA_API(::hipGetSymbolAddress,
+                                         "failed to call cudaGetSymbolAddress in cuda::get_device_address",
+                                         &__device_ptr,
+                                         __device_object);
+                      return static_cast<_Tp*>(__device_ptr);
+                    }))
+#  else
   NV_IF_ELSE_TARGET(NV_IS_DEVICE, (return ::cuda::std::addressof(__device_object);), ({
                       void* __device_ptr = nullptr; //
                       _CCCL_TRY_CUDA_API(::cudaGetSymbolAddress,
@@ -82,10 +81,10 @@ template <class _Tp>
                                          __device_object);
                       return static_cast<_Tp*>(__device_ptr);
                     }))
-// >>>>>>> END NEW CODE (f10906c3c2)
+#  endif
 }
 
-#  if !_CCCL_COMPILER(NVRTC)
+#  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 //! @brief Returns the address of the passed \c __device_object for the passed \c __device.
 //!
 //! @param __device_object The object residing in device memory.
@@ -99,13 +98,20 @@ template <class _Tp>
 {
   __ensure_current_context __ctx{__device};
   void* __device_ptr{};
+#  if _CCCL_HIP_COMPILATION()
+  _CCCL_TRY_CUDA_API(::hipGetSymbolAddress,
+                     "failed to call cudaGetSymbolAddress in cuda::get_device_address",
+                     &__device_ptr,
+                     __device_object);
+#  else
   _CCCL_TRY_CUDA_API(::cudaGetSymbolAddress,
                      "failed to call cudaGetSymbolAddress in cuda::get_device_address",
                      &__device_ptr,
                      __device_object);
+#  endif
   return static_cast<_Tp*>(__device_ptr);
 }
-#  endif // !_CCCL_COMPILER(NVRTC)
+#  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 _CCCL_END_NAMESPACE_CUDA
 
