@@ -55,7 +55,7 @@
       case ::cudaSuccess:                                        \
         break;                                                   \
       default:                                                   \
-        ::cudaGetLastError(); /* clear CUDA error state */       \
+        (void) ::cudaGetLastError(); /* clear CUDA error state */ \
         _CCCL_THROW(::cuda::cuda_error, __status, _MSG, #_NAME); \
     }                                                            \
   } while (0)
