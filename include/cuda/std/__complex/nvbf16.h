@@ -105,7 +105,17 @@ struct __cccl_complex_overload_traits<__nv_bfloat16, false, false>
 template <>
 class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) complex<__nv_bfloat16>
 {
+// NOTE(HIP/AMD): __hip_bfloat162 has user-defined copy constructor/assignment making it
+// non-trivially-copyable, which would propagate to complex<__nv_bfloat16> and break the
+// is_trivially_copyable guarantee.  On HIP we store two scalar fields instead and
+// construct __nv_bfloat162 on the fly for vectorized arithmetic.  On NVIDIA we keep
+// the original __nv_bfloat162 storage for maximum performance.
+#  if defined(__HIP_PLATFORM_AMD__)
+  __nv_bfloat16 __re_;
+  __nv_bfloat16 __im_;
+#  else
   __nv_bfloat162 __repr_;
+#  endif // defined(__HIP_PLATFORM_AMD__)
 
   template <class _Up>
   friend class complex;
@@ -132,9 +142,16 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) compl
 public:
   using value_type = __nv_bfloat16;
 
+#  if defined(__HIP_PLATFORM_AMD__)
+  _CCCL_API inline complex(const value_type& __re = value_type(), const value_type& __im = value_type()) noexcept
+      : __re_(__re)
+      , __im_(__im)
+  {}
+#  else
   _CCCL_API inline complex(const value_type& __re = value_type(), const value_type& __im = value_type()) noexcept
       : __repr_(__re, __im)
   {}
+#  endif // defined(__HIP_PLATFORM_AMD__)
 
 #  if !_CCCL_COMPILER(GCC, <, 10) // Old GCC considers those as deleted
   _CCCL_HIDE_FROM_ABI complex(const complex&) noexcept = default;
@@ -146,28 +163,48 @@ public:
 
   template <class _Up, enable_if_t<__cccl_internal::__is_non_narrowing_convertible<value_type, _Up>::value, int> = 0>
   _CCCL_API inline complex(const complex<_Up>& __c) noexcept
+#  if defined(__HIP_PLATFORM_AMD__)
+      : __re_(__convert_to_bfloat16(__c.real()))
+      , __im_(__convert_to_bfloat16(__c.imag()))
+#  else
       : __repr_(__convert_to_bfloat16(__c.real()), __convert_to_bfloat16(__c.imag()))
+#  endif // defined(__HIP_PLATFORM_AMD__)
   {}
 
   template <class _Up,
             enable_if_t<!__cccl_internal::__is_non_narrowing_convertible<value_type, _Up>::value, int> = 0,
             enable_if_t<is_constructible_v<value_type, _Up>, int>                                      = 0>
   _CCCL_API inline explicit complex(const complex<_Up>& __c) noexcept
+#  if defined(__HIP_PLATFORM_AMD__)
+      : __re_(__convert_to_bfloat16(__c.real()))
+      , __im_(__convert_to_bfloat16(__c.imag()))
+#  else
       : __repr_(__convert_to_bfloat16(__c.real()), __convert_to_bfloat16(__c.imag()))
+#  endif // defined(__HIP_PLATFORM_AMD__)
   {}
 
   _CCCL_API inline complex& operator=(const value_type& __re) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __re_ = __re;
+    __im_ = value_type();
+#  else
     __repr_.x = __re;
     __repr_.y = value_type();
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return *this;
   }
 
   template <class _Up>
   _CCCL_API inline complex& operator=(const complex<_Up>& __c) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __re_ = __convert_to_bfloat16(__c.real());
+    __im_ = __convert_to_bfloat16(__c.imag());
+#  else
     __repr_.x = __convert_to_bfloat16(__c.real());
     __repr_.y = __convert_to_bfloat16(__c.imag());
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return *this;
   }
 
@@ -175,90 +212,162 @@ public:
 #  if _CCCL_HOSTED()
   template <class _Up>
   _CCCL_API inline complex(const ::std::complex<_Up>& __other) noexcept
+#    if defined(__HIP_PLATFORM_AMD__)
+      : __re_(_LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__other))
+      , __im_(_LIBCUDACXX_ACCESS_STD_COMPLEX_IMAG(__other))
+#    else
       : __repr_(_LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__other), _LIBCUDACXX_ACCESS_STD_COMPLEX_IMAG(__other))
+#    endif // defined(__HIP_PLATFORM_AMD__)
   {}
 
   template <class _Up>
   _CCCL_API inline complex& operator=(const ::std::complex<_Up>& __other) noexcept
   {
+#    if defined(__HIP_PLATFORM_AMD__)
+    __re_ = _LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__other);
+    __im_ = _LIBCUDACXX_ACCESS_STD_COMPLEX_IMAG(__other);
+#    else
     __repr_.x = _LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__other);
     __repr_.y = _LIBCUDACXX_ACCESS_STD_COMPLEX_IMAG(__other);
+#    endif // defined(__HIP_PLATFORM_AMD__)
     return *this;
   }
 
   _CCCL_HOST_API operator ::std::complex<value_type>() const noexcept
   {
+#    if defined(__HIP_PLATFORM_AMD__)
+    return {__re_, __im_};
+#    else
     return {__repr_.x, __repr_.y};
+#    endif // defined(__HIP_PLATFORM_AMD__)
   }
 #  endif // _CCCL_HOSTED()
 
   [[nodiscard]] _CCCL_API inline value_type real() const
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return __re_;
+#  else
     return __repr_.x;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
   [[nodiscard]] _CCCL_API inline value_type imag() const
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return __im_;
+#  else
     return __repr_.y;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 
   _CCCL_API inline void real(value_type __re)
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __re_ = __re;
+#  else
     __repr_.x = __re;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
   _CCCL_API inline void imag(value_type __im)
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __im_ = __im;
+#  else
     __repr_.y = __im;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 
   // Those additional volatile overloads are meant to help with reductions in thrust
   [[nodiscard]] _CCCL_API inline value_type real() const volatile
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return __re_;
+#  else
     return __repr_.x;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
   [[nodiscard]] _CCCL_API inline value_type imag() const volatile
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return __im_;
+#  else
     return __repr_.y;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 
   _CCCL_API inline complex& operator+=(const value_type& __re)
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __re_ = ::__hadd(__re_, __re);
+#  else
     __repr_.x = ::__hadd(__repr_.x, __re);
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return *this;
   }
   _CCCL_API inline complex& operator-=(const value_type& __re)
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __re_ = ::__hsub(__re_, __re);
+#  else
     __repr_.x = ::__hsub(__repr_.x, __re);
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return *this;
   }
   _CCCL_API inline complex& operator*=(const value_type& __re)
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __re_ = ::__hmul(__re_, __re);
+    __im_ = ::__hmul(__im_, __re);
+#  else
     __repr_.x = ::__hmul(__repr_.x, __re);
     __repr_.y = ::__hmul(__repr_.y, __re);
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return *this;
   }
   _CCCL_API inline complex& operator/=(const value_type& __re)
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __re_ = ::__hdiv(__re_, __re);
+    __im_ = ::__hdiv(__im_, __re);
+#  else
     __repr_.x = ::__hdiv(__repr_.x, __re);
     __repr_.y = ::__hdiv(__repr_.y, __re);
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return *this;
   }
 
   // We can utilize vectorized operations for those operators
   _CCCL_API inline friend complex& operator+=(complex& __lhs, const complex& __rhs) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __nv_bfloat162 __tmp = ::__hadd2(__nv_bfloat162(__lhs.__re_, __lhs.__im_), __nv_bfloat162(__rhs.__re_, __rhs.__im_));
+    __lhs.__re_ = __tmp.x;
+    __lhs.__im_ = __tmp.y;
+#  else
     __lhs.__repr_ = ::__hadd2(__lhs.__repr_, __rhs.__repr_);
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return __lhs;
   }
 
   _CCCL_API inline friend complex& operator-=(complex& __lhs, const complex& __rhs) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    __nv_bfloat162 __tmp = ::__hsub2(__nv_bfloat162(__lhs.__re_, __lhs.__im_), __nv_bfloat162(__rhs.__re_, __rhs.__im_));
+    __lhs.__re_ = __tmp.x;
+    __lhs.__im_ = __tmp.y;
+#  else
     __lhs.__repr_ = ::__hsub2(__lhs.__repr_, __rhs.__repr_);
+#  endif // defined(__HIP_PLATFORM_AMD__)
     return __lhs;
   }
 
   [[nodiscard]] _CCCL_API inline friend bool operator==(const complex& __lhs, const complex& __rhs) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return ::__hbeq2(__nv_bfloat162(__lhs.__re_, __lhs.__im_), __nv_bfloat162(__rhs.__re_, __rhs.__im_));
+#  else
     return ::__hbeq2(__lhs.__repr_, __rhs.__repr_);
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 };
 
@@ -300,25 +409,41 @@ struct __get_complex_impl<__nv_bfloat16>
   template <size_t _Index>
   [[nodiscard]] static _CCCL_API constexpr __nv_bfloat16& get(complex<__nv_bfloat16>& __z) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return (_Index == 0) ? __z.__re_ : __z.__im_;
+#  else
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 
   template <size_t _Index>
   [[nodiscard]] static _CCCL_API constexpr __nv_bfloat16&& get(complex<__nv_bfloat16>&& __z) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return ::cuda::std::move((_Index == 0) ? __z.__re_ : __z.__im_);
+#  else
     return ::cuda::std::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 
   template <size_t _Index>
   [[nodiscard]] static _CCCL_API constexpr const __nv_bfloat16& get(const complex<__nv_bfloat16>& __z) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return (_Index == 0) ? __z.__re_ : __z.__im_;
+#  else
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 
   template <size_t _Index>
   [[nodiscard]] static _CCCL_API constexpr const __nv_bfloat16&& get(const complex<__nv_bfloat16>&& __z) noexcept
   {
+#  if defined(__HIP_PLATFORM_AMD__)
+    return ::cuda::std::move((_Index == 0) ? __z.__re_ : __z.__im_);
+#  else
     return ::cuda::std::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
+#  endif // defined(__HIP_PLATFORM_AMD__)
   }
 };
 

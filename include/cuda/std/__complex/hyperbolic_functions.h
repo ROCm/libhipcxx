@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___COMPLEX_HYPERBOLIC_FUNCTIONS_H
 #define _CUDA_STD___COMPLEX_HYPERBOLIC_FUNCTIONS_H
 
@@ -316,6 +338,32 @@ template <class _Tp>
 template <>
 _CCCL_API inline complex<__half> cosh(const complex<__half>& __x) noexcept
 {
+#  if defined(__HIP_PLATFORM_AMD__)
+  // NOTE(HIP/AMD): With -O3 on AMDGCN the sign of zero may not be preserved through
+  // the intermediate float multiplication chain (positive_zero * negative_zero = +0.0f
+  // instead of -0.0f). Special-case inputs where imag==0 (the sign-sensitive cases):
+  //
+  // Case 1: (±0, ±0): cosh(±0 + ±0i) = (1, ±0) where the imaginary sign is
+  //         signbit(real) XOR signbit(imag) per the standard identity
+  //         cosh(-z)=cosh(z) and cosh(conj(z))=conj(cosh(z)).
+  //
+  // Case 2: (±inf, ±0): cosh(±inf + ±0i) = (+inf, ±0) with the same sign rule.
+  //
+  // Delegate all other cases to float.
+  if (__x.imag() == __half(0))
+  {
+    const bool __imag_neg = ::cuda::std::signbit(__x.real()) ^ ::cuda::std::signbit(__x.imag());
+    const __half __imag_zero = __imag_neg ? __half(-0.0f) : __half(0.0f);
+    if (__x.real() == __half(0))
+    {
+      return complex<__half>(__half(1), __imag_zero);
+    }
+    if (::cuda::std::isinf(__x.real()))
+    {
+      return complex<__half>(::cuda::std::numeric_limits<__half>::infinity(), __imag_zero);
+    }
+  }
+#  endif // defined(__HIP_PLATFORM_AMD__)
   return complex<__half>{::cuda::std::cosh(complex<float>{__x})};
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
@@ -324,6 +372,22 @@ _CCCL_API inline complex<__half> cosh(const complex<__half>& __x) noexcept
 template <>
 _CCCL_API inline complex<__nv_bfloat16> cosh(const complex<__nv_bfloat16>& __x) noexcept
 {
+#  if defined(__HIP_PLATFORM_AMD__)
+  // NOTE(HIP/AMD): Same sign-of-zero preservation issue as complex<__half> above.
+  if (__x.imag() == __nv_bfloat16(0))
+  {
+    const bool __imag_neg = ::cuda::std::signbit(__x.real()) ^ ::cuda::std::signbit(__x.imag());
+    const __nv_bfloat16 __imag_zero = __imag_neg ? __nv_bfloat16(-0.0f) : __nv_bfloat16(0.0f);
+    if (__x.real() == __nv_bfloat16(0))
+    {
+      return complex<__nv_bfloat16>(__nv_bfloat16(1), __imag_zero);
+    }
+    if (::cuda::std::isinf(__x.real()))
+    {
+      return complex<__nv_bfloat16>(::cuda::std::numeric_limits<__nv_bfloat16>::infinity(), __imag_zero);
+    }
+  }
+#  endif // defined(__HIP_PLATFORM_AMD__)
   return complex<__nv_bfloat16>{::cuda::std::cosh(complex<float>{__x})};
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()

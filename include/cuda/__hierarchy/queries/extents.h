@@ -45,6 +45,13 @@
 
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
+// NOTE(HIP/AMD): _CCCL_HIP_WAVE_SIZE is needed for compile-time warp/wave
+// size in template parameters; it equals 64 on GFX9 (MI200/MI300) and 32
+// on RDNA (GFX10+/GFX11/GFX12).
+#  if _CCCL_HIP_COMPILATION()
+#    include <libhipcxx/__amd/amd_utils.h>
+#  endif
+
 #  include <cuda/__cmath/ceil_div.h>
 #  include <cuda/__fwd/hierarchy.h>
 #  include <cuda/__hierarchy/traits.h>
@@ -199,7 +206,14 @@ template <>
 struct __extents_query_native<thread_level, warp_level>
 {
   template <class _Tp>
+  // NOTE(HIP/AMD): wave size is 64 on GFX9 (MI200/MI300), 32 on RDNA; use
+  // _CCCL_HIP_WAVE_SIZE so the static extent in the return type matches the
+  // actual hardware wavefront size at compile time.
+#if _CCCL_HIP_COMPILATION()
+  [[nodiscard]] _CCCL_DEVICE_API static ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE> __call() noexcept
+#else
   [[nodiscard]] _CCCL_DEVICE_API static ::cuda::std::extents<_Tp, 32> __call() noexcept
+#endif // _CCCL_HIP_COMPILATION()
   {
     return {};
   }
@@ -223,7 +237,13 @@ struct __extents_query_native<warp_level, block_level>
   [[nodiscard]] _CCCL_DEVICE_API static ::cuda::std::dims<1, _Tp> __call() noexcept
   {
     const auto __thread_count = blockDim.x * blockDim.y * blockDim.z;
+#if _CCCL_HIP_COMPILATION()
+    // NOTE(HIP/AMD): _CCCL_HIP_WAVE_SIZE is the wavefront size (64 on GFX9, 32 on
+    // RDNA); device pass only, so it resolves to the target hardware value.
+    return ::cuda::std::dims<1, _Tp>{static_cast<_Tp>(::cuda::ceil_div(__thread_count, _CCCL_HIP_WAVE_SIZE))};
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
     return ::cuda::std::dims<1, _Tp>{static_cast<_Tp>(::cuda::ceil_div(__thread_count, 32))};
+#endif // !_CCCL_HIP_COMPILATION()
   }
 };
 
@@ -281,7 +301,13 @@ template <>
 struct __extents_query<thread_level, warp_level>
 {
   template <class _Tp, class _Hierarchy>
+  // NOTE(HIP/AMD): wave size is 64 on GFX9 (MI200/MI300), 32 on RDNA/CUDA;
+  // use _CCCL_HIP_WAVE_SIZE so the static extent matches the hardware wavefront.
+#if _CCCL_HIP_COMPILATION()
+  [[nodiscard]] _CCCL_API static constexpr ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE> __call(const _Hierarchy&) noexcept
+#else
   [[nodiscard]] _CCCL_API static constexpr ::cuda::std::extents<_Tp, 32> __call(const _Hierarchy&) noexcept
+#endif // _CCCL_HIP_COMPILATION()
   {
     static_assert(__has_bottom_unit_or_level_v<thread_level, _Hierarchy>, "_Hierarchy doesn't contain thread_level");
     static_assert(_Hierarchy::template has_level<block_level>(), "_Hierarchy doesn't contain block_level");
@@ -298,13 +324,29 @@ struct __extents_query<warp_level, _Level>
     auto __block_exts = __extents_query<thread_level, block_level>::template __call<_Tp>(__hier);
     using _BlockExts  = decltype(__block_exts);
 
+    // NOTE(HIP/AMD): wave size is 64 on GFX9 (MI200/MI300), 32 on RDNA/CUDA.
+    // Use _CCCL_HIP_WAVE_SIZE for the compile-time warp count; warpSize for
+    // the runtime count (matches the hardware wavefront on both backends).
+#if _CCCL_HIP_COMPILATION()
+    constexpr unsigned __wave_size = _CCCL_HIP_WAVE_SIZE;
+#else
+    constexpr unsigned __wave_size = 32;
+#endif // _CCCL_HIP_COMPILATION()
+
     if constexpr (_BlockExts::rank_dynamic() == 0)
     {
       constexpr auto __static_thread_count =
         _BlockExts::static_extent(0) * _BlockExts::static_extent(1) * _BlockExts::static_extent(2);
-      static_assert(__static_thread_count >= 32, "_Hierarchy doesn't contain enough threads to fill a single warp");
+      // NOTE(HIP/AMD): on HIP, partial wavefronts are valid (a block with fewer
+      // threads than the wave size still occupies one wavefront). The NVIDIA
+      // assertion >= 32 is relaxed to >= 1 on HIP; ceil_div handles the count.
+#if !_CCCL_HIP_COMPILATION()
+      static_assert(__static_thread_count >= __wave_size, "_Hierarchy doesn't contain enough threads to fill a single warp");
+#else
+      static_assert(__static_thread_count >= 1, "_Hierarchy must contain at least one thread");
+#endif // !_CCCL_HIP_COMPILATION()
 
-      constexpr auto __static_warp_count = ::cuda::ceil_div(__static_thread_count, 32);
+      constexpr auto __static_warp_count = ::cuda::ceil_div(__static_thread_count, __wave_size);
       ::cuda::std::extents<_Tp, __static_warp_count> __curr_exts{};
       if constexpr (::cuda::std::is_same_v<_Level, block_level>)
       {
@@ -319,9 +361,18 @@ struct __extents_query<warp_level, _Level>
     else
     {
       const auto __thread_count = __block_exts.extent(0) * __block_exts.extent(1) * __block_exts.extent(2);
-      _CCCL_ASSERT(__thread_count >= 32, "_Hierarchy doesn't contain enough threads to fill a single warp");
+      // NOTE(HIP/AMD): partial wavefronts are valid on HIP; relax the assert.
+#if !_CCCL_HIP_COMPILATION()
+      _CCCL_ASSERT(__thread_count >= __wave_size, "_Hierarchy doesn't contain enough threads to fill a single warp");
+#else
+      _CCCL_ASSERT(__thread_count >= 1, "_Hierarchy must contain at least one thread");
+#endif // !_CCCL_HIP_COMPILATION()
 
-      const auto __warp_count = static_cast<_Tp>(::cuda::ceil_div(__thread_count, 32));
+      // NOTE(HIP/AMD): __wave_size resolves to _CCCL_HIP_WAVE_SIZE on HIP (64 on
+      // GFX9, 32 on RDNA) and to the literal 32 on NVIDIA. Do NOT use the device
+      // builtin warpSize here: this is a host+device (_CCCL_API) function and
+      // warpSize is undefined in the host compilation pass on NVIDIA.
+      const auto __warp_count = static_cast<_Tp>(::cuda::ceil_div(__thread_count, __wave_size));
       ::cuda::std::dims<1, _Tp> __curr_exts{__warp_count};
       if constexpr (::cuda::std::is_same_v<_Level, block_level>)
       {

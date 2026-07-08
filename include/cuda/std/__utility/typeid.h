@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___UTILITY_TYPEID_H
 #define _CUDA_STD___UTILITY_TYPEID_H
 
@@ -339,6 +361,53 @@ struct __type_info
   __type_info(__type_info const&)            = delete;
   __type_info& operator=(__type_info const&) = delete;
 
+  // NOTE(HIP/AMD): In HIP compilation __CUDA_ARCH__ is never defined (not even in device
+  // compilation passes), so this host-fallback block is compiled in all passes. Use
+  // _CCCL_HIDE_FROM_ABI (= inline, no __host__ restriction) instead of _CCCL_HOST_API
+  // so that __host__ __device__ functions (e.g. fake_main in force_include_hip.h) can
+  // call these methods without triggering "reference to __host__ function" errors.
+  // On NVIDIA/CUDA, __CUDA_ARCH__ IS defined in device passes, so this block is host-only
+  // and the distinction between _CCCL_HOST_API and _CCCL_HIDE_FROM_ABI is irrelevant.
+#if _CCCL_HIP_COMPILATION()
+  _CCCL_HIDE_FROM_ABI constexpr __type_info(__string_view __name) noexcept
+      : __name_(__name)
+  {}
+
+  [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr char const* name() const noexcept
+  {
+    return __name_.begin();
+  }
+
+  [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr __string_view __name_view() const noexcept
+  {
+    return __name_;
+  }
+
+  [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr bool before(const __type_info& __other) const noexcept
+  {
+    return __name_ < __other.__name_;
+  }
+
+  // Not yet implemented:
+  // [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr size_t hash_code() const noexcept
+  // {
+  //   return ;
+  // }
+
+  [[nodiscard]] _CCCL_HIDE_FROM_ABI friend constexpr bool
+  operator==(const __type_info& __lhs, const __type_info& __rhs) noexcept
+  {
+    return &__lhs == &__rhs || __lhs.__name_ == __rhs.__name_;
+  }
+
+#  if _CCCL_STD_VER <= 2017
+  [[nodiscard]]
+  _CCCL_HIDE_FROM_ABI friend constexpr bool operator!=(const __type_info& __lhs, const __type_info& __rhs) noexcept
+  {
+    return !(__lhs == __rhs);
+  }
+#  endif // _CCCL_STD_VER <= 2017
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
   _CCCL_HOST_API constexpr __type_info(__string_view __name) noexcept
       : __name_(__name)
   {}
@@ -377,6 +446,7 @@ struct __type_info
     return !(__lhs == __rhs);
   }
 #  endif // _CCCL_STD_VER <= 2017
+#endif // !_CCCL_HIP_COMPILATION()
 
 private:
   __string_view __name_;
@@ -394,7 +464,14 @@ _CCCL_GLOBAL_CONSTANT __type_info __typeid_v{::cuda::std::__pretty_nameof<_Tp>()
 // When inline variables are available, this indirection through an inline function
 // is not necessary, but it doesn't hurt either.
 template <class _Tp>
+// NOTE(HIP/AMD): Use _CCCL_HIDE_FROM_ABI instead of _CCCL_HOST_API so that
+// __host__ __device__ functions can call __typeid() under HIP (where __CUDA_ARCH__
+// is never defined, so this host-fallback block is active in all compilation passes).
+#if _CCCL_HIP_COMPILATION()
+[[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr __type_info const& __typeid() noexcept
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
 [[nodiscard]] _CCCL_HOST_API constexpr __type_info const& __typeid() noexcept
+#endif // !_CCCL_HIP_COMPILATION()
 {
   return __typeid_v<_Tp>;
 }

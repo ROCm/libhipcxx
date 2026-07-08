@@ -452,6 +452,13 @@ void test_launch_dims(cuda::stream_ref stream, GridDesc grid_desc, BlockDesc blo
   CCCLRT_CHECK(launched_nthreads == exp_nthreads);
 }
 
+// NOTE(HIP/AMD): thread-block clusters are an NVIDIA SM90 feature that does
+// not exist on AMD GPUs. The 3-arg overload of test_launch_dims (which takes
+// a cluster_desc) and the cluster portion of the "Launch dims" test are
+// guarded out at compile time because (a) cuda::cluster_dims requires SM90
+// hardware and (b) on gfx90a the HIP bridge reports compute_capability_major
+// >= 9, so the runtime guard `if (CC >= 9)` would not protect AMD builds.
+#if !defined(__HIP_PLATFORM_AMD__)
 template <class GridDesc, class ClusterDesc, class BlockDesc>
 void test_launch_dims(cuda::stream_ref stream, GridDesc grid_desc, ClusterDesc cluster_desc, BlockDesc block_desc)
 {
@@ -476,6 +483,7 @@ void test_launch_dims(cuda::stream_ref stream, GridDesc grid_desc, ClusterDesc c
   const auto exp_nthreads = exp_nblocks * block_exts.extent(0) * block_exts.extent(1) * block_exts.extent(2);
   CCCLRT_CHECK(launched_nthreads == exp_nthreads);
 }
+#endif // !__HIP_PLATFORM_AMD__
 
 C2H_TEST("Launch dims", "[launch]")
 {
@@ -497,6 +505,10 @@ C2H_TEST("Launch dims", "[launch]")
   test_launch_dims(stream, cuda::grid_dims<2, 9>(), cuda::block_dims<3, 7>());
   test_launch_dims(stream, cuda::grid_dims<3, 4, 5>(), cuda::block_dims<2, 7, 9>());
 
+// NOTE(HIP/AMD): cluster_dims launch tests require SM90 (NV-only feature).
+// gfx90a reports compute_capability_major >= 9 via the HIP bridge, making the
+// runtime guard ineffective; use a compile-time guard instead.
+#if !defined(__HIP_PLATFORM_AMD__)
   if (cuda::device_attributes::compute_capability_major(stream.device()) >= 9)
   {
     test_launch_dims(stream, cuda::grid_dims(dim3{2}), cuda::cluster_dims(dim3{3}), cuda::block_dims(dim3{10}));
@@ -535,6 +547,7 @@ C2H_TEST("Launch dims", "[launch]")
     test_launch_dims(stream, cuda::grid_dims<2, 9>(), cuda::cluster_dims<1, 5>(), cuda::block_dims<3, 7>());
     test_launch_dims(stream, cuda::grid_dims<3, 4, 5>(), cuda::cluster_dims<3, 1, 2>(), cuda::block_dims<2, 7, 9>());
   }
+#endif // !__HIP_PLATFORM_AMD__
 }
 
 #endif // !_CCCL_CUDA_COMPILER(CLANG)

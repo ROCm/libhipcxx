@@ -32,9 +32,13 @@
 
 // UNSUPPORTED: enable-tile
 // error: asm statement is unsupported in tile code
-// NOTE(HIP/AMD): const_scalar_object cannot be used with get_device_address on HIP
-// -- tracked in SWDEV-571304. Fine-grained HIP guards are used inline below instead
-// of a blanket UNSUPPORTED: hiprtc.
+
+// UNSUPPORTED: hipcc, hiprtc
+// NOTE(HIP/AMD): cuda::get_device_address() from host code calls hipGetSymbolAddress,
+// which requires the symbol to be declared __device__ in the host-compilation pass.
+// TEST_GLOBAL_VARIABLE expands to _CCCL_GLOBAL_VARIABLE (= __device__ only in the
+// device-compilation pass; empty in the host pass), so hipGetSymbolAddress always
+// returns hipErrorInvalidDeviceSymbol at runtime. Tracked in SWDEV-571304.
 
 #include <cuda/devices>
 #include <cuda/memory>

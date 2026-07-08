@@ -217,7 +217,8 @@ class LibcxxTestFormat(object):
             cxx = test_cxx.host_cxx if test_cxx.type == "nvcc" else test_cxx
             if cxx.type == "msvc":
                 constexpr_steps_opt = f"/constexpr:steps{constexpr_steps}"
-            elif cxx.type == "clang":
+            elif cxx.type == "clang" or cxx.type == "hipcc":
+                # HIP: hipcc is clang-based and accepts -fconstexpr-steps.
                 constexpr_steps_opt = f"-fconstexpr-steps={constexpr_steps}"
             elif cxx.type == "gcc" and cxx.version[0] >= 9:
                 constexpr_steps_opt = f"-fconstexpr-ops-limit={constexpr_steps}"
