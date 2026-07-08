@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___NUMERIC_MUL_OVERFLOW_H
 #define _CUDA___NUMERIC_MUL_OVERFLOW_H
 
@@ -182,7 +204,12 @@ _CCCL_TEMPLATE(class _Result = void,
                class _ActResult = ::cuda::std::conditional_t<::cuda::std::is_void_v<_Result>, _Common, _Result>)
 _CCCL_REQUIRES((::cuda::std::is_void_v<_Result> || ::cuda::std::__cccl_is_integer_v<_Result>)
                  _CCCL_AND ::cuda::std::__cccl_is_integer_v<_Lhs> _CCCL_AND ::cuda::std::__cccl_is_integer_v<_Rhs>)
-[[nodiscard]] _CCCL_API constexpr overflow_result<_ActResult> mul_overflow(_Lhs __lhs, _Rhs __rhs) noexcept
+// NOTE(HIP/AMD): on HIP with __builtin_mul_overflow available (clang), the
+// NV_IF_TARGET(NV_IS_HOST,...) block is dead on device pass and the second
+// fallback block is also inactive (not CUDA, not !builtin, not NVHPC).
+// Mark parameters [[maybe_unused]] to silence -Werror,-Wunused-parameter.
+[[nodiscard]] _CCCL_API constexpr overflow_result<_ActResult>
+mul_overflow([[maybe_unused]] _Lhs __lhs, [[maybe_unused]] _Rhs __rhs) noexcept
 {
   // We want to use __builtin_mul_overflow only in host code. When compiling CUDA source file, we cannot use it in
   // constant expressions, because it doesn't work before nvcc 13.1 and is buggy in 13.1. When compiling C++ source
@@ -207,7 +234,10 @@ _CCCL_REQUIRES((::cuda::std::is_void_v<_Result> || ::cuda::std::__cccl_is_intege
 #endif // _CCCL_BUILTIN_MUL_OVERFLOW
 
   // Host fallback + device implementation.
-#if _CCCL_CUDA_COMPILATION() || !defined(_CCCL_BUILTIN_MUL_OVERFLOW) || (_CCCL_HAS_INT128() && _CCCL_COMPILER(NVHPC))
+  // NOTE(HIP/AMD): include _CCCL_HIP_COMPILATION() so the generic path is compiled for HIP device,
+  // which avoids unused-parameter warnings when the host-only builtin block provides nothing.
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || !defined(_CCCL_BUILTIN_MUL_OVERFLOW) \
+  || (_CCCL_HAS_INT128() && _CCCL_COMPILER(NVHPC))
   using ::cuda::std::is_signed_v;
 
   // If we would check for is_same_v, we would get slow path for e. g. long and long long, even though they represent
