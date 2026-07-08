@@ -89,11 +89,23 @@ function(
   parent_target
   with_ctk
 )
+  # NOTE(HIP/AMD): on HIP builds tag the host header-test TUs LANGUAGE HIP so the
+  # HIP/clang front-end compiles them (matching amd-integration-base). This is
+  # required because cccl_c2h_attach_hip_deps() below links hip::host, whose
+  # interface compile options (-x hip, --offload-arch=<gfx>, -D__HIP_PLATFORM_AMD__)
+  # are only understood by clang. With LANGUAGE CXX and a non-clang host compiler
+  # (e.g. CMAKE_CXX_COMPILER=g++) these leak onto the CXX compile and fail with
+  #   c++: error: unrecognized command-line option '--offload-arch=gfx90a'.
+  if (LIBCUDACXX_ENABLE_HIP)
+    set(header_lang HIP)
+  else()
+    set(header_lang CXX)
+  endif()
   cccl_generate_header_tests(
     ${target_name}
     libcudacxx/include
     NO_METATARGETS
-    LANGUAGE CXX
+    LANGUAGE ${header_lang}
     HEADER_TEMPLATE "${libcudacxx_SOURCE_DIR}/cmake/header_test.cpp.in"
     HEADERS ${public_headers_host_only}
   )
@@ -110,13 +122,8 @@ function(
   target_link_libraries(${target_name} PUBLIC libcudacxx.compiler_interface)
   # NOTE(HIP/AMD): attach the HIP host runtime + pthreads on HIP builds so the
   # generated header-test TUs find <hip/hip_runtime.h> and link std::once_flag.
-  # No-op on non-HIP. LANGUAGE stays CXX for this host-only sweep: these headers
-  # are host-only and are compiled as plain C++ (upstream behaviour). Unlike the
-  # device header suites -- which now pass LANGUAGE HIP -- this sweep is not
-  # routed through the HIP front-end.
-  # TODO(hip-upgrade): amd-integration-base tagged these host TUs LANGUAGE HIP;
-  # cccl_generate_header_tests() now supports LANGUAGE HIP, so decide whether the
-  # host sweep should also pass it to restore HIP-front-end coverage.
+  # No-op on non-HIP. On HIP these TUs are LANGUAGE HIP (see above), matching
+  # amd-integration-base, so hip::host's clang-only interface flags are handled.
   cccl_c2h_attach_hip_deps(${target_name})
   if (with_ctk)
     target_link_libraries(${target_name} PUBLIC CUDA::cudart)
