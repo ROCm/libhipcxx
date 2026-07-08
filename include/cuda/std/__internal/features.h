@@ -135,12 +135,8 @@
 
 // Third party libraries
 
-// <<<<<<< OLD CODE from 6decf64bfb (526774e97f) - COMMENTED OUT
-// #if __has_include(<dlpack/dlpack.h>) && !_CCCL_COMPILER(NVRTC) && !defined(CCCL_DISABLE_DLPACK) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #if (__has_include(<dlpack/dlpack.h>) || __has_include(<dlpack.h>)) && \
-     !_CCCL_COMPILER(NVRTC) && !defined(CCCL_DISABLE_DLPACK)
-// >>>>>>> END NEW CODE (526774e97f)
+     !_CCCL_COMPILER(NVRTC) && !defined(CCCL_DISABLE_DLPACK) && !defined(_CCCL_COMPILER_HIPRTC)
 #  define _CCCL_HAS_DLPACK() 1
 #else // ^^^ has dlpack ^^^ / vvv no dlpack vvv
 #  define _CCCL_HAS_DLPACK() 0

@@ -46,20 +46,6 @@
 #include <cuda/std/__exception/exception_macros.h>
 #include <cuda/std/__exception/terminate.h>
 
-// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
-// #define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)                \
-//   do                                                        \
-//   {                                                         \
-//     const ::cudaError_t __status = _NAME(__VA_ARGS__);      \
-//     switch (__status)                                       \
-//     {                                                       \
-//       case ::cudaSuccess:                                   \
-//         break;                                              \
-//       default:                                              \
-//         (void) ::cudaGetLastError(); /* clear CUDA error state */ \
-//         ::cuda::__throw_cuda_error(__status, _MSG, #_NAME); \
-//     }                                                       \
-// =======
 #define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)                     \
   do                                                             \
   {                                                              \
@@ -72,7 +58,6 @@
         ::cudaGetLastError(); /* clear CUDA error state */       \
         _CCCL_THROW(::cuda::cuda_error, __status, _MSG, #_NAME); \
     }                                                            \
-// >>>>>>> END NEW CODE (332e134db7)
   } while (0)
 
 #define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)                         \

@@ -69,15 +69,9 @@ enum __execution_backend : uint8_t
 {
   // The backends we provide
   __none = 0,
-// <<<<<<< OLD CODE from f0f3cb47cb (661975abec) - COMMENTED OUT
-// #if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
-//   __cuda = 1 << 1,
-// #endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
-// =======
-#if _CCCL_HAS_BACKEND_CUDA()
+#if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
   __cuda = 1 << 0,
-#endif // _CCCL_HAS_BACKEND_CUDA()
-// >>>>>>> END NEW CODE (661975abec)
+#endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
 #if _CCCL_HAS_BACKEND_OMP()
   __omp = 1 << 1,
 #endif // _CCCL_HAS_BACKEND_OMP()

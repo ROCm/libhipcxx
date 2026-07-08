@@ -49,11 +49,7 @@
 #include <cuda/std/__cstdlib/malloc.h>
 #include <cuda/std/cstring>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host <cstdlib>
 #  include <cstdlib>
 #endif // _CCCL_HOSTED()
 

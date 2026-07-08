@@ -166,20 +166,16 @@ struct hierarchy_query_result
   {
     return {static_cast<unsigned long long>(x), static_cast<unsigned long long>(y), static_cast<unsigned long long>(z)};
   }
-// <<<<<<< OLD CODE from b05a857845 (f20e019420) - COMMENTED OUT
-//
-//   // NOTE(HIP/AMD): on CUDA this type becomes constructible into ::dim3 via
-//   // dim3(uint3); HIP's ::dim3 has no uint3 constructor, so provide a direct
-//   // conversion to ::dim3 on HIP.
-// #  if _CCCL_HIP_COMPILATION()
-//   _CCCL_API constexpr operator dim3() const noexcept
-//   {
-//     return dim3{static_cast<unsigned>(x), static_cast<unsigned>(y), static_cast<unsigned>(z)};
-//   }
-// #  endif // _CCCL_HIP_COMPILATION()
-// =======
+  // NOTE(HIP/AMD): on CUDA this type becomes constructible into ::dim3 via
+  // dim3(uint3); HIP's ::dim3 has no uint3 constructor, so provide a direct
+  // conversion to ::dim3 on HIP.
+#  if _CCCL_HIP_COMPILATION()
+  _CCCL_API constexpr operator dim3() const noexcept
+  {
+    return dim3{static_cast<unsigned>(x), static_cast<unsigned>(y), static_cast<unsigned>(z)};
+  }
+#  endif // _CCCL_HIP_COMPILATION()
 #  endif // !_CCCL_DOXYGEN_INVOKED
-// >>>>>>> END NEW CODE (f20e019420)
 };
 
 _CCCL_END_NAMESPACE_CUDA

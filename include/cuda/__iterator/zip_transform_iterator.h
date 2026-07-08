@@ -574,25 +574,13 @@ public:
 
 #ifndef _CCCL_DOXYGEN_INVOKED
 template <class _Fn, class... _Iterators>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE zip_transform_iterator(_Fn, ::cuda::std::tuple<_Iterators...>)
-//   -> zip_transform_iterator<_Fn, _Iterators...>;
-//
-// template <class _Fn, class... _Iterators>
-// // <<<<<<< OLD CODE from 0ca631d177 (c8300b755a) - COMMENTED OUT
-// // _CCCL_CTAD_HOST_DEVICE zip_transform_iterator(_Fn, _Iterators...) -> zip_transform_iterator<_Fn, _Iterators...>;
-// // =======
-// _CCCL_HOST_DEVICE zip_transform_iterator(_Fn, _Iterators...) -> zip_transform_iterator<_Fn, _Iterators...>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES zip_transform_iterator(_Fn, ::cuda::std::tuple<_Iterators...>)
   -> zip_transform_iterator<_Fn, _Iterators...>;
 
 template <class _Fn, class... _Iterators>
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES zip_transform_iterator(_Fn, _Iterators...)
   -> zip_transform_iterator<_Fn, _Iterators...>;
-// >>>>>>> END NEW CODE (5a016e2713)
 #endif // _CCCL_DOXYGEN_INVOKED
-// >>>>>>> END NEW CODE (c8300b755a)
 
 //! @brief Creates a @c zip_transform_iterator from a tuple of iterators.
 //! @param __fun The functor used to transform dereferenced elements.

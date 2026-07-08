@@ -101,13 +101,8 @@ _CCCL_API constexpr _Tp bitfield_insert(const _Tp __dest, const _Tp __source, in
   _CCCL_ASSERT(__width >= 0 && __width <= __digits, "width out of range");
   _CCCL_ASSERT(__start >= 0 && __start <= __digits, "start position out of range");
   _CCCL_ASSERT(__start + __width <= __digits, "start position + width out of range");
-// <<<<<<< OLD CODE from 54526887dd (b6b29f65d9) - COMMENTED OUT
-// #ifndef __HIP_PLATFORM_AMD__
-//   if constexpr (sizeof(_Tp) <= sizeof(uint64_t))
-// =======
-#if !_CCCL_TILE_COMPILATION() // error: asm statement is unsupported in tile code
+#if !_CCCL_TILE_COMPILATION() && !defined(__HIP_PLATFORM_AMD__) // error: asm statement is unsupported in tile code; HIP uses fallback path
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
-// >>>>>>> END NEW CODE (b6b29f65d9)
   {
     if constexpr (sizeof(_Tp) <= sizeof(uint64_t))
     {
@@ -120,11 +115,7 @@ _CCCL_API constexpr _Tp bitfield_insert(const _Tp __dest, const _Tp __source, in
       // clang-format on
     }
   }
-// <<<<<<< OLD CODE from 54526887dd (b6b29f65d9) - COMMENTED OUT
-// #endif
-// =======
-#endif // !_CCCL_TILE_COMPILATION()
-// >>>>>>> END NEW CODE (b6b29f65d9)
+#endif // !_CCCL_TILE_COMPILATION() && !defined(__HIP_PLATFORM_AMD__)
   auto __mask = ::cuda::bitmask<_Tp>(__start, __width);
   return (::cuda::__shl(__source, __start) & __mask) | (__dest & ~__mask);
 }
@@ -138,13 +129,8 @@ template <typename _Tp>
   _CCCL_ASSERT(__width >= 0 && __width <= __digits, "width out of range");
   _CCCL_ASSERT(__start >= 0 && __start <= __digits, "start position out of range");
   _CCCL_ASSERT(__start + __width <= __digits, "start position + width out of range");
-// <<<<<<< OLD CODE from 54526887dd (b6b29f65d9) - COMMENTED OUT
-// #ifndef __HIP_PLATFORM_AMD__
-//   if constexpr (sizeof(_Tp) <= sizeof(uint32_t))
-// =======
-#if !_CCCL_TILE_COMPILATION() // error: asm statement is unsupported in tile code
+#if !_CCCL_TILE_COMPILATION() && !defined(__HIP_PLATFORM_AMD__) // error: asm statement is unsupported in tile code; HIP uses fallback path
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
-// >>>>>>> END NEW CODE (b6b29f65d9)
   {
     if constexpr (sizeof(_Tp) <= sizeof(uint32_t))
     {
@@ -156,11 +142,7 @@ template <typename _Tp>
       // clang-format on
     }
   }
-// <<<<<<< OLD CODE from 54526887dd (b6b29f65d9) - COMMENTED OUT
-// #endif
-// =======
-#endif // !_CCCL_TILE_COMPILATION()
-// >>>>>>> END NEW CODE (b6b29f65d9)
+#endif // !_CCCL_TILE_COMPILATION() && !defined(__HIP_PLATFORM_AMD__)
   return ::cuda::__shr(__value, __start) & ::cuda::bitmask<_Tp>(0, __width);
 }
 

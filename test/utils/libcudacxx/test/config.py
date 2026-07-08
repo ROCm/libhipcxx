@@ -319,20 +319,17 @@ class Configuration(object):
             self.configure_coroutines()
             self.configure_substitutions()
             self.configure_features()
-# <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
-#         elif self.cxx.type == 'hiprtcc':
-#             # NOTE(HIP/AMD): the full warning setup is skipped for the RTC
-#             # drivers, but FORCE_ALL_WARNINGS tests (e.g.
-#             # libcxx/macros/lifetime_bound.compile.fail.cpp) rely on warnings
-#             # being escalated to errors. Provide a minimal warning_flags set so
-#             # the per-test useWarnings(True) escalation works; the hiprtcc driver
-#             # forwards -W* flags to COMGR. These apply only when use_warnings is
-#             # enabled (the FORCE_ALL_WARNINGS directive), so normal tests are
-#             # unaffected.
-#             self.cxx.warning_flags += ['-Werror']
-# =======
+        elif self.cxx.type == 'hiprtcc':
+            # NOTE(HIP/AMD): the full warning setup is skipped for the RTC
+            # drivers, but FORCE_ALL_WARNINGS tests (e.g.
+            # libcxx/macros/lifetime_bound.compile.fail.cpp) rely on warnings
+            # being escalated to errors. Provide a minimal warning_flags set so
+            # the per-test useWarnings(True) escalation works; the hiprtcc driver
+            # forwards -W* flags to COMGR. These apply only when use_warnings is
+            # enabled (the FORCE_ALL_WARNINGS directive), so normal tests are
+            # unaffected.
+            self.cxx.warning_flags += ['-Werror']
         self.configure_ccache()
-# >>>>>>> END NEW CODE (ba2df44002)
 
     def print_config_info(self):
         # Print the final compile and link flags.
@@ -754,16 +751,7 @@ class Configuration(object):
     def configure_ccache(self):
         use_ccache_default = os.environ.get("CMAKE_CUDA_COMPILER_LAUNCHER") is not None
         use_ccache = self.get_lit_bool("use_ccache", use_ccache_default)
-# <<<<<<< OLD CODE from e4d60a4dd3 (fda59c92c6) - COMMENTED OUT
-# # <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
-# #         if use_ccache and not self.cxx.type == 'nvrtcc' and not self.cxx.type == 'hiprtcc':
-# # =======
-#         if "enable-tile" in self.config.available_features:
-#             return
-# =======
-# >>>>>>> END NEW CODE (fda59c92c6)
-        if use_ccache and not self.cxx.type == "nvrtcc":
-# >>>>>>> END NEW CODE (ba2df44002)
+        if use_ccache and not self.cxx.type == "nvrtcc" and not self.cxx.type == 'hiprtcc':
             self.cxx.use_ccache = True
             self.lit_config.note("enabling ccache")
 

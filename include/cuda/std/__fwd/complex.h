@@ -72,17 +72,10 @@ template <class _Tp>
 inline constexpr bool __is_std_complex_v<volatile _Tp> = __is_std_complex_v<_Tp>;
 template <class _Tp>
 inline constexpr bool __is_std_complex_v<const volatile _Tp> = __is_std_complex_v<_Tp>;
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host ::std::complex under hipRTC
-// template <class _Tp>
-// inline constexpr bool __is_std_complex_v<::std::complex<_Tp>> = true;
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
-#if _CCCL_HOSTED()
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host ::std::complex under hipRTC
 template <class _Tp>
 inline constexpr bool __is_std_complex_v<::std::complex<_Tp>> = true;
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 // __is_cuda_std_complex_v
 

@@ -75,11 +75,7 @@ _CCCL_BEGIN_NAMESPACE_STD
 template <class _Tp>
 struct tuple_size;
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_FREESTANDING()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
 
 template <class _Tp>
 struct tuple_size<
@@ -103,16 +99,12 @@ struct tuple_size<
                                           ::cuda::std::integral_constant<size_t, sizeof(tuple_size<_Tp>)>>>
     : public ::cuda::std::integral_constant<size_t, tuple_size<_Tp>::value>
 {};
-#endif // _CCCL_FREESTANDING()
+#endif // _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
 
 template <size_t _Ip, class _Tp>
 struct tuple_element;
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_FREESTANDING()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
 template <size_t _Ip, class _Tp>
 struct tuple_element<_Ip, const _Tp>
 {
@@ -130,7 +122,7 @@ struct tuple_element<_Ip, const volatile _Tp>
 {
   using type _CCCL_NODEBUG_ALIAS = const volatile typename tuple_element<_Ip, _Tp>::type;
 };
-#endif // _CCCL_FREESTANDING()
+#endif // _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
 
 template <class _Tp, size_t _Size>
 struct tuple_size<::cuda::std::array<_Tp, _Size>>

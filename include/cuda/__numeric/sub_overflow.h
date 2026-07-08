@@ -338,11 +338,8 @@ _CCCL_API constexpr overflow_result<_ActualResult> sub_overflow(const _Lhs __lhs
 #endif // _CCCL_BUILTIN_SUB_OVERFLOW
 
   // Host fallback + device implementation.
-// <<<<<<< OLD CODE from 8a7585762c (74071f643b) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || !defined(_CCCL_BUILTIN_SUB_OVERFLOW)
-// =======
-#if _CCCL_CUDA_COMPILATION() || !defined(_CCCL_BUILTIN_SUB_OVERFLOW) || (_CCCL_COMPILER(NVHPC) && _CCCL_HAS_INT128())
-// >>>>>>> END NEW CODE (74071f643b)
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || !defined(_CCCL_BUILTIN_SUB_OVERFLOW) \
+  || (_CCCL_COMPILER(NVHPC) && _CCCL_HAS_INT128())
   using ::cuda::std::common_type_t;
   using ::cuda::std::is_signed_v;
   using ::cuda::std::is_unsigned_v;
@@ -444,7 +441,7 @@ _CCCL_API constexpr overflow_result<_ActualResult> sub_overflow(const _Lhs __lhs
       return overflow_result<_ActualResult>{__sub_ret, __is_overflow};
     }
   }
-#endif // _CCCL_CUDA_COMPILATION() || !_CCCL_BUILTIN_SUB_OVERFLOW || (_CCCL_COMPILER(NVHPC) && _CCCL_HAS_INT128())
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || !_CCCL_BUILTIN_SUB_OVERFLOW || (_CCCL_COMPILER(NVHPC) && _CCCL_HAS_INT128())
 }
 
 //! @brief Subtracts two numbers \p __lhs and \p __rhs with overflow detection

@@ -43,29 +43,20 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  include <system_error>
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
+// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC (HIPRTC is not treated as
+// freestanding in compiler.h, and its driver is not hermetic), so gate the host
+// <system_error> explicitly like NVRTC to keep it out of the device-only HIPRTC TU.
 #if _CCCL_HOSTED()
 #  include <system_error>
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// using ::std::errc;
-// #else // ^^^ host ^^^ / vvv NVRTC or HIPRTC (self-contained) vvv
-// =======
 #if _CCCL_HOSTED()
 using ::std::errc;
-#else // ^^^ _CCCL_HOSTED() ^^^ / vvv _CCCL_FREESTANDING() vvv
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#else // ^^^ host ^^^ / vvv NVRTC or HIPRTC (self-contained) vvv
 enum class errc
 {
   invalid_argument    = 22,
@@ -76,7 +67,7 @@ enum class errc
   value_too_large = 75,
 #  endif // ^^^ !_CCCL_OS(WINDOWS) ^^^
 };
-#endif // _CCCL_FREESTANDING()
+#endif // NVRTC or HIPRTC (self-contained)
 
 _CCCL_END_NAMESPACE_CUDA_STD
 

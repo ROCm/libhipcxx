@@ -39,13 +39,9 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from 93e2bd2672 (51b1bad30b) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || defined(__HIPCC_RTC__)
-// =======
 #include <cuda/std/__cccl/cuda_capabilities.h>
 
-#if _CCCL_CUDA_COMPILATION()
-// >>>>>>> END NEW CODE (51b1bad30b)
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION() || defined(__HIPCC_RTC__)
 #  define _CCCL_HOST        __host__
 #  define _CCCL_DEVICE      __device__
 #  define _CCCL_HOST_DEVICE __host__ __device__
@@ -55,33 +51,21 @@
 #  define _CCCL_HOST_DEVICE
 #endif // !CUDA/HIP compilation
 
-// NOTE(HIP/AMD): clang 23 (ROCm 7.13) made class-template deduction guides
-// execution-space agnostic and now rejects CUDA/HIP target attributes on them
-// ("use of CUDA/HIP target attributes on deduction guides is deprecated",
-// -Wdeprecated-attributes, an error under -Werror). Earlier clang (e.g. ROCm
-// 7.2's clang 22) still requires __host__ __device__ on a deduction guide for it
-// to be usable from __host__ __device__ code. Prefix deduction guides with this
-// macro instead of _CCCL_HOST_DEVICE: it is empty on affected clang and
-// _CCCL_HOST_DEVICE everywhere else. Remove once the minimum-supported ROCm
-// clang is >= 23. 
-#if _CCCL_HIP_COMPILATION() && _CCCL_COMPILER(CLANG, >=, 23)
-#  define _CCCL_CTAD_HOST_DEVICE
-#else // ^^^ deduction-guide attributes rejected ^^^ / vvv attributes required ^^^
-#  define _CCCL_CTAD_HOST_DEVICE _CCCL_HOST_DEVICE
-#endif // deduction-guide target attributes required
-
 #if _CCCL_TILE_COMPILATION()
 #  define _CCCL_TILE __tile__
 #else // ^^^ _CCCL_TILE_COMPILATION() ^^^ / vvv !_CCCL_TILE_COMPILATION() vvv
 #  define _CCCL_TILE
 #endif // ^^^ !_CCCL_TILE_COMPILATION() ^^^
 
-// clang-cuda before version 22 requires __host__ __device__ annotations on deduction guides
-#if _CCCL_CUDA_COMPILER(CLANG, <, 22)
+// clang-cuda before v22 requires __host__ __device__ on deduction guides.
+// NOTE(HIP/AMD): ROCm clang <= 22 likewise requires them; clang 23 (ROCm 7.13+)
+// made deduction guides execution-space agnostic and rejects the attributes
+// (-Wdeprecated-attributes, an error under -Werror), so they must be empty there.
+#if _CCCL_CUDA_COMPILER(CLANG, <, 22) || (_CCCL_HIP_COMPILATION() && _CCCL_COMPILER(CLANG, <, 23))
 #  define _CCCL_DEDUCTION_GUIDE_ATTRIBUTES _CCCL_HOST_DEVICE
-#else // ^^^ _CCCL_CUDA_COMPILER(CLANG, <, 22) ^^^ / vvv !_CCCL_CUDA_COMPILER(CLANG, <, 22) vvv
+#else // ^^^ _CCCL_CUDA_COMPILER(CLANG, <, 22) || HIP clang < 23 ^^^ / vvv otherwise vvv
 #  define _CCCL_DEDUCTION_GUIDE_ATTRIBUTES
-#endif // ^^ !_CCCL_CUDA_COMPILER(CLANG, <, 22) ^^^
+#endif // ^^^ otherwise ^^^
 
 // Global variables of non builtin types are only device accessible if they are marked as `__device__`
 #if _CCCL_DEVICE_COMPILATION() && !_CCCL_CUDA_COMPILER(NVHPC)

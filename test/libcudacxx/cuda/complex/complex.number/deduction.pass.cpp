@@ -40,15 +40,9 @@
 #include <cuda/std/tuple>
 #include <cuda/std/type_traits>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  include <complex>
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
-#if _CCCL_HOSTED()
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host <complex>
 #  include <complex>
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include "test_macros.h"
 
@@ -80,11 +74,7 @@ TEST_FUNC void test_deduction()
   }
 
   // 5. Test cuda::complex(std::complex)
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host std::complex
   // std::complex is not required to support other than standard floating-point types
   if constexpr (cuda::std::__is_std_fp_v<T>)
   {
@@ -92,11 +82,7 @@ TEST_FUNC void test_deduction()
                  ([[maybe_unused]] cuda::complex c{std::complex<T>{}}; //
                   assert((cuda::std::is_same_v<T, typename decltype(c)::value_type>) );))
   }
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
   // 6. Test cuda::complex(tuple-like)
 #if _CCCL_STD_VER >= 2020

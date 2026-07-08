@@ -45,25 +45,19 @@
 #endif // no system header
 
 // clang-cuda only provides device flavors of operator new if we included <new>
-// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
-// // NOTE(HIP/AMD): hipcc and hiprtc are also clang-based, so the same rule
-// // applies on HIP: without an explicit '#include <new>', clang does not
-// // declare the device-side placement new overload, and consumers like
-// // cuda/__utility/__basic_any/semiregular.h fail with "no matching
-// // 'operator new' function for non-allocating placement new expression;
-// // include <new>". Trigger the include on HIP as well.
-// // NOTE(HIP/AMD): For HIPRTC, the ROCm clang headers at
-// // /opt/rocm/lib/llvm/lib/clang/22/include/cuda_wrappers/new provide
-// // __device__ operator new/delete implementations using device malloc/free,
-// // which allows code using dynamic memory (like cuda::std::seed_seq) to
-// // compile and link in HIPRTC JIT environments.
-// #if _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
-// #  include <new>
-// #endif // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
-// =======
-#if _CCCL_CUDA_COMPILER(CLANG)
+// NOTE(HIP/AMD): hipcc and hiprtc are also clang-based, so the same rule
+// applies on HIP: without an explicit '#include <new>', clang does not
+// declare the device-side placement new overload, and consumers like
+// cuda/__utility/__basic_any/semiregular.h fail with "no matching
+// 'operator new' function for non-allocating placement new expression;
+// include <new>". Trigger the include on HIP as well.
+// NOTE(HIP/AMD): For HIPRTC, the ROCm clang headers at
+// /opt/rocm/lib/llvm/lib/clang/22/include/cuda_wrappers/new provide
+// __device__ operator new/delete implementations using device malloc/free,
+// which allows code using dynamic memory (like cuda::std::seed_seq) to
+// compile and link in HIPRTC JIT environments.
+#if _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 #  include <cuda/std/__host_stdlib/new>
-#endif // _CCCL_CUDA_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (332e134db7)
+#endif // _CCCL_CUDA_COMPILER(CLANG) || _CCCL_HIP_COMPILATION()
 
 #endif // _CUDA_STD___NEW_DEVICE_NEW_H

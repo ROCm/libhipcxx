@@ -75,20 +75,17 @@ class __physical_device
 
   ::CUdevice __device_{};
 
-// <<<<<<< OLD CODE from 122089b1fd (c9683dc0da) - COMMENTED OUT
-// #if !_CCCL_HIP_COMPILATION()
-//   // NOTE(HIP/AMD): the cuDevicePrimaryCtx* API has no faithful HIP
-//   // equivalent (the HIP runtime owns per-device state implicitly via
-//   // hipSetDevice); the __primary_ctx_ field and __primary_context()
-//   // accessor are NV-only. Consumers on HIP go through
-//   // __ensure_current_context(device_ref) which calls hipSetDevice directly.
-// =======
-#  if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (c9683dc0da)
+  // NOTE(HIP/AMD): the cuDevicePrimaryCtx* API has no faithful HIP
+  // equivalent (the HIP runtime owns per-device state implicitly via
+  // hipSetDevice); the __primary_ctx_ field and __primary_context()
+  // accessor are NV-only. Consumers on HIP go through
+  // __ensure_current_context(device_ref) which calls hipSetDevice directly.
+#  if _CCCL_HOSTED() && !_CCCL_HIP_COMPILATION()
   ::std::once_flag __primary_ctx_once_flag_{};
-#  endif // _CCCL_HOSTED()
+#  endif // _CCCL_HOSTED() && !_CCCL_HIP_COMPILATION()
+#  if !_CCCL_HIP_COMPILATION()
   ::CUcontext __primary_ctx_{};
-#endif
+#  endif // !_CCCL_HIP_COMPILATION()
 
   static constexpr ::cuda::std::size_t __max_name_length{256};
 #  if _CCCL_HOSTED()
@@ -242,10 +239,14 @@ _CCCL_HOST_API inline void device_ref::init() const
 #endif
 }
 
+#if !_CCCL_HIP_COMPILATION()
+// NV-only: the __physical_device::__primary_context() member is HIP-excluded
+// (see the __primary_ctx_ note above), so this accessor is NV-only as well.
 [[nodiscard]] _CCCL_HOST_API inline ::CUcontext device_ref::__primary_context() const
 {
   return ::cuda::__physical_devices()[__id_].__primary_context();
 }
+#endif // !_CCCL_HIP_COMPILATION()
 
 [[nodiscard]] _CCCL_HOST_API inline ::cuda::std::string_view device_ref::name() const
 {

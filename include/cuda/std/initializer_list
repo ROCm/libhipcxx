@@ -43,70 +43,61 @@
 #  pragma system_header
 #endif // no system header
 
-# <<<<<<< OLD CODE from f901f4e57e (61d19710de) - COMMENTED OUT
-# # <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# # #if defined(_CCCL_COMPILER_HIPRTC) && __has_include(<initializer_list>)
-# # // NOTE(HIP/AMD): Under HIPRTC WITHOUT -nostdinc++ (e.g. libhipcxx's own lit tests), the
-# # // system <initializer_list> is on the include path. Prefer it so we share the exact same
-# # // std::initializer_list definition as any leaked system headers and avoid "redefinition of
-# # // 'initializer_list'" errors. Mirrors how NVRTC's hermeticity makes __has_include(<version>)
-# # // naturally false there (see cuda/std/version) -- HIPRTC gates on __has_include instead.
-# # #  include <initializer_list>
-# # #elif defined(_CCCL_COMPILER_HIPRTC)
-# # // NOTE(HIP/AMD): Under HIPRTC WITH -nostdinc++ (e.g. cudf's jitify JIT) there is no system
-# # // <initializer_list> and HIPRTC has no builtin std::initializer_list, so declare the minimal
-# # // compiler-magic type locally so `using ::std::initializer_list` below resolves. clang accepts
-# # // this as long as it lives in namespace std with exactly a {const T*, size} layout. This
-# # // mirrors the long-standing amd-integration behavior and needs no consumer-specific macro.
-# # namespace std
-# # {
-# # template <class _Ep>
-# # class initializer_list
-# # {
-# #   const _Ep* __begin_;
-# #   decltype(sizeof(int)) __size_;
-# #
-# #   _CCCL_API constexpr initializer_list(const _Ep* __b, decltype(sizeof(int)) __s) noexcept
-# #       : __begin_(__b)
-# #       , __size_(__s)
-# #   {}
-# #
-# # public:
-# #   using value_type      = _Ep;
-# #   using reference       = const _Ep&;
-# #   using const_reference = const _Ep&;
-# #   using size_type       = decltype(sizeof(int));
-# #   using iterator        = const _Ep*;
-# #   using const_iterator  = const _Ep*;
-# #
-# #   _CCCL_API constexpr initializer_list() noexcept
-# #       : __begin_(nullptr)
-# #       , __size_(0)
-# #   {}
-# #
-# #   [[nodiscard]] _CCCL_API constexpr size_type size() const noexcept
-# #   {
-# #     return __size_;
-# #   }
-# #   [[nodiscard]] _CCCL_API constexpr const _Ep* begin() const noexcept
-# #   {
-# #     return __begin_;
-# #   }
-# #   [[nodiscard]] _CCCL_API constexpr const _Ep* end() const noexcept
-# #   {
-# #     return __begin_ + __size_;
-# #   }
-# # };
-# # } // namespace std
-# # #elif !_CCCL_COMPILER(NVRTC)
-# # // On the host (and hipcc host pass, and libhipcxx's HIPRTC CI) include the system
-# # // <initializer_list> so we share the same definition as system headers.
-# # =======
-# #if _CCCL_HOSTED()
-# # >>>>>>> END NEW CODE (e5037ea8b4)
-# =======
-#if !_CCCL_COMPILER(NVRTC)
-# >>>>>>> END NEW CODE (61d19710de)
+#if defined(_CCCL_COMPILER_HIPRTC) && __has_include(<initializer_list>)
+// NOTE(HIP/AMD): Under HIPRTC WITHOUT -nostdinc++ (e.g. libhipcxx's own lit tests), the
+// system <initializer_list> is on the include path. Prefer it so we share the exact same
+// std::initializer_list definition as any leaked system headers and avoid "redefinition of
+// 'initializer_list'" errors. Mirrors how NVRTC's hermeticity makes __has_include(<version>)
+// naturally false there (see cuda/std/version) -- HIPRTC gates on __has_include instead.
+#  include <initializer_list>
+#elif defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): Under HIPRTC with -nostdinc++ there is no system <initializer_list>
+// and HIPRTC has no builtin std::initializer_list, so declare the minimal
+// compiler-magic type locally so `using ::std::initializer_list` below resolves. clang
+// accepts this as long as it lives in namespace std with exactly a {const T*, size} layout.
+namespace std
+{
+template <class _Ep>
+class initializer_list
+{
+  const _Ep* __begin_;
+  decltype(sizeof(int)) __size_;
+
+  _CCCL_API constexpr initializer_list(const _Ep* __b, decltype(sizeof(int)) __s) noexcept
+      : __begin_(__b)
+      , __size_(__s)
+  {}
+
+public:
+  using value_type      = _Ep;
+  using reference       = const _Ep&;
+  using const_reference = const _Ep&;
+  using size_type       = decltype(sizeof(int));
+  using iterator        = const _Ep*;
+  using const_iterator  = const _Ep*;
+
+  _CCCL_API constexpr initializer_list() noexcept
+      : __begin_(nullptr)
+      , __size_(0)
+  {}
+
+  [[nodiscard]] _CCCL_API constexpr size_type size() const noexcept
+  {
+    return __size_;
+  }
+  [[nodiscard]] _CCCL_API constexpr const _Ep* begin() const noexcept
+  {
+    return __begin_;
+  }
+  [[nodiscard]] _CCCL_API constexpr const _Ep* end() const noexcept
+  {
+    return __begin_ + __size_;
+  }
+};
+} // namespace std
+#elif !_CCCL_COMPILER(NVRTC)
+// On the host (and hipcc host pass, and libhipcxx's HIPRTC CI) include the system
+// <initializer_list> so we share the same definition as system headers.
 #  include <initializer_list>
 #else // ^^^ !_CCCL_COMPILER(NVRTC) ^^^ / vvv _CCCL_COMPILER(NVRTC) vvv
 #  if !defined(__NV_BUILTIN_INITIALIZER_LIST)

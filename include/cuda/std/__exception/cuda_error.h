@@ -43,15 +43,9 @@
 #include <cuda/std/__host_stdlib/stdexcept>
 #include <cuda/std/source_location>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  include <cstdio>
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #if _CCCL_HOSTED()
 #  include <cstdio>
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 
@@ -65,11 +59,7 @@ using __cuda_error_t = ::cudaError_t;
 using __cuda_error_t = int;
 #endif
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 namespace __detail
 {
 static char* __format_cuda_error(
@@ -121,11 +111,20 @@ public:
 private:
   __cuda_error_t __status_;
 };
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+
+// NOTE(HIP/AMD): upstream v3.4.0 dropped this helper in favor of inlining
+// _CCCL_THROW(::cuda::cuda_error, ...) at every call site, but the fork's
+// AMD-adapted is_pointer_accessible.h still calls ::cuda::__throw_cuda_error,
+// so it is retained here.
+[[noreturn]] _CCCL_API inline void __throw_cuda_error(
+  [[maybe_unused]] const __cuda_error_t __status,
+  [[maybe_unused]] const char* __msg,
+  [[maybe_unused]] const char* __api                  = nullptr,
+  [[maybe_unused]] ::cuda::std::source_location __loc = ::cuda::std::source_location::current())
+{
+  _CCCL_THROW(cuda::cuda_error, __status, __msg, __api, __loc);
+}
 
 _CCCL_END_NAMESPACE_CUDA
 

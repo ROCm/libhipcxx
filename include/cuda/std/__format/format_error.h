@@ -59,11 +59,11 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
+// NOTE(HIP/AMD): also exclude HIPRTC. HIPRTC is treated as hosted (_CCCL_HOSTED()
+// == 1) but has no host standard library, so ::std::runtime_error / <string> are
+// unavailable (their includes above are HIPRTC-excluded). Mirror the upstream
+// _CCCL_HOSTED() gate with the HIPRTC exclusion, as in __cccl/assert.h.
 #if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION
 
@@ -87,19 +87,11 @@ public:
 
 _CCCL_END_NAMESPACE_CUDA_STD_NOVERSION
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-// <<<<<<< OLD CODE from 83eb7e3384 (94d81c40fb) - COMMENTED OUT
-// [[noreturn]] _CCCL_API inline void __throw_format_error([[maybe_unused]] const char* __s)
-// =======
-[[noreturn]] _CCCL_HOST_DEVICE_API inline void __throw_format_error(const char* __s)
-// >>>>>>> END NEW CODE (94d81c40fb)
+[[noreturn]] _CCCL_HOST_DEVICE_API inline void __throw_format_error([[maybe_unused]] const char* __s)
 {
 #if _CCCL_HAS_EXCEPTIONS()
   // __s is consumed by the host arm of NV_IF_ELSE_TARGET; the device arm

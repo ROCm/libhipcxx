@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -444,22 +444,14 @@ TEST_FUNC constexpr bool is_invocable(F, Args&&...)
 }
 
 // execution space annotations on lambda require --extended-lambda flag with nvrtc
-// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
-// #if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-// static_assert(is_invocable([] {}), "");
-// static_assert(is_invocable([](int) {}, 0), "");
-// static_assert(is_invocable([](int) {}, 0L), "");
-// static_assert(!is_invocable([](int) {}, nullptr), "");
-// =======
-#if !TEST_COMPILER(NVRTC)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 static_assert(is_invocable([] {}));
 static_assert(is_invocable([](int) {}, 0));
 static_assert(is_invocable([](int) {}, 0L));
 static_assert(!is_invocable([](int) {}, nullptr));
-// >>>>>>> END NEW CODE (ac28a5deba)
 int i = 0;
 static_assert(is_invocable([](int&) {}, i));
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 
 int main(int, char**)
 {

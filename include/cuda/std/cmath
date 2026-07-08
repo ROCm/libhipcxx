@@ -79,48 +79,30 @@
 #include <cuda/std/limits>
 #include <cuda/std/version>
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# #  define INFINITY ::cuda::std::numeric_limits<float>::infinity()
-# #  define NAN      ::cuda::std::numeric_limits<float>::quiet_NaN()
-# #endif // _CCCL_COMPILER(NVRTC) || _CCCL_COMPILER_HIPRTC
-# =======
-#if _CCCL_FREESTANDING()
+// NOTE(HIP/AMD): HIPRTC also lacks host <math.h>, so it needs INFINITY/NAN defined locally.
+#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
 #  define INFINITY ::cuda::std::numeric_limits<float>::infinity()
 #  define NAN      ::cuda::std::numeric_limits<float>::quiet_NaN()
-#endif // _CCCL_FREESTANDING()
-# >>>>>>> END NEW CODE (e5037ea8b4)
+#endif // _CCCL_FREESTANDING() || _CCCL_COMPILER_HIPRTC
 
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# // NOTE(HIP/AMD): under HIPRTC there is no host <math.h>, so ::double_t / ::float_t
-# // are not available in the global namespace. Define them locally for the RTC path,
-# // mirroring the NVRTC branch.
-# #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# =======
-#if _CCCL_FREESTANDING()
-# >>>>>>> END NEW CODE (e5037ea8b4)
+// NOTE(HIP/AMD): under HIPRTC there is no host <math.h>, so ::double_t / ::float_t
+// are not available in the global namespace. Define them locally for the RTC path,
+// mirroring the NVRTC branch.
+#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
 
 using double_t = double;
 using float_t  = float;
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# #else // ^^^ RTC ^^^ / vvv !RTC vvv
-# =======
-#else // ^^^ _CCCL_FREESTANDING() ^^^ / vvv _CCCL_HOSTED() vvv
-# >>>>>>> END NEW CODE (e5037ea8b4)
+#else // ^^^ _CCCL_FREESTANDING() || HIPRTC ^^^ / vvv _CCCL_HOSTED() && !HIPRTC vvv
 
 using ::double_t;
 using ::float_t;
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# #endif // _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-# =======
-#endif // _CCCL_HOSTED()
-# >>>>>>> END NEW CODE (e5037ea8b4)
+#endif // _CCCL_HOSTED() && !HIPRTC
 
 _CCCL_END_NAMESPACE_CUDA_STD
 

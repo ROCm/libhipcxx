@@ -48,21 +48,11 @@
 #include <cuda/std/__type_traits/remove_const.h>
 #include <cuda/std/climits>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
-// #  include <cstring>
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
-#if _CCCL_HOSTED()
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): host C string fns unavailable under hipRTC
 #  include <cstring>
-// <<<<<<< OLD CODE from 3b82c5de98 (89b5a1e51d) - COMMENTED OUT
-// #endif // _CCCL_HOSTED()
-// // >>>>>>> END NEW CODE (e5037ea8b4)
-// =======
 #elif _CCCL_HOSTJIT()
 #  include <string.h>
 #endif // _CCCL_HOSTJIT()
-// >>>>>>> END NEW CODE (89b5a1e51d)
 
 #include <cuda/std/__cccl/prologue.h>
 

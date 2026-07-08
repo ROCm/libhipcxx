@@ -6,7 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -176,52 +176,6 @@ TEST_FUNC void doIncompleteTypeTest(int expect_alive, Args&&... ctor_args)
   checkNumIncompleteTypeAlive(0);
 }
 
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// // TODO(HIP/AMD): add __CCL_DEVICE to is_incomplete_test_anchor asap
-// #define INCOMPLETE_TEST_EPILOGUE()                                            \
-//   int is_incomplete_test_anchor = is_incomplete_test();                       \
-//                                                                               \
-//   TEST_GLOBAL_VARIABLE int IncompleteType_count = 0;                          \
-//   struct IncompleteType                                                       \
-//   {                                                                           \
-//     __host__ __device__ IncompleteType()                                      \
-//     {                                                                         \
-//       ++IncompleteType_count;                                                 \
-//     }                                                                         \
-//     __host__ __device__ ~IncompleteType()                                     \
-//     {                                                                         \
-//       --IncompleteType_count;                                                 \
-//     }                                                                         \
-//   };                                                                          \
-//                                                                               \
-//   __host__ __device__ void checkNumIncompleteTypeAlive(int i)                 \
-//   {                                                                           \
-//     assert(IncompleteType_count == i);                                        \
-//   }                                                                           \
-//   __host__ __device__ int getNumIncompleteTypeAlive()                         \
-//   {                                                                           \
-//     return IncompleteType_count;                                              \
-//   }                                                                           \
-//   __host__ __device__ IncompleteType* getNewIncomplete()                      \
-//   {                                                                           \
-//     return new IncompleteType;                                                \
-//   }                                                                           \
-//   __host__ __device__ IncompleteType* getNewIncompleteArray(int size)         \
-//   {                                                                           \
-//     return new IncompleteType[size];                                          \
-//   }                                                                           \
-//                                                                               \
-//   template <class IncompleteT, class Del>                                     \
-//   __host__ __device__ StoresIncomplete<IncompleteT, Del>::~StoresIncomplete() \
-//   {}
-//
-// // TODO(HIP/AMD): add constexpr to is_incomplete_test if required (and possible) 
-// #define DEFINE_AND_RUN_IS_INCOMPLETE_TEST(...)                  \
-//   __host__ __device__ static int is_incomplete_test()           \
-//   {                                                             \
-//     __VA_ARGS__ return 0;                                       \
-//   }                                                             \
-// =======
 #define INCOMPLETE_TEST_EPILOGUE()                                         \
   _LIBCUDACXX_DEVICE int is_incomplete_test_anchor = is_incomplete_test(); \
                                                                            \
@@ -264,7 +218,6 @@ TEST_FUNC void doIncompleteTypeTest(int expect_alive, Args&&... ctor_args)
   {                                                   \
     __VA_ARGS__ return 0;                             \
   }                                                   \
-// >>>>>>> END NEW CODE (5214850b75)
   INCOMPLETE_TEST_EPILOGUE()
 
 #endif // TEST_SUPPORT_UNIQUE_PTR_TEST_HELPER_H

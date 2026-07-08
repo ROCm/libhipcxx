@@ -44,11 +44,7 @@
 #include "test_macros.h"
 
 template <class T>
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// __host__ __device__ void test_isinf(const T pos, bool expected)
-// =======
 TEST_FUNC constexpr void test_isinf(const T pos, bool expected)
-// >>>>>>> END NEW CODE (5214850b75)
 {
   _CCCL_ASSERT(cuda::std::isinf(pos) == expected, "Positive infinity not correct detected");
 

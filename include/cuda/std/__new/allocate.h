@@ -42,13 +42,8 @@
 #include <cuda/std/__new/device_new.h>
 #include <cuda/std/cstddef>
 
-// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
-// #if _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  include <new> // for align_val_t
-// =======
-#if _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() && !_CCCL_COMPILER(NVRTC)
+#if _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  include <cuda/std/__host_stdlib/new> // for align_val_t
-// >>>>>>> END NEW CODE (332e134db7)
 #endif // _LIBCUDACXX_HAS_ALIGNED_ALLOCATION() !_CCCL_COMPILER(NVRTC)
 
 #if __cpp_sized_deallocation < 201309L

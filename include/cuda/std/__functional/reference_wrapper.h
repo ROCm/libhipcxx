@@ -98,11 +98,7 @@ public:
 };
 
 template <class _Tp>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE reference_wrapper(_Tp&) -> reference_wrapper<_Tp>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES reference_wrapper(_Tp&) -> reference_wrapper<_Tp>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 template <class _Tp>
 [[nodiscard]] _CCCL_API constexpr reference_wrapper<_Tp> ref(_Tp& __t) noexcept
