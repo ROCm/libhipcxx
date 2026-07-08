@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // UNSUPPORTED: enable-tile
 // error: accessing gridDim/blockDim/blockIdx/threadIdx/warpSize is unsupported in tile code
 
@@ -20,6 +42,15 @@
 
 #include "test_macros.h"
 
+// NOTE(HIP/AMD): the warp/wavefront size is 32 on NVIDIA but wave32/wave64 on
+// AMD, so the compile-time warp count (static_count_in_block) and its use in
+// template parameters must use the wave size for the target.
+#if _CCCL_HIP_COMPILATION()
+#  define TEST_WAVE_SIZE _CCCL_HIP_WAVE_SIZE
+#else
+#  define TEST_WAVE_SIZE 32
+#endif
+
 template <class Hierarchy, class GridExts, class ClusterExts, class BlockExts>
 TEST_DEVICE_FUNC void test_warp(
   const Hierarchy& hier, const GridExts& grid_exts, const ClusterExts& cluster_exts, const BlockExts& block_exts)
@@ -28,7 +59,8 @@ TEST_DEVICE_FUNC void test_warp(
 
   constexpr auto static_count_in_block =
     (BlockExts::rank_dynamic() == 0)
-      ? (BlockExts::static_extent(0) * BlockExts::static_extent(1) * BlockExts::static_extent(2) + 32 - 1) / 32
+      ? (BlockExts::static_extent(0) * BlockExts::static_extent(1) * BlockExts::static_extent(2) + TEST_WAVE_SIZE - 1)
+          / TEST_WAVE_SIZE
       : dext;
 
   const unsigned count_in_block = (blockDim.x * blockDim.y * blockDim.z + warpSize - 1) / warpSize;
@@ -47,7 +79,9 @@ TEST_DEVICE_FUNC void test_warp(
                  }))
     test_dims(exp, cuda::warp, cuda::cluster, hier);
   }
-  test_dims({count_in_block * gridDim.x, gridDim.y, gridDim.z}, cuda::warp, cuda::grid, hier);
+  // NOTE(HIP/AMD): use explicit uint3{} to avoid brace-initializer deduction
+  // failure on HIP where gridDim returns __hip_builtin_gridDim_t, not uint3.
+  test_dims(uint3{count_in_block * gridDim.x, gridDim.y, gridDim.z}, cuda::warp, cuda::grid, hier);
 
   // 2. Test cuda::warp.static_dims(x, hier)
   test_static_dims(ulonglong3{static_count_in_block, 1, 1}, cuda::warp, cuda::block, hier);
@@ -215,6 +249,7 @@ void test_launch(GridExts grid_exts, BlockExts block_exts)
     cuda::make_hierarchy(cuda::grid_dims(grid_dims), cuda::block_dims(block_dims)), grid_exts_dyn, block_exts_dyn);
 }
 
+#if !defined(__HIP_PLATFORM_AMD__) // NOTE(HIP/AMD): cluster launch is NVIDIA-only
 template <class GridExts, class ClusterExts, class BlockExts>
 void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_exts)
 {
@@ -257,6 +292,7 @@ void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_e
     assert(cudaLaunchKernelEx(&config, kernel, hier, grid_exts_dyn, cluster_exts_dyn, block_exts_dyn) == cudaSuccess);
   }
 }
+#endif // !defined(__HIP_PLATFORM_AMD__)
 
 void test()
 {
@@ -271,12 +307,14 @@ void test()
   test_launch(cuda::std::extents<unsigned, 2, 3, 1>{}, cuda::std::extents<unsigned, 7, 5, 1>{});
   test_launch(cuda::std::extents<unsigned, 2, 3, 4>{}, cuda::std::extents<unsigned, 4, 2, 8>{});
 
+#if !defined(__HIP_PLATFORM_AMD__) // NOTE(HIP/AMD): thread-block clusters are NVIDIA-only
   if (enable_clusters)
   {
     test_launch(cuda::std::extents<unsigned, 3, 5, 3>{},
                 cuda::std::extents<unsigned, 4, 2, 1>{},
                 cuda::std::extents<unsigned, 2, 8, 4>{});
   }
+#endif // !defined(__HIP_PLATFORM_AMD__)
 
   assert(cudaDeviceSynchronize() == cudaSuccess);
 }

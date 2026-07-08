@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___DEVICE_COMPUTE_CAPABILITY_H
 #define _CUDA___DEVICE_COMPUTE_CAPABILITY_H
 
@@ -210,7 +232,15 @@ template <int... _Vs>
   return ::cuda::__all_compute_capabilities();
 #  endif // ^^^ no arch list ^^^
 }
-#endif // _CCCL_CUDA_COMPILATION()
+#elif _CCCL_HIP_COMPILATION() // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv _CCCL_HIP_COMPILATION() vvv
+// NOTE(HIP/AMD): HIP has no equivalent of __CUDA_ARCH_LIST__ / NV_TARGET_SM_INTEGER_LIST.
+// Fall back to the full list of known CUDA compute capabilities, matching the CUDA
+// fallback behaviour above (same result when no arch list is defined).
+[[nodiscard]] _CCCL_API _CCCL_CONSTEVAL auto __target_compute_capabilities() noexcept
+{
+  return ::cuda::__all_compute_capabilities();
+}
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA
 
