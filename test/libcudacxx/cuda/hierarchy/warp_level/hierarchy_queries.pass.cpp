@@ -198,7 +198,7 @@ TEST_DEVICE_FUNC void test_device()
             cuda::std::dims<3, unsigned>{blockDim.x, blockDim.y, blockDim.z});
 }
 
-#if !_CCCL_COMPILER(NVRTC)
+#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 template <class Hierarchy, class GridExts, class BlockExts>
 __global__ void test_kernel(Hierarchy hier, GridExts grid_exts, BlockExts block_exts)
 {
@@ -318,7 +318,7 @@ void test()
 
   assert(cudaDeviceSynchronize() == cudaSuccess);
 }
-#endif // !_CCCL_COMPILER(NVRTC)
+#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 int main(int, char**)
 {
