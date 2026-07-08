@@ -56,17 +56,12 @@ TEST_DEVICE_FUNC void test_result(cuda::std::extents<IRes, Exts...> res, cuda::s
   }
 }
 
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// // NOTE(HIP/AMD): templated on the vector type so the built-in dimension
-// // variables (e.g. gridDim/blockDim, which are uint3 on CUDA but distinct
-// // __hip_builtin_*_t types on HIP) can be passed directly. test_result only
-// // uses .x/.y/.z, so this is portable across both backends.
-// template <class Vec, class Level, class... Args>
-// __device__ void test_dims(const Vec exp, const Level& level, Args... args)
-// =======
-template <class Level, class... Args>
-TEST_DEVICE_FUNC void test_dims(const uint3 exp, const Level& level, Args... args)
-// >>>>>>> END NEW CODE (5214850b75)
+// NOTE(HIP/AMD): templated on the vector type so the built-in dimension
+// variables (e.g. gridDim/blockDim, which are uint3 on CUDA but distinct
+// __hip_builtin_*_t types on HIP) can be passed directly. test_result only
+// uses .x/.y/.z, so this is portable across both backends.
+template <class Vec, class Level, class... Args>
+TEST_DEVICE_FUNC void test_dims(const Vec exp, const Level& level, Args... args)
 {
   test_result(level.dims(args...), exp);
   test_result(level.template dims_as<short>(args...), exp);
@@ -123,14 +118,9 @@ TEST_DEVICE_FUNC void test_count(const cuda::std::size_t exp, const Level& level
   assert(level.template count_as<unsigned long long>(args...) == static_cast<unsigned long long>(exp));
 }
 
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// // NOTE(HIP/AMD): templated first parameter; see test_dims above.
-// template <class Vec, class Level, class... Args>
-// __device__ void test_index(const Vec exp, const Level& level, Args... args)
-// =======
-template <class Level, class... Args>
-TEST_DEVICE_FUNC void test_index(const uint3 exp, const Level& level, Args... args)
-// >>>>>>> END NEW CODE (5214850b75)
+// NOTE(HIP/AMD): templated first parameter; see test_dims above.
+template <class Vec, class Level, class... Args>
+TEST_DEVICE_FUNC void test_index(const Vec exp, const Level& level, Args... args)
 {
   test_result(level.index(args...), exp);
   test_result(level.template index_as<short>(args...), exp);

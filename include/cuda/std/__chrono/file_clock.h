@@ -47,15 +47,9 @@
 #include <cuda/std/__chrono/time_point.h>
 #include <cuda/std/ctime>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC) // NOTE(HIP/AMD): no host <chrono> under hipRTC
-// #  include <chrono>
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
-#if _CCCL_HOSTED()
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host <chrono> under hipRTC
 #  include <chrono>
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 

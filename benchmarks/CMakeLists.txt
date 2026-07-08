@@ -81,28 +81,14 @@ function(add_bench target_name bench_name bench_src)
   set(bench_target ${bench_name})
   set(${target_name} ${bench_target} PARENT_SCOPE)
 
-# <<<<<<< OLD CODE from 9fa0464b8f (e3b745085e) - COMMENTED OUT
-# # <<<<<<< OLD CODE from 313f9fe948 (67794b2eb4) - COMMENTED OUT
-# #   add_executable(${bench_target} "${bench_src}")
-# #   if (LIBCUDACXX_ENABLE_HIP)
-# #     set_source_files_properties("${bench_src}" PROPERTIES LANGUAGE HIP)
-# #     # nvbench_helper.cuh's device paths make [[nodiscard]] hip* calls whose returns
-# #     # the upstream CUDA code ignores; don't fail -Werror on that (see nvbench_helper).
-# #     target_compile_options(${bench_target} PRIVATE
-# #       $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value -Wno-error=unused-result>)
-# #   endif()
-# #   cccl_configure_target(${bench_target} DIALECT 17)
-# # =======
-#   cccl_add_executable(
-#     ${bench_target}
-#     NO_METATARGETS
-#     DIALECT 17
-#     SOURCES "${bench_src}"
-#   )
-# # >>>>>>> END NEW CODE (67794b2eb4)
-# =======
   cccl_add_executable(${bench_target} NO_METATARGETS SOURCES "${bench_src}")
-# >>>>>>> END NEW CODE (e3b745085e)
+  if (LIBCUDACXX_ENABLE_HIP)
+    set_source_files_properties("${bench_src}" PROPERTIES LANGUAGE HIP)
+    # nvbench_helper.cuh's device paths make [[nodiscard]] hip* calls whose returns
+    # the upstream CUDA code ignores; don't fail -Werror on that (see nvbench_helper).
+    target_compile_options(${bench_target} PRIVATE
+      $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value -Wno-error=unused-result>)
+  endif()
   target_link_libraries(
     ${bench_target}
     PRIVATE libcudacxx::libcudacxx cccl.nvbench_helper nvbench::main
@@ -124,17 +110,10 @@ function(add_bench_dir bench_dir)
     add_bench(base_bench_target ${base_bench_name} "${bench_src}")
     add_dependencies(${benches_meta_target} ${base_bench_target})
     target_compile_definitions(${base_bench_target} PRIVATE TUNE_BASE=1)
-# <<<<<<< OLD CODE from 2eddf6d094 (b1db6ffd85) - COMMENTED OUT
-#     # --extended-lambda is an nvcc-only flag; clang-HIP supports device lambdas natively.
-#     if (NOT LIBCUDACXX_ENABLE_HIP)
-#       target_compile_options(${base_bench_target} PRIVATE "--extended-lambda")
-#     endif()
-# =======
     target_compile_options(
       ${base_bench_target}
       PRIVATE "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:--extended-lambda>"
     )
-# >>>>>>> END NEW CODE (b1db6ffd85)
     # benchmarking
     register_cccl_benchmark("${bench_name}" "")
   endforeach()

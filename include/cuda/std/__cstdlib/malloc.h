@@ -47,11 +47,7 @@
 #include <cuda/std/__cstddef/types.h>
 #include <cuda/std/__cstring/memset.h>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host <cstdlib>
 #  include <cstdlib>
 #endif // _CCCL_HOSTED()
 
@@ -64,13 +60,8 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 using ::free;
 using ::malloc;
 
-// <<<<<<< OLD CODE from 03118a502c (215dc6e187) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
-// [[nodiscard]] _CCCL_HIDE_FROM_ABI _CCCL_DEVICE void* __calloc_device(size_t __n, size_t __size) noexcept
-// =======
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 [[nodiscard]] _CCCL_DEVICE_API inline void* __calloc_device(size_t __n, size_t __size) noexcept
-// >>>>>>> END NEW CODE (215dc6e187)
 {
   void* __ptr{};
 

@@ -419,11 +419,7 @@ _CCCL_DIAG_POP
 
 _CCCL_TEMPLATE(class _Tp, class... _Args)
 _CCCL_REQUIRES((is_same_v<_Tp, _Args> && ...))
-# <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-# _CCCL_CTAD_HOST_DEVICE array(_Tp, _Args...) -> array<_Tp, 1 + sizeof...(_Args)>;
-# =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES array(_Tp, _Args...) -> array<_Tp, 1 + sizeof...(_Args)>;
-# >>>>>>> END NEW CODE (5a016e2713)
 
 template <class _Tp, size_t _Size>
 [[nodiscard]] _CCCL_API constexpr bool operator==(const array<_Tp, _Size>& __x, const array<_Tp, _Size>& __y)

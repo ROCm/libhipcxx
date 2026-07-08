@@ -502,12 +502,8 @@ public:
 };
 
 template <class _Range, class _Fn>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE transform_view(_Range&&, _Fn) -> transform_view<::cuda::std::ranges::views::all_t<_Range>, _Fn>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES transform_view(_Range&&, _Fn)
   -> transform_view<::cuda::std::ranges::views::all_t<_Range>, _Fn>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 _CCCL_END_NAMESPACE_CUDA_STD_RANGES
 

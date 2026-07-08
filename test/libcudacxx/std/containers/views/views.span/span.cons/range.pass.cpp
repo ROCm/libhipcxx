@@ -47,16 +47,12 @@
 
 #include "test_macros.h"
 
-// <<<<<<< OLD CODE from 684c571bce (3423f96d11) - COMMENTED OUT
-// #if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-// =======
-#if !TEST_COMPILER(NVRTC)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 #  if defined(__cpp_lib_span)
 #    include <span>
 #  endif //__cpp_lib_span
-// >>>>>>> END NEW CODE (3423f96d11)
 #  include <vector>
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 
 struct A
 {};
@@ -171,7 +167,7 @@ void test_std()
   }
 #  endif // __cpp_lib_span
 }
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 
 TEST_FUNC constexpr bool test()
 {
@@ -189,14 +185,9 @@ int main(int, char**)
   static_assert(test());
   checkCV();
 
-// <<<<<<< OLD CODE from 684c571bce (3423f96d11) - COMMENTED OUT
-// #if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-//   NV_IF_TARGET(NV_IS_HOST, (testContainers<int>(); testContainers<A>();))
-// =======
-#if !TEST_COMPILER(NVRTC)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   NV_IF_TARGET(NV_IS_HOST, (test_std<int>(); test_std<A>();))
-// >>>>>>> END NEW CODE (3423f96d11)
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 
   return 0;
 }

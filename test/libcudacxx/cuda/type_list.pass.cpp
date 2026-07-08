@@ -38,13 +38,9 @@
 #include <cuda/std/__utility/integer_sequence.h>
 #include <cuda/std/__utility/pair.h>
 
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// #if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
-// =======
 #include "test_macros.h"
 
-#if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG)
-// >>>>>>> END NEW CODE (5214850b75)
+#if _CCCL_CUDA_COMPILER(NVCC) || _CCCL_COMPILER(NVRTC) || _CCCL_CUDA_COMPILER(CLANG) || defined(_CCCL_HIP_COMPILER)
 // These compilers have trouble making substitution failures during
 // alias template instantiation non-fatal.
 #  define SKIP_SFINAE_TESTS

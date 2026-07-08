@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -76,13 +76,8 @@ struct MoveOnlyForwardIter
   {
     return lhs.base == rhs;
   }
-// <<<<<<< OLD CODE from 2ceb15d672 (5214850b75) - COMMENTED OUT
-// #if TEST_STD_VER < 2020 || TEST_COMPILER(CLANG) || TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC) || TEST_COMPILER(MSVC)
-//   __host__ __device__ friend constexpr bool operator==(int* rhs, const self& lhs)
-// =======
-#if TEST_STD_VER < 2020 || TEST_COMPILER(CLANG) || TEST_COMPILER(NVRTC) || TEST_COMPILER(MSVC)
+#if TEST_STD_VER < 2020 || TEST_COMPILER(CLANG) || TEST_COMPILER(NVRTC) || defined(TEST_COMPILER_HIPRTC) || TEST_COMPILER(MSVC)
   TEST_FUNC friend constexpr bool operator==(int* rhs, const self& lhs)
-// >>>>>>> END NEW CODE (5214850b75)
   {
     return lhs.base == rhs;
   }

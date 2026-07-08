@@ -26,11 +26,18 @@
 # .inl files are not globbed for, because they are not supposed to be used as public
 # entrypoints.
 
-# <<<<<<< OLD CODE from f17cf0067f (5c6dd87a64) - COMMENTED OUT
-# include(${CMAKE_CURRENT_LIST_DIR}/CCCLC2hHipDeps.cmake)
-# =======
-cccl_get_cudatoolkit()
-# >>>>>>> END NEW CODE (5c6dd87a64)
+# NOTE(HIP/AMD): upstream 3.4.0 added an unconditional cccl_get_cudatoolkit()
+# here. On HIP the macro pulls in a REQUIRED find_package(hiprand); the host
+# header sweep does not need the CUDA toolkit at all, so gate it out on HIP
+# (mirrors cmake/LibcudacxxInternalHeaderTesting.cmake).
+if (NOT LIBCUDACXX_ENABLE_HIP)
+  cccl_get_cudatoolkit()
+endif()
+
+# NOTE(HIP/AMD): pull in cccl_c2h_attach_hip_deps() so the generated header
+# test targets pick up hip::host + Threads::Threads on HIP builds (no-op on
+# non-HIP). See cmake/CCCLC2hHipDeps.cmake for the pthreads/glibc rationale.
+include(${CMAKE_CURRENT_LIST_DIR}/CCCLC2hHipDeps.cmake)
 
 # Meta target for all configs' header builds:
 add_custom_target(libcudacxx.test.public_headers_host_only)
@@ -76,56 +83,6 @@ if (CCCL_USE_LIBCXX)
   list(APPEND public_host_header_cxx_compile_options "-stdlib=libc++")
 endif()
 
-# <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
-# function(libcudacxx_create_public_header_test_host header_name headertest_src)
-#   # Create the default target for that file
-#   add_library(
-#     public_headers_host_only_${header_name}
-#     SHARED
-#     "${headertest_src}.cpp"
-#   )
-#   # NOTE(HIP/AMD): tag the configured headertest TU with LANGUAGE HIP so
-#   # it goes through the HIP toolchain rather than the plain CXX host
-#   # compiler -- this exercises the same compilation pipeline our HIP
-#   # consumers use. Lessons-learned ported from the upgrade/3.1_base
-#   # test/public_headers_host_only/CMakeLists.txt.
-#   if (LIBCUDACXX_ENABLE_HIP)
-#     set_source_files_properties(
-#       "${headertest_src}.cpp"
-#       PROPERTIES LANGUAGE HIP
-#     )
-#   endif()
-#   cccl_configure_target(public_headers_host_only_${header_name})
-#   target_include_directories(
-#     public_headers_host_only_${header_name}
-#     PRIVATE "${libcudacxx_SOURCE_DIR}/include"
-#   )
-#   target_compile_definitions(
-#     public_headers_host_only_${header_name}
-#     PRIVATE #
-#       ${public_host_header_cxx_compile_definitions}
-#       _CCCL_HEADER_TEST
-#   )
-#   target_compile_options(
-#     public_headers_host_only_${header_name}
-#     PRIVATE ${public_host_header_cxx_compile_options}
-#   )
-#   target_link_libraries(
-#     public_headers_host_only_${header_name}
-#     PUBLIC libcudacxx.compiler_interface
-#   )
-#   # NOTE(HIP/AMD): under HIP also attach the HIP host runtime + pthreads.
-#   # See cmake/CCCLC2hHipDeps.cmake for the manylinux/glibc < 2.34
-#   # rationale on Threads::Threads. No-op on non-HIP builds.
-#   cccl_c2h_attach_hip_deps(public_headers_host_only_${header_name})
-#   add_dependencies(
-#     libcudacxx.test.public_headers_host_only
-#     public_headers_host_only_${header_name}
-#   )
-# endfunction()
-#
-# =======
-# >>>>>>> END NEW CODE (49a588ce37)
 function(
   libcudacxx_add_public_header_test_host_target
   target_name
@@ -151,47 +108,32 @@ function(
     PRIVATE ${public_host_header_cxx_compile_options}
   )
   target_link_libraries(${target_name} PUBLIC libcudacxx.compiler_interface)
+  # NOTE(HIP/AMD): attach the HIP host runtime + pthreads on HIP builds so the
+  # generated header-test TUs find <hip/hip_runtime.h> and link std::once_flag.
+  # No-op on non-HIP. LANGUAGE stays CXX because cccl_generate_header_tests()
+  # only supports C/CXX/CUDA; the pre-3.4 per-TU `LANGUAGE HIP` tagging cannot
+  # be reapplied on the new bulk path.
+  # TODO(hip-upgrade): add HIP support to cccl_generate_header_tests() to
+  # restore HIP-toolchain compilation of the host header sweep.
+  cccl_c2h_attach_hip_deps(${target_name})
   if (with_ctk)
     target_link_libraries(${target_name} PUBLIC CUDA::cudart)
   endif()
   add_dependencies(${parent_target} ${target_name})
 endfunction()
 
-# <<<<<<< OLD CODE from bfe97afd5b (49a588ce37) - COMMENTED OUT
-# function(libcudacxx_add_public_headers_host_only header)
-#   # ${header} contains the "/" from the subfolder, replace by "_" for actual names
-#   string(REPLACE "/" "_" header_name "${header}")
-#
-#   # Create the source file for the header target from the template and add the file to the global project
-#   set(headertest_src "headers/${header_name}")
-#   configure_file(
-#     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/header_test.cpp.in"
-#     "${headertest_src}.cpp"
-#   )
-#
-#   # Create the default target for that file
-#   libcudacxx_create_public_header_test_host(${header_name} ${headertest_src})
-#   # NOTE(HIP/AMD): the *_with_ctk variant links CUDA::cudart and exercises
-#   # CTK-only headers, neither of which exists on a HIP-only build. Skip
-#   # it on HIP (the empty libcudacxx.test.public_headers_host_only_with_ctk
-#   # umbrella target stays defined near the top so references still resolve).
-#   if (NOT LIBCUDACXX_ENABLE_HIP)
-#     libcudacxx_create_public_header_test_host_with_ctk(${header_name} ${headertest_src})
-#   endif()
-# endfunction()
-#
-# foreach (header IN LISTS public_headers_host_only)
-#   libcudacxx_add_public_headers_host_only(${header})
-# endforeach()
-# =======
 libcudacxx_add_public_header_test_host_target(
   libcudacxx.test.public_headers_host_only.base
   libcudacxx.test.public_headers_host_only
   OFF
 )
-libcudacxx_add_public_header_test_host_target(
-  libcudacxx.test.public_headers_host_only_with_ctk.base
-  libcudacxx.test.public_headers_host_only_with_ctk
-  ON
-)
-# >>>>>>> END NEW CODE (49a588ce37)
+# NOTE(HIP/AMD): the *_with_ctk variant links CUDA::cudart and exercises
+# CTK-only headers, neither of which exists on a HIP-only build. Skip it on
+# HIP; the empty umbrella target defined near the top keeps references valid.
+if (NOT LIBCUDACXX_ENABLE_HIP)
+  libcudacxx_add_public_header_test_host_target(
+    libcudacxx.test.public_headers_host_only_with_ctk.base
+    libcudacxx.test.public_headers_host_only_with_ctk
+    ON
+  )
+endif()

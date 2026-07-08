@@ -8,7 +8,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -224,16 +224,10 @@ int main(int, char**)
   test_ambiguous_std<swap_with_friend<::std::pair<int, int>>>();
 #endif // !TEST_COMPILER(NVRTC)
 
-// <<<<<<< OLD CODE from 8e489afdf7 (ac28a5deba) - COMMENTED OUT
-// #if !defined(TEST_COMPILER_NVRTC) && !defined(TEST_COMPILER_HIPRTC)
-//   static_assert(cuda::std::is_swappable<cuda::std::pair<::std::pair<int, int>, int>>::value, "");
-//   static_assert(cuda::std::is_swappable<swap_with_friend<::std::pair<int, int>>>::value, "");
-// =======
-#if !TEST_COMPILER(NVRTC)
+#if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
   static_assert(cuda::std::is_swappable<cuda::std::pair<::std::pair<int, int>, int>>::value);
   static_assert(cuda::std::is_swappable<swap_with_friend<::std::pair<int, int>>>::value);
-// >>>>>>> END NEW CODE (ac28a5deba)
-#endif // !TEST_COMPILER(NVRTC)
+#endif // !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 
   return 0;
 }

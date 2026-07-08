@@ -43,11 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host <cstdlib>
 #  include <cstdlib>
 #endif // _CCCL_HOSTED()
 
@@ -57,15 +53,11 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // If available, use the host's div_t, ldiv_t, and lldiv_t types because the struct members order is
 // implementation-defined.
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+#if _CCCL_HOSTED() // NOTE(HIP/AMD): no host div_t under HIPRTC (see <cstdlib> gate above)
 using ::div_t;
 using ::ldiv_t;
 using ::lldiv_t;
-#else // ^^^ _CCCL_HOSTED() ^^^ / vvv _CCCL_FREESTANDING() vvv
+#else // ^^^ host div_t ^^^ / vvv _CCCL_FREESTANDING() or HIPRTC vvv
 struct _CCCL_TYPE_VISIBILITY_DEFAULT div_t
 {
   int quot;

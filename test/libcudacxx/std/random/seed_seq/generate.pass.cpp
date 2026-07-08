@@ -8,45 +8,36 @@
 //
 //===----------------------------------------------------------------------===//
 
-// <<<<<<< OLD CODE from 867ba7a390 (b4f59b00b3) - COMMENTED OUT
-// // MIT License
-// //
-// // Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
-// //
-// // Permission is hereby granted, free of charge, to any person obtaining a copy
-// // of this software and associated documentation files (the "Software"), to deal
-// // in the Software without restriction, including without limitation the rights
-// // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// // copies of the Software, and to permit persons to whom the Software is
-// // furnished to do so, subject to the following conditions:
-// //
-// // The above copyright notice and this permission notice shall be included in all
-// // copies or substantial portions of the Software.
-// //
-// // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// // SOFTWARE.
-// =======
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // XFAIL: enable-tile
 // error: dynamic memory allocation is unsupported in tile code
-// >>>>>>> END NEW CODE (b4f59b00b3)
 
 #include <cuda/std/random>
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #  include <cstdint>
-// #  include <random>
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
 #if _CCCL_HOSTED()
 #  include <cstdint>
 #  include <random>
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include "test_macros.h"
 
@@ -60,11 +51,7 @@ TEST_FUNC TEST_CONSTEXPR_CXX20 bool test()
   return true;
 }
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 void test_against_std()
 {
   cuda::std::size_t n                                     = 100;
@@ -87,11 +74,7 @@ void test_against_std()
     assert(cuda_output == std_output);
   }
 }
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-// =======
 #endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 int main(int, char**)
 {

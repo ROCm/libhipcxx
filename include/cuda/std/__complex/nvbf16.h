@@ -49,15 +49,10 @@
 #  include <cuda/std/__type_traits/is_constructible.h>
 
 // todo: find a way to get rid of this include
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// #    include <complex> // for std::complex stream operators
-// #  endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
+// NOTE(HIP/AMD): Also exclude for HIPRTC to avoid system math.h enum conflicts
 #  if _CCCL_HOSTED()
 #    include <complex> // for std::complex stream operators
 #  endif // _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 
 #  include <cuda/std/__cccl/prologue.h>
 
@@ -176,11 +171,8 @@ public:
     return *this;
   }
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
+// NOTE(HIP/AMD): Exclude for HIPRTC to avoid system math.h enum conflicts
 #  if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
   template <class _Up>
   _CCCL_API inline complex(const ::std::complex<_Up>& __other) noexcept
       : __repr_(_LIBCUDACXX_ACCESS_STD_COMPLEX_REAL(__other), _LIBCUDACXX_ACCESS_STD_COMPLEX_IMAG(__other))
@@ -330,11 +322,8 @@ struct __get_complex_impl<__nv_bfloat16>
   }
 };
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
+// NOTE(HIP/AMD): Exclude for HIPRTC to avoid system math.h enum conflicts
 #  if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 template <class _CharT, class _Traits>
 ::std::basic_istream<_CharT, _Traits>&
 operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<__nv_bfloat16>& __x)

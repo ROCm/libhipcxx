@@ -410,28 +410,16 @@ public:
 
 _CCCL_TEMPLATE(class _Iter, class _Sent)
 _CCCL_REQUIRES(input_or_output_iterator<_Iter> _CCCL_AND sentinel_for<_Sent, _Iter>)
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE subrange(_Iter, _Sent) -> subrange<_Iter, _Sent>;
-//
-// _CCCL_TEMPLATE(class _Iter, class _Sent)
-// _CCCL_REQUIRES(input_or_output_iterator<_Iter> _CCCL_AND sentinel_for<_Sent, _Iter>)
-// _CCCL_CTAD_HOST_DEVICE subrange(_Iter, _Sent, make_unsigned_t<iter_difference_t<_Iter>>)
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES subrange(_Iter, _Sent) -> subrange<_Iter, _Sent>;
 
 _CCCL_TEMPLATE(class _Iter, class _Sent)
 _CCCL_REQUIRES(input_or_output_iterator<_Iter> _CCCL_AND sentinel_for<_Sent, _Iter>)
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES subrange(_Iter, _Sent, make_unsigned_t<iter_difference_t<_Iter>>)
-// >>>>>>> END NEW CODE (5a016e2713)
   -> subrange<_Iter, _Sent, subrange_kind::sized>;
 
 _CCCL_TEMPLATE(class _Range)
 _CCCL_REQUIRES(borrowed_range<_Range>)
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE subrange(_Range&&)
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES subrange(_Range&&)
-// >>>>>>> END NEW CODE (5a016e2713)
   -> subrange<iterator_t<_Range>,
               sentinel_t<_Range>,
               (sized_range<_Range> || sized_sentinel_for<sentinel_t<_Range>, iterator_t<_Range>>)
@@ -440,11 +428,7 @@ _CCCL_DEDUCTION_GUIDE_ATTRIBUTES subrange(_Range&&)
 
 _CCCL_TEMPLATE(class _Range)
 _CCCL_REQUIRES(borrowed_range<_Range>)
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE subrange(_Range&&, make_unsigned_t<range_difference_t<_Range>>)
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES subrange(_Range&&, make_unsigned_t<range_difference_t<_Range>>)
-// >>>>>>> END NEW CODE (5a016e2713)
   -> subrange<iterator_t<_Range>, sentinel_t<_Range>, subrange_kind::sized>;
 
 // Not _CCCL_TEMPLATE because we need to forward declare them

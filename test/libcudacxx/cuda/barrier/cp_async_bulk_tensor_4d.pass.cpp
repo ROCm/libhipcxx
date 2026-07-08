@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -35,13 +35,10 @@
 // XFAIL: clang && !nvcc
 // NVRTC_SKIP_KERNEL_RUN // This will have effect once PR 433 is merged (line above should be removed.)
 
-// <<<<<<< OLD CODE from 7011c55229 (9e9eeeb439) - COMMENTED OUT
-// // NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
-// // UNSUPPORTED: hipcc
-// =======
+// NOTE(HIP/AMD): currently barrier is not supported on AMD hardware
+// UNSUPPORTED: hipcc
 // UNSUPPORTED: enable-tile
 // error: asm statement is unsupported in tile code
-// >>>>>>> END NEW CODE (9e9eeeb439)
 
 // <cuda/barrier>
 

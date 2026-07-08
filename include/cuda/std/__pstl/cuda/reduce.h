@@ -88,15 +88,6 @@ _CCCL_DIAG_POP
 #  include <cuda/std/__utility/forward.h>
 #  include <cuda/std/__utility/move.h>
 
-// <<<<<<< OLD CODE from 98216bdf35 (332e134db7) - COMMENTED OUT
-// // On HIP the cuda* runtime symbols come from <libhipcxx/__amd/cuda_runtime.h>
-// // (pulled globally via <cuda/std/detail/__config>); there is no <cuda_runtime.h>.
-// #  if !_CCCL_HIP_COMPILATION()
-// #    include <cuda_runtime.h>
-// #  endif
-//
-// =======
-// >>>>>>> END NEW CODE (332e134db7)
 #  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD_EXECUTION

@@ -59,11 +59,7 @@ struct __fmt_parse_number_result
 };
 
 template <class _It>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE __fmt_parse_number_result(_It, uint32_t) -> __fmt_parse_number_result<_It>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES __fmt_parse_number_result(_It, uint32_t) -> __fmt_parse_number_result<_It>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 //! The maximum value of a numeric argument.
 //!

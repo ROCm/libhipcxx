@@ -59,11 +59,9 @@
 #include <cuda/std/__utility/priority_tag.h>
 #include <cuda/std/cstddef>
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
+// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC (HIPRTC is not treated as freestanding in compiler.h), so gate the
+// host standard library headers explicitly like NVRTC to keep them out of the device-only HIPRTC TU.
 #if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 #  if _CCCL_COMPILER(MSVC)
 #    include <xutility> // for ::std::input_iterator_tag
 #  else // ^^^ _CCCL_COMPILER(MSVC) ^^^ / vvv !_CCCL_COMPILER(MSVC) vvv
@@ -130,11 +128,9 @@ template <class _Tp>
 using iter_reference_t = enable_if_t<__dereferenceable<_Tp>, decltype(*::cuda::std::declval<_Tp&>())>;
 #endif // _CCCL_HAS_CONCEPTS()
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// #if _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
-// =======
-#if _CCCL_FREESTANDING()
-// >>>>>>> END NEW CODE (e5037ea8b4)
+// NOTE(HIP/AMD): HIPRTC has no host standard library but _CCCL_HOSTED() is 1 under HIPRTC, so mirror the freestanding
+// branch for HIPRTC to define the iterator tags locally instead of aliasing the unavailable ::std ones.
+#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
 
 struct _CCCL_TYPE_VISIBILITY_DEFAULT input_iterator_tag
 {};
@@ -149,7 +145,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT random_access_iterator_tag : public bidirec
 struct _CCCL_TYPE_VISIBILITY_DEFAULT contiguous_iterator_tag : public random_access_iterator_tag
 {};
 
-#else // ^^^ _CCCL_FREESTANDING() ^^^ / vvv _CCCL_HOSTED() vvv
+#else // ^^^ _CCCL_FREESTANDING() || HIPRTC ^^^ / vvv _CCCL_HOSTED() && !HIPRTC vvv
 
 using input_iterator_tag         = ::std::input_iterator_tag;
 using output_iterator_tag        = ::std::output_iterator_tag;
@@ -185,13 +181,8 @@ _CCCL_TEMPLATE(class _Iter, class _Ty, class _Range)
 _CCCL_REQUIRES(_IsSame<_Iter, ::__gnu_debug::_Safe_iterator<_Ty*, _Range>>::value)
 _CCCL_API inline auto __iter_concept_fn(::__gnu_debug::_Safe_iterator<_Ty*, _Range>, __priority_tag<3>)
   -> contiguous_iterator_tag;
-// <<<<<<< OLD CODE from 9438b35ed0 (2985fd5983) - COMMENTED OUT
-// #endif // _GLIBCXX_DEBUG
-// #if _CCCL_HOST_STD_LIB(LIBSTDCXX) && !defined(_CCCL_COMPILER_HIPRTC)
-// =======
 #  endif // _GLIBCXX_DEBUG
 #  if _CCCL_HOST_STD_LIB(LIBSTDCXX)
-// >>>>>>> END NEW CODE (2985fd5983)
 _CCCL_TEMPLATE(class _Iter, class _Ty, class _Range)
 _CCCL_REQUIRES(_IsSame<_Iter, ::__gnu_cxx::__normal_iterator<_Ty*, _Range>>::value)
 _CCCL_API inline auto __iter_concept_fn(::__gnu_cxx::__normal_iterator<_Ty*, _Range>, __priority_tag<3>)
@@ -468,15 +459,8 @@ template <class _Iter>
 template <class _Iter, __iterator_traits_selection = ::cuda::std::__select_iterator_traits_specialization<_Iter>()>
 struct __iterator_traits;
 
-// <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-// // <<<<<<< OLD CODE from 9616edecab (0668f6d399) - COMMENTED OUT
-// // #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// // =======
-// #if !_CCCL_COMPILER(NVRTC)
-// // >>>>>>> END NEW CODE (0668f6d399)
-// =======
+// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC, but ::std::iterator_traits is unavailable there, so exclude HIPRTC.
 #if _CCCL_HOSTED()
-// >>>>>>> END NEW CODE (e5037ea8b4)
 // We need to properly accept specializations of `std::iterator_traits`
 template <class _Iter>
 struct __iterator_traits<_Iter, __iterator_traits_selection::__specialized_from_std>
@@ -523,244 +507,10 @@ struct __iterator_traits<_Iter, __iterator_traits_selection::__cpp17_iterator>
   using reference         = void;
 };
 
-// <<<<<<< OLD CODE from 9616edecab (0668f6d399) - COMMENTED OUT
-// template <class _Ip>
-// struct _CCCL_TYPE_VISIBILITY_DEFAULT iterator_traits : __iterator_traits<_Ip>
-// {
-//   using __cccl_primary_template = iterator_traits;
-// };
-//
-// #else // ^^^ _CCCL_HAS_CONCEPTS() ^^^ / vvv !_CCCL_HAS_CONCEPTS() vvv
-//
-// // The `cpp17-*-iterator` exposition-only concepts have very similar names to the `Cpp17*Iterator` named requirements
-// // from `[iterator.cpp17]`. To avoid confusion between the two, the exposition-only concepts have been banished to
-// // a "detail" namespace indicating they have a niche use-case.
-// namespace __iterator_traits_detail
-// {
-// template <class _Ip>
-// _CCCL_CONCEPT_FRAGMENT(
-//   __cpp17_iterator_,
-//   requires(_Ip __i)(requires(__can_reference<decltype(*__i)>),
-//                     requires(same_as<_Ip&, decltype(++__i)>),
-//                     requires(__can_reference<decltype(*__i++)>),
-//                     requires(copyable<_Ip>)));
-//
-// template <class _Ip>
-// _CCCL_CONCEPT __cpp17_iterator = _CCCL_FRAGMENT(__cpp17_iterator_, _Ip);
-//
-// template <class _Ip>
-// _CCCL_CONCEPT_FRAGMENT(
-//   __cpp17_input_iterator_,
-//   requires(_Ip __i)(
-//     typename(common_reference_t<iter_reference_t<_Ip>&&, typename indirectly_readable_traits<_Ip>::value_type&>),
-//     typename(common_reference_t<decltype(*__i++)&&, typename indirectly_readable_traits<_Ip>::value_type&>),
-//     requires(__cpp17_iterator<_Ip>),
-//     requires(equality_comparable<_Ip>),
-//     requires(__has_member_difference_type<incrementable_traits<_Ip>>),
-//     requires(__has_member_value_type<indirectly_readable_traits<_Ip>>),
-//     requires(signed_integral<typename incrementable_traits<_Ip>::difference_type>)));
-//
-// template <class _Ip>
-// _CCCL_CONCEPT __cpp17_input_iterator = _CCCL_FRAGMENT(__cpp17_input_iterator_, _Ip);
-//
-// template <class _Ip>
-// _CCCL_CONCEPT_FRAGMENT(
-//   __cpp17_forward_iterator_,
-//   requires(_Ip __i)(
-//     requires(__cpp17_input_iterator<_Ip>),
-//     requires(convertible_to<decltype(__i++), _Ip const&>),
-//     requires(same_as<iter_reference_t<_Ip>, decltype(*__i++)>),
-//     requires(constructible_from<_Ip>),
-//     requires(is_lvalue_reference_v<iter_reference_t<_Ip>>),
-//     requires(same_as<remove_cvref_t<iter_reference_t<_Ip>>, typename indirectly_readable_traits<_Ip>::value_type>)));
-//
-// template <class _Ip>
-// _CCCL_CONCEPT __cpp17_forward_iterator = _CCCL_FRAGMENT(__cpp17_forward_iterator_, _Ip);
-//
-// template <class _Ip>
-// _CCCL_CONCEPT_FRAGMENT(
-//   __cpp17_bidirectional_iterator_,
-//   requires(_Ip __i)(requires(__cpp17_forward_iterator<_Ip>),
-//                     requires(same_as<_Ip&, decltype(--__i)>),
-//                     requires(convertible_to<decltype(__i--), _Ip const&>),
-//                     requires(same_as<iter_reference_t<_Ip>, decltype(*__i--)>)));
-//
-// template <class _Ip>
-// _CCCL_CONCEPT __cpp17_bidirectional_iterator = _CCCL_FRAGMENT(__cpp17_bidirectional_iterator_, _Ip);
-//
-// template <class _Ip>
-// _CCCL_CONCEPT_FRAGMENT(
-//   __cpp17_random_access_iterator_,
-//   requires(_Ip __i, typename incrementable_traits<_Ip>::difference_type __n)(
-//     requires(same_as<_Ip&, decltype(__i += __n)>),
-//     requires(same_as<_Ip&, decltype(__i -= __n)>),
-//     requires(same_as<_Ip, decltype(__i + __n)>),
-//     requires(same_as<_Ip, decltype(__n + __i)>),
-//     requires(same_as<_Ip, decltype(__i - __n)>),
-//     requires(same_as<decltype(__n), decltype(__i - __i)>),
-//     requires(convertible_to<decltype(__i[__n]), iter_reference_t<_Ip>>)));
-//
-// template <class _Ip>
-// _CCCL_CONCEPT __cpp17_random_access_iterator =
-//   __cpp17_bidirectional_iterator<_Ip> && totally_ordered<_Ip> && _CCCL_FRAGMENT(__cpp17_random_access_iterator_, _Ip);
-// } // namespace __iterator_traits_detail
-//
-// // We need to consider if a user has specialized std::iterator_traits
-// template <class _Ip>
-// inline constexpr bool __specialized_from_std = !__is_primary_std_template<remove_cvref_t<_Ip>>::value;
-//
-// template <class _Ip>
-// _CCCL_CONCEPT __specifies_members =
-//   !__specialized_from_std<_Ip> && __has_member_value_type<_Ip> && __has_member_difference_type<_Ip>
-//   && __has_member_reference<_Ip> && __has_member_iterator_category<_Ip>;
-// // NOTE(HIP): In C++17, all member types including pointer must be present.
-// // "If Iter does not have any of the five nested types above, then this template has no members 
-// // by any of those names (std::iterator_traits is SFINAE-friendly)."
-// template <class, class = void>
-// struct __iterator_traits_member_pointer_or_void
-// {
-//   using type = void;
-// };
-//
-// template <class _Tp>
-// struct __iterator_traits_member_pointer_or_void<_Tp, enable_if_t<__has_member_pointer<_Tp>>>
-// {
-//   using type = typename _Tp::pointer;
-// };
-//
-// template <class _Tp>
-// _CCCL_CONCEPT __cpp17_iterator_missing_members =
-//   !__specialized_from_std<_Tp> && !__specifies_members<_Tp> && __iterator_traits_detail::__cpp17_iterator<_Tp>;
-//
-// template <class _Tp>
-// _CCCL_CONCEPT __cpp17_input_iterator_missing_members =
-//   __cpp17_iterator_missing_members<_Tp> && __iterator_traits_detail::__cpp17_input_iterator<_Tp>;
-//
-// // Otherwise, `pointer` names `void`.
-// template <class, class = void>
-// struct __iterator_traits_member_pointer_or_arrow_or_void
-// {
-//   using type = void;
-// };
-//
-// // [iterator.traits]/3.2.1
-// // If the qualified-id `I::pointer` is valid and denotes a type, `pointer` names that type.
-// template <class _Ip>
-// struct __iterator_traits_member_pointer_or_arrow_or_void<_Ip, enable_if_t<__has_member_pointer<_Ip>>>
-// {
-//   using type = typename _Ip::pointer;
-// };
-//
-// template <class _Ip, class = void>
-// inline constexpr bool __has_operator_arrow = false;
-//
-// template <class _Ip>
-// inline constexpr bool __has_operator_arrow<_Ip, decltype((void) ::cuda::std::declval<_Ip&>().operator->())> = true;
-//
-// // Otherwise, if `decltype(declval<I&>().operator->())` is well-formed, then `pointer` names that
-// // type.
-// template <class _Ip>
-// struct __iterator_traits_member_pointer_or_arrow_or_void<
-//   _Ip,
-//   enable_if_t<__has_operator_arrow<_Ip> && !__has_member_pointer<_Ip>>>
-// {
-//   using type = decltype(declval<_Ip&>().operator->());
-// };
-//
-// // Otherwise, `reference` names `iter-reference-t<I>`.
-// template <class _Ip, class = void>
-// struct __iterator_traits_member_reference
-// {
-//   using type = iter_reference_t<_Ip>;
-// };
-//
-// // [iterator.traits]/3.2.2
-// // If the qualified-id `I::reference` is valid and denotes a type, `reference` names that type.
-// template <class _Ip>
-// struct __iterator_traits_member_reference<_Ip, enable_if_t<__has_member_reference<_Ip>>>
-// {
-//   using type = typename _Ip::reference;
-// };
-//
-// // [iterator.traits]/3.2.3.4
-// // input_iterator_tag
-// template <class _Ip, class = void>
-// struct __deduce_iterator_category
-// {
-//   using type = input_iterator_tag;
-// };
-//
-// // [iterator.traits]/3.2.3.1
-// // `random_access_iterator_tag` if `I` satisfies `cpp17-random-access-iterator`, or otherwise
-// template <class _Ip>
-// struct __deduce_iterator_category<_Ip, enable_if_t<__iterator_traits_detail::__cpp17_random_access_iterator<_Ip>>>
-// {
-//   using type = random_access_iterator_tag;
-// };
-//
-// // [iterator.traits]/3.2.3.2
-// // `bidirectional_iterator_tag` if `I` satisfies `cpp17-bidirectional-iterator`, or otherwise
-// template <class _Ip>
-// struct __deduce_iterator_category<_Ip,
-//                                   enable_if_t<!__iterator_traits_detail::__cpp17_random_access_iterator<_Ip>
-//                                               && __iterator_traits_detail::__cpp17_bidirectional_iterator<_Ip>>>
-// {
-//   using type = bidirectional_iterator_tag;
-// };
-//
-// // [iterator.traits]/3.2.3.3
-// // `forward_iterator_tag` if `I` satisfies `cpp17-forward-iterator`, or otherwise
-// template <class _Ip>
-// struct __deduce_iterator_category<_Ip,
-//                                   enable_if_t<!__iterator_traits_detail::__cpp17_bidirectional_iterator<_Ip>
-//                                               && __iterator_traits_detail::__cpp17_forward_iterator<_Ip>>>
-// {
-//   using type = forward_iterator_tag;
-// };
-//
-// template <class _Ip, class = void>
-// struct __iterator_traits_iterator_category : __deduce_iterator_category<_Ip>
-// {};
-//
-// // [iterator.traits]/3.2.3
-// // If the qualified-id `I::iterator-category` is valid and denotes a type, `iterator-category` names
-// // that type.
-// template <class _Ip>
-// struct __iterator_traits_iterator_category<_Ip, enable_if_t<__has_member_iterator_category<_Ip>>>
-// {
-//   using type = typename _Ip::iterator_category;
-// };
-//
-// // otherwise, it names void.
-// template <class, class = void>
-// struct __iterator_traits_difference_type
-// {
-//   using type = void;
-// };
-//
-// // If the qualified-id `incrementable_traits<I>::difference_type` is valid and denotes a type, then
-// // `difference_type` names that type;
-// template <class _Ip>
-// struct __iterator_traits_difference_type<_Ip, void_t<typename incrementable_traits<_Ip>::difference_type>>
-// {
-//   using type = typename incrementable_traits<_Ip>::difference_type;
-// };
-//
-// // [iterator.traits]/3.4
-// // Otherwise, `iterator_traits<I>` has no members by any of the above names.
-// template <class, class = void>
-// struct __iterator_traits
-// {};
-//
-// #  if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// template <class _Ip>
-// struct __iterator_traits<_Ip, enable_if_t<__specialized_from_std<_Ip>>> : public ::std::iterator_traits<_Ip>
-// =======
 // [iterator.traits]#3.4
 // Otherwise, `iterator_traits<I>` has no members by any of the above names.
 template <class _Iter>
 struct __iterator_traits<_Iter, __iterator_traits_selection::__no_members>
-// >>>>>>> END NEW CODE (0668f6d399)
 {};
 
 template <class _Iter, class>

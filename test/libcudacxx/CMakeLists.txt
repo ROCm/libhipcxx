@@ -64,11 +64,7 @@ if (LIBCUDACXX_ENABLE_HIP)
   find_package(rocthrust QUIET CONFIG)
 endif()
 
-# <<<<<<< OLD CODE from f50fdf0cd8 (ba2df44002) - COMMENTED OUT
-# if(LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP))
-# =======
-if (NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT CCCL_ENABLE_TILE)
-# >>>>>>> END NEW CODE (ba2df44002)
+if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT CCCL_ENABLE_TILE AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP))
   file(
     GLOB_RECURSE test_srcs
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
@@ -135,17 +131,6 @@ if (NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT CCCL_ENABLE_TILE)
     string(REGEX REPLACE "\\.[^.]+$" "" target_name "${target_name}")
     set(${target_name_var} ${target_name} PARENT_SCOPE)
 
-# <<<<<<< OLD CODE from 313f9fe948 (67794b2eb4) - COMMENTED OUT
-#     add_executable(${target_name} "${source}")
-#     if (LIBCUDACXX_ENABLE_HIP)
-#       # The .cu file extension defaults to LANGUAGE CUDA in CMake.
-#       # Force LANGUAGE HIP on HIP builds so hipcc / clang -x hip
-#       # picks the file up. Mirrors the pattern in c2h/CMakeLists.txt.
-#       set_source_files_properties("${source}" PROPERTIES LANGUAGE HIP)
-#     else()
-#       cccl_configure_target(${target_name} DIALECT ${CMAKE_CUDA_STANDARD})
-#     endif()
-# =======
     cccl_add_executable(
       ${target_name}
       ADD_CTEST
@@ -153,7 +138,12 @@ if (NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT CCCL_ENABLE_TILE)
       DIALECT ${CMAKE_CUDA_STANDARD}
       SOURCES "${source}"
     )
-# >>>>>>> END NEW CODE (67794b2eb4)
+    if (LIBCUDACXX_ENABLE_HIP)
+      # The .cu file extension defaults to LANGUAGE CUDA in CMake.
+      # Force LANGUAGE HIP on HIP builds so hipcc / clang -x hip
+      # picks the file up. Mirrors the pattern in c2h/CMakeLists.txt.
+      set_source_files_properties("${source}" PROPERTIES LANGUAGE HIP)
+    endif()
     target_include_directories(
       ${target_name}
       PRIVATE

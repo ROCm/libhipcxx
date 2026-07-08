@@ -144,11 +144,7 @@ public:
 };
 
 template <class _Tp>
-// <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-// _CCCL_CTAD_HOST_DEVICE single_view(_Tp) -> single_view<_Tp>;
-// =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES single_view(_Tp) -> single_view<_Tp>;
-// >>>>>>> END NEW CODE (5a016e2713)
 
 _CCCL_END_NAMESPACE_CUDA_STD_RANGES
 

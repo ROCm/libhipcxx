@@ -625,19 +625,6 @@ _CCCL_API inline auto as_writable_bytes(span<_Tp, _Extent> __s) noexcept
 
 //  Deduction guides
 template <class _Tp, size_t _Sz>
-# <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-# _CCCL_CTAD_HOST_DEVICE span(_Tp (&)[_Sz]) -> span<_Tp, _Sz>;
-#
-# template <class _Tp, size_t _Sz>
-# _CCCL_CTAD_HOST_DEVICE span(array<_Tp, _Sz>&) -> span<_Tp, _Sz>;
-#
-# template <class _Tp, size_t _Sz>
-# _CCCL_CTAD_HOST_DEVICE span(const array<_Tp, _Sz>&) -> span<const _Tp, _Sz>;
-#
-# _CCCL_TEMPLATE(class _It, class _EndOrSize)
-# _CCCL_REQUIRES(contiguous_iterator<_It>)
-# _CCCL_CTAD_HOST_DEVICE span(_It, _EndOrSize)
-# =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES span(_Tp (&)[_Sz]) -> span<_Tp, _Sz>;
 
 template <class _Tp, size_t _Sz>
@@ -648,26 +635,21 @@ _CCCL_DEDUCTION_GUIDE_ATTRIBUTES span(const array<_Tp, _Sz>&) -> span<const _Tp,
 
 #if _CCCL_HAS_HOST_STD_LIB()
 template <class _Tp, size_t _Sz>
-_CCCL_HOST_DEVICE span(::std::array<_Tp, _Sz>&) -> span<_Tp, _Sz>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES span(::std::array<_Tp, _Sz>&) -> span<_Tp, _Sz>;
 
 template <class _Tp, size_t _Sz>
-_CCCL_HOST_DEVICE span(const ::std::array<_Tp, _Sz>&) -> span<const _Tp, _Sz>;
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES span(const ::std::array<_Tp, _Sz>&) -> span<const _Tp, _Sz>;
 #endif // _CCCL_HAS_HOST_STD_LIB()
 
 _CCCL_TEMPLATE(class _It, class _EndOrSize)
 _CCCL_REQUIRES(contiguous_iterator<_It>)
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES span(_It, _EndOrSize)
-# >>>>>>> END NEW CODE (5a016e2713)
   -> span<remove_reference_t<iter_reference_t<_It>>, __maybe_static_ext<_EndOrSize>>;
 
 _CCCL_TEMPLATE(class _Range)
 _CCCL_REQUIRES(::cuda::std::ranges::contiguous_range<_Range>)
-# <<<<<<< OLD CODE from 2b8994f2d1 (5a016e2713) - COMMENTED OUT
-# _CCCL_CTAD_HOST_DEVICE span(_Range&&) -> span<remove_reference_t<::cuda::std::ranges::range_reference_t<_Range>>>;
-# =======
 _CCCL_DEDUCTION_GUIDE_ATTRIBUTES span(_Range&&)
   -> span<remove_reference_t<::cuda::std::ranges::range_reference_t<_Range>>>;
-# >>>>>>> END NEW CODE (5a016e2713)
 
 _CCCL_END_NAMESPACE_CUDA_STD
 

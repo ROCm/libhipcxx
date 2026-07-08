@@ -47,15 +47,10 @@
 #include <cuda/std/__cstring/memset.h>
 #include <cuda/std/__string/constexpr_c_functions.h>
 
-# <<<<<<< OLD CODE from b5d4ca3cf8 (e5037ea8b4) - COMMENTED OUT
-# #if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-# #  include <cstring>
-# #endif // !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC
-# =======
+// NOTE(HIP/AMD): HIPRTC does not have <cstring> available; exclude it like NVRTC.
 #if _CCCL_HOSTED()
 #  include <cstring>
 #endif // _CCCL_HOSTED()
-# >>>>>>> END NEW CODE (e5037ea8b4)
 
 #include <cuda/std/__cccl/prologue.h>
 

@@ -43,28 +43,33 @@
 #  pragma system_header
 #endif // no system header
 
-// <<<<<<< OLD CODE from cfac2f6346 (521ff4297e) - COMMENTED OUT
-// #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-//
-// // NOTE(HIP/AMD): the CUDA vector type names (char1, uint3, float4, ...) are
-// // provided on HIP by <hip/hip_vector_types.h> as HIP_vector_type<T,N> aliases.
-// #  if _CCCL_HIP_COMPILATION()
-// #    include <hip/hip_vector_types.h>
-// #  elif !_CCCL_CUDA_COMPILATION()
-// #    include <vector_types.h>
-// #  endif // vector type definitions
-// =======
-#if _CCCL_HAS_CTK()
-#  include <cuda/__type_traits/scalar_type.h>
-#  include <cuda/__type_traits/vector_size.h>
-#  include <cuda/std/__floating_point/traits.h>
-#  include <cuda/std/__type_traits/integral_constant.h>
-#  include <cuda/std/__type_traits/void_t.h>
-// >>>>>>> END NEW CODE (521ff4297e)
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
+
+// NOTE(HIP/AMD): the CUDA vector type names (char1, uint3, float4, ...) are
+// provided on HIP by <hip/hip_vector_types.h> as HIP_vector_type<T,N> aliases.
+#  if _CCCL_HIP_COMPILATION()
+#    include <hip/hip_vector_types.h>
+#  elif !_CCCL_CUDA_COMPILATION()
+#    include <vector_types.h>
+#  endif // vector type definitions
+#  if _CCCL_HAS_CTK()
+#    include <cuda/__type_traits/scalar_type.h>
+#    include <cuda/__type_traits/vector_size.h>
+#    include <cuda/std/__floating_point/traits.h>
+#    include <cuda/std/__type_traits/integral_constant.h>
+#    include <cuda/std/__type_traits/void_t.h>
+#  endif // _CCCL_HAS_CTK()
 
 #  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
+
+// TODO(hip-upgrade): on HIP (_CCCL_HIP_COMPILATION() && !_CCCL_HAS_CTK()) the
+// definitions below rely on vector_size_v (<cuda/__type_traits/vector_size.h>)
+// and scalar_type (<cuda/__type_traits/scalar_type.h>), which currently gate on
+// _CCCL_HAS_CTK() only. Until those headers support HIP, is_vector_type_v and
+// is_extended_fp_vector_type_v are not usable on HIP. Extend those headers for
+// HIP, or add HIP fallback specializations here.
 
 // is_vector_type
 
