@@ -48,6 +48,7 @@
 #include <cuda/std/__cmath/logarithms.h>
 #include <cuda/std/__cmath/roots.h>
 #include <cuda/std/__cmath/rounding_functions.h>
+#include <cuda/std/cmath> // NOTE(HIP/AMD): for INFINITY macro under hiprtc
 #include <cuda/std/__host_stdlib/istream>
 #include <cuda/std/__host_stdlib/ostream>
 #include <cuda/std/__limits/numeric_limits.h>

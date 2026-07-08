@@ -42,7 +42,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #  if _CCCL_HIP_COMPILATION() // HIP: __call_or is otherwise pulled in via the CUDA pstl backend (gated off on HIP)
 #    include <cuda/__functional/call_or.h>
 #  endif // _CCCL_HIP_COMPILATION()
@@ -53,7 +53,7 @@
 #  include <cuda/__stream/get_stream.h>
 #  include <cuda/__stream/stream.h>
 #  include <cuda/__stream/stream_ref.h>
-#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 #include <cuda/std/__bit/has_single_bit.h>
 #include <cuda/std/__concepts/concept_macros.h>
 #include <cuda/std/__execution/env.h>
@@ -98,7 +98,7 @@ struct __execution_policy_base : env<__unwrap_reference_t<_Envs>...>
   //! Forwards queries to the env
   using env<__unwrap_reference_t<_Envs>...>::query;
 
-#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
   //! @brief create a new policy with additional environments attached
   template <class _Env, size_t... _Indices>
   [[nodiscard]] _CCCL_HOST_API constexpr __execution_policy_base<_Policy, _Env, _Envs...>
@@ -193,7 +193,7 @@ struct __execution_policy_base : env<__unwrap_reference_t<_Envs>...>
                     ::cuda::std::make_index_sequence<sizeof...(_Envs)>());
     }
   }
-#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC)
+#endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 };
 
 using sequenced_policy = __execution_policy_base<static_cast<uint32_t>(__execution_policy::__sequenced)>;
