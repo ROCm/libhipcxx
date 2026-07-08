@@ -197,18 +197,51 @@ function(cccl_generate_header_tests target_name project_include_path)
 
   # Check that all functions in headers are either template functions or inline:
   set(link_target ${target_name}.link_check)
+
+  # NOTE(HIP/AMD): the link-check main is link_check_main.cpp, a .cpp = LANGUAGE
+  # CXX. On HIP builds this executable links the HIP object library and
+  # hip::device, whose INTERFACE compile/link options (-x hip,
+  # --offload-arch=<gfx>) are only understood by the HIP/clang driver and
+  # propagate onto this CXX source's compile AND the link. When the host CXX
+  # compiler is not clang (e.g. CMAKE_CXX_COMPILER=g++) both steps fail with
+  #   c++: error: unrecognized command-line option '--offload-arch=gfx90a'
+  # (it happened to work when CMAKE_CXX_COMPILER was hipcc/clang). Build the
+  # link-check itself as HIP so clang drives compile+link, matching the pre-3.4
+  # per-header mechanism which built LANGUAGE HIP targets. Use a per-target copy
+  # of the source so the LANGUAGE HIP property does not leak onto other suites
+  # (e.g. the LANGUAGE CXX public host sweep) that share link_check_main.cpp.
+  set(link_main "${CCCL_SOURCE_DIR}/cmake/link_check_main.cpp")
+  if (${CGHT_LANGUAGE} STREQUAL "HIP")
+    set(link_main "${CMAKE_CURRENT_BINARY_DIR}/headers/${target_name}/link_check_main.cu")
+    configure_file("${CCCL_SOURCE_DIR}/cmake/link_check_main.cpp" "${link_main}" COPYONLY)
+    set_source_files_properties("${link_main}" PROPERTIES LANGUAGE HIP)
+  endif()
+
   cccl_add_executable(
     ${link_target}
-    SOURCES "${CCCL_SOURCE_DIR}/cmake/link_check_main.cpp"
+    SOURCES "${link_main}"
     NO_METATARGETS
   )
   # Linking both ${target_name} and $<TARGET_OBJECTS:${target_name}> forces CMake to
   # link the same objects twice. The compiler will complain about duplicate symbols if
   # any functions are missing inline markup.
-  target_link_libraries(
-    ${link_target}
-    PRIVATE #
-      ${target_name}
-      $<TARGET_OBJECTS:${target_name}>
-  )
+  #
+  # NOTE(HIP/AMD): that double-link is incompatible with HIP -- clang emits a
+  # unique per-TU registration symbol (__hip_cuid_<hash>) into every HIP object,
+  # so linking each object twice makes those collide
+  # (ld.lld: error: duplicate symbol: __hip_cuid_*), not just genuine non-inline
+  # functions. On HIP we therefore link the header objects ONCE: this still
+  # verifies that the whole header set links together, but the "missing inline"
+  # lint is unavailable on HIP (the pre-3.4 per-header mechanism did not provide
+  # it either). TODO(hip-upgrade): restore an equivalent non-inline check on HIP.
+  if (${CGHT_LANGUAGE} STREQUAL "HIP")
+    target_link_libraries(${link_target} PRIVATE ${target_name})
+  else()
+    target_link_libraries(
+      ${link_target}
+      PRIVATE #
+        ${target_name}
+        $<TARGET_OBJECTS:${target_name}>
+    )
+  endif()
 endfunction()
