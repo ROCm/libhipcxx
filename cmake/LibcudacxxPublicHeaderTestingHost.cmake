@@ -110,11 +110,13 @@ function(
   target_link_libraries(${target_name} PUBLIC libcudacxx.compiler_interface)
   # NOTE(HIP/AMD): attach the HIP host runtime + pthreads on HIP builds so the
   # generated header-test TUs find <hip/hip_runtime.h> and link std::once_flag.
-  # No-op on non-HIP. LANGUAGE stays CXX because cccl_generate_header_tests()
-  # only supports C/CXX/CUDA; the pre-3.4 per-TU `LANGUAGE HIP` tagging cannot
-  # be reapplied on the new bulk path.
-  # TODO(hip-upgrade): add HIP support to cccl_generate_header_tests() to
-  # restore HIP-toolchain compilation of the host header sweep.
+  # No-op on non-HIP. LANGUAGE stays CXX for this host-only sweep: these headers
+  # are host-only and are compiled as plain C++ (upstream behaviour). Unlike the
+  # device header suites -- which now pass LANGUAGE HIP -- this sweep is not
+  # routed through the HIP front-end.
+  # TODO(hip-upgrade): amd-integration-base tagged these host TUs LANGUAGE HIP;
+  # cccl_generate_header_tests() now supports LANGUAGE HIP, so decide whether the
+  # host sweep should also pass it to restore HIP-front-end coverage.
   cccl_c2h_attach_hip_deps(${target_name})
   if (with_ctk)
     target_link_libraries(${target_name} PUBLIC CUDA::cudart)

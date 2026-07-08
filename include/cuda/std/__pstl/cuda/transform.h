@@ -103,6 +103,24 @@ struct __pstl_dispatch<__pstl_algorithm::__transform, __execution_backend::__cud
     _UnaryOp __func,
     _Predicate __pred)
   {
+    // Get the stream for synchronization after the algorithm is run
+    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStream_t{}}, __policy);
+
+#  if _CCCL_HIP_COMPILATION()
+    // NOTE(HIP/AMD): hipCUB does not have DeviceTransform::TransformIf. Use the
+    // cub::detail::transform::dispatch shim provided by __hipcub.h instead, which
+    // dispatches via rocprim::transform with a counting+discard iterator pattern.
+    constexpr auto __stable_address = CUB_NS_QUALIFIER::detail::transform::requires_stable_address::no;
+    _CCCL_TRY_CUDA_API(
+      CUB_NS_QUALIFIER::detail::transform::dispatch<__stable_address>,
+      "cuda::std::transform: failed inside CUDA backend",
+      ::cuda::std::move(__first),
+      __result,
+      __count,
+      ::cuda::std::move(__pred),
+      ::cuda::std::move(__func),
+      __stream.get());
+#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
     // We pass the policy as an environment to DeviceTransform
     _CCCL_TRY_CUDA_API(
       CUB_NS_QUALIFIER::DeviceTransform::TransformIf,
@@ -113,9 +131,8 @@ struct __pstl_dispatch<__pstl_algorithm::__transform, __execution_backend::__cud
       ::cuda::std::move(__pred),
       ::cuda::std::move(__func),
       __policy);
+#  endif // !_CCCL_HIP_COMPILATION()
 
-    // Get the stream for synchronization after the algorithm is run
-    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStream_t{}}, __policy);
     __stream.sync();
 
     return __result + __count;
