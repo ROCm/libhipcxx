@@ -227,6 +227,14 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS OR CCCL_ENABLE_BENCHMARKS)
   include(cmake/CCCLBuildCompilerTargets.cmake)
   include(cmake/CCCLConfigureTarget.cmake)
   include(cmake/CCCLGetDependencies.cmake)
+  # NOTE(HIP/AMD): CCCLEnsureMetaTargets/CCCLAddExecutable/CCCLAddTidyTarget are
+  # dependencies of CCCLGenerateHeaderTests; in a full CCCL parent build these
+  # are loaded by the top-level CCCL CMakeLists.txt. In the standalone libhipcxx
+  # build we must include them explicitly before the header-test cmake files.
+  include(cmake/CCCLEnsureMetaTargets.cmake)
+  include(cmake/CCCLAddTidyTarget.cmake)
+  include(cmake/CCCLAddExecutable.cmake)
+  include(cmake/CCCLGenerateHeaderTests.cmake)
   cccl_build_compiler_targets()
 
   # CCCL_{SOURCE,BINARY}_DIR are referenced by some cccl_get_* macros

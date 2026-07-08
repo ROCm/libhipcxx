@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___MEMORY_RANGES_OVERLAP_H
 #define _CUDA___MEMORY_RANGES_OVERLAP_H
 
@@ -34,7 +56,7 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 [[nodiscard]] _CCCL_DEVICE_API inline bool __ptr_ranges_overlap_device(
   const void* __lhs_begin, const void* __lhs_end, const void* __rhs_begin, const void* __rhs_end) noexcept
 {
@@ -47,7 +69,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
   _CCCL_ASSERT(__rhs_start_ptr <= __rhs_end_ptr, "rhs range is invalid");
   return __lhs_start_ptr < __rhs_end_ptr && __rhs_start_ptr < __lhs_end_ptr;
 }
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #if !_CCCL_COMPILER(NVRTC)
 template <typename _Tp>

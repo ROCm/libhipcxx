@@ -120,6 +120,23 @@ function(
     )
   endforeach()
 
+  # NOTE(HIP/AMD): HIP-specific warning relaxations, emitted AFTER the mirrored
+  # cxx warning flags above so they take precedence on the HIP command line.
+  #  - -Wno-nvcc-compat: upstream enables -Wnvcc-compat, which flags every
+  #    __host__/__device__ target-attribute function overload as an NVCC
+  #    incompatibility. Such overloads are valid and pervasive under clang's HIP
+  #    front-end, so the warning is meaningless here (and fatal under -Werror).
+  #  - -Wno-error=unused-value / -Wno-error=unused-result: HIP runtime APIs
+  #    return [[nodiscard]] hipError_t; library/device paths legitimately ignore
+  #    some returns. Matches the existing c2h / benchmark HIP WAR.
+  target_compile_options(
+    ${interface_target}
+    INTERFACE
+      $<$<COMPILE_LANGUAGE:HIP>:-Wno-nvcc-compat>
+      $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-value>
+      $<$<COMPILE_LANGUAGE:HIP>:-Wno-error=unused-result>
+  )
+
   target_compile_definitions(${interface_target} INTERFACE ${compile_defs})
 endfunction()
 

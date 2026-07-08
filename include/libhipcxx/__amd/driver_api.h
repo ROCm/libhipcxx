@@ -97,6 +97,17 @@ _CCCL_HOST_API inline void __deviceGetName(char* __name_out, int __len, int __or
   _CCCL_TRY_CUDA_API(::hipDeviceGetName, "Failed to query the name of a device", __name_out, __len, __dev);
 }
 
+// NOTE(HIP/AMD): mirrors upstream cuda::__driver::__deviceTotalMem(int ordinal).
+// hipDeviceTotalMem takes (size_t*, hipDevice_t), so we adapt the one-argument
+// ordinal-taking form used by cuda/device_attributes.h.
+[[nodiscard]] _CCCL_HOST_API inline ::cuda::std::size_t __deviceTotalMem(int __ordinal)
+{
+  ::hipDevice_t __dev = __deviceGet(__ordinal);
+  ::std::size_t __result = 0;
+  _CCCL_TRY_CUDA_API(::hipDeviceTotalMem, "Failed to query total memory of a device", &__result, __dev);
+  return static_cast<::cuda::std::size_t>(__result);
+}
+
 [[nodiscard]] _CCCL_HOST_API inline bool __deviceCanAccessPeer(::hipDevice_t __dev, ::hipDevice_t __peer_dev)
 {
   int __result = 0;
@@ -519,6 +530,13 @@ __mallocFromPoolAsync(::size_t __bytes, ::hipMemPool_t __pool, ::hipStream_t __s
 __freeAsyncNoThrow(::hipDeviceptr_t __dptr, ::hipStream_t __stream)
 {
   return static_cast<::cudaError_t>(::hipFreeAsync(__dptr, __stream));
+}
+
+// NOTE(HIP/AMD): mirrors upstream cuda::__driver::__mempoolDestroyNoThrow.
+// Used by device_memory_pool.h destructor via _CCCL_ASSERT_CUDA_API.
+[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __mempoolDestroyNoThrow(::hipMemPool_t __pool) noexcept
+{
+  return static_cast<::cudaError_t>(::hipMemPoolDestroy(__pool));
 }
 
 _CCCL_HOST_API inline void __mempoolDestroy(::hipMemPool_t __pool)

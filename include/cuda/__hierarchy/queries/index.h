@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___HIERARCHY_QUERIES_INDEX_H
 #define _CUDA___HIERARCHY_QUERIES_INDEX_H
 
@@ -21,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CTK()
+#if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/__cmath/ceil_div.h>
 #  include <cuda/__fwd/hierarchy.h>
@@ -31,15 +53,15 @@
 #  include <cuda/std/__cstddef/types.h>
 #  include <cuda/std/__mdspan/extents.h>
 
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #    include <cuda/__ptx/instructions/get_sreg.h>
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-#  if _CCCL_CUDA_COMPILATION()
+#  if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 // cudafe++ makes the queries (that are device only) return void when compiling for host, which causes host compilers
 // to warn about applying [[nodiscard]] to a function that returns void.
@@ -178,7 +200,7 @@ template <class _Unit, class _Level>
 struct __index_query
 {
   template <class _Tp, class _Hierarchy>
-  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call(const _Hierarchy& __hier) noexcept
+  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call([[maybe_unused]] const _Hierarchy& __hier) noexcept
   {
     static_assert(__has_bottom_unit_or_level_v<_Unit, _Hierarchy> || __is_native_hierarchy_level_v<_Unit>,
                   "_Hierarchy doesn't contain _Unit");
@@ -194,7 +216,7 @@ template <>
 struct __index_query<thread_level, warp_level>
 {
   template <class _Tp, class _Hierarchy>
-  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call(const _Hierarchy& __hier) noexcept
+  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call([[maybe_unused]] const _Hierarchy& __hier) noexcept
   {
     return __index_query_native<thread_level, warp_level>::template __call<_Tp>();
   }
@@ -204,7 +226,7 @@ template <class _Level>
 struct __index_query<warp_level, _Level>
 {
   template <class _Tp, class _Hierarchy>
-  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call(const _Hierarchy& __hier) noexcept
+  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call([[maybe_unused]] const _Hierarchy& __hier) noexcept
   {
     const auto __block_exts = __extents_query<thread_level, block_level>::template __call<unsigned>(__hier);
     const auto __thread_idx = __index_query<thread_level, block_level>::template __call<unsigned>(__hier);
@@ -250,19 +272,19 @@ template <>
 struct __index_query<cluster_level, grid_level>
 {
   template <class _Tp, class _Hierarchy>
-  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call(const _Hierarchy& __hier) noexcept
+  [[nodiscard]] _CCCL_DEVICE_API static hierarchy_query_result<_Tp> __call([[maybe_unused]] const _Hierarchy& __hier) noexcept
   {
     return __index_query_native<cluster_level, grid_level>::template __call<_Tp>();
   }
 };
 
 _CCCL_DIAG_POP
-#  endif // _CCCL_CUDA_COMPILATION()
+#  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_CTK()
+#endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #endif // _CUDA___HIERARCHY_QUERIES_INDEX_H

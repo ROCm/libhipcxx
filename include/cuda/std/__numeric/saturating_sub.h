@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___NUMERIC_SATURATING_SUB_H
 #define _CUDA_STD___NUMERIC_SATURATING_SUB_H
 
@@ -111,6 +133,15 @@ template <class _Tp>
 #  endif // ^^^ !_CCCL_BUILTIN_ELEMENTWISE_SUB_SAT ^^^
 }
 #endif // !_CCCL_COMPILER(NVRTC)
+
+#if _CCCL_HIP_COMPILATION()
+// NOTE(HIP/AMD): HIP device does not have PTX; use the generic overflow-based fallback.
+template <class _Tp>
+[[nodiscard]] _CCCL_DEVICE_API _Tp __saturating_sub_impl_device(_Tp __x, _Tp __y) noexcept
+{
+  return ::cuda::saturating_sub_overflow(__x, __y).value;
+}
+#endif // _CCCL_HIP_COMPILATION()
 
 #if _CCCL_CUDA_COMPILATION()
 template <class _Tp>

@@ -97,6 +97,12 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT CCCL_
       # PSTL parallel algorithms (cuda::execution) -- new in 3.3, need a HIP
       # execution / device_transform port.
       pstl_
+      # TODO(hip-upgrade): cuda::std::is_partitioned(policy, ...) (new in
+      # v3.4.0) dispatches through __pstl/is_partitioned.h which uses
+      # cub::DeviceFind::FindIf; hipCUB has no DeviceFind equivalent yet.
+      # Re-enable when a HIP (hipCUB/rocPRIM) backend for __pstl find_if
+      # and is_partitioned is available.
+      std/algorithms/alg.modifying/alg.partitions/is_partitioned.cu
     )
   endif()
 
