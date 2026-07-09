@@ -106,6 +106,19 @@ function(add_bench_dir bench_dir)
     get_filename_component(bench_name "${bench_src}" NAME_WLE)
     string(PREPEND bench_name "libcudacxx.${bench_prefix}.")
 
+    # NOTE(HIP/AMD): skip benches with no working HIP backend yet (see the list).
+    set(_bench_skip FALSE)
+    foreach (_skip_pat IN LISTS LIBCUDACXX_BENCH_HIP_SKIP_LIST)
+      string(FIND "${bench_name}" "${_skip_pat}" _skip_pos)
+      if (NOT _skip_pos EQUAL -1)
+        set(_bench_skip TRUE)
+        break()
+      endif()
+    endforeach()
+    if (_bench_skip)
+      continue()
+    endif()
+
     set(base_bench_name "${bench_name}.base")
     add_bench(base_bench_target ${base_bench_name} "${bench_src}")
     add_dependencies(${benches_meta_target} ${base_bench_target})
@@ -118,6 +131,32 @@ function(add_bench_dir bench_dir)
     register_cccl_benchmark("${bench_name}" "")
   endforeach()
 endfunction()
+
+# NOTE(HIP/AMD): benchmarks whose PSTL algorithm has no working HIP backend yet.
+# Matched as substrings of the dotted bench name (libcudacxx.bench.<algo>.<variant>);
+# the surrounding dots keep e.g. `.find.` from matching `find_if`/`.reverse.` from
+# matching `reverse_copy`. Re-enable a group when its backend lands.
+set(LIBCUDACXX_BENCH_HIP_SKIP_LIST)
+if (LIBCUDACXX_ENABLE_HIP)
+  set(LIBCUDACXX_BENCH_HIP_SKIP_LIST
+    # find_if family: hipCUB has no cub::DeviceFind (see __pstl/cuda/find_if.h),
+    # so every algorithm dispatching through it has no selected HIP backend.
+    .adjacent_find. .all_of. .any_of. .equal. .find. .find_if. .find_if_not.
+    .is_heap. .is_heap_until. .is_partitioned. .is_sorted. .is_sorted_until.
+    .mismatch. .none_of.
+    # min/max_element: rocPRIM's arg_index_iterator static-asserts the input is a
+    # std::random_access_iterator, which the thrust device_vector iterator category
+    # (thrust::random_access_device_iterator_tag) does not satisfy.
+    .max_element. .min_element.
+    # iter_swap / multi-input transform materialization write through rocThrust
+    # proxy references (device_reference), which are not yet fully swappable/
+    # assignable in these paths (single-input transform.fib DOES build).
+    .reverse. .swap_ranges. .transform.babelstream
+    # backends not ported to hipCUB/rocPRIM yet (DeviceSelect::Unique signature,
+    # ForEachN-policy stable_partition).
+    .unique. .unique_copy. .stable_partition.
+  )
+endif()
 
 get_recursive_subdirs(subdirs)
 
