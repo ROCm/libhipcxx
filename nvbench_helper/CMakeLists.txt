@@ -67,7 +67,13 @@ target_include_directories(
 )
 
 # Old NVCC incorrectly infers the host device annotation of std::map::map() which calls a non-host device member
-if (CUDAToolkit_VERSION VERSION_LESS "12.5.0")
+# NOTE(HIP/AMD): `-diag-suppress` is an nvcc-only flag, and CUDAToolkit_VERSION is
+# 0.0 on a HIP build (no CUDA toolkit), so this old-nvcc workaround would
+# otherwise be force-added and break the HIP-clang benchmark compile: clang treats
+# the diagnostic number `20011` as a positional filename ("no such file or
+# directory: '20011'"). Since it is a PUBLIC option it propagates to every bench
+# that links nvbench_helper. Only apply it for a real (old) CUDA toolkit.
+if (NOT LIBCUDACXX_ENABLE_HIP AND CUDAToolkit_VERSION VERSION_LESS "12.5.0")
   target_compile_options(cccl.nvbench_helper PUBLIC -diag-suppress 20011)
 endif()
 
