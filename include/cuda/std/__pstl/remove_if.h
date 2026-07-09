@@ -59,9 +59,9 @@
 #  include <cuda/std/__type_traits/is_execution_policy.h>
 #  include <cuda/std/__utility/move.h>
 
-#  if _CCCL_HAS_BACKEND_CUDA()
+#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION() // HIP: hipCUB-backed backend
 #    include <cuda/std/__pstl/cuda/remove_if.h>
-#  endif // _CCCL_HAS_BACKEND_CUDA()
+#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/std/__cccl/prologue.h>
 
