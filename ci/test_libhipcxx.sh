@@ -75,8 +75,18 @@ if ! $CONFIGURE_ONLY; then
         run_command "🏗️  Build libcudacxx (atomic codegen)" \
             cmake --build "${BUILD_DIR}/${PRESET}" \
                   --target libcudacxx.test.atomics.ptx
+
+        # Same for the simd codegen tests (test/simd_codegen): the
+        # 'libcudacxx.test.simd.sass' umbrella uses the identical POST_BUILD
+        # FileCheck mechanism (HIP path: clang -S AMDGCN ISA + FileCheck the
+        # v_pk_* / s_xor_b32 packed-instruction lines). It is a separate umbrella
+        # target from atomics.ptx, so it must be built explicitly here too, and
+        # is gated on the same FileCheck-found signal.
+        run_command "🏗️  Build libcudacxx (simd codegen)" \
+            cmake --build "${BUILD_DIR}/${PRESET}" \
+                  --target libcudacxx.test.simd.sass
     else
-        echo "atomic codegen tests skipped (FileCheck not found at configure time)"
+        echo "atomic + simd codegen tests skipped (FileCheck not found at configure time)"
     fi
 
     popd > /dev/null
