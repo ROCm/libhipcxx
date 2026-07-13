@@ -188,8 +188,28 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
     " -I${libhipcxx_SOURCE_DIR}/include/libhipcxx"
 #    " CACHE INTERNAL "Flags for libcxx testing."
   )
-  get_target_property(_amdhip64_loc hip::amdhip64 LOCATION)
-  cmake_path(GET _amdhip64_loc PARENT_PATH _hip_lib_dir)
+  # hipcc used to add the HIP runtime library automatically; with amdclang++
+  # we must link it explicitly.
+  # On Windows, the DLL (amdhip64.dll) is in bin/ but the import library
+  # (amdhip64.lib) is in lib/. Try IMPORTED_IMPLIB variants first; if none
+  # are set, derive lib/ by going up from the DLL's bin/ directory.
+  set(_hip_lib_dir "")
+  foreach(_cfg "" "_RELEASE" "_DEBUG" "_RELWITHDEBINFO" "_MINSIZEREL")
+    get_target_property(_amdhip64_implib hip::amdhip64 "IMPORTED_IMPLIB${_cfg}")
+    if(_amdhip64_implib)
+      cmake_path(GET _amdhip64_implib PARENT_PATH _hip_lib_dir)
+      break()
+    endif()
+  endforeach()
+  if(NOT _hip_lib_dir)
+    get_target_property(_amdhip64_loc hip::amdhip64 LOCATION)
+    cmake_path(GET _amdhip64_loc PARENT_PATH _hip_lib_dir)
+    if(WIN32)
+      # DLL is in bin/, import lib is in lib/ — go up one and use lib/
+      cmake_path(GET _hip_lib_dir PARENT_PATH _hip_root_dir)
+      set(_hip_lib_dir "${_hip_root_dir}/lib")
+    endif()
+  endif()
   string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS
     " -L${_hip_lib_dir}"
     " -lamdhip64")
