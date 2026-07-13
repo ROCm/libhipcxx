@@ -8,11 +8,35 @@
 ##
 ##===----------------------------------------------------------------------===##
 
+# MIT License
+#
+# Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 add_custom_target(libcudacxx.test.simd.sass)
 
 find_program(
   filecheck
   NAMES FileCheck FileCheck-21 FileCheck-20 FileCheck-19 FileCheck-18
+  # NOTE(HIP/AMD): on ROCm, FileCheck lives here and is usually NOT on $PATH.
+  HINTS /opt/rocm/lib/llvm/bin
 )
 
 if (filecheck)
@@ -21,13 +45,56 @@ else()
   return()
 endif()
 
-find_program(cuobjdump "cuobjdump" REQUIRED)
 find_program(bash "bash" REQUIRED)
 
 set(libcudacxx_simd_codegen_tests)
 if (NOT "NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
   file(GLOB libcudacxx_simd_codegen_tests "*.cu")
 endif()
+
+# NOTE(HIP/AMD): the simd codegen tests assert that cuda::std::simd operators
+# lower to the packed vector ISA. On NVIDIA that is SASS (cuobjdump --dump-sass +
+# FileCheck HADD2/HFMA2/...); on HIP/AMD it is AMDGCN ISA (clang -S + FileCheck
+# v_pk_add_f16 / v_pk_mul_f16 / v_pk_fma_f16 / v_pk_add_f32 / ...). The .cu
+# sources carry the upstream 'SMxx' checks plus an additional 'HIP_ISA' block
+# (fenced by an AMD/HIP divider). cuobjdump is CUDA-only, so it is only required
+# on the CUDA path -- HIP returns before it (this is also the fix for CI configure
+# hard-failing on 'find_program(cuobjdump REQUIRED)' on HIP builds).
+if (LIBCUDACXX_ENABLE_HIP)
+  # ----- HIP path: FileCheck AMDGCN ISA via clang -S -----
+  if (NOT DEFINED LIBCUDACXX_SIMD_CODEGEN_HIP_ARCH)
+    if (CMAKE_HIP_ARCHITECTURES)
+      list(GET CMAKE_HIP_ARCHITECTURES 0 LIBCUDACXX_SIMD_CODEGEN_HIP_ARCH)
+    else()
+      set(LIBCUDACXX_SIMD_CODEGEN_HIP_ARCH "gfx90a")
+    endif()
+  endif()
+  message(STATUS "simd codegen tests (HIP): targeting ${LIBCUDACXX_SIMD_CODEGEN_HIP_ARCH}")
+
+  foreach (test_path IN LISTS libcudacxx_simd_codegen_tests)
+    add_custom_command(
+      TARGET libcudacxx.test.simd.sass
+      POST_BUILD
+      # gersemi: off
+      COMMAND
+        ${CMAKE_COMMAND} -E env
+          "FILECHECK=${filecheck}"
+          "LIBCUDACXX_SOURCE_DIR=${libcudacxx_SOURCE_DIR}"
+          "HIP_ISA_ARCH=${LIBCUDACXX_SIMD_CODEGEN_HIP_ARCH}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/dump_and_check_hip.bash"
+          "${test_path}"
+          "HIP_ISA"
+      # gersemi: on
+    )
+  endforeach()
+  return()
+elseif (NOT LIBCUDACXX_ENABLE_CUDA)
+  message("-- simd codegen tests need CUDA or HIP; skipping")
+  return()
+endif()
+
+# ----- NV path (unchanged upstream behaviour) -----
+find_program(cuobjdump "cuobjdump" REQUIRED)
 
 set(simd_codegen_cuda_archs 80 90)
 if (CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 12.8)
