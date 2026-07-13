@@ -45,7 +45,7 @@
 
 // NOTE(HIP/AMD): also enabled on HIP, where ::cub::DeviceReduce resolves to a
 // thin shim over hipcub::DeviceReduce via <cuda/std/__pstl/cuda/__hipcub.h>.
-#if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wshadow")
@@ -182,6 +182,6 @@ _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif /// _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#endif /// _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #endif // _CUDA_STD___PSTL_CUDA_MIN_ELEMENT_H

@@ -61,9 +61,9 @@
 #  include <cuda/std/__type_traits/is_nothrow_copy_constructible.h>
 #  include <cuda/std/__utility/move.h>
 
-#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION() // HIP: hipCUB-backed backend
+#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP() // HIP: hipCUB-backed backend
 #    include <cuda/std/__pstl/cuda/transform.h>
-#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #  include <cuda/std/__cccl/prologue.h>
 

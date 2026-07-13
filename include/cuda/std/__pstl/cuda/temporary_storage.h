@@ -46,7 +46,7 @@
 // NOTE(HIP/AMD): __temporary_storage is also needed by the HIP PSTL backend (cuda/reduce.h,
 // cuda/transform_reduce.h, etc.). The underlying memory-resource and memory-pool headers
 // already support HIP (guarded by _CCCL_HIP_COMPILATION()), so extend this class to HIP.
-#if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #  include <cuda/__cmath/round_up.h>
 #  include <cuda/__functional/call_or.h>
@@ -226,6 +226,6 @@ _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif /// _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#endif /// _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #endif // _CUDA_STD___PSTL_CUDA_TEMPORARY_STORAGE_H

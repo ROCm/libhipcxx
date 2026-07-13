@@ -49,7 +49,7 @@
 // counting+discard iterator and an explicit index op (the same reliable pattern
 // hipCUB uses internally), NOT over hipcub::DeviceTransform::Transform's tuple
 // overload (whose op-argument convention differs from CUB's unpacked one).
-#if _CCCL_HIP_COMPILATION()
+#if _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <hipcub/hipcub.hpp>
 #  include <hipcub/device/device_adjacent_difference.hpp>
@@ -746,6 +746,6 @@ hipError_t dispatch(_InTuple __inputs, _OutIt __out, _OffsetT __count, _Pred __p
 } // namespace detail
 } // namespace cub
 
-#endif // _CCCL_HIP_COMPILATION()
+#endif // _CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 
 #endif // _CUDA_STD___PSTL_CUDA_HIPCUB_H
