@@ -60,9 +60,9 @@
 #  include <cuda/std/__utility/move.h>
 #  include <cuda/std/__utility/pair.h>
 
-#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 #    include <cuda/std/__pstl/cuda/partition_copy.h>
-#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #  include <cuda/std/__cccl/prologue.h>
 

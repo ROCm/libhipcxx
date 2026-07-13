@@ -47,11 +47,21 @@
 
 // NOTE(HIP/AMD): _CCCL_HAS_BACKEND_CUDA() is deliberately kept CUDA-only so
 // that the NVIDIA-CUB backend include paths are never activated on HIP.  Each
-// enabled pstl algorithm frontend has its own `|| _CCCL_HIP_COMPILATION()`
-// guard to pull in the hipCUB-backed __hipcub.h shim instead.
+// enabled pstl algorithm frontend instead pulls in the hipCUB-backed __hipcub.h
+// shim behind _CCCL_HAS_BACKEND_HIP() (below).
 #define _CCCL_HAS_BACKEND_CUDA() _CCCL_CUDA_COMPILATION() && !_CCCL_COMPILER(NVRTC)
 #define _CCCL_HAS_BACKEND_OMP()  0
 #define _CCCL_HAS_BACKEND_TBB()  0
+
+// NOTE(HIP/AMD): the hipCUB-backed pstl device backend requires the HIP host
+// runtime (hipStream_t / hipMemcpyKind / hipSetDevice, ...) plus the host stdlib
+// headers that <hipcub/hipcub.hpp> + rocPRIM pull in (<atomic>, <stdint.h>, ...),
+// none of which exist under HIPRTC (device-only COMGR compilation -- the stdlib
+// headers also clash with libhipcxx's own <cstdint>). So the backend is available
+// only for full hipcc compilation, NOT HIPRTC -- exactly mirroring the way
+// _CCCL_HAS_BACKEND_CUDA() excludes NVRTC. Use this instead of a bare
+// _CCCL_HIP_COMPILATION() wherever a hipCUB include path is gated.
+#define _CCCL_HAS_BACKEND_HIP() (_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC))
 
 // HIP uses the __cuda execution backend enum value (already gated by
 // _CCCL_HIP_COMPILATION() in __fwd/execution_policy.h) and routes dispatch
@@ -60,7 +70,7 @@
 // declarations in <cuda/std/execution> visible when building with hipcc, without
 // activating any NVIDIA-CUB include path (those remain behind _CCCL_HAS_BACKEND_CUDA()).
 #define _CCCL_HAS_PSTL_BACKEND() \
-  (_CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_OMP() || _CCCL_HAS_BACKEND_TBB() || _CCCL_HIP_COMPILATION())
+  (_CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_OMP() || _CCCL_HAS_BACKEND_TBB() || _CCCL_HAS_BACKEND_HIP())
 
 #include <cuda/std/__cccl/epilogue.h>
 

@@ -54,9 +54,9 @@
 #  include <cuda/std/__type_traits/is_execution_policy.h>
 #  include <cuda/std/__utility/move.h>
 
-#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION() // HIP: hipCUB-backed for_each_n
+#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP() // HIP: hipCUB-backed for_each_n
 #    include <cuda/std/__pstl/cuda/for_each_n.h>
-#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #  include <cuda/std/__cccl/prologue.h>
 

@@ -67,10 +67,10 @@
 #  include <cuda/std/__utility/swap.h>
 #  include <cuda/std/tuple>
 
-#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 #    include <cuda/std/__pstl/cuda/for_each_n.h>
 #    include <cuda/std/__pstl/cuda/transform.h>
-#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #  include <cuda/std/__cccl/prologue.h>
 
