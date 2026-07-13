@@ -275,13 +275,13 @@
 #endif // !_CCCL_COMPILER(MSVC)
 
 // Freestanding environment detection
-// NVRTC is treated as freestanding since it has no access to the host standard library
-#if defined(_CCCL_ENABLE_FREESTANDING) || _CCCL_COMPILER(NVRTC)
+// NVRTC/HIPRTC are treated as freestanding since they have no access to the host standard library
+#if defined(_CCCL_ENABLE_FREESTANDING) || _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC)
 #  define _CCCL_FREESTANDING() 1
 #  define _CCCL_HOSTED()       0
-#  define _CCCL_HOSTJIT()      (!_CCCL_COMPILER(NVRTC))
+#  define _CCCL_HOSTJIT()      (!_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC))
 #  define _CCCL_NO_TYPEID
-#else // ^^^ _CCCL_ENABLE_FREESTANDING ||  _CCCL_COMPILER(NVRTC) ^^^ / vvv Hosted environment vvv
+#else // ^^^ _CCCL_ENABLE_FREESTANDING ||  _CCCL_COMPILER(NVRTC) || defined(_CCCL_COMPILER_HIPRTC) ^^^ / vvv Hosted environment vvv
 #  define _CCCL_FREESTANDING() 0
 #  define _CCCL_HOSTED()       1
 #  define _CCCL_HOSTJIT()      0
