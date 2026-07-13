@@ -60,9 +60,9 @@
 #  include <cuda/std/__type_traits/is_move_constructible.h>
 #  include <cuda/std/__utility/move.h>
 
-#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION() // HIP: hipCUB-backed reduce
+#  if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP() // HIP: hipCUB-backed reduce
 #    include <cuda/std/__pstl/cuda/reduce.h>
-#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#  endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #  include <cuda/std/__cccl/prologue.h>
 

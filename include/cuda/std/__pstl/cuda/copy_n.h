@@ -43,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#if _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wshadow")
@@ -163,6 +163,6 @@ _CCCL_END_NAMESPACE_CUDA_STD_EXECUTION
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HIP_COMPILATION()
+#endif // _CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_HIP()
 
 #endif // _CUDA_STD___PSTL_CUDA_COPY_N_H
