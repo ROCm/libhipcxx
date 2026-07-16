@@ -186,6 +186,7 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
     " -I${CMAKE_SOURCE_DIR}/include"
     " -I${libhipcxx_SOURCE_DIR}/include"
     " -I${libhipcxx_SOURCE_DIR}/include/libhipcxx"
+    " -O3"  # hipcc defaults to -O3; amdclang++ invoked directly does not
 #    " CACHE INTERNAL "Flags for libcxx testing."
   )
   # hipcc used to add the HIP runtime library automatically; with amdclang++
