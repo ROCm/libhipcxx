@@ -24,9 +24,15 @@ cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )";
 
 # Script defaults
 VERBOSE=${VERBOSE:-}
-HOST_COMPILER=${CXX:-hipcc} # $CXX if set, otherwise `g++`
+HOST_COMPILER=${CXX:-amdclang++} # $CXX if set, otherwise `amdclang++`
 CXX_STANDARD=17
-CUDA_COMPILER=${CUDACXX:-hipcc} # $CUDACXX if set, otherwise `nvcc`
+# Mirror hipcc's platform detection: HIP_PLATFORM=nvidia uses nvcc,
+# everything else (including unset) uses amdclang++ directly.
+if [ "${HIP_PLATFORM:-amd}" = "nvidia" ] || [ "${HIP_PLATFORM:-amd}" = "nvcc" ]; then
+  CUDA_COMPILER=${CUDACXX:-nvcc}
+else
+  CUDA_COMPILER=${CUDACXX:-amdclang++}
+fi
 CUDA_ARCHS= # Empty, use presets by default.
 GLOBAL_CMAKE_OPTIONS=()
 DISABLE_CUB_BENCHMARKS= # Enable to force-disable building CUB benchmarks.

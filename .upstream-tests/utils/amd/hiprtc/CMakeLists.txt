@@ -18,10 +18,11 @@
 project(hiprtcc)
 
 enable_language(HIP)
-find_package(HIP REQUIRED)
+find_package(hip CONFIG REQUIRED)
+find_package(hiprtc CONFIG REQUIRED)
 
 add_executable(libcudacxx.nvrtcc hiprtcc.cpp)
 
 set_target_properties(libcudacxx.nvrtcc PROPERTIES OUTPUT_NAME hiprtcc)
-target_link_libraries(libcudacxx.nvrtcc hiprtc hip::host)
+target_link_libraries(libcudacxx.nvrtcc hiprtc::hiprtc hip::host)
 target_compile_features(libcudacxx.nvrtcc PRIVATE cxx_std_17)

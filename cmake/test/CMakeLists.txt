@@ -25,6 +25,7 @@ set(cmake_opts
   -D "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
   -D "CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
   -D "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+  -D "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
 )
 
 # Temporary installation prefix for tests against installed project:

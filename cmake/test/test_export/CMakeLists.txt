@@ -23,6 +23,7 @@ find_package(hip REQUIRED)
 find_package(libhipcxx REQUIRED)
 
 add_executable(version_check version_check.cxx)
+target_compile_options(version_check PRIVATE -x hip)
 target_link_libraries(version_check PRIVATE libhipcxx::libhipcxx hip::host)
 enable_testing()
 add_test(NAME version_check COMMAND "$<TARGET_FILE:version_check>")
