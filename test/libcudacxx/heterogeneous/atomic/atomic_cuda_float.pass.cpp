@@ -40,15 +40,8 @@
 
 void kernel_invoker()
 {
-#ifdef LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
   validate_pinned<cuda::atomic<float>, arithmetic_atomic_testers>();
   validate_pinned<cuda::atomic<double>, arithmetic_atomic_testers>();
-#else
-  // NOTE(HIP/AMD): fetch_(sub/or/xor/and) are not supported with cudaMallocManaged.
-  // For float and double also fetch_add is not supported. This issue is tracked internally in issue SWDEV-390383.
-  validate_pinned<cuda::atomic<float>, basic_testers>();
-  validate_pinned<cuda::atomic<double>, basic_testers>();
-#endif
 }
 
 int main(int arg, char** argv)

@@ -62,6 +62,22 @@
 // with system headers).
 #include <cuda/std/cstdint>
 
+// NOTE(HIP/AMD): pulls in LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH,
+// used below to decide whether the native __hip_atomic_fetch_{add,and,or,
+// xor,max,min} intrinsics can be used directly, or must instead go through
+// the CAS-loop fallback (see the NOTE at those overloads).
+#include <libhipcxx/__amd/amd_utils.h>
+
+// NOTE(HIP/AMD): boolean form of LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
+// for use inside enable_if expressions below (the source macro is an
+// #ifdef-style presence flag, not a 0/1 value, and `defined(...)` cannot
+// appear directly in a template argument).
+#if defined(LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH)
+#  define _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE 1
+#else
+#  define _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE 0
+#endif
+
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
@@ -146,36 +162,59 @@ template <typename _Tp, typename _Fn, typename _Sco>
 }
 
 // NOTE(HIP/AMD): the type condition includes is_floating_point (not just
-// sizeof<=2). The native __hip_atomic_fetch_add lowers `double` to the hardware
-// FP64 atomic (global_atomic_add_f64), which is SILENTLY DROPPED on managed
-// (hipMallocManaged) memory on gfx90a/ROCm 7.2 -- e.g. a hash-groupby SUM/MEAN
-// of doubles returns 0. Routing floating-point add/sub through the CAS loop
-// (__atomic_fetch_update_cuda), exactly as fetch_max/fetch_min already do for
-// FP, is correct on both device and managed memory.
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
+// sizeof<=2) UNLESS _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE. The native
+// __hip_atomic_fetch_add lowers `double`/`float` to the hardware FP64/FP32
+// atomic (global_atomic_add_f64/f32), which is SILENTLY DROPPED on managed
+// (hipMallocManaged, fine-grained-by-default) memory on gfx908 (MI100) and
+// gfx90a (MI200) -- e.g. a hash-groupby SUM/MEAN of doubles returns 0. Per
+// AMD's GPU atomics support tables, this is fixed from CDNA3 onward
+// (gfx940/941/942/950 -- see LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
+// in <libhipcxx/__amd/amd_utils.h>), where the native instruction is correct
+// on managed memory too. So: route floating-point add/sub through the CAS
+// loop (__atomic_fetch_update_cuda), exactly as fetch_max/fetch_min already
+// do for FP, only on architectures where the native op is unsafe; on
+// CDNA3+ let floating-point add/sub fall through to the native
+// __hip_atomic_fetch_add path (see atomic_hip_generated.h) for full
+// performance.
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || (::cuda::std::is_floating_point<_Tp>::value && !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE), int>::type = 0>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_add_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::plus>{static_cast<_Tp>(__val)}, __memorder, __s);
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
+template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || (::cuda::std::is_floating_point<_Tp>::value && !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE), int>::type = 0>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_sub_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::minus>{static_cast<_Tp>(__val)}, __memorder, __s);
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+// NOTE(HIP/AMD): unlike fetch_add/fetch_sub, the native __hip_atomic_fetch_*
+// used here has no fine-grained-memory-safe case at all sizes for
+// fetch_and/or/xor -- probing on real gfx90a hardware showed the native op
+// silently drops on managed memory regardless of operand width (verified for
+// both 8-bit and 32-bit operands). So route through the CAS loop
+// unconditionally on architectures where LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
+// is unset; on CDNA3+ fall through to the native path (see
+// atomic_hip_generated.h) for full performance.
+//
+// This split is a plain '#if', not an enable_if, because the condition does
+// not depend on _Tp at all -- an enable_if that is always-false for every
+// possible _Tp is rejected by Clang ("enable_if cannot be used to disable
+// this declaration"), since such a template could never be instantiated.
+#if !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
+template<typename _Tp, typename _Up, typename _Sco>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_and_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::bit_and>{static_cast<_Tp>(__val)}, __memorder, __s);
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+template<typename _Tp, typename _Up, typename _Sco>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_or_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::bit_or>{static_cast<_Tp>(__val)}, __memorder, __s);
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2, int>::type = 0>
+template<typename _Tp, typename _Up, typename _Sco>
 [[nodiscard]] _Tp _CCCL_DEVICE __atomic_fetch_xor_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     return __atomic_fetch_update_cuda(__ptr, __cccl_atomic_op_bind<_Tp, ::cuda::std::bit_xor>{static_cast<_Tp>(__val)}, __memorder, __s);
 }
+#endif // !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
 // NOTE(HIP/AMD): fetch_min / fetch_max keep their per-op CAS-loop
 // implementation rather than going through __atomic_fetch_update_cuda
@@ -186,14 +225,20 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 // CAS per iteration once the stored value is already <= / >= the
 // proposed value. The generic adapter would always CAS, even when
 // no change is needed, so folding these in would be a (small but
-// measurable) perf regression on min/max heavy workloads. Upstream
-// cuda_ptx_derived.h doesn't carry this optimization for its
-// generic adapter path, but their underlying PTX `atom.min/max`
-// instruction is hardware-fast for the common arithmetic types
-// (sizeof >= 4); HIP only hits the CAS-loop fallback for the
-// sizeof<=2 and floating-point arms, where the optimization
-// matters more.
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
+// measurable) perf regression on min/max heavy workloads.
+//
+// Like fetch_and/or/xor above, the native __hip_atomic_fetch_max/min is
+// silently dropped on managed (fine-grained) memory regardless of operand
+// type or width on architectures where LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
+// is unset (probed on real gfx90a hardware for both int32 and uint8) -- so
+// this CAS-loop is used unconditionally there, for every type, not just
+// sizeof<=2 / floating-point. On CDNA3+ fall through to the native path
+// (see atomic_hip_generated.h) for full performance.
+//
+// Plain '#if' (see fetch_and/or/xor above) rather than enable_if, since the
+// condition is not _Tp-dependent.
+#if !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
+template<typename _Tp, typename _Up, typename _Sco>
 [[nodiscard]] _Tp _CCCL_HOST_DEVICE __atomic_fetch_max_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected > __val ? __expected : __val;
@@ -206,7 +251,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
     return __expected;
 }
 
-template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable_if<sizeof(_Tp)<=2 || ::cuda::std::is_floating_point<_Tp>::value, int>::type = 0>
+template<typename _Tp, typename _Up, typename _Sco>
 [[nodiscard]] _Tp _CCCL_HOST_DEVICE __atomic_fetch_min_cuda(_Tp volatile *__ptr, _Up __val, int __memorder, _Sco __s) noexcept {
     _Tp __expected = __atomic_load_n_cuda(__ptr, __ATOMIC_RELAXED, __s);
     _Tp __desired = __expected < __val ? __expected : __val;
@@ -218,6 +263,7 @@ template<typename _Tp, typename _Up, typename _Sco, typename ::cuda::std::enable
 
     return __expected;
 }
+#endif // !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
 template<typename _Tp, typename _Sco>
 void _CCCL_DEVICE __atomic_store_n_cuda(_Tp *__ptr, _Tp __val, int __memorder, _Sco __s) noexcept {

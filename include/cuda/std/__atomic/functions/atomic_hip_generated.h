@@ -43,6 +43,19 @@
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__atomic/functions/cuda_local.h>
 
+// NOTE(HIP/AMD): pulls in LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH,
+// used below to gate the native fetch_{add,and,or,xor,max,min} path.
+#include <libhipcxx/__amd/amd_utils.h>
+
+// Boolean form of LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH for use
+// inside enable_if expressions (defined(...) cannot appear in a template
+// argument). See the identical helper in atomic_hip_derived.h.
+#if defined(LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH)
+#  define _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE 1
+#else
+#  define _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE 0
+#endif
+
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
@@ -97,49 +110,59 @@ static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _T
     }
 }
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
-template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_WORKGROUP);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
-template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_block_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
@@ -280,49 +303,59 @@ static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _T
     }
 }
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
-template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_AGENT);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
-template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_device_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
@@ -391,49 +424,59 @@ static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _T
     }
 }
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_and_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_and_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_and(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_or_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_or_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_or(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_xor_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_xor_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_xor(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
-template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_add_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_add_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_add(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_max_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_max_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_max(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
+#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 template<class _Type>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_min_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_min_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_min(__ptr, __val, __memorder, __HIP_MEMORY_SCOPE_SYSTEM);
 }
+#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE
 
-template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, __thread_scope_system_tag) {
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;

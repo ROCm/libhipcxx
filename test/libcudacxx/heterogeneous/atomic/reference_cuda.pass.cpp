@@ -174,42 +174,14 @@ using basic_testers =
               strong_cas_tester<-12, 31, 17, -12>,
               exchange_tester<-12, 17>>;
 
-// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with cudaMallocManaged for certain architectures (like MI200).
-// For float and double also fetch_add is not supported. For float fetch_max and fecth_min is supported.
-// This issue is tracked internally in issue SWDEV-390383.
-using arithmetic_atomic_testers_no_atomic_fetch_integer =
-  append<basic_testers,
-         fetch_add_tester<17, 13, 30>
-         >;
-
-// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with cudaMallocManaged for certain architectures (like MI200).
-// For float and double also fetch_add is not supported. For float fetch_max and fecth_min is supported.
-// This issue is tracked internally in issue SWDEV-390383.
-using arithmetic_atomic_testers_no_atomic_fetch_float=
-  append<basic_testers,
-         fetch_min_tester<17, 5, 5>,
-         fetch_max_tester<5, 9, 9>
-         >;
-
-// NOTE(HIP/AMD): fetch_(sub/or/xor/and/min/max) are not supported with cudaMallocManaged for certain architectures (like MI200).
-// For float and double also fetch_add is not supported. For float fetch_max and fecth_min is supported.
-// This issue is tracked internally in issue SWDEV-390383.
-using bitwise_atomic_testers_no_atomic_fetch =
-  append<arithmetic_atomic_testers_no_atomic_fetch_integer,
-         fetch_add_tester<30, 10, 40>
-         >;
-
-// NOTE(HIP/AMD): full set of atomics if atomic fetch operations are suppored
-using arithmetic_atomic_testers=
+using arithmetic_atomic_testers =
   append<basic_testers,
          fetch_add_tester<17, 13, 30>,
          fetch_sub_tester<30, 21, 9>,
          fetch_min_tester<9, 5, 5>,
          fetch_max_tester<5, 9, 9>,
-         fetch_sub_tester<9, 17, -8>
-         >;
+         fetch_sub_tester<9, 17, -8>>;
 
-// NOTE(HIP/AMD): full set of atomics if atomic fetch operations are suppored
 using bitwise_atomic_testers =
   append<arithmetic_atomic_testers,
          fetch_add_tester<-8, 10, 2>,
@@ -220,8 +192,6 @@ using bitwise_atomic_testers =
 
 void kernel_invoker()
 {
-
-#ifdef LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
   validate_pinned<signed char, arithmetic_atomic_testers>();
   validate_pinned<signed short, arithmetic_atomic_testers>();
   validate_pinned<signed int, arithmetic_atomic_testers>();
@@ -236,25 +206,6 @@ void kernel_invoker()
 
   validate_pinned<float, arithmetic_atomic_testers>();
   validate_pinned<double, arithmetic_atomic_testers>();
-#else
-  validate_pinned<signed char, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<signed short, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<signed int, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<signed long, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<signed long long, bitwise_atomic_testers_no_atomic_fetch>();
-
-  validate_pinned<unsigned char, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<unsigned short, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<unsigned int, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<unsigned long, bitwise_atomic_testers_no_atomic_fetch>();
-  validate_pinned<unsigned long long, bitwise_atomic_testers_no_atomic_fetch>();
-  #ifdef __GFX9__
-  validate_pinned<float, arithmetic_atomic_testers_no_atomic_fetch_float>();
-  #else
-  validate_pinned<double, basic_testers>();
-  #endif
-  validate_pinned<double, basic_testers>();
-#endif
 }
 
 int main(int arg, char** argv)
