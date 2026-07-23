@@ -43,7 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): enabled on HIP (as in upgrade/3.2_base / 3.2.1_enable). The PTX
+// NOTE(HIP/AMD): enabled on HIP. The PTX
 // clusterlaunchcontrol fast path is gated on __cccl_ptx_isa >= 870, which is
 // false on HIP, so HIP takes the portable fallback that invokes the unary
 // function once with the current block index (see __for_each_canceled_block_sm100
