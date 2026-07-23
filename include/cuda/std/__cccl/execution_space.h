@@ -57,7 +57,7 @@
 // to be usable from __host__ __device__ code. Prefix deduction guides with this
 // macro instead of _CCCL_HOST_DEVICE: it is empty on affected clang and
 // _CCCL_HOST_DEVICE everywhere else. Remove once the minimum-supported ROCm
-// clang is >= 23. See rocm-llvm-maxnum-snan-bug.md's sibling notes.
+// clang is >= 23. 
 #if _CCCL_HIP_COMPILATION() && _CCCL_COMPILER(CLANG, >=, 23)
 #  define _CCCL_CTAD_HOST_DEVICE
 #else // ^^^ deduction-guide attributes rejected ^^^ / vvv attributes required ^^^
