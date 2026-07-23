@@ -69,6 +69,29 @@
 #  define _CCCL_HIP_WAVE_SIZE 32
 #endif
 
+// NOTE(HIP/AMD): Managed (hipMallocManaged) memory is fine-grained by
+// default on ROCm. Per AMD's GPU atomics support tables
+// (https://rocm.docs.amd.com/en/latest/reference/gpu-atomics-operation.html,
+// "Migratable Host DRAM" -> fine-grained), 32-/64-bit float atomicAdd and
+// 64-bit float atomicMin/Max on fine-grained memory are a silent NOP on
+// CDNA1/CDNA2 (gfx908 / MI100, gfx90a / MI200) but are natively supported
+// from CDNA3 onward (gfx940/941/942 / MI300, gfx950 / MI350) -- both at
+// device scope; MI300X/MI350X additionally downgrade (not drop) at system
+// scope, and MI300A (APU) is natively correct at system scope too. This
+// macro is only defined on architectures where the native instructions are
+// safe to use on managed memory; it is undefined (not 0) on gfx908/gfx90a
+// and any other/unknown architecture so new targets default to the safe
+// (CAS-loop) behavior. Originally lived in test/support/test_macros.h;
+// moved here so library code (atomic_hip_derived.h) and the test suite
+// share one definition instead of two independently-maintained arch lists.
+#ifdef __HIP_PLATFORM_AMD__
+#if defined(__GFX9__)
+#if !defined(__gfx90a__) and !defined(__gfx906__) and !defined(__gfx908__)
+#define LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
+#endif
+#endif
+#endif
+
 namespace libhipcxx
 {
   __host__ __device__ inline void __trap(){

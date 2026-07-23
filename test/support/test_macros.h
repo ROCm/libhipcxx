@@ -191,12 +191,8 @@ __host__ __device__ constexpr bool unused(T&&...)
   return true;
 }
 
-#ifdef __HIP_PLATFORM_AMD__
-#if defined(__GFX9__)
-#if !defined(__gfx90a__) and !defined(__gfx906__) and !defined(__gfx908__)
-#define LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH
-#endif
-#endif
-#endif
+// NOTE(HIP/AMD): LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH now lives in
+// <libhipcxx/__amd/amd_utils.h> (included above) so the library and the
+// test suite share one arch-support definition.
 
 #endif // SUPPORT_TEST_MACROS_HPP

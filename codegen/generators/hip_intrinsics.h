@@ -106,6 +106,19 @@ inline void FormatHipHeader(std::ostream& out)
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__atomic/functions/cuda_local.h>
 
+// NOTE(HIP/AMD): pulls in LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH,
+// used below to gate the native fetch_{{add,and,or,xor,max,min}} path.
+#include <libhipcxx/__amd/amd_utils.h>
+
+// Boolean form of LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH for use
+// inside enable_if expressions (defined(...) cannot appear in a template
+// argument). See the identical helper in atomic_hip_derived.h.
+#if defined(LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH)
+#  define _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE 1
+#else
+#  define _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE 0
+#endif
+
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
@@ -166,25 +179,58 @@ inline void FormatHipScope(std::ostream& out,
   std::string fetch_ops_body;
   for (const char* op : {"and", "or", "xor", "add", "max", "min"})
   {
-    // NOTE(HIP/AMD): exclude floating-point from the native fetch_add path. The
-    // native __hip_atomic_fetch_add lowers `double` to the hardware FP64 atomic
-    // (global_atomic_add_f64), which is silently dropped on managed
-    // (hipMallocManaged) memory. Floating-point add/sub are instead served by
-    // the CAS-loop overloads in atomic_hip_derived.h (gated sizeof<=2 ||
-    // is_floating_point), which are correct on both device and managed memory.
-    const std::string tmpl =
-      (std::string(op) == "add")
-        ? "template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>"
-        : "template<class _Type>";
+    // NOTE(HIP/AMD): exclude floating-point from the native fetch_add path,
+    // UNLESS _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE. The native
+    // __hip_atomic_fetch_add lowers `double`/`float` to the hardware
+    // FP64/FP32 atomic, which is silently dropped on managed
+    // (hipMallocManaged, fine-grained-by-default) memory on gfx908/gfx90a
+    // but is natively correct there from CDNA3 onward (gfx940/941/942/950 --
+    // see LIBHIPCXX_SUPPORTS_MANAGED_MEMORY_ATOMIC_FETCH in
+    // <libhipcxx/__amd/amd_utils.h>). On unsafe architectures, floating-point
+    // add/sub are instead served by the CAS-loop overloads in
+    // atomic_hip_derived.h (gated sizeof<=2 || (is_floating_point &&
+    // !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE)), which are correct on
+    // both device and managed memory.
+    //
+    // and/or/xor/max/min are excluded from the native path entirely (for
+    // ALL types, not just floating-point) on unsafe architectures: probing
+    // on real gfx90a hardware showed the native __hip_atomic_fetch_{and,or,
+    // xor,max,min} silently drops on managed memory regardless of operand
+    // type or width (verified for both 8-bit and 32-bit integers). The
+    // complementary CAS-loop overloads for these ops in atomic_hip_derived.h
+    // are gated !_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE (unconditional on
+    // unsafe architectures).
+    //
+    // add uses enable_if (is_floating_point<_Type> makes the condition
+    // _Type-dependent); the rest use a plain '#if', not enable_if, because
+    // their condition does not depend on _Type at all -- an enable_if that
+    // is always-false for every possible _Type is rejected by Clang
+    // ("enable_if cannot be used to disable this declaration").
+    std::string tmpl;
+    std::string pp_open;
+    std::string pp_close;
+    if (std::string(op) == "add")
+    {
+      tmpl = "template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || "
+             "_LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>";
+    }
+    else
+    {
+      tmpl     = "template<class _Type>";
+      pp_open  = "#if _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE\n";
+      pp_close = "#endif // _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE\n";
+    }
     fetch_ops_body += fmt::format(R"XXX(
-{tmpl}
+{pp_open}{tmpl}
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_{op}_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {scope_tag}) {{
     _Type __ret;
     if (__cuda_fetch_{op}_weak_if_local(__ptr, __val, &__ret)) return __ret;
     return __hip_atomic_fetch_{op}(__ptr, __val, __memorder, {scope_macro});
 }}
-)XXX",
+{pp_close})XXX",
                                   fmt::arg("tmpl", tmpl),
+                                  fmt::arg("pp_open", pp_open),
+                                  fmt::arg("pp_close", pp_close),
                                   fmt::arg("op", op),
                                   fmt::arg("scope_tag", scope_tag),
                                   fmt::arg("scope_macro", scope_macro));
@@ -260,7 +306,7 @@ static inline _CCCL_DEVICE void __atomic_exchange_cuda(volatile _Type* __ptr, _T
     }}
 }}
 {fetch_ops_body}
-template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value, int>::type = 0>
+template<class _Type, typename ::cuda::std::enable_if<!::cuda::std::is_floating_point<_Type>::value || _LIBCUDACXX_HIP_ATOMIC_FETCH_NATIVE_SAFE, int>::type = 0>
 [[nodiscard]] static inline _CCCL_DEVICE _Type __atomic_fetch_sub_cuda(volatile _Type *__ptr, _Type __val, int __memorder, {scope_tag}) {{
     _Type __ret;
     if (__cuda_fetch_sub_weak_if_local(__ptr, __val, &__ret)) return __ret;
