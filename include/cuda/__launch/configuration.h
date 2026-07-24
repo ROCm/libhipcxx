@@ -45,6 +45,7 @@
 
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
+#  include <cuda/__device/hip_dynamic_smem.h>
 #  include <cuda/__driver/driver_api.h>
 #  include <cuda/__hierarchy/hierarchy_dimensions.h>
 #  include <cuda/__numeric/overflow_cast.h>
@@ -292,10 +293,18 @@ public:
     {
       _CCCL_IF_NOT_CONSTEVAL_DEFAULT
       {
-        // NOTE(HIP/AMD): AMDGCN has no dynamic-shared-memory-size special
-        // register; the device-side query is dropped on HIP and the configured
-        // size below is used instead.
-#if !defined(__HIP_PLATFORM_AMD__)
+#if defined(__HIP_PLATFORM_AMD__)
+        // NOTE(HIP/AMD): AMDGCN has no %dynamic_smem_size-equivalent special
+        // register. Recover the dynamic size from the HSA AQL dispatch packet's
+        // group_segment_size (total static+dynamic LDS allocated at launch) minus
+        // the static portion (__builtin_amdgcn_groupstaticsize()), matching
+        // %dynamic_smem_size's semantics. The packet read lives in
+        // <cuda/__device/hip_dynamic_smem.h> (shared with __max_smem_allocation_bytes).
+#  if defined(__HIP_DEVICE_COMPILE__)
+        const auto __static_smem_size = static_cast<::cuda::std::uint32_t>(__builtin_amdgcn_groupstaticsize());
+        return ::cuda::__hip_group_segment_size() - __static_smem_size;
+#  endif // __HIP_DEVICE_COMPILE__
+#else // ^^^ __HIP_PLATFORM_AMD__ ^^^ / vvv !__HIP_PLATFORM_AMD__ vvv
         NV_IF_TARGET(NV_IS_DEVICE, (return ::cuda::ptx::get_sreg_dynamic_smem_size();))
 #endif // !__HIP_PLATFORM_AMD__
       }

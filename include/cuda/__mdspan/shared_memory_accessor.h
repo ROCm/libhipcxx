@@ -43,6 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/__device/hip_dynamic_smem.h>
 #include <cuda/__memory/address_space.h>
 #include <cuda/__ptx/instructions/get_sreg.h>
 #include <cuda/std/__concepts/concept_macros.h>
@@ -93,11 +94,17 @@ inline constexpr bool is_shared_memory_accessor_v<__shared_memory_accessor<_Acce
 {
 #  if _CCCL_HIP_COMPILATION()
   // NOTE(HIP/AMD): NVPTX exposes %total_smem_size / %dynamic_smem_size special
-  // registers (cuda::ptx::get_sreg_*) that have no AMDGCN equivalent. Use the
-  // static LDS size reported by __builtin_amdgcn_groupstaticsize() in the
-  // device pass; the host pass (parsed for two-pass clang-hip) returns 0.
+  // registers (cuda::ptx::get_sreg_*) that have no AMDGCN equivalent. AMDGCN only
+  // exposes the STATIC LDS size directly (__builtin_amdgcn_groupstaticsize()); the
+  // total (static + dynamic) is read from the HSA AQL dispatch packet's
+  // group_segment_size via __hip_group_segment_size() (AMDGCN's equivalent of
+  // %total_smem_size), so the dynamic portion is total - static. Verified on
+  // gfx90a: a kernel with 256B static + 1024B dynamic LDS reports 1280.
 #    if defined(__HIP_DEVICE_COMPILE__)
-  return static_cast<::cuda::std::uint32_t>(__builtin_amdgcn_groupstaticsize());
+  const auto __static_smem_size  = static_cast<::cuda::std::uint32_t>(__builtin_amdgcn_groupstaticsize());
+  const auto __total_smem_size   = ::cuda::__hip_group_segment_size();
+  const auto __dynamic_smem_size = __total_smem_size - __static_smem_size;
+  return ::max(__static_smem_size, __dynamic_smem_size);
 #    else // ^^^ __HIP_DEVICE_COMPILE__ ^^^ / vvv !__HIP_DEVICE_COMPILE__ vvv
   return 0;
 #    endif // ^^^ !__HIP_DEVICE_COMPILE__ ^^^
