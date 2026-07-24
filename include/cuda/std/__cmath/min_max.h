@@ -150,8 +150,8 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
 #  elif _CCCL_HIP_COMPILATION()
           // NOTE(HIP/AMD): __builtin_fmax lowers to llvm.maxnum, which the LLVM
           // LangRef permits to return NaN when an operand is a signaling NaN, so on
-          // ROCm clang fmax(x, sNaN) can yield NaN instead of x (see
-          // rocm-llvm-maxnum-snan-bug.md). The deterministic C23 __builtin_fmaximum_num
+          // ROCm clang fmax(x, sNaN) can yield NaN instead of x. The
+          // deterministic C23 __builtin_fmaximum_num
           // would fix that, but it is unreliable on some shipped ROCm clang snapshots
           // (ROCm 7.2 / clang 22.0.0git miscomputes even non-NaN cases like
           // fmin(x, +0)). Fall through to the local isnan implementation below, which

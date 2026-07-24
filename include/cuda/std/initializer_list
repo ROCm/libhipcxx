@@ -51,11 +51,10 @@
 // naturally false there (see cuda/std/version) -- HIPRTC gates on __has_include instead.
 #  include <initializer_list>
 #elif defined(_CCCL_COMPILER_HIPRTC)
-// NOTE(HIP/AMD): Under HIPRTC WITH -nostdinc++ (e.g. cudf's jitify JIT) there is no system
-// <initializer_list> and HIPRTC has no builtin std::initializer_list, so declare the minimal
-// compiler-magic type locally so `using ::std::initializer_list` below resolves. clang accepts
-// this as long as it lives in namespace std with exactly a {const T*, size} layout. This
-// mirrors the long-standing amd-integration behavior and needs no consumer-specific macro.
+// NOTE(HIP/AMD): Under HIPRTC with -nostdinc++ there is no system <initializer_list>
+// and HIPRTC has no builtin std::initializer_list, so declare the minimal
+// compiler-magic type locally so `using ::std::initializer_list` below resolves. clang
+// accepts this as long as it lives in namespace std with exactly a {const T*, size} layout.
 namespace std
 {
 template <class _Ep>
