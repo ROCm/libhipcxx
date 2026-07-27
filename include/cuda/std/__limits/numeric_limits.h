@@ -50,7 +50,7 @@ enum float_denorm_style
 enum class __numeric_limits_type
 {
   __integral,
-  __bool,
+  __boolean,
   __floating_point,
   __other,
 };
@@ -61,7 +61,7 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr __numeric_limits_type __make_numeric_limits_
 #if !defined(_CCCL_NO_IF_CONSTEXPR)
   if constexpr (_CCCL_TRAIT(is_same, _Tp, bool))
   {
-    return __numeric_limits_type::__bool;
+    return __numeric_limits_type::__boolean;
   }
   else if constexpr (_CCCL_TRAIT(is_integral, _Tp))
   {
@@ -77,7 +77,7 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr __numeric_limits_type __make_numeric_limits_
   }
 #else // ^^^ !_CCCL_NO_IF_CONSTEXPR ^^^ // vvv _CCCL_NO_IF_CONSTEXPR vvv
   return _CCCL_TRAIT(is_same, _Tp, bool)
-         ? __numeric_limits_type::__bool
+         ? __numeric_limits_type::__boolean
          : (_CCCL_TRAIT(is_integral, _Tp)
               ? __numeric_limits_type::__integral
               : (_CCCL_TRAIT(is_floating_point, _Tp) || _CCCL_TRAIT(__is_extended_floating_point, _Tp)
@@ -252,7 +252,7 @@ public:
 };
 
 template <>
-class __numeric_limits_impl<bool, __numeric_limits_type::__bool>
+class __numeric_limits_impl<bool, __numeric_limits_type::__boolean>
 {
 public:
   using type = bool;
