@@ -260,6 +260,27 @@ using detail::provides;
 
 #endif // C++  && !defined(__CUDACC_RTC__)
 
+// NOTE(HIP/AMD): ROCm's bundled Thrust ships an older copy of
+// nv/detail/__target_macros.h that shares the include guard
+// (_NV__TARGET_MACROS) with libhipcxx's version but only defines
+// NV_IF_TARGET -- it lacks NV_IF_ELSE_TARGET and the NV_PROVIDES_SM_*
+// dispatch machinery added in the CCCL v3.4.0 merge. If a Thrust header is
+// pulled in before libhipcxx (common in TUs that include hip_runtime.h
+// early, e.g. via thrust/detail/nv_target.h), the ROCm copy claims the
+// guard first and libhipcxx's full macros are skipped, breaking every
+// downstream user of NV_IF_ELSE_TARGET / NV_PROVIDES_SM_* (e.g.
+// <cuda/std/cmath>'s half-precision paths).
+//
+// Clear the shared guard here -- immediately before, and at the sole
+// include site of, the inner header -- so libhipcxx's complete version is
+// always processed regardless of include order. This is robust to the
+// umbrella's own outer guard (__NV_TARGET_LIBHIPCXX_H) being set first:
+// the undef + inner include happen together the first time this umbrella
+// is seen. Both __target_macros copies are `#pragma GCC system_header`, so
+// re-defining the shared macro names does not emit -Wmacro-redefined.
+#ifdef _NV__TARGET_MACROS
+#  undef _NV__TARGET_MACROS
+#endif
 #include <nv/detail/__target_macros>
 
 #endif // __NV_TARGET_LIBHIPCXX_H
