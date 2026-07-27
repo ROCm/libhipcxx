@@ -140,54 +140,97 @@ set(
 )
 mark_as_advanced(CCCL_NVBENCH_SHA)
 
-# NOTE(HIP/AMD): NVBench is CUDA-only; the HIP port is hipBench, from the public
-# repo github.com/ROCm/hipbench. These benchmarks use the HIP exec-tag API
-# (nvbench::exec_tag::gpu / no_batch), which currently lives on the 'amd-develop'
-# branch -- verified to build+run all benches. The 'main' and 'release/rocmds-25.10'
-# branches are too old (no nvbench::exec_tag::gpu) and do NOT work yet.
-# hipBench bundles its OWN libhipcxx via CPM, so add_subdirectory'ing it here would
-# create a second libcudacxx::libcudacxx target and collide with ours. Instead we
-# consume a PRE-BUILT hipBench tree through IMPORTED targets (nvbench::nvbench ->
-# libnvbench.so, nvbench::main -> nvbench/main.{cu,hip}). Build hipBench once with:
-#   git clone -b amd-develop https://github.com/ROCm/hipbench <hipBench>
-#   cmake -GNinja -S <hipBench> -B <hipBench>/build -DCMAKE_BUILD_TYPE=Release \
-#         -DCMAKE_HIP_ARCHITECTURES=${CMAKE_HIP_ARCHITECTURES} && ninja -C <hipBench>/build nvbench
-set(CCCL_HIPBENCH_ROOT  "" CACHE PATH "hipBench source tree (HIP NVBench port); defaults to <repo>/../hipBench")
-set(CCCL_HIPBENCH_BUILD "" CACHE PATH "hipBench build tree (libnvbench.so + generated nvbench/config.cuh); defaults to <root>/build")
+# NOTE(HIP/AMD): NVBench is CUDA-only; the HIP port is hipBench
+# (github.com/ROCm/hipbench). Its exec-tag API (nvbench::exec_tag::gpu / no_batch)
+# lives on the 'amd-develop' branch ('main' / 'release/rocmds-25.10' are too old).
+# By default cccl_get_nvbench() auto-downloads and builds hipBench via CPM, reusing
+# our in-tree libcudacxx so hipBench's rapids_cpm_libhipcxx does not fetch a second
+# copy (which would collide on libcudacxx::libcudacxx). Set CCCL_HIPBENCH_ROOT /
+# CCCL_HIPBENCH_BUILD to consume a PRE-BUILT tree instead (offline / faster CI).
+set(
+  CCCL_HIPBENCH_SHA
+  "631f22085a07df66652fb765674abaeac19ac145"
+  CACHE STRING
+  "SHA/tag to use for hipBench (HIP NVBench port)."
+)
+mark_as_advanced(CCCL_HIPBENCH_SHA)
+set(CCCL_HIPBENCH_ROOT  "" CACHE PATH "Pre-built hipBench source tree (set to skip CPM auto-download)")
+set(CCCL_HIPBENCH_BUILD "" CACHE PATH "Pre-built hipBench build tree (libnvbench.so + generated nvbench/config.cuh)")
 
 macro(cccl_get_nvbench)
   if (LIBCUDACXX_ENABLE_HIP)
-    # Resolve defaults here (not at file scope) so CCCL_SOURCE_DIR is populated.
-    if (NOT CCCL_HIPBENCH_ROOT)
-      get_filename_component(CCCL_HIPBENCH_ROOT "${CCCL_SOURCE_DIR}/../hipBench" ABSOLUTE)
-    endif()
-    if (NOT CCCL_HIPBENCH_BUILD)
-      set(CCCL_HIPBENCH_BUILD "${CCCL_HIPBENCH_ROOT}/build")
-    endif()
-    if (NOT EXISTS "${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so")
-      message(FATAL_ERROR
-        "hipBench not built at '${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so'. "
-        "Clone github.com/ROCm/hipbench to '${CCCL_HIPBENCH_ROOT}' and build the "
-        "'nvbench' target, or set -DCCCL_HIPBENCH_ROOT / -DCCCL_HIPBENCH_BUILD.")
-    endif()
-    if (NOT TARGET nvbench::nvbench)
-      add_library(nvbench::nvbench SHARED IMPORTED GLOBAL)
-      set_target_properties(nvbench::nvbench PROPERTIES
-        IMPORTED_LOCATION "${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so"
-        INTERFACE_INCLUDE_DIRECTORIES "${CCCL_HIPBENCH_ROOT};${CCCL_HIPBENCH_BUILD}")
-    endif()
-    if (NOT TARGET nvbench::main)
-      # nvbench::main is the benchmark entry point the benches link. hipBench has
-      # carried this source as both nvbench/main.cu and (newer) nvbench/main.hip;
-      # accept whichever the checked-out revision provides.
-      set(_cccl_nvbench_main "${CCCL_HIPBENCH_ROOT}/nvbench/main.cu")
-      if (NOT EXISTS "${_cccl_nvbench_main}")
-        set(_cccl_nvbench_main "${CCCL_HIPBENCH_ROOT}/nvbench/main.hip")
+    if (CCCL_HIPBENCH_ROOT OR CCCL_HIPBENCH_BUILD)
+      # ---- Pre-built hipBench (explicit override): consume via IMPORTED targets ----
+      if (NOT CCCL_HIPBENCH_ROOT)
+        get_filename_component(CCCL_HIPBENCH_ROOT "${CCCL_SOURCE_DIR}/../hipBench" ABSOLUTE)
       endif()
-      add_library(cccl.nvbench.main STATIC "${_cccl_nvbench_main}")
-      set_source_files_properties("${_cccl_nvbench_main}" PROPERTIES LANGUAGE HIP)
-      target_link_libraries(cccl.nvbench.main PUBLIC nvbench::nvbench)
-      add_library(nvbench::main ALIAS cccl.nvbench.main)
+      if (NOT CCCL_HIPBENCH_BUILD)
+        set(CCCL_HIPBENCH_BUILD "${CCCL_HIPBENCH_ROOT}/build")
+      endif()
+      if (NOT EXISTS "${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so")
+        message(FATAL_ERROR
+          "hipBench not built at '${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so'. "
+          "Build it, or unset CCCL_HIPBENCH_ROOT/CCCL_HIPBENCH_BUILD to auto-download.")
+      endif()
+      if (NOT TARGET nvbench::nvbench)
+        add_library(nvbench::nvbench SHARED IMPORTED GLOBAL)
+        set_target_properties(nvbench::nvbench PROPERTIES
+          IMPORTED_LOCATION "${CCCL_HIPBENCH_BUILD}/lib/libnvbench.so"
+          INTERFACE_INCLUDE_DIRECTORIES "${CCCL_HIPBENCH_ROOT};${CCCL_HIPBENCH_BUILD}")
+      endif()
+      if (NOT TARGET nvbench::main)
+        set(_cccl_nvbench_main "${CCCL_HIPBENCH_ROOT}/nvbench/main.cu")
+        if (NOT EXISTS "${_cccl_nvbench_main}")
+          set(_cccl_nvbench_main "${CCCL_HIPBENCH_ROOT}/nvbench/main.hip")
+        endif()
+        add_library(cccl.nvbench.main STATIC "${_cccl_nvbench_main}")
+        set_source_files_properties("${_cccl_nvbench_main}" PROPERTIES LANGUAGE HIP)
+        target_link_libraries(cccl.nvbench.main PUBLIC nvbench::nvbench)
+        add_library(nvbench::main ALIAS cccl.nvbench.main)
+      endif()
+    else()
+      # ---- Auto-download hipBench via CPM ----
+      # hipBench pulls its own libhipcxx through rapids_cpm_libhipcxx; left alone
+      # that creates a SECOND libcudacxx::libcudacxx target that collides with ours.
+      # rapids_cpm_find skips its fetch when the GLOBAL_TARGET (libhipcxx::libhipcxx)
+      # already exists (rapids-cmake cpm/find.cmake), so expose our in-tree
+      # libcudacxx under that name first -- the same dedup upstream relies on for
+      # nvbench reusing CCCL's libcudacxx.
+      if (NOT TARGET libhipcxx::libhipcxx AND TARGET libcudacxx::libcudacxx)
+        add_library(libhipcxx::libhipcxx INTERFACE IMPORTED GLOBAL)
+        set_target_properties(libhipcxx::libhipcxx PROPERTIES
+          INTERFACE_LINK_LIBRARIES libcudacxx::libcudacxx)
+      endif()
+      include("${_cccl_cpm_file}")
+      CPMAddPackage(
+        NAME hipBench
+        GITHUB_REPOSITORY ROCm/hipbench
+        GIT_TAG ${CCCL_HIPBENCH_SHA}
+        EXCLUDE_FROM_ALL TRUE
+        OPTIONS "CMAKE_HIP_ARCHITECTURES ${CMAKE_HIP_ARCHITECTURES}"
+      )
+      # hipBench provides nvbench::nvbench and nvbench::main directly. It maps .cu
+      # to the HIP language via its overrides.cmake, which only fires when hipBench
+      # is the top-level project -- under add_subdirectory it does not, so CMake
+      # cannot determine a language for its .cu sources ("cannot determine linker
+      # language for target: nvbench.main / nvbench.ctl"). Tag those sources as HIP
+      # here instead (TARGET_DIRECTORY needs CMake >= 3.18).
+      foreach (_cccl_hb_tgt IN ITEMS nvbench nvbench.main nvbench.ctl)
+        if (TARGET ${_cccl_hb_tgt})
+          get_target_property(_cccl_hb_srcs ${_cccl_hb_tgt} SOURCES)
+          get_target_property(_cccl_hb_sdir ${_cccl_hb_tgt} SOURCE_DIR)
+          foreach (_cccl_hb_src IN LISTS _cccl_hb_srcs)
+            if (_cccl_hb_src MATCHES "\\.cu$")
+              if (NOT IS_ABSOLUTE "${_cccl_hb_src}")
+                set(_cccl_hb_src "${_cccl_hb_sdir}/${_cccl_hb_src}")
+              endif()
+              set_source_files_properties("${_cccl_hb_src}"
+                TARGET_DIRECTORY ${_cccl_hb_tgt}
+                PROPERTIES LANGUAGE HIP)
+            endif()
+          endforeach()
+        endif()
+      endforeach()
     endif()
   else()
     include("${_cccl_cpm_file}")
