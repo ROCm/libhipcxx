@@ -9,6 +9,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _LIBCUDACXX___LIMITS_NUMERIC_LIMITS_H
 #define _LIBCUDACXX___LIMITS_NUMERIC_LIMITS_H
 
@@ -50,7 +72,7 @@ enum float_denorm_style
 enum class __numeric_limits_type
 {
   __integral,
-  __bool,
+  __boolean,
   __floating_point,
   __other,
 };
@@ -61,7 +83,7 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr __numeric_limits_type __make_numeric_limits_
 #if !defined(_CCCL_NO_IF_CONSTEXPR)
   if constexpr (_CCCL_TRAIT(is_same, _Tp, bool))
   {
-    return __numeric_limits_type::__bool;
+    return __numeric_limits_type::__boolean;
   }
   else if constexpr (_CCCL_TRAIT(is_integral, _Tp))
   {
@@ -77,7 +99,7 @@ _LIBCUDACXX_HIDE_FROM_ABI constexpr __numeric_limits_type __make_numeric_limits_
   }
 #else // ^^^ !_CCCL_NO_IF_CONSTEXPR ^^^ // vvv _CCCL_NO_IF_CONSTEXPR vvv
   return _CCCL_TRAIT(is_same, _Tp, bool)
-         ? __numeric_limits_type::__bool
+         ? __numeric_limits_type::__boolean
          : (_CCCL_TRAIT(is_integral, _Tp)
               ? __numeric_limits_type::__integral
               : (_CCCL_TRAIT(is_floating_point, _Tp) || _CCCL_TRAIT(__is_extended_floating_point, _Tp)
@@ -252,7 +274,7 @@ public:
 };
 
 template <>
-class __numeric_limits_impl<bool, __numeric_limits_type::__bool>
+class __numeric_limits_impl<bool, __numeric_limits_type::__boolean>
 {
 public:
   using type = bool;
