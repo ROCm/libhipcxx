@@ -80,24 +80,28 @@ struct __hsa_kernel_dispatch_packet_prefix
 //! callers recover the dynamic portion by subtracting the static size
 //! (@c __builtin_amdgcn_groupstaticsize()).
 //!
-//! The field offset is derived from the HSA packet type (via @c offsetof) rather
-//! than hard-coded, so it stays correct by construction if the ABI ever changes.
+//! When the HSA headers are available the field is read directly through the
+//! authoritative @c hsa_kernel_dispatch_packet_t type; otherwise it is read via
+//! @c offsetof on the ABI-pinned mirror, so the offset is never hard-coded.
 [[nodiscard]] _CCCL_DEVICE_API inline ::cuda::std::uint32_t __hip_group_segment_size() noexcept
 {
-  const char* __packet                       = static_cast<const char*>(__builtin_amdgcn_dispatch_ptr());
-  ::cuda::std::uint32_t __group_segment_size  = 0;
 #  if defined(_CCCL_HAS_HSA_KERNEL_DISPATCH_PACKET)
-  __builtin_memcpy(&__group_segment_size,
-                   __packet + offsetof(hsa_kernel_dispatch_packet_t, group_segment_size),
-                   sizeof(__group_segment_size));
+  // Authoritative HSA type available: read group_segment_size directly.
+  return static_cast<const hsa_kernel_dispatch_packet_t*>(__builtin_amdgcn_dispatch_ptr())->group_segment_size;
 #  else
+  // Fallback: read via the ABI-pinned mirror of the packet prefix. offsetof gives
+  // the field position within the mirror; the static_assert ties the mirror to the
+  // fixed HSA ABI (group_segment_size @ 28) so a bad edit to the mirror fails to
+  // compile instead of silently misreading the real packet.
   static_assert(offsetof(__hsa_kernel_dispatch_packet_prefix, __group_segment_size) == 28,
                 "HSA AQL kernel dispatch packet layout changed unexpectedly");
+  const char* __packet                       = static_cast<const char*>(__builtin_amdgcn_dispatch_ptr());
+  ::cuda::std::uint32_t __group_segment_size  = 0;
   __builtin_memcpy(&__group_segment_size,
                    __packet + offsetof(__hsa_kernel_dispatch_packet_prefix, __group_segment_size),
                    sizeof(__group_segment_size));
-#  endif // !_CCCL_HAS_HSA_KERNEL_DISPATCH_PACKET
   return __group_segment_size;
+#  endif // !_CCCL_HAS_HSA_KERNEL_DISPATCH_PACKET
 }
 
 #endif // __HIP_DEVICE_COMPILE__
