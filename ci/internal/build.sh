@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+# MIT License
+#
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Build libhipcxx for CI: drives the project's own ci/build_libhipcxx.sh, then
+# produces the CPack packages and the tests tarball the tester images consume.
+#
+# Both callers go through this script: the Jenkins pipeline on GPU-capable
+# hosts, and the platform CI Docker builders on CPU-only hosts. The build hosts
+# differ only in which host compiler they can use, which is why the host
+# compiler is a knob rather than two separate build paths.
+#
+# Required environment variables:
+#   SRC_DIR              Parent directory of the project checkout.
+#   BUILD_DIR            Scratch directory for the build tree.
+#   BUILD_ARTIFACTS_DIR  Destination for packages and the tests tarball.
+#
+# Optional environment variables:
+#   PROJECT_ID                Checkout directory name under SRC_DIR
+#                             (default: libhipcxx).
+#   LIBHIPCXX_BUILD_TYPE      build | install (default: build).
+#   LIBHIPCXX_CONDA_ENV       Conda environment to activate first.
+#   LIBHIPCXX_HOST_COMPILER   Host compiler handed to ci/build_libhipcxx.sh.
+#                             Defaults to hipcc, which is what the project's
+#                             own scripts assume. The CPU-only Docker build
+#                             hosts set this to a plain C++ compiler, because
+#                             hipcc as the *host* compiler crashes there.
+#   LIBHIPCXX_CXX_STANDARD    C++ standard selecting the preset
+#                             (default: 17; keep in sync with ci/build_common.sh).
+#   LIBHIPCXX_CPACK_GENERATORS  Semicolon separated CPack generator list.
+#                             Defaults to the generators whose backend is
+#                             present (RPM and/or DEB).
+#   LIBHIPCXX_LIT_VERSION     lit version installed into the venv.
+#   CMAKE_INSTALL_PREFIX      Install prefix; the literal '<conda-prefix>'
+#                             resolves to CONDA_PREFIX.
+#   CPACK_PACKAGING_INSTALL_PREFIX  Prefix baked into the packages. Defaults to
+#                             CMAKE_INSTALL_PREFIX.
+#   AMDGPU_TARGETS            GPU architectures to compile for. Always passed
+#                             explicitly so nothing tries to detect a local GPU.
+#   HIP_HIPCC_EXECUTABLE      Defaults to ${ROCM_PATH}/bin/hipcc. Required with
+#                             a TheRock ROCm installation.
+#   CMAKE_VERSION             When set, cmake of that version plus the other
+#                             python build tools are installed into a venv.
+#   ROCM_PATH, CMAKE_PREFIX_PATH
+#   CMAKE_BUILD_PARALLEL_LEVEL, MAX_JOBS   Build and lit parallelism.
+
+set -xeu
+
+: "${SRC_DIR:?SRC_DIR must be set}"
+: "${BUILD_DIR:?BUILD_DIR must be set}"
+: "${BUILD_ARTIFACTS_DIR:?BUILD_ARTIFACTS_DIR must be set}"
+
+PROJECT_ID="${PROJECT_ID:-libhipcxx}"
+
+[[ "${LIBHIPCXX_BUILD_TYPE:-build}" == "install" ]] && do_install="1"
+
+# note: keep in sync with ci/build_common.sh
+CXX_STANDARD="${LIBHIPCXX_CXX_STANDARD:-17}"
+PRESET="libcudacxx-cpp${CXX_STANDARD}"
+
+tests_tarball_name="${PROJECT_ID}-tests.tar.gz"
+
+if [ -n "${LIBHIPCXX_CONDA_ENV:-}" ]; then
+  set +u # note: conda script may have unbound variables
+  source ${CONDA_DIR}/etc/profile.d/conda.sh
+  conda activate ${LIBHIPCXX_CONDA_ENV}
+  set -u
+fi
+
+[[ "${CMAKE_INSTALL_PREFIX:-}" == "<conda-prefix>" ]] && install_to_conda_prefix="1"
+
+if [ -d "/opt/rh/gcc-toolset-$(g++ -dumpversion)" ]; then
+  toolchain="/opt/rh/gcc-toolset-$(g++ -dumpversion)/root/usr"
+  export CCC_OVERRIDE_OPTIONS="+--gcc-toolchain=${toolchain}"
+  # note: in some shells, cmake is using /bin/{cc, c++} as compilers,
+  # which may not be the compilers of the enabled toolchain.
+  export CC=${toolchain}/bin/cc
+fi
+
+# ci/build_common.sh takes the host compiler from CXX, defaulting to hipcc.
+export CXX="${LIBHIPCXX_HOST_COMPILER:-hipcc}"
+
+#### packaging backends
+
+if [ -n "${LIBHIPCXX_CPACK_GENERATORS:-}" ]; then
+  cpack_generators="${LIBHIPCXX_CPACK_GENERATORS}"
+else
+  detected=()
+  if command -v rpmbuild >/dev/null 2>&1; then
+    detected+=("RPM")
+  fi
+  if command -v dpkg-deb >/dev/null 2>&1; then
+    detected+=("DEB")
+  fi
+  cpack_generators="$(IFS=';'; echo "${detected[*]:-}")"
+fi
+
+if [ -z "${cpack_generators}" ]; then
+  echo "ERROR: no CPack backend available (need rpmbuild and/or dpkg-deb)" >&2
+  exit 2
+fi
+
+#### source tree
+
+src_dir=${SRC_DIR}/${PROJECT_ID}
+build_src_dir=${BUILD_DIR}/${PROJECT_ID}
+# ci/build_common.sh builds into <source>/build/<preset>
+build_build_dir=${build_src_dir}/build/${PRESET}
+
+rm -rf ${build_src_dir}
+mkdir -p ${BUILD_DIR}
+cp -R ${src_dir} ${build_src_dir}
+
+mkdir -p ${BUILD_ARTIFACTS_DIR}
+
+cd ${build_src_dir}
+
+# The pipeline pins these per build; the Docker images ship their own.
+if [ -n "${CMAKE_VERSION:-}" ]; then
+  python3 -m venv _venv # note: a venv keeps this out of the conda env
+  . _venv/bin/activate
+  pip3 install --upgrade pip
+  pip3 install cmake==${CMAKE_VERSION}
+  pip3 install lit==${LIBHIPCXX_LIT_VERSION} # specific requirement for libhipcxx testing
+  pip3 install ninja
+  pip3 install sccache
+fi
+
+export CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:-}${ROCM_PATH:+:${ROCM_PATH}/lib/cmake}"
+
+# NOTE: -DHIP_HIPCC_EXECUTABLE required with TheRock ROCm installation
+# according to https://github.com/ROCm/TheRock/pull/2018; see file:
+# build_tools/github_actions/test_executable_scripts/test_libhipcxx.py
+HIP_HIPCC_EXECUTABLE="${HIP_HIPCC_EXECUTABLE:-${ROCM_PATH:-/opt/rocm}/bin/hipcc}"
+
+#### configure and build
+
+if [ -n "${install_to_conda_prefix:-}" ]; then
+  resolved_install_prefix="${CONDA_PREFIX}"
+else
+  resolved_install_prefix="${CMAKE_INSTALL_PREFIX:-}"
+fi
+package_prefix="${CPACK_PACKAGING_INSTALL_PREFIX:-${resolved_install_prefix}}"
+
+cmake_options=(
+  "-DHIP_HIPCC_EXECUTABLE=${HIP_HIPCC_EXECUTABLE}"
+  "-DCPACK_OUTPUT_FILE_PREFIX=${BUILD_ARTIFACTS_DIR}"
+  "-DCPACK_GENERATOR=${cpack_generators}"
+  "-Dlibcudacxx_LIT_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL:-${MAX_JOBS:-1}}"
+  ${AMDGPU_TARGETS:+"-DCMAKE_HIP_ARCHITECTURES=${AMDGPU_TARGETS}"}
+  ${AMDGPU_TARGETS:+"-DGPU_TARGETS=${AMDGPU_TARGETS}"}
+  ${AMDGPU_TARGETS:+"-DAMDGPU_TARGETS=${AMDGPU_TARGETS}"}
+  ${resolved_install_prefix:+"-DCMAKE_INSTALL_PREFIX=${resolved_install_prefix}"}
+  ${package_prefix:+"-DCPACK_PACKAGING_INSTALL_PREFIX=${package_prefix}"}
+)
+
+bash ./ci/build_libhipcxx.sh -cmake-options "${cmake_options[*]}"
+
+#### package and install
+
+cmake --build ${build_build_dir} --target package
+
+if [ -n "${do_install:-}" ]; then
+  cmake --install ${build_build_dir} --verbose
+fi
+
+#### test archive
+
+# The tester images extract this at / and drive ci/internal/test.sh out of the
+# source tree it carries, so the archive keeps absolute paths. The build tree
+# lives inside the source tree for preset builds, so one entry covers both.
+tar --exclude=.git -czf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} ${build_src_dir}
+du -sh ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name}
