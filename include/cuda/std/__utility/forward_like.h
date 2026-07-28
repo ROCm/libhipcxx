@@ -59,13 +59,10 @@
 #  define _CCCL_HAS_BUILTIN_STD_FORWARD_LIKE() 0
 #endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION()
 
-// NOTE(HIP/AMD): hipRTC has no host C++ standard library, so ::std::forward_like
-// is unavailable. Treat hipRTC like NVCC device compilation and use the manual
-// template implementation below.
-#if defined(_CCCL_COMPILER_HIPRTC)
-#  undef _CCCL_HAS_BUILTIN_STD_FORWARD_LIKE
-#  define _CCCL_HAS_BUILTIN_STD_FORWARD_LIKE() 0
-#endif // _CCCL_COMPILER_HIPRTC
+// NOTE(HIP/AMD): hipRTC needs no explicit exclusion here -- the primary
+// condition already requires `__cpp_lib_forward_like >= 202217L`, a library
+// feature-test macro that is undefined (i.e. 0) under hipRTC since there is no
+// host C++ standard library, so hipRTC already resolves to 0.
 
 // include minimal std:: headers
 #if _CCCL_HAS_BUILTIN_STD_FORWARD_LIKE()
