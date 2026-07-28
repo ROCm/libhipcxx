@@ -61,7 +61,7 @@
 // NOTE(HIP/AMD): Under HIPRTC the fixed-width integer types must match HIP's
 // device types (<hip/amd_detail/host_defines.h> __hip_internal::), where the
 // 64-bit types are 'long long' / 'unsigned long long' -- NOT glibc's 'long'.
-// cudf (cudf/types.hpp) establishes '::int64_t = __hip_internal::int64_t'
+// Downstream consumers may establish '::int64_t = __hip_internal::int64_t'
 // (= long long) at global scope before including this header, so we must use
 // 'long long' for the 64-bit aliases here too; pulling in host <stdint.h>
 // (which typedefs int64_t = long via <bits/stdint-intn.h>) would clash with
