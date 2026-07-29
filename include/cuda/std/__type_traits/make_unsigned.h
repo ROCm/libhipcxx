@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___TYPE_TRAITS_MAKE_UNSIGNED_H
 #define _CUDA_STD___TYPE_TRAITS_MAKE_UNSIGNED_H
 
@@ -45,6 +67,21 @@
 #if _CCCL_COMPILER(NVRTC, <, 13, 3)
 #  undef _CCCL_BUILTIN_MAKE_UNSIGNED
 #endif // _CCCL_COMPILER(NVRTC, <, 13, 3)
+
+// NOTE(HIP/AMD): under hipRTC, libhipcxx transitively pulls the host <new> ->
+// <type_traits> (via construct_at.h / __host_stdlib/new). gcc-8's libstdc++
+// <type_traits> declares `namespace std { struct __make_unsigned; }`, which
+// makes clang revert its own __make_unsigned builtin to a plain identifier for
+// the rest of the TU (clang's RevertibleTypeTrait mechanism). That reversion is
+// invisible to _CCCL_CHECK_BUILTIN above (__has_builtin stays 1, __is_identifier
+// stays 0), so the check still selects the now-non-functional builtin and it
+// fails with "unknown type name '__make_unsigned'" (seen on the manylinux/gcc-8
+// CI image; newer libstdc++ instead drops __has_builtin to 0, and plain hipcc
+// doesn't pull host <type_traits>, so both avoid it). The revert cannot be
+// detected at preprocessor time, so force the manual fallback for all hipRTC.
+#if defined(_CCCL_COMPILER_HIPRTC)
+#  undef _CCCL_BUILTIN_MAKE_UNSIGNED
+#endif // _CCCL_COMPILER_HIPRTC
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
