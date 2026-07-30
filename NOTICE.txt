@@ -1,8 +1,8 @@
 ==============================================================================
 
-hipDF: GPU DataFrame library for AMD GPUs
+libhipcxx: The C++ Standard Library for Your Entire System
 
-This project is derived from the cuDF project by NVIDIA Corporation,
+This project is derived from the libcudacxx project by NVIDIA Corporation,
 which is licensed under the Apache License, Version 2.0 (see LICENSE).
 
 Parts of this software are based on, or derived from, code covered under
