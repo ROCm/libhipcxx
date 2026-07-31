@@ -30,33 +30,61 @@ include(GNUInstallDirs)
 # ROCm-cmake may generate an invalid install(*) command where COMPONENT comes
 # after PATTERN, which is not valid in CMake
 
+# NOTE(HIP): All libhipcxx headers are installed *under* '<inc>/libhipcxx/'
+# instead of directly into '<inc>/'. This keeps the whole payload self-contained
+# in a single subtree (so a single '-I<inc>/libhipcxx' resolves <cuda/...>,
+# <nv/...>, <amd/...> and <hip/...>) and avoids polluting/colliding with the
+# top-level '<inc>/cuda' of a CUDA Toolkit or ROCm's own headers. Consumers must
+# pull in libhipcxx via find_package(libhipcxx) + libhipcxx::libhipcxx (which
+# carries the correct include dir); bare '#include <cuda/...>' off the default
+# '<inc>' search path no longer resolves.
+#
+# The subtree name is exposed as a cache variable so downstream packagers can
+# rename it (or set it empty to install straight into '<inc>/') from the command
+# line without editing these rules, e.g. -DLIBHIPCXX_INSTALL_INCLUDE_SUBDIR=foo.
+# LIBHIPCXX_INSTALL_INCLUDEDIR is the single source of truth for the header
+# destinations below *and* for the consumer-side probe path baked into
+# libhipcxx-header-search.cmake.in (via configure_file), so the install layout
+# and the find_package() detection can never drift apart.
+set(LIBHIPCXX_INSTALL_INCLUDE_SUBDIR "libhipcxx"
+  CACHE STRING
+  "Subdirectory under the install includedir that receives libhipcxx headers (empty = install directly into <includedir>)"
+)
+
+if(LIBHIPCXX_INSTALL_INCLUDE_SUBDIR)
+  set(LIBHIPCXX_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}/${LIBHIPCXX_INSTALL_INCLUDE_SUBDIR}")
+else()
+  set(LIBHIPCXX_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}")
+endif()
+
 # Libhipcxx headers
 rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/cuda"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  FILES_MATCHING  
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
 rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/nv"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  FILES_MATCHING  
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
 rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/amd"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
   FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
 
-# Copy libhipcxx headers into hip folder additionally
-# for minimizing changes of existing dependee packages.
+# Copy libhipcxx headers into the hip folder additionally to provide the
+# hip/cuda aliasing (i.e. '#include <hip/std/...>'). This destination already
+# lives under the libhipcxx include subtree, so it tracks the subtree move above.
 # Note: we can't use symlinks here, as this would
 # break builds of packages like hipDF which
 # create a Python wheel with setuptools.
 rocm_install(DIRECTORY "${libhipcxx_SOURCE_DIR}/include/cuda/"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/libhipcxx/hip"
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}/hip"
   FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE

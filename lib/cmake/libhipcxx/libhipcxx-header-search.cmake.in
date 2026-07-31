@@ -21,9 +21,15 @@ unset(_libhipcxx_VERSION_INCLUDE_DIR CACHE) # Clear old result to force search
 # Find CMAKE_INSTALL_INCLUDEDIR=@CMAKE_INSTALL_INCLUDEDIR@ directory"
 set(from_install_prefix "@from_install_prefix@")
 
+# NOTE(HIP): headers are installed under the libhipcxx include subtree (see
+# libhipcxxInstallRules.cmake), so the include root exported to consumers is that
+# subdirectory, not '<inc>' itself. @LIBHIPCXX_INSTALL_INCLUDEDIR@ is the exact
+# includedir-relative destination those install rules used (default
+# '<inc>/libhipcxx', overridable via LIBHIPCXX_INSTALL_INCLUDE_SUBDIR); baking
+# the same value in here keeps the probe path and the install layout in lockstep.
 find_path(_libhipcxx_VERSION_INCLUDE_DIR cuda/std/detail/__config
   NO_DEFAULT_PATH # Only search explicit paths below:
   PATHS
-    "${CMAKE_CURRENT_LIST_DIR}/${from_install_prefix}/@CMAKE_INSTALL_INCLUDEDIR@" # Install tree
+    "${CMAKE_CURRENT_LIST_DIR}/${from_install_prefix}/@LIBHIPCXX_INSTALL_INCLUDEDIR@" # Install tree
 )
 set_property(CACHE _libhipcxx_VERSION_INCLUDE_DIR PROPERTY TYPE INTERNAL)
