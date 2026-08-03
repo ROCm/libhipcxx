@@ -23,7 +23,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// UNSUPPORTED: hipcc, hiprtc
 // UNSUPPORTED: nvrtc, pre-sm-70
 
 // uncomment for a really verbose output detailing what test steps are being launched
