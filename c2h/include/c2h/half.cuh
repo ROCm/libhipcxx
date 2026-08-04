@@ -372,17 +372,21 @@ public:
 
 CUB_NAMESPACE_BEGIN
 
-// NOTE(HIP/AMD): hipcub::BaseTraits has a fifth template parameter
-// ('_nullptr_TYPE') on hipCub <= 4.4.0; insert a literal 'false' for it
-// and suppress the FLOATING_POINT deprecation narrowly. The 4-arg
-// realignment (StreamHPC branch users/matyas-streamhpc/hipcub-cccl-3-0)
-// matches upstream cub's form, so the WAR auto-disables once the
-// minimum-supported hipCub crosses that version. Note the shipped ROCm
-// hipCub still reports HIPCUB_VERSION 400400 while carrying the 5-arg
-// BaseTraits, so the gate includes 400400 itself. The longer-term
-// migration is to rocprim::traits::define<T>; deferred until both
-// branches are widely available.
-#if defined(__HIP_PLATFORM_AMD__) && HIPCUB_VERSION <= 400400
+// NOTE(HIP/AMD): before hipCub realigned with CCCL 3.x, hipcub::BaseTraits
+// took a fifth '_nullptr_TYPE' parameter and its 'Category' enum was
+// deprecated in favour of '<rocprim/type_traits>' -- hence the literal
+// 'false' and the narrow deprecation suppression. hipCub 5.0.0 dropped
+// both, so the '#else' branch is correct and warning-free from there on.
+//
+// Gate on HIPCUB_CCCL_VERSION_MAJOR (the CCCL version hipCub advertises
+// compatibility with), not HIPCUB_VERSION: hipCub 4.5.0 bumped the latter
+// while keeping the 5-arg form, so no HIPCUB_VERSION threshold separates
+// the two. The macro only exists from 4.5.0, so older hipCub is matched by
+// the explicit !defined() test rather than the implicit-0 rule.
+//
+// Longer term the migration is to rocprim::traits::define<T>.
+#if defined(__HIP_PLATFORM_AMD__) \
+  && (!defined(HIPCUB_CCCL_VERSION_MAJOR) || HIPCUB_CCCL_VERSION_MAJOR < 3)
 _CCCL_SUPPRESS_DEPRECATED_PUSH
 template <>
 struct NumericTraits<half_t> : BaseTraits<FLOATING_POINT, true, false, uint16_t, half_t>
