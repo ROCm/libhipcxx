@@ -107,6 +107,19 @@ using __type_info_ref_ = type_info const&;
 
 #endif // _CCCL_NO_TYPEID
 
+// NOTE(HIP/AMD): the __type_info fallback below is selected by !defined(__CUDA_ARCH__),
+// which upstream makes it host-only. Under HIP __CUDA_ARCH__ is never defined -- not even
+// in a device pass -- so the same block is compiled for device too, and _CCCL_HOST_API
+// would make __host__ __device__ callers (e.g. fake_main in force_include_hip.h) fail with
+// "reference to __host__ function". _CCCL_HIDE_FROM_ABI is plain inline with no execution
+// space restriction, which is correct in both passes on HIP and equivalent to
+// _CCCL_HOST_API in the host-only block on NVIDIA.
+#if _CCCL_HIP_COMPILATION()
+#  define _CCCL_TYPEID_API _CCCL_HIDE_FROM_ABI
+#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
+#  define _CCCL_TYPEID_API _CCCL_HOST_API
+#endif // !_CCCL_HIP_COMPILATION()
+
 // We find a type _Tp's name as follows:
 // 1. Use __PRETTY_FUNCTION__ in a function template parameterized by
 //    __pretty_name_begin<_Tp>::__pretty_name_end.
@@ -361,40 +374,32 @@ struct __type_info
   __type_info(__type_info const&)            = delete;
   __type_info& operator=(__type_info const&) = delete;
 
-  // NOTE(HIP/AMD): In HIP compilation __CUDA_ARCH__ is never defined (not even in device
-  // compilation passes), so this host-fallback block is compiled in all passes. Use
-  // _CCCL_HIDE_FROM_ABI (= inline, no __host__ restriction) instead of _CCCL_HOST_API
-  // so that __host__ __device__ functions (e.g. fake_main in force_include_hip.h) can
-  // call these methods without triggering "reference to __host__ function" errors.
-  // On NVIDIA/CUDA, __CUDA_ARCH__ IS defined in device passes, so this block is host-only
-  // and the distinction between _CCCL_HOST_API and _CCCL_HIDE_FROM_ABI is irrelevant.
-#if _CCCL_HIP_COMPILATION()
-  _CCCL_HIDE_FROM_ABI constexpr __type_info(__string_view __name) noexcept
+  _CCCL_TYPEID_API constexpr __type_info(__string_view __name) noexcept
       : __name_(__name)
   {}
 
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr char const* name() const noexcept
+  [[nodiscard]] _CCCL_TYPEID_API constexpr char const* name() const noexcept
   {
     return __name_.begin();
   }
 
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr __string_view __name_view() const noexcept
+  [[nodiscard]] _CCCL_TYPEID_API constexpr __string_view __name_view() const noexcept
   {
     return __name_;
   }
 
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr bool before(const __type_info& __other) const noexcept
+  [[nodiscard]] _CCCL_TYPEID_API constexpr bool before(const __type_info& __other) const noexcept
   {
     return __name_ < __other.__name_;
   }
 
   // Not yet implemented:
-  // [[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr size_t hash_code() const noexcept
+  // [[nodiscard]] _CCCL_TYPEID_API constexpr size_t hash_code() const noexcept
   // {
   //   return ;
   // }
 
-  [[nodiscard]] _CCCL_HIDE_FROM_ABI friend constexpr bool
+  [[nodiscard]] _CCCL_TYPEID_API friend constexpr bool
   operator==(const __type_info& __lhs, const __type_info& __rhs) noexcept
   {
     return &__lhs == &__rhs || __lhs.__name_ == __rhs.__name_;
@@ -402,51 +407,11 @@ struct __type_info
 
 #  if _CCCL_STD_VER <= 2017
   [[nodiscard]]
-  _CCCL_HIDE_FROM_ABI friend constexpr bool operator!=(const __type_info& __lhs, const __type_info& __rhs) noexcept
+  _CCCL_TYPEID_API friend constexpr bool operator!=(const __type_info& __lhs, const __type_info& __rhs) noexcept
   {
     return !(__lhs == __rhs);
   }
 #  endif // _CCCL_STD_VER <= 2017
-#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-  _CCCL_HOST_API constexpr __type_info(__string_view __name) noexcept
-      : __name_(__name)
-  {}
-
-  [[nodiscard]] _CCCL_HOST_API constexpr char const* name() const noexcept
-  {
-    return __name_.begin();
-  }
-
-  [[nodiscard]] _CCCL_HOST_API constexpr __string_view __name_view() const noexcept
-  {
-    return __name_;
-  }
-
-  [[nodiscard]] _CCCL_HOST_API constexpr bool before(const __type_info& __other) const noexcept
-  {
-    return __name_ < __other.__name_;
-  }
-
-  // Not yet implemented:
-  // [[nodiscard]] _CCCL_HOST_API constexpr size_t hash_code() const noexcept
-  // {
-  //   return ;
-  // }
-
-  [[nodiscard]] _CCCL_HOST_API friend constexpr bool
-  operator==(const __type_info& __lhs, const __type_info& __rhs) noexcept
-  {
-    return &__lhs == &__rhs || __lhs.__name_ == __rhs.__name_;
-  }
-
-#  if _CCCL_STD_VER <= 2017
-  [[nodiscard]]
-  _CCCL_HOST_API friend constexpr bool operator!=(const __type_info& __lhs, const __type_info& __rhs) noexcept
-  {
-    return !(__lhs == __rhs);
-  }
-#  endif // _CCCL_STD_VER <= 2017
-#endif // !_CCCL_HIP_COMPILATION()
 
 private:
   __string_view __name_;
@@ -464,14 +429,7 @@ _CCCL_GLOBAL_CONSTANT __type_info __typeid_v{::cuda::std::__pretty_nameof<_Tp>()
 // When inline variables are available, this indirection through an inline function
 // is not necessary, but it doesn't hurt either.
 template <class _Tp>
-// NOTE(HIP/AMD): Use _CCCL_HIDE_FROM_ABI instead of _CCCL_HOST_API so that
-// __host__ __device__ functions can call __typeid() under HIP (where __CUDA_ARCH__
-// is never defined, so this host-fallback block is active in all compilation passes).
-#if _CCCL_HIP_COMPILATION()
-[[nodiscard]] _CCCL_HIDE_FROM_ABI constexpr __type_info const& __typeid() noexcept
-#else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
-[[nodiscard]] _CCCL_HOST_API constexpr __type_info const& __typeid() noexcept
-#endif // !_CCCL_HIP_COMPILATION()
+[[nodiscard]] _CCCL_TYPEID_API constexpr __type_info const& __typeid() noexcept
 {
   return __typeid_v<_Tp>;
 }
@@ -479,6 +437,8 @@ template <class _Tp>
 #  define _CCCL_TYPEID_FALLBACK(...) ::cuda::std::__typeid<::cuda::std::remove_cv_t<__VA_ARGS__>>()
 
 #endif // !defined(__CUDA_ARCH__) && !_CCCL_BROKEN_MSVC_FUNCSIG
+
+#undef _CCCL_TYPEID_API
 
 // if `__pretty_nameof` is constexpr _CCCL_TYPEID_FALLBACK is also constexpr.
 #if !defined(_CCCL_NO_CONSTEXPR_PRETTY_NAMEOF) && (!defined(_CCCL_BROKEN_MSVC_FUNCSIG) || defined(__CUDA_ARCH__))
