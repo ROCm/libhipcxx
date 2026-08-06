@@ -179,7 +179,7 @@ TEST_FUNC constexpr void test_iteration(Mapping m)
   // (both `devicePointer` and `hostPointer` come back null), so the
   // assertion `cuda::__managed_accessor data handle is not a MANAGED
   // pointer` fires. Skip the iteration on HIP until the HIP runtime is
-  // fixed -- ported from upgrade/3.1.4.
+  // fixed.
   iterate(mds);
 #endif // !_CCCL_HIP_COMPILATION()
 }

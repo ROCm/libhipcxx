@@ -774,8 +774,7 @@
 // attributes.h, is_pointer_accessible.h, ...). The corresponding cuXxx
 // function aliases are NOT provided here -- the libhipcxx driver-API
 // wrappers in <libhipcxx/__amd/driver_api.h> call the HIP runtime / driver API
-// functions directly using their native hipXxx names. Ported from
-// upgrade/3.1.4.
+// functions directly using their native hipXxx names.
 #ifndef CUcontext
 #  define CUcontext hipCtx_t
 #endif

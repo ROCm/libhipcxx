@@ -29,7 +29,7 @@
 # NOTE(HIP/AMD): on HIP there is no CUDA Toolkit; cccl_get_cudatoolkit()
 # does a REQUIRED find_package(CUDAToolkit) that hard-fails. The HIP
 # internal header tests link hip::device instead.
-# TODO(hip-upgrade): upstream 3.4.0 calls cccl_get_cudatoolkit() unconditionally;
+# TODO(HIP/AMD): upstream 3.4.0 calls cccl_get_cudatoolkit() unconditionally;
 # gate it here to avoid hard-fail on HIP builds.
 if ("NVHPC" STREQUAL "${CMAKE_CXX_COMPILER_ID}")
   find_package(NVHPC)
