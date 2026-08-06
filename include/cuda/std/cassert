@@ -43,9 +43,6 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC, so <cassert> stays included on
-// the HIPRTC path -- this is deliberate; dropping it produced undefined-symbol
-// errors in the fork. Only NVRTC (freestanding) skips it.
 #if _CCCL_HOSTED()
 #  include <cassert>
 #endif // _CCCL_HOSTED()

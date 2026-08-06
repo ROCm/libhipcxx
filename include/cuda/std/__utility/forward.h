@@ -62,12 +62,10 @@
 
 // We cannot use host features if we are building in freestanding
 // However, NVRTC handles it specially
-// NOTE(HIP/AMD): hipRTC has no host C++ standard library and no __NV_BUILTIN_MOVE_FORWARD,
-// so the clang>=15 branch above must not bring in ::std::forward; force the manual template.
-#if (_CCCL_FREESTANDING() && !_CCCL_COMPILER(NVRTC)) || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING() && !_CCCL_COMPILER(NVRTC)
 #  undef _CCCL_HAS_BUILTIN_STD_FORWARD
 #  define _CCCL_HAS_BUILTIN_STD_FORWARD() 0
-#endif // _CCCL_ENABLE_FREESTANDING || _CCCL_COMPILER_HIPRTC
+#endif // _CCCL_ENABLE_FREESTANDING
 
 // include minimal std:: headers, nvcc in device mode doesn't need the std:: header
 #if _CCCL_HAS_BUILTIN_STD_FORWARD() && !(_CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION())
@@ -75,7 +73,7 @@
 #    include <bits/move.h>
 #  elif _CCCL_HOST_STD_LIB(LIBCXX) && __has_include(<__utility/forward.h>)
 #    include <__utility/forward.h>
-#  elif _CCCL_HOSTED() // NOTE(HIP/AMD): no host <utility> under hipRTC
+#  elif _CCCL_HOSTED()
 #    include <utility>
 #  endif // _CCCL_HOSTED()
 #endif // _CCCL_HAS_BUILTIN_STD_FORWARD() && !(_CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION())

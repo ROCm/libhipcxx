@@ -31,9 +31,6 @@
 // SOFTWARE.
 
 #include <cuda/std/random>
-// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC (HIPRTC is not treated as
-// freestanding in compiler.h), so gate the host <sstream> explicitly like NVRTC
-// to keep it out of the device-only HIPRTC TU.
 #if _CCCL_HOSTED()
 #  include <sstream>
 #endif // _CCCL_HOSTED()
@@ -174,8 +171,6 @@ TEST_FUNC TEST_CONSTEXPR_CXX20 bool test_min_max()
   return true;
 }
 
-// NOTE(HIP/AMD): gate this host-only test
-// (uses std::stringstream) with the explicit HIPRTC exclusion like NVRTC.
 #if _CCCL_HOSTED()
 template <typename Engine>
 void test_save_restore()

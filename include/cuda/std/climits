@@ -43,12 +43,9 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC, but HIPRTC's driver is not
-// hermetic and cannot pull in system <climits>; route it to the freestanding
-// fallback defines like NVRTC.
 #if _CCCL_HOSTED()
 #  include <climits>
-#else // ^^^ _CCCL_HOSTED() && !HIPRTC ^^^ / vvv _CCCL_FREESTANDING() || HIPRTC vvv
+#else // ^^^ _CCCL_HOSTED() ^^^ / vvv _CCCL_FREESTANDING() vvv
 #  define _CCCL_CHAR_IS_UNSIGNED() ('\xff' > 0) // CURSED
 
 #  define CHAR_BIT 8

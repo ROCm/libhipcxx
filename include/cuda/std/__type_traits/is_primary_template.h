@@ -79,7 +79,7 @@ using __is_primary_cccl_template = _IsValidExpansion<__test_for_primary_template
 
 #endif // !_CCCL_COMPILER(MSVC)
 
-#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING()
 
 // No ::std::traits with freestanding implementations
 template <class _Iter>
@@ -89,7 +89,7 @@ struct __is_primary_std_template : true_type
 template <class _Iter, class _OtherTraits>
 using __select_traits = conditional_t<__is_primary_cccl_template<_Iter>::value, _OtherTraits, iterator_traits<_Iter>>;
 
-#else // ^^^ _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC) ^^^ / vvv _CCCL_HOSTED() && !HIPRTC vvv
+#else // ^^^ _CCCL_FREESTANDING() ^^^ / vvv _CCCL_HOSTED() vvv
 
 // We also need to respect what the user is defining to std::iterator_traits
 #  if _CCCL_HOST_STD_LIB(LIBSTDCXX)

@@ -44,25 +44,14 @@
 
 #include <cuda/std/__exception/terminate.h>
 
-// NOTE(HIP/AMD): Also exclude HIPRTC. Including <stdexcept> here pulls in
-// libstdc++ <string> -> <bits/char_traits.h> -> <cstdint> -> system <stdint.h>,
-// which under HIPRTC conflicts with the int_fast*_t / uint_fast*_t aliases
-// previously defined by cuda/std/cstdint (e.g. int_fast16_t aliased to
-// int16_t/short in our header vs. long int in glibc's stdint.h).
-#if !defined(_CCCL_COMPILER_HIPRTC)
-#  if __cpp_lib_format >= 201907L
-#    include <format>
-#  else // ^^^ __cpp_lib_format >= 201907L ^^^ / vvv __cpp_lib_format < 201907L vvv
-#    include <cuda/std/__host_stdlib/stdexcept>
-#  endif // ^^^ __cpp_lib_format < 201907L ^^^
-#endif // !defined(_CCCL_COMPILER_HIPRTC)
+#if __cpp_lib_format >= 201907L
+#  include <format>
+#else // ^^^ __cpp_lib_format >= 201907L ^^^ / vvv __cpp_lib_format < 201907L vvv
+#  include <cuda/std/__host_stdlib/stdexcept>
+#endif // ^^^ __cpp_lib_format < 201907L ^^^
 
 #include <cuda/std/__cccl/prologue.h>
 
-// NOTE(HIP/AMD): also exclude HIPRTC. HIPRTC is treated as hosted (_CCCL_HOSTED()
-// == 1) but has no host standard library, so ::std::runtime_error / <string> are
-// unavailable (their includes above are HIPRTC-excluded). Mirror the upstream
-// _CCCL_HOSTED() gate with the HIPRTC exclusion, as in __cccl/assert.h.
 #if _CCCL_HOSTED()
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION
