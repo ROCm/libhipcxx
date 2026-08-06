@@ -404,7 +404,9 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT scalar_type<::__nv_bfloat162>
 };
 #  endif // _CCCL_HAS_NVBF16()
 
-// NOTE(HIP/AMD): NVFP8/FP6/FP4 vector types do not exist on HIP.
+// NOTE(HIP/AMD): the e4m3/e5m2 fp8 vector types do exist on HIP (see the same note
+// in <cuda/__type_traits/vector_size.h>); the e8m0 family and fp6/fp4 do not, and
+// their _CCCL_HAS_* macros are 0 there.
 #  if _CCCL_HAS_NVFP8_E4M3()
 template <>
 struct _CCCL_TYPE_VISIBILITY_DEFAULT scalar_type<::__nv_fp8x2_e4m3>
