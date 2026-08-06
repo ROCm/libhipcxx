@@ -232,15 +232,7 @@ template <int... _Vs>
   return ::cuda::__all_compute_capabilities();
 #  endif // ^^^ no arch list ^^^
 }
-#elif _CCCL_HIP_COMPILATION() // ^^^ _CCCL_CUDA_COMPILATION() ^^^ / vvv _CCCL_HIP_COMPILATION() vvv
-// NOTE(HIP/AMD): HIP has no equivalent of __CUDA_ARCH_LIST__ / NV_TARGET_SM_INTEGER_LIST.
-// Fall back to the full list of known CUDA compute capabilities, matching the CUDA
-// fallback behaviour above (same result when no arch list is defined).
-[[nodiscard]] _CCCL_API _CCCL_CONSTEVAL auto __target_compute_capabilities() noexcept
-{
-  return ::cuda::__all_compute_capabilities();
-}
-#endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION()
 
 _CCCL_END_NAMESPACE_CUDA
 
