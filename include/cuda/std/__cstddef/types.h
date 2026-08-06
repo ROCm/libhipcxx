@@ -44,37 +44,30 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): hipRTC has no host standard library and must take the freestanding
-// path, but compiler.h does not fold HIPRTC into _CCCL_FREESTANDING()/_CCCL_HOSTED()
-// (see __cccl/compiler.h freestanding gate), so mirror it explicitly here just as the
-// pre-upgrade code did with !_CCCL_COMPILER(NVRTC) && !_CCCL_COMPILER_HIPRTC.
 #if _CCCL_HOSTED()
 #  include <cstddef>
-#else // ^^^ hosted (non-HIPRTC) ^^^ / vvv freestanding or HIPRTC vvv
+#else // ^^^ hosted ^^^ / vvv freestanding (incl. NVRTC / hipRTC) vvv
 #  if !defined(offsetof)
 // NOTE(HIP/AMD): C++ does not allow accessing a member through a null pointer in a constant expression.
-// The following is a true constant expression and does not dereference a null pointer.
-#  if defined(_CCCL_COMPILER_HIPRTC)
-#    define offsetof(type, member) __builtin_offsetof(type, member)
-#else
-#    define offsetof(type, member) (::size_t) ((char*) &(((type*) 0)->member) - (char*) 0)
-#endif
+// __builtin_offsetof is a true constant expression and does not dereference a null pointer.
+#    if defined(_CCCL_COMPILER_HIPRTC)
+#      define offsetof(type, member) __builtin_offsetof(type, member)
+#    else // ^^^ _CCCL_COMPILER_HIPRTC ^^^ / vvv !_CCCL_COMPILER_HIPRTC vvv
+#      define offsetof(type, member) (::size_t) ((char*) &(((type*) 0)->member) - (char*) 0)
+#    endif // !_CCCL_COMPILER_HIPRTC
 #  endif // !offsetof
-#endif // freestanding or HIPRTC
+#endif // _CCCL_FREESTANDING()
 
 #include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
-// NOTE(HIP/AMD): host <cstddef> is not included under hipRTC, so ::max_align_t
-// is not in the global namespace; define it like NVRTC. HIPRTC is not folded into
-// _CCCL_FREESTANDING() by compiler.h, so mirror it explicitly here.
-#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING()
 using max_align_t = long double;
-#else // ^^^ freestanding or HIPRTC ^^^ / vvv hosted vvv
+#else // ^^^ _CCCL_FREESTANDING() ^^^ / vvv _CCCL_HOSTED() vvv
 // Re-use the compiler's <stddef.h> max_align_t where possible.
 using ::max_align_t;
-#endif // hosted
+#endif // _CCCL_HOSTED()
 
 using nullptr_t = decltype(nullptr);
 #if defined(_CCCL_COMPILER_HIPRTC)

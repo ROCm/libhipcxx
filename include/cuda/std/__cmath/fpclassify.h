@@ -62,7 +62,7 @@
 #  undef fpclassify
 #endif // _CCCL_COMPILER_HIPRTC
 
-#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING()
 #  ifndef FP_NAN
 #    define FP_NAN 0
 #  endif // ! FP_NAN
@@ -78,7 +78,7 @@
 #  ifndef FP_NORMAL
 #    define FP_NORMAL 4
 #  endif // ! FP_NORMAL
-#endif // _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#endif // _CCCL_FREESTANDING()
 
 #ifndef FP_ILOGB0
 #  define FP_ILOGB0 (-INT_MAX - 1)

@@ -57,18 +57,16 @@
 #endif // _CCCL_CUDA_COMPILER(NVCC) && _CCCL_DEVICE_COMPILATION()
 
 // We cannot use host features if we are building in freestanding
-// NOTE(HIP/AMD): hipRTC has no host C++ standard library, so ::std::as_const is
-// unavailable; treat it like freestanding and use the manual template below.
-#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING()
 #  undef _CCCL_HAS_BUILTIN_STD_AS_CONST
 #  define _CCCL_HAS_BUILTIN_STD_AS_CONST() 0
-#endif // _CCCL_FREESTANDING() || _CCCL_COMPILER_HIPRTC
+#endif // _CCCL_FREESTANDING()
 
 // include minimal std:: headers
 #if _CCCL_HAS_BUILTIN_STD_AS_CONST()
 #  if _CCCL_HOST_STD_LIB(LIBCXX) && __has_include(<__utility/as_const.h>)
 #    include <__utility/as_const.h>
-#  elif _CCCL_HOSTED() // NOTE(HIP/AMD): no host <utility> under hipRTC
+#  elif _CCCL_HOSTED()
 #    include <utility>
 #  endif // _CCCL_HOSTED()
 #endif // _CCCL_HAS_BUILTIN_STD_AS_CONST()
