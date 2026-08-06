@@ -337,14 +337,13 @@ struct __extents_query<warp_level, _Level>
     {
       constexpr auto __static_thread_count =
         _BlockExts::static_extent(0) * _BlockExts::static_extent(1) * _BlockExts::static_extent(2);
-      // NOTE(HIP/AMD): on HIP, partial wavefronts are valid (a block with fewer
-      // threads than the wave size still occupies one wavefront). The NVIDIA
-      // assertion >= 32 is relaxed to >= 1 on HIP; ceil_div handles the count.
-#if !_CCCL_HIP_COMPILATION()
-      static_assert(__static_thread_count >= __wave_size, "_Hierarchy doesn't contain enough threads to fill a single warp");
-#else
-      static_assert(__static_thread_count >= 1, "_Hierarchy must contain at least one thread");
-#endif // !_CCCL_HIP_COMPILATION()
+      // NOTE(HIP/AMD): assert against a fixed 32 rather than __wave_size. Upstream writes
+      // `>= __wave_size`, which is 32 on NVIDIA; substituting the HIP wave size would make
+      // this `>= 64` on GFX9 and reject an ordinary 32-thread block -- a tightening upstream
+      // never intended. Both wave32 and wave64 targets are supported, and blocks smaller
+      // than 32 threads are rejected exactly as on CUDA. ceil_div below still yields the
+      // correct (possibly partial) wavefront count.
+      static_assert(__static_thread_count >= 32, "_Hierarchy doesn't contain enough threads to fill a single warp");
 
       constexpr auto __static_warp_count = ::cuda::ceil_div(__static_thread_count, __wave_size);
       ::cuda::std::extents<_Tp, __static_warp_count> __curr_exts{};
@@ -361,12 +360,9 @@ struct __extents_query<warp_level, _Level>
     else
     {
       const auto __thread_count = __block_exts.extent(0) * __block_exts.extent(1) * __block_exts.extent(2);
-      // NOTE(HIP/AMD): partial wavefronts are valid on HIP; relax the assert.
-#if !_CCCL_HIP_COMPILATION()
-      _CCCL_ASSERT(__thread_count >= __wave_size, "_Hierarchy doesn't contain enough threads to fill a single warp");
-#else
-      _CCCL_ASSERT(__thread_count >= 1, "_Hierarchy must contain at least one thread");
-#endif // !_CCCL_HIP_COMPILATION()
+      // NOTE(HIP/AMD): fixed 32 rather than __wave_size, for the reason given on the
+      // static_assert in the rank_dynamic() == 0 branch above.
+      _CCCL_ASSERT(__thread_count >= 32, "_Hierarchy doesn't contain enough threads to fill a single warp");
 
       // NOTE(HIP/AMD): __wave_size resolves to _CCCL_HIP_WAVE_SIZE on HIP (64 on
       // GFX9, 32 on RDNA) and to the literal 32 on NVIDIA. Do NOT use the device
