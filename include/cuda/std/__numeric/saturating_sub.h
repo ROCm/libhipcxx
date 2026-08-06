@@ -135,11 +135,29 @@ template <class _Tp>
 #endif // !_CCCL_COMPILER(NVRTC)
 
 #if _CCCL_HIP_COMPILATION()
-// NOTE(HIP/AMD): HIP device does not have PTX; use the generic overflow-based fallback.
+// NOTE(HIP/AMD): the CUDA device implementation below is inline PTX -- and its signed
+// 32-bit branch is not even guarded by NV_IF_TARGET -- so it cannot be reused on AMDGCN.
+// HIP is clang, though, so __builtin_elementwise_sub_sat (the same builtin
+// __saturating_sub_impl_host uses above) is available in device code and lowers to the
+// native saturating instructions. Mirror the host implementation, including its
+// clang < 21 carve-out for 8- and 16-bit types.
 template <class _Tp>
 [[nodiscard]] _CCCL_DEVICE_API _Tp __saturating_sub_impl_device(_Tp __x, _Tp __y) noexcept
 {
+#  if defined(_CCCL_BUILTIN_ELEMENTWISE_SUB_SAT)
+#    if _CCCL_COMPILER(CLANG, <, 21)
+  if constexpr (sizeof(_Tp) < sizeof(int32_t))
+  {
+    return ::cuda::saturating_sub_overflow(__x, __y).value;
+  }
+  else
+#    endif // _CCCL_COMPILER(CLANG, <, 21)
+  {
+    return _CCCL_BUILTIN_ELEMENTWISE_SUB_SAT(__x, __y);
+  }
+#  else // ^^^ _CCCL_BUILTIN_ELEMENTWISE_SUB_SAT ^^^ / vvv !_CCCL_BUILTIN_ELEMENTWISE_SUB_SAT vvv
   return ::cuda::saturating_sub_overflow(__x, __y).value;
+#  endif // ^^^ !_CCCL_BUILTIN_ELEMENTWISE_SUB_SAT ^^^
 }
 #endif // _CCCL_HIP_COMPILATION()
 
