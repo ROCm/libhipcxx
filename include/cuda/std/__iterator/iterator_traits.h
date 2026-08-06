@@ -59,8 +59,6 @@
 #include <cuda/std/__utility/priority_tag.h>
 #include <cuda/std/cstddef>
 
-// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC (HIPRTC is not treated as freestanding in compiler.h), so gate the
-// host standard library headers explicitly like NVRTC to keep them out of the device-only HIPRTC TU.
 #if _CCCL_HOSTED()
 #  if _CCCL_COMPILER(MSVC)
 #    include <xutility> // for ::std::input_iterator_tag
@@ -128,9 +126,7 @@ template <class _Tp>
 using iter_reference_t = enable_if_t<__dereferenceable<_Tp>, decltype(*::cuda::std::declval<_Tp&>())>;
 #endif // _CCCL_HAS_CONCEPTS()
 
-// NOTE(HIP/AMD): HIPRTC has no host standard library but _CCCL_HOSTED() is 1 under HIPRTC, so mirror the freestanding
-// branch for HIPRTC to define the iterator tags locally instead of aliasing the unavailable ::std ones.
-#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING()
 
 struct _CCCL_TYPE_VISIBILITY_DEFAULT input_iterator_tag
 {};
@@ -145,7 +141,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT random_access_iterator_tag : public bidirec
 struct _CCCL_TYPE_VISIBILITY_DEFAULT contiguous_iterator_tag : public random_access_iterator_tag
 {};
 
-#else // ^^^ _CCCL_FREESTANDING() || HIPRTC ^^^ / vvv _CCCL_HOSTED() && !HIPRTC vvv
+#else // ^^^ _CCCL_FREESTANDING() ^^^ / vvv _CCCL_HOSTED() vvv
 
 using input_iterator_tag         = ::std::input_iterator_tag;
 using output_iterator_tag        = ::std::output_iterator_tag;
@@ -459,7 +455,6 @@ template <class _Iter>
 template <class _Iter, __iterator_traits_selection = ::cuda::std::__select_iterator_traits_specialization<_Iter>()>
 struct __iterator_traits;
 
-// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC, but ::std::iterator_traits is unavailable there, so exclude HIPRTC.
 #if _CCCL_HOSTED()
 // We need to properly accept specializations of `std::iterator_traits`
 template <class _Iter>

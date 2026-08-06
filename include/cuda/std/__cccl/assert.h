@@ -49,9 +49,6 @@
 #include <cuda/std/__cccl/execution_space.h>
 #include <cuda/std/__cccl/preprocessor.h>
 
-// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC (HIPRTC is not treated as
-// freestanding in compiler.h, and its driver is not hermetic), so gate the host
-// <assert.h> explicitly like NVRTC to keep it out of the device-only HIPRTC TU.
 #if _CCCL_HOSTED()
 #  include <assert.h>
 #endif // _CCCL_HOSTED()

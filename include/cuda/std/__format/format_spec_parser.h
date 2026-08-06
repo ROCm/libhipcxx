@@ -62,9 +62,6 @@
 #include <cuda/std/cstdint>
 #include <cuda/std/string_view>
 
-// NOTE(HIP/AMD): also exclude HIPRTC. HIPRTC is treated as hosted (_CCCL_HOSTED()
-// == 1) but has no host standard library, so <string> is unavailable. Mirror the
-// upstream _CCCL_HOSTED() gate with the HIPRTC exclusion, as in __cccl/assert.h.
 #if _CCCL_HOSTED()
 #  include <string>
 #endif // _CCCL_HOSTED()

@@ -43,12 +43,9 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): _CCCL_HOSTED() is 1 under HIPRTC, but HIPRTC's driver is not
-// hermetic and cannot pull in system <cfloat>; route it to the freestanding
-// fallback defines like NVRTC.
 #if _CCCL_HOSTED()
 #  include <cfloat>
-#else // ^^^ _CCCL_HOSTED() && !HIPRTC ^^^ / vvv _CCCL_FREESTANDING() || HIPRTC vvv
+#else // ^^^ _CCCL_HOSTED() ^^^ / vvv _CCCL_FREESTANDING() vvv
 #  define FLT_RADIX       2
 #  define DECIMAL_DIG     DBL_DECIMAL_DIG
 #  define FLT_ROUNDS      1
