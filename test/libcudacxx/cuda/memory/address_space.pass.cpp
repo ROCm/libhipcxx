@@ -74,7 +74,7 @@ __global__ void test_kernel(const _CCCL_GRID_CONSTANT MyStruct grid_constant_var
     // variables on HIP -- they are reported as global memory by the existing
     // address-space builtins (see <libhipcxx/__amd/amd_utils.h>). Skip the constant-
     // address-space assertions on HIP until the HIP runtime / compiler
-    // exposes the necessary builtin. Ported from upgrade/3.1.4.
+    // exposes the necessary builtin.
     assert(is_address_from(&constant_var, address_space::constant));
 #endif // !_CCCL_HIP_COMPILATION()
     assert(is_address_from(&local_var, address_space::local));
