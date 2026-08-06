@@ -90,8 +90,8 @@ function(
   with_ctk
 )
   # NOTE(HIP/AMD): on HIP builds tag the host header-test TUs LANGUAGE HIP so the
-  # HIP/clang front-end compiles them (matching amd-integration-base). This is
-  # required because cccl_c2h_attach_hip_deps() below links hip::host, whose
+  # HIP/clang front-end compiles them. This is required because
+  # cccl_c2h_attach_hip_deps() below links hip::host, whose
   # interface compile options (-x hip, --offload-arch=<gfx>, -D__HIP_PLATFORM_AMD__)
   # are only understood by clang. With LANGUAGE CXX and a non-clang host compiler
   # (e.g. CMAKE_CXX_COMPILER=g++) these leak onto the CXX compile and fail with
@@ -122,8 +122,8 @@ function(
   target_link_libraries(${target_name} PUBLIC libcudacxx.compiler_interface)
   # NOTE(HIP/AMD): attach the HIP host runtime + pthreads on HIP builds so the
   # generated header-test TUs find <hip/hip_runtime.h> and link std::once_flag.
-  # No-op on non-HIP. On HIP these TUs are LANGUAGE HIP (see above), matching
-  # amd-integration-base, so hip::host's clang-only interface flags are handled.
+  # No-op on non-HIP. On HIP these TUs are LANGUAGE HIP (see above), so
+  # hip::host's clang-only interface flags are handled.
   cccl_c2h_attach_hip_deps(${target_name})
   if (with_ctk)
     target_link_libraries(${target_name} PUBLIC CUDA::cudart)

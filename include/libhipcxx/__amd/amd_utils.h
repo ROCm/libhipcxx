@@ -206,11 +206,11 @@ namespace libhipcxx
    * (`__builtin_amdgcn_is_shared`, `__builtin_amdgcn_is_private`) cannot
    * disambiguate `__constant__` memory from regular global memory --
    * `__constant__` globals live in the global address space on AMDGCN
-   * and are reported as global by the existing builtins. Adapted from
-   * upgrade/3.1.4's amd_utils.h: rather than silently returning a wrong
-   * answer (the previous heuristic had a logic bug that always returned
-   * `false`; `is_global` was defined as the same set of conditions as
-   * the final return, making them mutually exclusive), trip a hard
+   * and are reported as global by the existing builtins. Rather than
+   * silently returning a wrong answer (the previous heuristic had a
+   * logic bug that always returned `false`; `is_global` was defined as
+   * the same set of conditions as the final return, making them
+   * mutually exclusive), trip a hard
    * failure (printf + __builtin_trap) so callers know the query is
    * unsupported. We don't use _CCCL_VERIFY here because including
    * <cuda/std/__cccl/assert.h> from this file (which is pulled in

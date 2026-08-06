@@ -233,7 +233,7 @@ function(cccl_generate_header_tests target_name project_include_path)
   # functions. On HIP we therefore link the header objects ONCE: this still
   # verifies that the whole header set links together, but the "missing inline"
   # lint is unavailable on HIP (the pre-3.4 per-header mechanism did not provide
-  # it either). TODO(hip-upgrade): restore an equivalent non-inline check on HIP.
+  # it either). TODO(HIP/AMD): restore an equivalent non-inline check on HIP.
   if (${CGHT_LANGUAGE} STREQUAL "HIP")
     target_link_libraries(${link_target} PRIVATE ${target_name})
   else()
