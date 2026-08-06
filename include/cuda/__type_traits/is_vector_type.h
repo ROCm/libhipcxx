@@ -52,23 +52,17 @@
 #  elif !_CCCL_CUDA_COMPILATION()
 #    include <vector_types.h>
 #  endif // vector type definitions
-#  if _CCCL_HAS_CTK()
-#    include <cuda/__type_traits/scalar_type.h>
-#    include <cuda/__type_traits/vector_size.h>
-#    include <cuda/std/__floating_point/traits.h>
-#    include <cuda/std/__type_traits/integral_constant.h>
-#    include <cuda/std/__type_traits/void_t.h>
-#  else // _CCCL_HIP_COMPILATION() && !_CCCL_HAS_CTK()
-#    include <cuda/std/__type_traits/integral_constant.h>
-#  endif // _CCCL_HAS_CTK()
+#  include <cuda/__type_traits/scalar_type.h>
+#  include <cuda/__type_traits/vector_size.h>
+#  include <cuda/std/__floating_point/traits.h>
+#  include <cuda/std/__type_traits/integral_constant.h>
+#  include <cuda/std/__type_traits/void_t.h>
 
 #  include <cuda/std/__cccl/prologue.h>
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-#  if _CCCL_HAS_CTK()
-
-// is_vector_type (CUDA/CTK path: derived from vector_size_v)
+// is_vector_type
 
 template <class _Tp>
 inline constexpr bool is_vector_type_v = (vector_size_v<_Tp> != 0);
@@ -86,213 +80,6 @@ inline constexpr bool is_extended_fp_vector_type_v<_Tp, ::cuda::std::void_t<type
 
 template <class _Tp>
 using is_extended_fp_vector_type = ::cuda::std::bool_constant<is_extended_fp_vector_type_v<_Tp>>;
-
-#  else // _CCCL_HIP_COMPILATION() && !_CCCL_HAS_CTK()
-
-// NOTE(HIP/AMD): on HIP without CTK, vector_size_v and scalar_type are not
-// available (they gate on _CCCL_HAS_CTK()). Provide direct bool specializations
-// matching the AMD integration approach (g019 / phase-3 adaptation).
-_CCCL_SUPPRESS_DEPRECATED_PUSH
-
-// is_vector_type (HIP fallback: explicit specializations)
-
-template <class _Tp>
-inline constexpr bool is_vector_type_v = false;
-template <class _Tp>
-inline constexpr bool is_vector_type_v<const _Tp> = is_vector_type_v<_Tp>;
-template <class _Tp>
-inline constexpr bool is_vector_type_v<volatile _Tp> = is_vector_type_v<_Tp>;
-template <class _Tp>
-inline constexpr bool is_vector_type_v<const volatile _Tp> = is_vector_type_v<_Tp>;
-
-template <>
-inline constexpr bool is_vector_type_v<::char1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::char2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::char3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::char4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::uchar1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::uchar2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::uchar3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::uchar4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::short1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::short2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::short3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::short4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::ushort1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ushort2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ushort3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ushort4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::int1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::int2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::int3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::int4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::uint1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::uint2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::uint3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::uint4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::long1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::long2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::long3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::long4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::ulong1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ulong2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ulong3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ulong4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::longlong1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::longlong2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::longlong3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::longlong4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::ulonglong1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ulonglong2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ulonglong3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::ulonglong4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::float1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::float2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::float3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::float4> = true;
-
-template <>
-inline constexpr bool is_vector_type_v<::double1> = true;
-template <>
-inline constexpr bool is_vector_type_v<::double2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::double3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::double4> = true;
-
-// dim3 is a vector type on the CUDA path (vector_size_v<dim3> == 3); mirror that
-// here for parity (matches the amd-integration-base adaptation).
-template <>
-inline constexpr bool is_vector_type_v<::dim3> = true;
-
-// NOTE(HIP/AMD): __half2 and __nv_bfloat162 are vector types on both CUDA and HIP
-// (vector_size_v<__half2> == 2 on the CTK path). Mirror that here for parity.
-#    if _CCCL_HAS_NVFP16()
-template <>
-inline constexpr bool is_vector_type_v<::__half2> = true;
-#    endif // _CCCL_HAS_NVFP16()
-
-#    if _CCCL_HAS_NVBF16()
-template <>
-inline constexpr bool is_vector_type_v<::__nv_bfloat162> = true;
-#    endif // _CCCL_HAS_NVBF16()
-
-// NOTE(HIP/AMD): HIP ships __hip_fp8x2_e4m3/__hip_fp8x4_e4m3/__hip_fp8x2_e5m2/
-// __hip_fp8x4_e5m2 in <hip/hip_fp8.h>; <libhipcxx/__amd/cuda_runtime.h> aliases
-// them to the upstream __nv_fp8x* names. These are vector types analogous to
-// __half2 / __nv_bfloat162 (vector_size_v<__nv_fp8x2_e4m3> == 2 on the CTK path).
-#    if _CCCL_HAS_NVFP8()
-template <>
-inline constexpr bool is_vector_type_v<::__nv_fp8x2_e4m3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::__nv_fp8x4_e4m3> = true;
-template <>
-inline constexpr bool is_vector_type_v<::__nv_fp8x2_e5m2> = true;
-template <>
-inline constexpr bool is_vector_type_v<::__nv_fp8x4_e5m2> = true;
-#    endif // _CCCL_HAS_NVFP8()
-
-template <class _Tp>
-using is_vector_type = ::cuda::std::bool_constant<is_vector_type_v<_Tp>>;
-
-// is_extended_fp_vector_type (HIP fallback: explicit specializations)
-
-template <class _Tp>
-inline constexpr bool is_extended_fp_vector_type_v = false;
-// NOTE(HIP/AMD): strip cv qualifiers so const/volatile specializations work.
-template <class _Tp>
-inline constexpr bool is_extended_fp_vector_type_v<const _Tp> = is_extended_fp_vector_type_v<_Tp>;
-template <class _Tp>
-inline constexpr bool is_extended_fp_vector_type_v<volatile _Tp> = is_extended_fp_vector_type_v<_Tp>;
-template <class _Tp>
-inline constexpr bool is_extended_fp_vector_type_v<const volatile _Tp> = is_extended_fp_vector_type_v<_Tp>;
-
-#    if _CCCL_HAS_NVFP16()
-template <>
-inline constexpr bool is_extended_fp_vector_type_v<::__half2> = true;
-#    endif // _CCCL_HAS_NVFP16()
-
-#    if _CCCL_HAS_NVBF16()
-template <>
-inline constexpr bool is_extended_fp_vector_type_v<::__nv_bfloat162> = true;
-#    endif // _CCCL_HAS_NVBF16()
-
-// NOTE(HIP/AMD): HIP ships __hip_fp8x2_e4m3/__hip_fp8x4_e4m3/__hip_fp8x2_e5m2/
-// __hip_fp8x4_e5m2 in <hip/hip_fp8.h>; <libhipcxx/__amd/cuda_runtime.h> aliases
-// them to the upstream __nv_fp8x* names. Add is_extended_fp_vector_type_v
-// specializations so that __data_type_to_dlpack<> can decompose them into their
-// scalar element type via tuple_size_v / tuple_element_t (defined in
-// cuda/std/__tuple_dir/vector_types.h, guarded by _CCCL_HAS_NVFP8()).
-#    if _CCCL_HAS_NVFP8()
-template <>
-inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x2_e4m3> = true;
-template <>
-inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x4_e4m3> = true;
-template <>
-inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x2_e5m2> = true;
-template <>
-inline constexpr bool is_extended_fp_vector_type_v<::__nv_fp8x4_e5m2> = true;
-#    endif // _CCCL_HAS_NVFP8()
-
-template <class _Tp>
-using is_extended_fp_vector_type = ::cuda::std::bool_constant<is_extended_fp_vector_type_v<_Tp>>;
-
-_CCCL_SUPPRESS_DEPRECATED_POP
-
-#  endif // _CCCL_HAS_CTK() vs. HIP fallback
 
 _CCCL_END_NAMESPACE_CUDA
 
