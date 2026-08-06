@@ -219,7 +219,11 @@ template <>
 inline constexpr ::cuda::std::size_t vector_size_v<::__nv_bfloat162> = 2;
 #  endif // _CCCL_HAS_NVBF16()
 
-// NOTE(HIP/AMD): NVFP8/FP6/FP4 vector types do not exist on HIP.
+// NOTE(HIP/AMD): the e4m3/e5m2 fp8 vector types do exist on HIP -- HIP ships
+// __hip_fp8x{2,4}_{e4m3,e5m2} in <hip/hip_fp8.h> and <libhipcxx/__amd/cuda_runtime.h>
+// aliases them to the upstream __nv_fp8x* names, so _CCCL_HAS_NVFP8() is 1 on HIP.
+// The e8m0 family (CTK 12.8+) and all fp6/fp4 vector types have no HIP analogue;
+// their _CCCL_HAS_* macros are 0 there, so those blocks drop out on HIP.
 #  if _CCCL_HAS_NVFP8_E4M3()
 template <>
 inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp8x2_e4m3> = 2;
