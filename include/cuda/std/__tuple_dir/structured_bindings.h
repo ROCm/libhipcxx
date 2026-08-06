@@ -40,17 +40,6 @@
 _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmismatched-tags")
 
-#if !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-// Fetch utility to get primary template for ::std::tuple_size necessary for the specialization of
-// ::std::tuple_size<cuda::std::tuple> to enable structured bindings.
-// See https://github.com/NVIDIA/libcudacxx/issues/316
-// NOTE(HIP/AMD): Under HIPRTC we keep the translation unit self-contained (no host
-// libstdc++ headers) -- pulling system <utility> here dragged in <initializer_list>/
-// <stdint.h> and clashed with our HIPRTC-local std definitions. The primary
-// ::std::tuple_size/tuple_element templates are declared locally for HIPRTC below.
-#  include <utility>
-#endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
-
 #include <cuda/__fwd/complex.h>
 #include <cuda/std/__fwd/array.h>
 #include <cuda/std/__fwd/complex.h>
@@ -75,7 +64,7 @@ _CCCL_BEGIN_NAMESPACE_STD
 template <class _Tp>
 struct tuple_size;
 
-#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING()
 
 template <class _Tp>
 struct tuple_size<
@@ -99,12 +88,12 @@ struct tuple_size<
                                           ::cuda::std::integral_constant<size_t, sizeof(tuple_size<_Tp>)>>>
     : public ::cuda::std::integral_constant<size_t, tuple_size<_Tp>::value>
 {};
-#endif // _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#endif // _CCCL_FREESTANDING()
 
 template <size_t _Ip, class _Tp>
 struct tuple_element;
 
-#if _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#if _CCCL_FREESTANDING()
 template <size_t _Ip, class _Tp>
 struct tuple_element<_Ip, const _Tp>
 {
@@ -122,7 +111,7 @@ struct tuple_element<_Ip, const volatile _Tp>
 {
   using type _CCCL_NODEBUG_ALIAS = const volatile typename tuple_element<_Ip, _Tp>::type;
 };
-#endif // _CCCL_FREESTANDING() || defined(_CCCL_COMPILER_HIPRTC)
+#endif // _CCCL_FREESTANDING()
 
 template <class _Tp, size_t _Size>
 struct tuple_size<::cuda::std::array<_Tp, _Size>>
@@ -155,8 +144,6 @@ struct tuple_element<1, ::cuda::complex<_Tp>>
   using type = _Tp;
 };
 
-// NOTE(HIP/AMD): These partial specializations work with both libstdc++ and our
-// tuple_size/tuple_element since they are single-template-parameter specializations.
 template <class _Tp>
 struct tuple_size<::cuda::std::complex<_Tp>>
 {
