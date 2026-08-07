@@ -82,14 +82,12 @@ macro(cccl_get_cub)
 endmacro()
 
 macro(cccl_get_cudatoolkit)
-  # NOTE(HIP/AMD): there is no CUDA Toolkit on HIP. The benchmark registry only
-  # reads CUDAToolkit_VERSION (for the meta CSV); provide a benign value and skip
-  # the REQUIRED find_package(CUDAToolkit), which hard-fails ("Could not find
-  # nvcc") on a ROCm system.
+  # NOTE(HIP/AMD): there is no CUDA Toolkit on HIP, so skip the REQUIRED
+  # find_package(CUDAToolkit), which hard-fails ("Could not find nvcc") on a
+  # ROCm system. CUDAToolkit_VERSION and CUDAToolkit_FOUND are deliberately left
+  # undefined -- there is no CUDA toolkit to report a version for, and every
+  # consumer must key off CUDAToolkit_FOUND rather than a stand-in version.
   if (LIBCUDACXX_ENABLE_HIP)
-    if (NOT DEFINED CUDAToolkit_VERSION)
-      set(CUDAToolkit_VERSION "0.0")
-    endif()
     # nvbench_helper links CUDA::curand (part of the CUDA toolkit). Map it to
     # hipRAND on HIP so the unmodified nvbench_helper/CMakeLists.txt link line works.
     find_package(hiprand CONFIG REQUIRED)
