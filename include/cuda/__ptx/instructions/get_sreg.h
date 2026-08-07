@@ -92,11 +92,24 @@ _CCCL_BEGIN_NAMESPACE_CUDA_PTX
 
 using __hip_lanemask_t = unsigned long long;
 
-#  if _CCCL_HIP_WAVE_SIZE >= 64
+// NOTE(HIP/AMD): unlike __hip_lanemask_t above, the *value* of this mask is
+// necessarily wave-size dependent, and _CCCL_HIP_WAVE_SIZE is derived from the
+// __GFX*__ predefines, which clang emits only in the device pass. In the host
+// pass the macro silently takes its wave-32 fallback, so a host-visible
+// definition here would read 0x00000000ffffffff on GFX9 rather than all-ones.
+// Every use is inside a _CCCL_DEVICE function guarded by __HIP_DEVICE_COMPILE__,
+// so the definition is device-pass only: any future host use is then an
+// undeclared-identifier error instead of a wrong value. Same invariant as the
+// warp primitives in AMD-AIOSS/libhipcxx#255 and the warp-level hierarchy
+// queries -- the wave size is device-only, anything host-visible must be
+// pass-invariant.
+#  if defined(__HIP_DEVICE_COMPILE__)
+#    if _CCCL_HIP_WAVE_SIZE >= 64
 inline constexpr __hip_lanemask_t __hip_wave_mask = ~__hip_lanemask_t{0};
-#  else
+#    else
 inline constexpr __hip_lanemask_t __hip_wave_mask = (__hip_lanemask_t{1} << _CCCL_HIP_WAVE_SIZE) - 1u;
-#  endif
+#    endif
+#  endif // __HIP_DEVICE_COMPILE__
 
 template <typename = void>
 _CCCL_DEVICE static inline ::cuda::std::uint32_t get_sreg_laneid()
