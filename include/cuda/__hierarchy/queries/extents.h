@@ -303,8 +303,18 @@ struct __extents_query<thread_level, warp_level>
   template <class _Tp, class _Hierarchy>
   // NOTE(HIP/AMD): wave size is 64 on GFX9 (MI200/MI300), 32 on RDNA/CUDA;
   // use _CCCL_HIP_WAVE_SIZE so the static extent matches the hardware wavefront.
+  //
+  // _CCCL_HIP_WAVE_SIZE is derived from the __GFX*__ predefines, which clang emits
+  // only in the *device* pass, so it must never reach a host-visible signature: the
+  // host pass would silently take the wave-32 fallback and answer 32 on GFX9. This
+  // query is therefore _CCCL_DEVICE_API on HIP (upstream uses _CCCL_API, which is
+  // fine there because 32 is pass-invariant on NVIDIA). That matches the native
+  // sibling above and every warp-level query in queries/index.h, and it keeps the
+  // invariant established for the warp primitives in AMD-AIOSS/libhipcxx#255: the
+  // wave size is device-only, anything host-visible must be pass-invariant.
 #if _CCCL_HIP_COMPILATION()
-  [[nodiscard]] _CCCL_API static constexpr ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE> __call(const _Hierarchy&) noexcept
+  [[nodiscard]] _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE>
+  __call(const _Hierarchy&) noexcept
 #else
   [[nodiscard]] _CCCL_API static constexpr ::cuda::std::extents<_Tp, 32> __call(const _Hierarchy&) noexcept
 #endif // _CCCL_HIP_COMPILATION()
@@ -318,8 +328,17 @@ struct __extents_query<thread_level, warp_level>
 template <class _Level>
 struct __extents_query<warp_level, _Level>
 {
+  // NOTE(HIP/AMD): _CCCL_DEVICE_API rather than upstream's _CCCL_API. The body divides
+  // by _CCCL_HIP_WAVE_SIZE, which is only meaningful in the device pass; leaving this
+  // host-callable would make the host pass silently compute warp counts against a
+  // 32-lane wave on GFX9. See the note on __extents_query<thread_level, warp_level>.
+#if _CCCL_HIP_COMPILATION()
+  template <class _Tp, class _Hierarchy>
+  [[nodiscard]] _CCCL_DEVICE_API static constexpr auto __call(const _Hierarchy& __hier) noexcept
+#else
   template <class _Tp, class _Hierarchy>
   [[nodiscard]] _CCCL_API static constexpr auto __call(const _Hierarchy& __hier) noexcept
+#endif // _CCCL_HIP_COMPILATION()
   {
     auto __block_exts = __extents_query<thread_level, block_level>::template __call<_Tp>(__hier);
     using _BlockExts  = decltype(__block_exts);
