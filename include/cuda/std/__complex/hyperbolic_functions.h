@@ -339,32 +339,33 @@ template <>
 _CCCL_API inline complex<__half> cosh(const complex<__half>& __x) noexcept
 {
 #  if defined(__HIP_PLATFORM_AMD__)
-  // NOTE(HIP/AMD): With -O3 on AMDGCN the sign of zero may not be preserved through
-  // the intermediate float multiplication chain (positive_zero * negative_zero = +0.0f
-  // instead of -0.0f). Special-case inputs where imag==0 (the sign-sensitive cases):
+  // FIXME(HIP/AMD): a zero result loses its sign here. Once cosh(complex<float>) is
+  // inlined, the narrowing conversion below leaves the pattern
+  //   fptrunc(fmul(<f32>, fpext(<f16>)))
+  // which the AMDGPU backend selects as `v_fma_mixlo_f16 d, a, b, 0`. That fused form
+  // adds a literal +0.0 to the product, and IEEE-754 gives (+0 * -0) + (+0) == +0 while
+  // (+0 * -0) == -0. The rewrite is only valid under `nsz`, which is not in effect. It
+  // reproduces on gfx90a/gfx942/gfx11xx/gfx12xx at -O1 and above and is not disabled by
+  // -ffp-contract=off. See Reproducer/claude/libhipcxx-3.4-pr331.
   //
-  // Case 1: (±0, ±0): cosh(±0 + ±0i) = (1, ±0) where the imaginary sign is
-  //         signbit(real) XOR signbit(imag) per the standard identity
-  //         cosh(-z)=cosh(z) and cosh(conj(z))=conj(cosh(z)).
-  //
-  // Case 2: (±inf, ±0): cosh(±inf + ±0i) = (+inf, ±0) with the same sign rule.
-  //
-  // Delegate all other cases to float.
-  if (__x.imag() == __half(0))
+  // cosh(complex<float>) itself is correct, so recover the sign from the float result
+  // rather than duplicating the computation. __nv_bfloat16 needs no such fixup: there is
+  // no bf16 form of v_fma_mix*, so its narrowing conversion is not rewritten.
+  const complex<float> __r{::cuda::std::cosh(complex<float>{__x})};
+  __half __re = __half(__r.real());
+  __half __im = __half(__r.imag());
+  if (__re == __half(0))
   {
-    const bool __imag_neg = ::cuda::std::signbit(__x.real()) ^ ::cuda::std::signbit(__x.imag());
-    const __half __imag_zero = __imag_neg ? __half(-0.0f) : __half(0.0f);
-    if (__x.real() == __half(0))
-    {
-      return complex<__half>(__half(1), __imag_zero);
-    }
-    if (::cuda::std::isinf(__x.real()))
-    {
-      return complex<__half>(::cuda::std::numeric_limits<__half>::infinity(), __imag_zero);
-    }
+    __re = ::cuda::std::signbit(__r.real()) ? __half(-0.0f) : __half(0.0f);
   }
-#  endif // defined(__HIP_PLATFORM_AMD__)
+  if (__im == __half(0))
+  {
+    __im = ::cuda::std::signbit(__r.imag()) ? __half(-0.0f) : __half(0.0f);
+  }
+  return complex<__half>{__re, __im};
+#  else // ^^^ defined(__HIP_PLATFORM_AMD__) ^^^ / vvv !defined(__HIP_PLATFORM_AMD__) vvv
   return complex<__half>{::cuda::std::cosh(complex<float>{__x})};
+#  endif // ^^^ !defined(__HIP_PLATFORM_AMD__) ^^^
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
@@ -372,22 +373,6 @@ _CCCL_API inline complex<__half> cosh(const complex<__half>& __x) noexcept
 template <>
 _CCCL_API inline complex<__nv_bfloat16> cosh(const complex<__nv_bfloat16>& __x) noexcept
 {
-#  if defined(__HIP_PLATFORM_AMD__)
-  // NOTE(HIP/AMD): Same sign-of-zero preservation issue as complex<__half> above.
-  if (__x.imag() == __nv_bfloat16(0))
-  {
-    const bool __imag_neg = ::cuda::std::signbit(__x.real()) ^ ::cuda::std::signbit(__x.imag());
-    const __nv_bfloat16 __imag_zero = __imag_neg ? __nv_bfloat16(-0.0f) : __nv_bfloat16(0.0f);
-    if (__x.real() == __nv_bfloat16(0))
-    {
-      return complex<__nv_bfloat16>(__nv_bfloat16(1), __imag_zero);
-    }
-    if (::cuda::std::isinf(__x.real()))
-    {
-      return complex<__nv_bfloat16>(::cuda::std::numeric_limits<__nv_bfloat16>::infinity(), __imag_zero);
-    }
-  }
-#  endif // defined(__HIP_PLATFORM_AMD__)
   return complex<__nv_bfloat16>{::cuda::std::cosh(complex<float>{__x})};
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
