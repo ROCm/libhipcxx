@@ -33,24 +33,31 @@
 // UNSUPPORTED: enable-tile
 // error: asm statement is unsupported in tile code
 
-// UNSUPPORTED: hipcc, hiprtc
-// NOTE(HIP/AMD): cuda::get_device_address() from host code calls hipGetSymbolAddress,
-// which requires the symbol to be declared __device__ in the host-compilation pass.
-// TEST_GLOBAL_VARIABLE expands to _CCCL_GLOBAL_VARIABLE (= __device__ only in the
-// device-compilation pass; empty in the host pass), so hipGetSymbolAddress always
-// returns hipErrorInvalidDeviceSymbol at runtime. Tracked in SWDEV-571304.
-
 #include <cuda/devices>
 #include <cuda/memory>
 #include <cuda/std/cassert>
 
 #include "test_macros.h"
 
-TEST_GLOBAL_VARIABLE int scalar_object             = 42;
-TEST_GLOBAL_VARIABLE const int const_scalar_object = 42;
+// NOTE(HIP/AMD): cuda::get_device_address() from host code calls hipGetSymbolAddress,
+// which needs the symbol declared __device__ in the *host* compilation pass.
+// TEST_GLOBAL_VARIABLE expands to `static _CCCL_GLOBAL_VARIABLE`, and
+// _CCCL_GLOBAL_VARIABLE is __device__ only in the device pass and empty in the host
+// pass, so the host pass sees an ordinary internal-linkage object and
+// hipGetSymbolAddress fails with hipErrorInvalidDeviceSymbol. Spell the annotation
+// out for both passes instead -- the same workaround is_pointer_accessible.pass.cpp
+// uses for its device globals. Tracked in SWDEV-571304.
+#if _CCCL_HIP_COMPILATION()
+#  define TEST_DEVICE_GLOBAL __device__
+#else // ^^^ HIP ^^^ / vvv CUDA vvv
+#  define TEST_DEVICE_GLOBAL TEST_GLOBAL_VARIABLE
+#endif // ^^^ CUDA ^^^
 
-TEST_GLOBAL_VARIABLE int array_object[]             = {42, 1337, -1};
-TEST_GLOBAL_VARIABLE const int const_array_object[] = {42, 1337, -1};
+TEST_DEVICE_GLOBAL int scalar_object             = 42;
+TEST_DEVICE_GLOBAL const int const_scalar_object = 42;
+
+TEST_DEVICE_GLOBAL int array_object[]             = {42, 1337, -1};
+TEST_DEVICE_GLOBAL const int const_array_object[] = {42, 1337, -1};
 
 #if !TEST_COMPILER(NVRTC) && !defined(TEST_COMPILER_HIPRTC)
 template <class T>
