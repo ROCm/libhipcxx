@@ -31,8 +31,7 @@
 // SOFTWARE.
 
 // UNSUPPORTED: no_execute
-// UNSUPPORTED: nvrtc
-// UNSUPPORTED: hiprtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 // _CCCL_VERIFY is always on
 #undef CCCL_ENABLE_ASSERTIONS
