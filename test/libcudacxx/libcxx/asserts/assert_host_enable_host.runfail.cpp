@@ -31,8 +31,7 @@
 // SOFTWARE.
 
 // UNSUPPORTED: no_execute
-// UNSUPPORTED: nvrtc
-// UNSUPPORTED: hiprtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 // We compile with CCCL_ENABLE_ASSERTIONS, but want to enable only host assertions
 #undef CCCL_ENABLE_ASSERTIONS

@@ -34,8 +34,7 @@
 // error: taking address of a function is unsupported in tile code
 
 // UNSUPPORTED: msvc-19.16
-// UNSUPPORTED: nvrtc
-// UNSUPPORTED: hiprtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 // cuda::mr::resource_ref equality
 
