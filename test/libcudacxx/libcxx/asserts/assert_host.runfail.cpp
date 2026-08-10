@@ -31,8 +31,7 @@
 // SOFTWARE.
 
 // UNSUPPORTED: no_execute
-// UNSUPPORTED: nvrtc
-// UNSUPPORTED: hiprtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 // We compile with CCCL_ENABLE_ASSERTIONS
 #ifndef CCCL_ENABLE_ASSERTIONS

@@ -29,8 +29,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// UNSUPPORTED: nvrtc
-// UNSUPPORTED: hiprtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 // UNSUPPORTED: enable-tile
 // error: function-to-pointer decay is unsupported in tile code

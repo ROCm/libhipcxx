@@ -30,8 +30,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// UNSUPPORTED: nvrtc
-// UNSUPPORTED: hiprtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 // We compile with CCCL_ENABLE_ASSERTIONS, but want to disable assertions
 #undef CCCL_ENABLE_ASSERTIONS

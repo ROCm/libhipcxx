@@ -31,8 +31,7 @@
 
 // UNSUPPORTED: enable-tile
 
-// UNSUPPORTED: nvrtc
-// UNSUPPORTED: hiprtc
+// UNSUPPORTED: nvrtc, hiprtc
 
 #include <cuda/std/cassert>
 #include <cuda/std/optional>
