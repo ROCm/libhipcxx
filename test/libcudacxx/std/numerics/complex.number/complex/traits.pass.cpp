@@ -66,6 +66,15 @@ TEST_FUNC void test()
   // precisely so the storage stays trivial.  So complex<T> here is trivial for all four T,
   // while is_floating_point_v<T> is still false for the two extended types.
   //
+  // That divergence is intentional and is a strict extension: triviality only gates which
+  // programs are accepted (atomic<>, atomic_ref<>, bit_cast, cuda::buffer, cuda::copy/fill,
+  // memcpy_async), so everything CUDA accepts is accepted here and behaves the same, and HIP
+  // additionally accepts complex<__half> / complex<__nv_bfloat16> in those slots.  It does not
+  // conflict with the intent of those gates: both types are padding-free, lock-free at 4 bytes,
+  // and round-trip exactly through bit_cast and atomic load/store/exchange/compare_exchange.
+  // Matching CUDA instead would mean adding a do-nothing user-provided copy constructor to our
+  // storage on purpose, pessimizing the HIP types to reproduce a quirk of NVIDIA's headers.
+  //
   // Diverge only on the HIP path, so the CUDA expectation stays exactly upstream's.
 #if _CCCL_HIP_COMPILATION()
   constexpr bool expected_trivial = cuda::std::is_trivially_copyable_v<T>;
