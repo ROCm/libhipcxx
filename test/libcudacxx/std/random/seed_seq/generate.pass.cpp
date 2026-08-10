@@ -83,8 +83,6 @@ int main(int, char**)
 #if TEST_STD_VER >= 2020
   static_assert(test());
 #endif
-#if _CCCL_HOSTED()
   NV_IF_TARGET(NV_IS_HOST, ({ test_against_std(); }));
-#endif // _CCCL_HOSTED()
   return 0;
 }
