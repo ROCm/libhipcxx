@@ -108,7 +108,8 @@ _CCCL_DEDUCTION_GUIDE_ATTRIBUTES restrict_mdspan(_ElementType*, ::cuda::std::spa
 // `_ElementType*`s, and `data_handle_type` is taken from `accessor_type::data_handle_type`, which
 // seems to throw off automatic deduction guides.
 template <class _ElementType, class _OtherIndexType, size_t... _ExtentsPack>
-_CCCL_DEDUCTION_GUIDE_ATTRIBUTES restrict_mdspan(_ElementType*, const ::cuda::std::extents<_OtherIndexType, _ExtentsPack...>&)
+_CCCL_DEDUCTION_GUIDE_ATTRIBUTES
+restrict_mdspan(_ElementType*, const ::cuda::std::extents<_OtherIndexType, _ExtentsPack...>&)
   -> restrict_mdspan<_ElementType, ::cuda::std::extents<_OtherIndexType, _ExtentsPack...>>;
 
 template <class _ElementType, class _MappingType>
