@@ -112,12 +112,27 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) compl
   // NOTE(HIP/AMD): __hip_bfloat162 (which __nv_bfloat162 aliases here) declares a
   // user-provided copy constructor that does nothing the implicit one would not do
   // (<hip/amd_detail/amd_hip_bf16.h>). That alone makes it non-trivially-copyable, and
-  // using it as the storage type would propagate the loss to complex<__nv_bfloat16>,
-  // breaking the is_trivially_copyable guarantee that upstream relies on.
+  // using it as the storage type would propagate the loss to complex<__nv_bfloat16>.
   //
   // Store a layout-compatible, trivially copyable stand-in instead. It converts
   // implicitly to and from __nv_bfloat162, so every member below -- including the
   // vectorized __hadd2 / __hsub2 / __hbeq2 paths -- is upstream code, unmodified.
+  // The alternative the fork used previously was ~20 #if blocks through the class
+  // body replacing those paths with scalar ones over separate __re_ / __im_ members.
+  //
+  // Keeping the storage trivial makes complex<__nv_bfloat16> trivially copyable on
+  // HIP, where on CUDA it is not -- CUDA's __nv_bfloat162 carries the same kind of
+  // user-provided copy operations, so upstream's own traits test pins the type as
+  // non-trivial there. This is a deliberate, permissive divergence: it only widens
+  // the set of accepted programs (atomic<>, atomic_ref<>, bit_cast, cuda::buffer,
+  // cuda::copy/fill and memcpy_async all gate on is_trivially_copyable_v), and it
+  // does not conflict with what those gates are for -- the type has no padding, is
+  // lock-free at 4 bytes, and round-trips exactly through bit_cast and through
+  // atomic load/store/exchange/compare_exchange on host and device. Every program
+  // CUDA accepts still behaves identically here. Note complex<__half> is trivially
+  // copyable on HIP for the same reason without any help from us, because ROCm's
+  // __half2 is a plain POD, so dropping this stand-in would not buy CUDA parity --
+  // it would only move the inconsistency to the other extended type.
   //
   // Remove this once the gratuitous copy constructor is dropped from the HIP headers.
   struct _CCCL_ALIGNAS(alignof(__nv_bfloat162)) __bfloat162_storage
