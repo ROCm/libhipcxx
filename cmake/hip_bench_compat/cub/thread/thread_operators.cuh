@@ -31,12 +31,19 @@
 // lacks: cub::DeviceTransform::Generate and cub::detail::transform::*).
 #include <cuda/std/__pstl/cuda/__hipcub.h>
 
-// NOTE(HIP/AMD): CUB 3.x renamed the arg-extremum reduction functors to
-// lowercase `cub::detail::arg_min` / `cub::detail::arg_max`. nvbench_helper.cuh
-// (3.4.0) references them directly (NVBENCH_DECLARE_TYPE_STRINGS + the
+// TODO(HIP/AMD): remove this alias block once hipCUB is rebased on CUB 3.x.
+//
+// CUB 3.x renamed the arg-extremum reduction functors to lowercase
+// `cub::detail::arg_min` / `cub::detail::arg_max`. nvbench_helper.cuh (3.4.0)
+// references them directly (NVBENCH_DECLARE_TYPE_STRINGS + the
 // min_element/max_element benches). hipCUB still ships the old capitalized
 // `hipcub::ArgMin` / `hipcub::ArgMax` (plain structs with a templated
 // operator()(KeyValuePair,KeyValuePair)), so map the new names onto them.
+//
+// Removal condition: hipCUB exports `hipcub::detail::arg_min` / `arg_max` (i.e.
+// it has picked up the CUB 3.x rename). At that point the two `using`
+// declarations below become redundant with the re-exported ::cub namespace from
+// <cuda/std/__pstl/cuda/__hipcub.h> and should be deleted, not re-pointed.
 namespace cub
 {
 namespace detail

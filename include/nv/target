@@ -278,6 +278,18 @@ using detail::provides;
 // the undef + inner include happen together the first time this umbrella
 // is seen. Both __target_macros copies are `#pragma GCC system_header`, so
 // re-defining the shared macro names does not emit -Wmacro-redefined.
+//
+// The guard sharing is deliberate and does the other half of the job: because
+// nv/detail/__target_macros keeps the upstream _NV__TARGET_MACROS name, once
+// libhipcxx's copy has been processed the ROCm copy is skipped, so Thrust
+// cannot overwrite the full macros with its cut-down ones later in the TU.
+// Renaming our guard to something unique would fix the Thrust-first order but
+// break the libhipcxx-first order -- Thrust's copy would then be processed
+// after ours and clobber NV_IF_TARGET/_NV_TARGET_IF/NV_IS_HOST. That is what
+// ROCm 7.13's installed libhipcxx does (guard _NV__TARGET_MACROS_LIBHIPCXX, no
+// undef), and any TU there that mixes <nv/target> with rocThrust fails to
+// compile NV_IF_ELSE_TARGET / NV_PROVIDES_SM_* in *either* include order.
+// Both halves are needed; do not split them.
 #ifdef _NV__TARGET_MACROS
 #  undef _NV__TARGET_MACROS
 #endif
