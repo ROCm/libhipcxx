@@ -48,7 +48,6 @@
 #include <cuda/std/__cmath/logarithms.h>
 #include <cuda/std/__cmath/roots.h>
 #include <cuda/std/__cmath/rounding_functions.h>
-#include <cuda/std/cmath> // NOTE(HIP/AMD): for INFINITY macro under hiprtc
 #include <cuda/std/__host_stdlib/istream>
 #include <cuda/std/__host_stdlib/ostream>
 #include <cuda/std/__limits/numeric_limits.h>
@@ -56,6 +55,11 @@
 #include <cuda/std/__random/is_valid.h>
 #include <cuda/std/__random/normal_distribution.h>
 #include <cuda/std/__random/uniform_real_distribution.h>
+// NOTE(HIP/AMD): for the INFINITY macro used in __eval() below. Under a
+// freestanding configuration INFINITY is defined at cuda/std/cmath:83 and nowhere
+// else in cuda::std, and none of the headers above reach that umbrella, so hipRTC
+// (where the host <math.h> is skipped) would otherwise not see it.
+#include <cuda/std/cmath>
 
 #include <cuda/std/__cccl/prologue.h>
 
