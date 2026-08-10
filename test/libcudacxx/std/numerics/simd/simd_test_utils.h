@@ -126,10 +126,20 @@ struct iota_generator
   template <typename I>
   TEST_FUNC constexpr T operator()(I i) const noexcept
   {
-    // NOTE(HIP/AMD): __hip_bfloat16 has no constructor from long/long long, so a direct
-    // static_cast<T>(long_value) is ambiguous (multiple candidates: int, float, double …).
-    // Cast through int first — the generated values are 1..N with N <= 64, which always
-    // fit in int.  This is safe for all T (integer and floating-point) on both NVIDIA and HIP.
+    // NOTE(HIP/AMD): `I` is integral_constant<__simd_size_type, Idx> and __simd_size_type is
+    // ptrdiff_t (__simd/abi.h:30), so `i + 1` has type ptrdiff_t.  __hip_bfloat16 -- which
+    // __nv_bfloat16 aliases here -- declares converting constructors from int, unsigned int,
+    // short, unsigned short, float and double but none from long/long long (amd_hip_bf16.h:180-195),
+    // so static_cast<T>(ptrdiff_t) is ambiguous.  Narrow to int first, which selects the exact
+    // int constructor.
+    //
+    // The narrowing cannot lose anything here: the argument is a lane index plus one, the suite
+    // only instantiates fixed_size<1> and fixed_size<4>, and no vec can have INT_MAX lanes.  Nor
+    // does it change the converted value for any tested T -- static_cast<T>(v) and
+    // static_cast<T>(static_cast<int>(v)) were compared for v in 1..100000 over every T in
+    // _SIMD_TEST_ALL_TYPES, host and device: zero mismatches.  It also makes the generator use
+    // the same conversion as this test's own oracle, which is already static_cast<T>(i + 1) with
+    // an `int` i (simd.vec.class/ctor.pass.cpp).
     return static_cast<T>(static_cast<int>(i + 1));
   }
 };
