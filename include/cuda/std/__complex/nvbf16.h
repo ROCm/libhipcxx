@@ -134,8 +134,8 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) compl
   // __half2 is a plain POD, so dropping this stand-in would not buy CUDA parity --
   // it would only move the inconsistency to the other extended type.
   //
-  // The gratuitous copy constructor is tracked as AIRUNTIME-2627; remove this stand-in
-  // and store __nv_bfloat162 directly once that lands.
+  // The gratuitous copy constructor is tracked as AIRUNTIME-2627, and in this repo as
+  // #352; remove this stand-in and store __nv_bfloat162 directly once that lands.
   struct _CCCL_ALIGNAS(alignof(__nv_bfloat162)) __bfloat162_storage
   {
     __nv_bfloat16 x;
