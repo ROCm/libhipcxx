@@ -264,12 +264,22 @@ using detail::provides;
 // nv/detail/__target_macros.h that shares the include guard
 // (_NV__TARGET_MACROS) with libhipcxx's version but only defines
 // NV_IF_TARGET -- it lacks NV_IF_ELSE_TARGET and the NV_PROVIDES_SM_*
-// dispatch machinery added in the CCCL v3.4.0 merge. If a Thrust header is
-// pulled in before libhipcxx (common in TUs that include hip_runtime.h
-// early, e.g. via thrust/detail/nv_target.h), the ROCm copy claims the
-// guard first and libhipcxx's full macros are skipped, breaking every
-// downstream user of NV_IF_ELSE_TARGET / NV_PROVIDES_SM_* (e.g.
-// <cuda/std/cmath>'s half-precision paths).
+// dispatch machinery added in the CCCL v3.4.0 merge. Whichever copy is
+// preprocessed first claims the guard, and the other is skipped in its
+// entirety with no diagnostic -- so if the ROCm copy wins, every downstream
+// user of NV_IF_ELSE_TARGET / NV_PROVIDES_SM_* breaks (e.g. <cuda/std/cmath>'s
+// half-precision paths).
+//
+// Measured, only a *direct* include of the private stub header
+// (thrust/system/hip/detail/nv/target.h) reaches that state today:
+// thrust/detail/nv_target.h, thrust/device_vector.h, hipcub/hipcub.hpp and the
+// HIP-system detail headers all pull thrust/detail/config.h first, which pulls
+// libhipcxx, so our copy claims the guard and the stub is skipped. That
+// protection is accidental -- it rests entirely on rocThrust's internal include
+// order, and the failure mode if it shifts is a confusing "macro not defined"
+// deep inside <cuda/std/cmath> rather than anything naming nv/target. So the
+// clear below is defence-in-depth against a ROCm-side bug, not a fix for a
+// failure observed in our own builds. Tracked in #354.
 //
 // Clear the shared guard here -- immediately before, and at the sole
 // include site of, the inner header -- so libhipcxx's complete version is
