@@ -47,8 +47,8 @@
 
 #  include <cuda/__nvtx/nvtx.h>
 #  include <cuda/std/__algorithm/unique.h>
-#  include <cuda/std/__functional/operations.h>
 #  include <cuda/std/__execution/policy.h>
+#  include <cuda/std/__functional/operations.h>
 #  include <cuda/std/__iterator/concepts.h>
 #  include <cuda/std/__iterator/iterator_traits.h>
 #  include <cuda/std/__iterator/readable_traits.h>
@@ -91,7 +91,7 @@ _CCCL_HOST_API _InputIterator unique(
   }
   else
   {
-    static_assert(__always_false_v<_Policy>, "Parallel cuda::std::unique requires at least one selected backend");
+    static_assert(__always_false_v<_Policy>, _CCCL_PSTL_NO_BACKEND_MSG("unique"));
     return ::cuda::std::unique(::cuda::std::move(__first), ::cuda::std::move(__last), ::cuda::std::move(__pred));
   }
 }
