@@ -49,7 +49,14 @@
 //
 // The host pass defaults to wave-32 (no __GFX*__ defined); the bodies
 // that consume this macro are __device__-only so this only affects
-// codegen in the device pass. clang predefines '__GFX10__' for every
+// codegen in the device pass. That constraint is load-bearing, not
+// incidental: this macro must never appear in a host-visible signature
+// (_CCCL_API / _CCCL_HOST_DEVICE), or the two passes disagree about the
+// type. Violating it is how the warp-extents query came to report 2x the
+// wave count on the host for every CDNA part -- see #353, which also
+// tracks the lint that would enforce this tree-wide.
+//
+// clang predefines '__GFX10__' for every
 // gfx10xx variant (including the gfx101x range that doesn't get the
 // '__GFX10_1__' sub-generation define on older clang releases), so the
 // bare '__GFX10__' check covers the whole RDNA1/2 generation.

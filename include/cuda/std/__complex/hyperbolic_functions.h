@@ -346,8 +346,8 @@ _CCCL_API inline complex<__half> cosh(const complex<__half>& __x) noexcept
   // adds a literal +0.0 to the product, and IEEE-754 gives (+0 * -0) + (+0) == +0 while
   // (+0 * -0) == -0. The rewrite is only valid under `nsz`, which is not in effect. It
   // reproduces on gfx90a/gfx942/gfx11xx/gfx12xx at -O1 and above and is not disabled by
-  // -ffp-contract=off. Tracked against the AMDGPU backend as LCOMPILER-2591; delete this
-  // fixup and restore the plain narrowing conversion once that is fixed.
+  // -ffp-contract=off. Tracked against the AMDGPU backend as LCOMPILER-2591, and in this
+  // repo as #351; delete this fixup and restore the plain narrowing conversion once fixed.
   //
   // cosh(complex<float>) itself is correct, so recover the sign from the float result
   // rather than duplicating the computation. __nv_bfloat16 needs no such fixup: there is
