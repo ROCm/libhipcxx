@@ -72,6 +72,33 @@
 #define _CCCL_HAS_PSTL_BACKEND() \
   (_CCCL_HAS_BACKEND_CUDA() || _CCCL_HAS_BACKEND_OMP() || _CCCL_HAS_BACKEND_TBB() || _CCCL_HAS_BACKEND_HIP())
 
+// NOTE(HIP/AMD): the algorithms whose frontends are still gated on
+// _CCCL_HAS_BACKEND_CUDA() alone fall through to upstream's
+//   "Parallel cuda::std::X requires at least one selected backend"
+// static_assert when they are called with an execution policy on HIP. That
+// wording is actively misleading here: a backend *is* selected
+// (_CCCL_HAS_BACKEND_HIP() is 1), it simply does not cover this algorithm, so
+// the message sends users hunting for a build flag that does not exist.
+//
+// Route just those frontends through this macro so the HIP diagnostic says what
+// is actually wrong. On every non-HIP configuration it expands to upstream's
+// string character-for-character, so the CUDA diagnostic is unchanged. The
+// frontends that do have a hipCUB backend keep upstream's literal inline --
+// their static_assert is unreachable on HIP anyway.
+//
+// TODO(HIP/AMD): delete this macro and restore the upstream literal at its call
+// sites once hipCUB gains the missing primitives (DeviceFind for the
+// find/all_of/any_of/none_of/mismatch/equal/adjacent_find/is_* family,
+// DeviceSelect::Unique for unique/unique_copy, a stable DevicePartition::If for
+// stable_partition) and those frontends pick up _CCCL_HAS_BACKEND_HIP().
+#if _CCCL_HAS_BACKEND_HIP()
+#  define _CCCL_PSTL_NO_BACKEND_MSG(_Name)                                                   \
+    "Parallel cuda::std::" _Name " is not available on HIP: hipCUB provides no backend for " \
+    "this algorithm. Call the serial overload instead, without an execution policy."
+#else // ^^^ _CCCL_HAS_BACKEND_HIP() ^^^ / vvv !_CCCL_HAS_BACKEND_HIP() vvv
+#  define _CCCL_PSTL_NO_BACKEND_MSG(_Name) "Parallel cuda::std::" _Name " requires at least one selected backend"
+#endif // ^^^ !_CCCL_HAS_BACKEND_HIP() ^^^
+
 #include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA_STD___INTERNAL_PSTL_CONFIG_H
