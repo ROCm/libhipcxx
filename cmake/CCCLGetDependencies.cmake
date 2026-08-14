@@ -46,6 +46,33 @@ endmacro()
 macro(cccl_get_catch2)
   include("${_cccl_cpm_file}")
   CPMAddPackage("gh:catchorg/Catch2@3.12.0")
+  # NOTE(HIP/AMD): the c2h test executables are HIP targets, so amdclang++ links
+  # them with '-pie' (CLANG_DEFAULT_PIE_ON_LINUX=ON), while Catch2 is a plain
+  # CXX project built by whatever the host compiler is. When that compiler does
+  # not itself default to PIE -- a gcc-toolset g++, say, which is built without
+  # --enable-default-pie -- libCatch2.a ships objects carrying absolute
+  # relocations and ld.lld refuses them in the PIE image:
+  #   ld.lld: error: relocation R_X86_64_32S cannot be used against symbol
+  #   'vtable for Catch::CompactReporter'; recompile with -fPIC
+  # ci/internal/build.sh now uses amdclang++ on every builder, whose -fPIE
+  # default is enough for an executable, so nothing in CI hits this. It is kept
+  # as a guard for LIBHIPCXX_HOST_COMPILER pointing somewhere else, since the
+  # failure surfaces as a link error inside a dependency rather than anything
+  # naming the host compiler. Ubuntu's g++ defaults to PIE and hides it too.
+  #
+  # The arch variables are no help here: CMAKE_HIP_ARCHITECTURES / GPU_TARGETS /
+  # AMDGPU_TARGETS reach HIP-language compiles only, never a CXX one. Setting
+  # the property on the two archives beats CMAKE_POSITION_INDEPENDENT_CODE for
+  # the whole tree; they are the only CXX static libraries a HIP test
+  # executable links. hipBench needs no equivalent -- it sets
+  # CMAKE_POSITION_INDEPENDENT_CODE itself and forwards it to its fmt fetch.
+  if (LIBCUDACXX_ENABLE_HIP)
+    foreach (_cccl_c2_tgt IN ITEMS Catch2 Catch2WithMain)
+      if (TARGET ${_cccl_c2_tgt})
+        set_target_properties(${_cccl_c2_tgt} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+      endif()
+    endforeach()
+  endif()
 endmacro()
 
 macro(cccl_get_cccl)
