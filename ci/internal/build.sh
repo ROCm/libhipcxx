@@ -25,9 +25,9 @@
 # produces the CPack packages and the tests tarball the tester images consume.
 #
 # Both callers go through this script: the Jenkins pipeline on GPU-capable
-# hosts, and the platform CI Docker builders on CPU-only hosts. The build hosts
-# differ only in which host compiler they can use, which is why the host
-# compiler is a knob rather than two separate build paths.
+# hosts, and the platform CI Docker builders on CPU-only hosts. Both use the
+# same host compiler (amdclang++, see LIBHIPCXX_HOST_COMPILER below), so the
+# two host types differ only in whether a GPU is present at build time.
 #
 # Required environment variables:
 #   SRC_DIR              Parent directory of the project checkout.
@@ -40,10 +40,14 @@
 #   LIBHIPCXX_BUILD_TYPE      build | install (default: build).
 #   LIBHIPCXX_CONDA_ENV       Conda environment to activate first.
 #   LIBHIPCXX_HOST_COMPILER   Host compiler handed to ci/build_libhipcxx.sh.
-#                             Defaults to hipcc, which is what the project's
-#                             own scripts assume. The CPU-only Docker build
-#                             hosts set this to a plain C++ compiler, because
-#                             hipcc as the *host* compiler crashes there.
+#                             Defaults to amdclang++ from the ROCm install,
+#                             which works on both host types. Neither
+#                             alternative does: hipcc compiles even a plain
+#                             .cpp as HIP and so needs an offload arch it
+#                             cannot detect on a GPU-less builder, while a
+#                             distro g++ chokes on the clang-only flags
+#                             (-x hip, --offload-arch) that hip::device puts
+#                             on plain CXX targets.
 #   LIBHIPCXX_CXX_STANDARD    C++ standard selecting the preset
 #                             (default: 17; keep in sync with ci/build_common.sh).
 #   LIBHIPCXX_CPACK_GENERATORS  Semicolon separated CPack generator list.
@@ -96,8 +100,29 @@ if [ -d "/opt/rh/gcc-toolset-$(g++ -dumpversion)" ]; then
   export CC=${toolchain}/bin/cc
 fi
 
-# ci/build_common.sh takes the host compiler from CXX, defaulting to hipcc.
-export CXX="${LIBHIPCXX_HOST_COMPILER:-hipcc}"
+# ci/build_common.sh takes the host compiler from CXX. Resolve amdclang++ out of
+# the ROCm install rather than trusting PATH, and fail loudly if it is missing:
+# falling back to hipcc or g++ would resurface the failures described above as
+# confusing compile errors deep in a dependency.
+if [ -z "${LIBHIPCXX_HOST_COMPILER:-}" ]; then
+  rocm_root="${ROCM_PATH:-}"
+  if [ -z "${rocm_root}" ] && command -v rocm-sdk >/dev/null 2>&1; then
+    # ROCm >= 7.14 ships as a pip SDK with no /opt/rocm.
+    rocm_root="$(rocm-sdk path --root)"
+  fi
+  rocm_root="${rocm_root:-/opt/rocm}"
+
+  if [ -x "${rocm_root}/bin/amdclang++" ]; then
+    LIBHIPCXX_HOST_COMPILER="${rocm_root}/bin/amdclang++"
+  elif command -v amdclang++ >/dev/null 2>&1; then
+    LIBHIPCXX_HOST_COMPILER="$(command -v amdclang++)"
+  else
+    echo "ERROR: amdclang++ not found in '${rocm_root}/bin' or on PATH." >&2
+    echo "       Set LIBHIPCXX_HOST_COMPILER to override the host compiler." >&2
+    exit 2
+  fi
+fi
+export CXX="${LIBHIPCXX_HOST_COMPILER}"
 
 #### packaging backends
 
