@@ -57,9 +57,10 @@ if [ -n "${LIBHIPCXX_CONDA_ENV:-}" ]; then
   set -u
 fi
 
-# NOTE: the libhipcxx tests require that CXX is set to hipcc. The build may run
-# on a CPU-only host with a different host compiler, but the tests always run
-# on a GPU runner.
+# NOTE: this only takes effect when the tree has not been configured yet -- CMake
+# reads $CXX on the first configure and the cache wins on every later one, so a
+# tree built by ci/internal/build.sh keeps that script's host compiler
+# (amdclang++) no matter what is set here. Kept for a from-scratch test run.
 export CXX="${CXX_FOR_TESTS:-hipcc}"
 
 # NOTE: We must execute the tests from the build tree because they need the
