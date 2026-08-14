@@ -268,6 +268,24 @@
 #  undef _CCCL_BUILTIN_MEMMOVE
 #endif // _CCCL_CUDA_COMPILER(NVCC)
 
+// TODO(HIP/AMD): the ROCm 7.14 AMDGPU backend cannot lower an LDS (addrspace 3)
+// memmove on GFX10.1 (gfx1010/gfx1011/gfx1012) in WGP mode and aborts with
+// "error in backend: cannot lower memory intrinsic in address space 3".
+// AMDGPUPromoteAlloca moves kernel-local arrays into LDS at -O2 and above, so
+// any cuda::std::copy/move over a trivially copyable type can reach it. ROCm
+// 7.13 lowers the very same IR without complaint, so the WAR is pinned to the
+// affected release. It is also restricted to the device pass: the host pass has
+// no LDS and keeps the faster builtin. Without _CCCL_BUILTIN_MEMMOVE,
+// __dispatch_memmove falls back to ::cuda::std::memmove at runtime and to the
+// element-wise loop during constant evaluation, which is the path NVCC already
+// takes.
+#if _CCCL_HIP_COMPILATION() && defined(__HIP_DEVICE_COMPILE__)
+#  include <libhipcxx/__amd/amd_utils.h>
+#  if (LIBHIPCXX_ROCM_VERSION_EQ(7, 14))
+#    undef _CCCL_BUILTIN_MEMMOVE
+#  endif // LIBHIPCXX_ROCM_VERSION_EQ(7, 14)
+#endif // _CCCL_HIP_COMPILATION() && __HIP_DEVICE_COMPILE__
+
 #if _CCCL_CHECK_BUILTIN(builtin_operator_new) && _CCCL_CHECK_BUILTIN(builtin_operator_delete) \
   && _CCCL_CUDA_COMPILER(CLANG)
 #  define _CCCL_BUILTIN_OPERATOR_DELETE(...) __builtin_operator_delete(__VA_ARGS__)
