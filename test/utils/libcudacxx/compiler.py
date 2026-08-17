@@ -59,6 +59,7 @@ class CXXCompiler(object):
     ):
         self.source_lang = "c++"
         self.compile_timeout = 100
+        self.compile_timeout_per_extra_arch = 60
         self.path = path
         self.first_arg = first_arg or ""
         self.flags = list(flags or [])
