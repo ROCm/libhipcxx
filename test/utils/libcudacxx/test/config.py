@@ -1020,6 +1020,17 @@ class Configuration(object):
                 if arch.startswith("gfx"):
                     arch_flag = '--offload-arch={0}'.format(arch)
                     self.cxx.compile_flags += [arch_flag]
+            # NOTE(HIP/AMD): a compile costs one host pass plus one device pass
+            # per --offload-arch.
+            num_offload_archs = len([a for a in compute_archs if a.startswith("gfx")])
+            if num_offload_archs > 1:
+                self.cxx.compile_timeout += self.cxx.compile_timeout_per_extra_arch * (
+                    num_offload_archs - 1
+                )
+                self.lit_config.note(
+                    "Compile timeout: %ds (%d offload archs)"
+                    % (self.cxx.compile_timeout, num_offload_archs)
+                )
         if pre_gfx908:
             self.config.available_features.add("pre-gfx908")
         if pre_gfx90a:
