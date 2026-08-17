@@ -168,6 +168,7 @@ if [ -n "${CMAKE_VERSION:-}" ]; then
   pip3 install lit==${LIBHIPCXX_LIT_VERSION} # specific requirement for libhipcxx testing
   pip3 install ninja
   pip3 install sccache
+  pip3 install psutil
 fi
 
 export CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:-}${ROCM_PATH:+:${ROCM_PATH}/lib/cmake}"
