@@ -505,7 +505,26 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "HIPCC")
   )
 endif()
 
-set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${CMAKE_HIP_ARCHITECTURES}")
+# NOTE(HIP/AMD): lit.site.cfg.in substitutes this into 'config.compute_archs',
+# from which config.py emits one '--offload-arch=' per entry. Deduplicate:
+# CMake autodetects one entry per visible device, and every repeat costs
+# another device-compilation pass on every test. HIP-only, so the CUDA branch
+# above keeps the value it built.
+if (LIBCUDACXX_ENABLE_HIP)
+  set(_libcudacxx_compute_archs ${CMAKE_HIP_ARCHITECTURES})
+  list(REMOVE_DUPLICATES _libcudacxx_compute_archs)
+  set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${_libcudacxx_compute_archs}")
+  if (NOT LIBCUDACXX_COMPUTE_ARCHS_STRING)
+    message(
+      WARNING
+      "CMAKE_HIP_ARCHITECTURES is empty: the lit tests will be compiled for "
+      "hipcc's default target, not the requested one. Set AMDGPU_TARGETS."
+    )
+  endif()
+  message(STATUS "lit test offload archs: ${LIBCUDACXX_COMPUTE_ARCHS_STRING}")
+  unset(_libcudacxx_compute_archs)
+endif()
+
 include(AddLLVM)
 
 set(LIBCUDACXX_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
