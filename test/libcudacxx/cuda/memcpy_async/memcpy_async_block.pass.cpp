@@ -14,6 +14,8 @@
 
 // UNSUPPORTED: pre-sm-70
 
+// UNSUPPORTED: hipcc, hiprtc
+
 // clang-cuda < 20 errors out with "fatal error: error in backend: Cannot cast between two non-generic address spaces"
 // XFAIL: clang-14 && !nvcc
 // XFAIL: clang-15 && !nvcc
