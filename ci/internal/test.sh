@@ -92,6 +92,10 @@ fi
 
 HIP_HIPCC_EXECUTABLE="${HIP_HIPCC_EXECUTABLE:-${ROCM_PATH:-/opt/rocm}/bin/hipcc}"
 
+# Pip-installed ROCm SDK puts libamdhip64.so under ${ROCM_PATH}/lib, which is not
+# on the default loader path. c2h binaries have no RPATH, so set it here.
+export LD_LIBRARY_PATH="${ROCM_PATH:-/opt/rocm}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
+
 cmake_options=(
   "-DHIP_HIPCC_EXECUTABLE=${HIP_HIPCC_EXECUTABLE}"
   # No fetching during a test run: the build already satisfied all dependencies.
