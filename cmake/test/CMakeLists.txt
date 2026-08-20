@@ -24,9 +24,25 @@ endif()
 set(cmake_opts
   -D "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
   -D "CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-  -D "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-  -D "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
 )
+
+# NOTE(HIP/AMD): version_check.cxx includes <cuda/std/atomic>, whose HIP device
+# intrinsics are only declared when the TU compiles as HIP -- so it needs hipcc,
+# not the host compiler (amdclang++ on a plain .cxx fails just like g++).
+set(_libhipcxx_test_export_cxx "${CMAKE_CXX_COMPILER}")
+if (LIBCUDACXX_ENABLE_HIP)
+  if (HIP_HIPCC_EXECUTABLE)
+    set(_libhipcxx_test_export_cxx "${HIP_HIPCC_EXECUTABLE}")
+  else()
+    find_program(_libhipcxx_hipcc NAMES hipcc
+      HINTS ENV ROCM_PATH "${ROCM_PATH}" "/opt/rocm"
+      PATH_SUFFIXES bin)
+    if (_libhipcxx_hipcc)
+      set(_libhipcxx_test_export_cxx "${_libhipcxx_hipcc}")
+    endif()
+  endif()
+endif()
+list(APPEND cmake_opts -D "CMAKE_CXX_COMPILER=${_libhipcxx_test_export_cxx}")
 
 # Temporary installation prefix for tests against installed project:
 set(tmp_install_prefix "${CMAKE_CURRENT_BINARY_DIR}/test_install")
