@@ -234,6 +234,19 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS OR CCCL_ENABLE_BENCHMARKS)
   #   cccl.compiler_interface_cppXX targets that libcudacxx links against.
   # - CCCLConfigureTarget.cmake provides cccl_configure_target() used by the
   #   header-testing helpers below.
+  # CCCL_{SOURCE,BINARY}_DIR are referenced by some cccl_get_* macros
+  # (e.g. cccl_get_c2h() pulls add_subdirectory("${CCCL_SOURCE_DIR}/c2h"
+  # "${CCCL_BINARY_DIR}/c2h")). In a normal CCCL parent build these get
+  # set by the parent CMakeLists.txt; libhipcxx is standalone so we
+  # alias them to our own source / binary directories. Must precede the
+  # includes: CCCLConfigureTarget.cmake reads CCCL_BINARY_DIR at include time.
+  if (NOT DEFINED CCCL_SOURCE_DIR)
+    set(CCCL_SOURCE_DIR "${libcudacxx_SOURCE_DIR}")
+  endif()
+  if (NOT DEFINED CCCL_BINARY_DIR)
+    set(CCCL_BINARY_DIR "${CMAKE_BINARY_DIR}")
+  endif()
+
   include(cmake/AppendOptionIfAvailable.cmake)
   include(cmake/CCCLBuildCompilerTargets.cmake)
   include(cmake/CCCLConfigureTarget.cmake)
@@ -247,18 +260,6 @@ if (LIBCUDACXX_ENABLE_LIBCUDACXX_TESTS OR CCCL_ENABLE_BENCHMARKS)
   include(cmake/CCCLAddExecutable.cmake)
   include(cmake/CCCLGenerateHeaderTests.cmake)
   cccl_build_compiler_targets()
-
-  # CCCL_{SOURCE,BINARY}_DIR are referenced by some cccl_get_* macros
-  # (e.g. cccl_get_c2h() pulls add_subdirectory("${CCCL_SOURCE_DIR}/c2h"
-  # "${CCCL_BINARY_DIR}/c2h")). In a normal CCCL parent build these get
-  # set by the parent CMakeLists.txt; libhipcxx is standalone so we
-  # alias them to our own source / binary directories.
-  if (NOT DEFINED CCCL_SOURCE_DIR)
-    set(CCCL_SOURCE_DIR "${libcudacxx_SOURCE_DIR}")
-  endif()
-  if (NOT DEFINED CCCL_BINARY_DIR)
-    set(CCCL_BINARY_DIR "${CMAKE_BINARY_DIR}")
-  endif()
 
   # On HIP we ship a Catch2-only stripped-down c2h (see c2h/CMakeLists.txt)
   # that does not pull thrust / cub / cudaToolkit. The upstream
