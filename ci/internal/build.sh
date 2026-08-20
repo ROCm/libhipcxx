@@ -213,6 +213,6 @@ fi
 
 # The tester images extract this at / and drive ci/internal/test.sh out of the
 # source tree it carries, so the archive keeps absolute paths. The build tree
-# lives inside the source tree for preset builds, so one entry covers both.
-tar --exclude=.git -czf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} ${build_src_dir}
+# and the original source tree are archived as two separate entries.
+tar --exclude=.git -czf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} ${build_src_dir} ${src_dir}
 du -sh ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name}
