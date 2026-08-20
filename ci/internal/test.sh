@@ -57,6 +57,17 @@ if [ -n "${LIBHIPCXX_CONDA_ENV:-}" ]; then
   set -u
 fi
 
+# Keep the host toolchain build.sh used. CCC_OVERRIDE_OPTIONS is read by the
+# clang driver per invocation and is not persisted in the CMake cache, so
+# without it the test relink falls back to the platform libstdc++.
+if [ -d "/opt/rh/gcc-toolset-$(g++ -dumpversion)" ]; then
+  toolchain="/opt/rh/gcc-toolset-$(g++ -dumpversion)/root/usr"
+  export CCC_OVERRIDE_OPTIONS="+--gcc-toolchain=${toolchain}"
+  # note: in some shells, cmake is using /bin/{cc, c++} as compilers,
+  # which may not be the compilers of the enabled toolchain.
+  export CC=${toolchain}/bin/cc
+fi
+
 # NOTE: this only takes effect when the tree has not been configured yet -- CMake
 # reads $CXX on the first configure and the cache wins on every later one, so a
 # tree built by ci/internal/build.sh keeps that script's host compiler
@@ -83,6 +94,8 @@ HIP_HIPCC_EXECUTABLE="${HIP_HIPCC_EXECUTABLE:-${ROCM_PATH:-/opt/rocm}/bin/hipcc}
 
 cmake_options=(
   "-DHIP_HIPCC_EXECUTABLE=${HIP_HIPCC_EXECUTABLE}"
+  # No fetching during a test run: the build already satisfied all dependencies.
+  "-DFETCHCONTENT_FULLY_DISCONNECTED=ON"
   ${AMDGPU_TARGETS:+"-DCMAKE_HIP_ARCHITECTURES=${AMDGPU_TARGETS}"}
   ${AMDGPU_TARGETS:+"-DGPU_TARGETS=${AMDGPU_TARGETS}"}
   ${AMDGPU_TARGETS:+"-DAMDGPU_TARGETS=${AMDGPU_TARGETS}"}
