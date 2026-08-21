@@ -35,7 +35,7 @@ set(PACKAGE_NAME libhipcxx)
 set(PACKAGE_VERSION 11.0)
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
-project(libhipcxx LANGUAGES CXX VERSION 3.0.2)
+project(libhipcxx LANGUAGES CXX VERSION 3.4.0)
 
 # Expose libcudacxx_SOURCE_DIR / libcudacxx_BINARY_DIR for parity with the
 # upstream libcudacxx project name; lets all libhipcxx CMake code use the
