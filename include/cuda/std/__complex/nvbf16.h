@@ -108,64 +108,7 @@ struct __cccl_complex_overload_traits<__nv_bfloat16, false, false>
 template <>
 class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) complex<__nv_bfloat16>
 {
-#  if _CCCL_HIP_COMPILATION()
-  // NOTE(HIP/AMD): __hip_bfloat162 (which __nv_bfloat162 aliases here) declares a
-  // user-provided copy constructor that does nothing the implicit one would not do
-  // (<hip/amd_detail/amd_hip_bf16.h>). That alone makes it non-trivially-copyable, and
-  // using it as the storage type would propagate the loss to complex<__nv_bfloat16>.
-  //
-  // Store a layout-compatible, trivially copyable stand-in instead. It converts
-  // implicitly to and from __nv_bfloat162, so every member below -- including the
-  // vectorized __hadd2 / __hsub2 / __hbeq2 paths -- is upstream code, unmodified.
-  // The alternative the fork used previously was ~20 #if blocks through the class
-  // body replacing those paths with scalar ones over separate __re_ / __im_ members.
-  //
-  // Keeping the storage trivial makes complex<__nv_bfloat16> trivially copyable on
-  // HIP, where on CUDA it is not -- CUDA's __nv_bfloat162 carries the same kind of
-  // user-provided copy operations, so upstream's own traits test pins the type as
-  // non-trivial there. This is a deliberate, permissive divergence: it only widens
-  // the set of accepted programs (atomic<>, atomic_ref<>, bit_cast, cuda::buffer,
-  // cuda::copy/fill and memcpy_async all gate on is_trivially_copyable_v), and it
-  // does not conflict with what those gates are for -- the type has no padding, is
-  // lock-free at 4 bytes, and round-trips exactly through bit_cast and through
-  // atomic load/store/exchange/compare_exchange on host and device. Every program
-  // CUDA accepts still behaves identically here. Note complex<__half> is trivially
-  // copyable on HIP for the same reason without any help from us, because ROCm's
-  // __half2 is a plain POD, so dropping this stand-in would not buy CUDA parity --
-  // it would only move the inconsistency to the other extended type.
-  //
-  // The gratuitous copy constructor is tracked as AIRUNTIME-2627, and in this repo as
-  // #352; remove this stand-in and store __nv_bfloat162 directly once that lands.
-  struct _CCCL_ALIGNAS(alignof(__nv_bfloat162)) __bfloat162_storage
-  {
-    __nv_bfloat16 x;
-    __nv_bfloat16 y;
-
-    _CCCL_HIDE_FROM_ABI __bfloat162_storage() = default;
-
-    _CCCL_API inline __bfloat162_storage(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
-        : x(__x)
-        , y(__y)
-    {}
-
-    _CCCL_API inline __bfloat162_storage(const __nv_bfloat162& __v) noexcept
-        : x(__v.x)
-        , y(__v.y)
-    {}
-
-    _CCCL_API inline operator __nv_bfloat162() const noexcept
-    {
-      return __nv_bfloat162{x, y};
-    }
-  };
-
-  static_assert(is_trivially_copyable_v<__bfloat162_storage>,
-                "the complex<__nv_bfloat16> storage stand-in must be trivially copyable");
-
-  __bfloat162_storage __repr_;
-#  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
   __nv_bfloat162 __repr_;
-#  endif // ^^^ !_CCCL_HIP_COMPILATION() ^^^
 
   template <class _Up>
   friend class complex;
