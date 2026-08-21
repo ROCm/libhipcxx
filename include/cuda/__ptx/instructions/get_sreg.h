@@ -103,12 +103,13 @@ using __hip_lanemask_t = unsigned long long;
 // warp primitives in AMD-AIOSS/libhipcxx#255 and the warp-level hierarchy
 // queries -- the wave size is device-only, anything host-visible must be
 // pass-invariant.
+// Shift the all-ones value down rather than shifting 1 up: the latter needs a
+// wave-size branch, because (1 << 64) is undefined for a 64-bit type. This form
+// is branchless and exact for every wave size up to the width of the type.
 #  if defined(__HIP_DEVICE_COMPILE__)
-#    if _CCCL_HIP_WAVE_SIZE >= 64
-inline constexpr __hip_lanemask_t __hip_wave_mask = ~__hip_lanemask_t{0};
-#    else
-inline constexpr __hip_lanemask_t __hip_wave_mask = (__hip_lanemask_t{1} << _CCCL_HIP_WAVE_SIZE) - 1u;
-#    endif
+inline constexpr int __hip_lanemask_bits = static_cast<int>(sizeof(__hip_lanemask_t) * __CHAR_BIT__);
+static_assert(_CCCL_HIP_WAVE_SIZE <= __hip_lanemask_bits, "wave size exceeds the width of __hip_lanemask_t");
+inline constexpr __hip_lanemask_t __hip_wave_mask = ~__hip_lanemask_t{0} >> (__hip_lanemask_bits - _CCCL_HIP_WAVE_SIZE);
 #  endif // __HIP_DEVICE_COMPILE__
 
 template <typename = void>
