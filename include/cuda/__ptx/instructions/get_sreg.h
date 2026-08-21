@@ -100,9 +100,8 @@ using __hip_lanemask_t = unsigned long long;
 // Every use is inside a _CCCL_DEVICE function guarded by __HIP_DEVICE_COMPILE__,
 // so the definition is device-pass only: any future host use is then an
 // undeclared-identifier error instead of a wrong value. Same invariant as the
-// warp primitives in AMD-AIOSS/libhipcxx#255 and the warp-level hierarchy
-// queries -- the wave size is device-only, anything host-visible must be
-// pass-invariant.
+// warp primitives and the warp-level hierarchy queries -- the wave size is
+// device-only, anything host-visible must be pass-invariant.
 // Shift the all-ones value down rather than shifting 1 up: the latter needs a
 // wave-size branch, because (1 << 64) is undefined for a 64-bit type. This form
 // is branchless and exact for every wave size up to the width of the type.
