@@ -44,6 +44,23 @@
 
 #include "test_macros.h"
 
+// NOTE(HIP/AMD): complex<T> is trivially copyable iff its storage is.  The extended types
+// are stored as the paired vector type (__half2 / __nv_bfloat162) so the vectorized paths
+// work; everything else is held as plain scalars.  __type_to_vector_t is only defined for
+// the former, hence the if constexpr -- the untaken branch is never instantiated.
+template <class T>
+constexpr bool expected_trivial_storage()
+{
+  if constexpr (cuda::std::__has_vector_type_v<T>)
+  {
+    return cuda::std::is_trivially_copyable_v<cuda::std::__type_to_vector_t<T>>;
+  }
+  else
+  {
+    return true;
+  }
+}
+
 template <class T>
 TEST_FUNC void test()
 {
@@ -57,30 +74,12 @@ TEST_FUNC void test()
   // storage is", and it spells that as is_floating_point_v<T> because on CUDA the two agree:
   // complex<__half> / complex<__nv_bfloat16> store a __half2 / __nv_bfloat162, and those
   // vector types carry user-provided copy operations, so they are non-trivial exactly where
-  // is_floating_point_v<T> is false.  (Note it is the *vector* type that is non-trivial --
-  // CUDA's scalar __half has no user-provided copy operations and is trivially copyable, so
-  // is_trivially_copyable_v<T> is NOT a drop-in for is_floating_point_v<T> on CUDA.)
+  // is_floating_point_v<T> is false.
   //
-  // On HIP the coincidence breaks: __half2 is a trivially copyable POD, and complex<
-  // __nv_bfloat16> uses the trivially copyable stand-in added in <cuda/std/__complex/nvbf16.h>
-  // precisely so the storage stays trivial.  So complex<T> here is trivial for all four T,
-  // while is_floating_point_v<T> is still false for the two extended types.
-  //
-  // That divergence is intentional and is a strict extension: triviality only gates which
-  // programs are accepted (atomic<>, atomic_ref<>, bit_cast, cuda::buffer, cuda::copy/fill,
-  // memcpy_async), so everything CUDA accepts is accepted here and behaves the same, and HIP
-  // additionally accepts complex<__half> / complex<__nv_bfloat16> in those slots.  It does not
-  // conflict with the intent of those gates: both types are padding-free, lock-free at 4 bytes,
-  // and round-trip exactly through bit_cast and atomic load/store/exchange/compare_exchange.
-  // Matching CUDA instead would mean adding a do-nothing user-provided copy constructor to our
-  // storage on purpose, pessimizing the HIP types to reproduce a quirk of NVIDIA's headers.
-  //
-  // Diverge only on the HIP path, so the CUDA expectation stays exactly upstream's.
-#if _CCCL_HIP_COMPILATION()
-  constexpr bool expected_trivial = cuda::std::is_trivially_copyable_v<T>;
-#else // ^^^ HIP ^^^ / vvv CUDA vvv
-  constexpr bool expected_trivial = cuda::std::is_floating_point_v<T>;
-#endif // ^^^ CUDA ^^^
+  // They do not agree on HIP: ROCm's __half2 is a plain POD, so complex<__half> is trivially
+  // copyable here while CUDA's is not.  Assert the invariant directly instead of the CUDA
+  // shorthand for it, which holds on both platforms and needs no #if.
+  constexpr bool expected_trivial = expected_trivial_storage<T>();
 
   static_assert(cuda::std::is_copy_constructible_v<C>);
   static_assert(cuda::std::is_trivially_copy_constructible_v<C> == expected_trivial);
