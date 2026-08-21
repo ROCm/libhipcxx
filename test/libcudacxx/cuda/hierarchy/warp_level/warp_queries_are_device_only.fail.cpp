@@ -31,9 +31,8 @@
 // fallback. A host-callable warp-level query would therefore answer 32 on GFX9,
 // so cuda/__hierarchy/queries/extents.h marks these _CCCL_DEVICE_API on HIP
 // (upstream uses _CCCL_API, which is fine there because 32 is pass-invariant on
-// NVIDIA). This is the same invariant established for the warp primitives in
-// AMD-AIOSS/libhipcxx#255: the wave size is device-only, anything host-visible
-// must be pass-invariant.
+// NVIDIA). This is the same invariant established for the warp primitives: the
+// wave size is device-only, anything host-visible must be pass-invariant.
 //
 // The companion wave_size_matches_hardware.pass.cpp anchors the *value* against
 // the runtime wavefront size, but it runs device-side, so it stays green if the

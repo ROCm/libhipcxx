@@ -310,8 +310,8 @@ struct __extents_query<thread_level, warp_level>
   // query is therefore _CCCL_DEVICE_API on HIP (upstream uses _CCCL_API, which is
   // fine there because 32 is pass-invariant on NVIDIA). That matches the native
   // sibling above and every warp-level query in queries/index.h, and it keeps the
-  // invariant established for the warp primitives in AMD-AIOSS/libhipcxx#255: the
-  // wave size is device-only, anything host-visible must be pass-invariant.
+  // invariant established for the warp primitives: the wave size is device-only,
+  // anything host-visible must be pass-invariant.
 #if _CCCL_HIP_COMPILATION()
   [[nodiscard]] _CCCL_DEVICE_API static constexpr ::cuda::std::extents<_Tp, _CCCL_HIP_WAVE_SIZE>
   __call(const _Hierarchy&) noexcept
