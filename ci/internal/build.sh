@@ -189,6 +189,11 @@ package_prefix="${CPACK_PACKAGING_INSTALL_PREFIX:-${resolved_install_prefix}}"
 
 cmake_options=(
   "-DHIP_HIPCC_EXECUTABLE=${HIP_HIPCC_EXECUTABLE}"
+  # rocm-cmake's rocm_create_package() otherwise puts a hard rocm-core
+  # requirement on the generated RPM/DEB. A pip/TheRock ROCm install ships no
+  # rocm-core package, so that requirement is unsatisfiable wherever these
+  # packages are consumed.
+  "-DROCM_DEP_ROCMCORE=OFF"
   "-DCPACK_OUTPUT_FILE_PREFIX=${BUILD_ARTIFACTS_DIR}"
   "-DCPACK_GENERATOR=${cpack_generators}"
   "-Dlibcudacxx_LIT_PARALLEL_LEVEL=${CMAKE_BUILD_PARALLEL_LEVEL:-${MAX_JOBS:-1}}"
