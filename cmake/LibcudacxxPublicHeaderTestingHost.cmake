@@ -90,11 +90,18 @@ function(
   with_ctk
 )
   # NOTE(HIP/AMD): on HIP builds tag the host header-test TUs LANGUAGE HIP so the
-  # HIP/clang front-end compiles them. This is required because
-  # cccl_c2h_attach_hip_deps() below links hip::host, whose
-  # interface compile options (-x hip, --offload-arch=<gfx>, -D__HIP_PLATFORM_AMD__)
-  # are only understood by clang. With LANGUAGE CXX and a non-clang host compiler
-  # (e.g. CMAKE_CXX_COMPILER=g++) these leak onto the CXX compile and fail with
+  # HIP/clang front-end compiles them. The clang-only flags come from hip::device
+  # (-x hip, --offload-arch=<gfx>; see hip-config-amd.cmake), not from the
+  # hip::host that cccl_c2h_attach_hip_deps() links below -- hip::host carries
+  # only -D__HIP_PLATFORM_AMD__=1. hip::device arrives transitively over an
+  # all-PUBLIC chain we do not control:
+  #   <this target> -> libcudacxx.compiler_interface -> libcudacxx::libcudacxx
+  #                 -> CUB / Thrust -> hip::hipcub / roc::rocthrust
+  #                 -> roc::rocprim_hip -> hip::device
+  # so it cannot be unlinked here. Its options are $<COMPILE_LANGUAGE:CXX>-guarded,
+  # which is why LANGUAGE HIP is the fix: the genex goes false and clang drives the
+  # compile anyway. With LANGUAGE CXX and a non-clang host compiler
+  # (e.g. CMAKE_CXX_COMPILER=g++) they leak onto the CXX compile and fail with
   #   c++: error: unrecognized command-line option '--offload-arch=gfx90a'.
   if (LIBCUDACXX_ENABLE_HIP)
     set(header_lang HIP)
@@ -122,8 +129,8 @@ function(
   target_link_libraries(${target_name} PUBLIC libcudacxx.compiler_interface)
   # NOTE(HIP/AMD): attach the HIP host runtime + pthreads on HIP builds so the
   # generated header-test TUs find <hip/hip_runtime.h> and link std::once_flag.
-  # No-op on non-HIP. On HIP these TUs are LANGUAGE HIP (see above), so
-  # hip::host's clang-only interface flags are handled.
+  # No-op on non-HIP. hip::host itself carries no clang-only flags; the LANGUAGE
+  # HIP tagging above is for the hip::device options that reach us transitively.
   cccl_c2h_attach_hip_deps(${target_name})
   if (with_ctk)
     target_link_libraries(${target_name} PUBLIC CUDA::cudart)
