@@ -32,6 +32,8 @@
 # Required environment variables:
 #   SRC_DIR              Parent directory of the project checkout.
 #   BUILD_DIR            Scratch directory for the build tree.
+#   INSTALL_DIR          Prefix the install step targets and the packages are
+#                        built for.
 #   BUILD_ARTIFACTS_DIR  Destination for packages and the tests tarball.
 #
 # Optional environment variables:
@@ -54,10 +56,10 @@
 #                             Defaults to the generators whose backend is
 #                             present (RPM and/or DEB).
 #   LIBHIPCXX_LIT_VERSION     lit version installed into the venv.
-#   CMAKE_INSTALL_PREFIX      Install prefix; the literal '<conda-prefix>'
-#                             resolves to CONDA_PREFIX.
+#   CMAKE_INSTALL_PREFIX      Install prefix, overriding INSTALL_DIR; the
+#                             literal '<conda-prefix>' resolves to CONDA_PREFIX.
 #   CPACK_PACKAGING_INSTALL_PREFIX  Prefix baked into the packages. Defaults to
-#                             CMAKE_INSTALL_PREFIX.
+#                             the install prefix.
 #   AMDGPU_TARGETS            GPU architectures to compile for. Always passed
 #                             explicitly so nothing tries to detect a local GPU.
 #   HIP_HIPCC_EXECUTABLE      Defaults to ${ROCM_PATH}/bin/hipcc. Required with
@@ -71,6 +73,7 @@ set -xeu
 
 : "${SRC_DIR:?SRC_DIR must be set}"
 : "${BUILD_DIR:?BUILD_DIR must be set}"
+: "${INSTALL_DIR:?INSTALL_DIR must be set}"
 : "${BUILD_ARTIFACTS_DIR:?BUILD_ARTIFACTS_DIR must be set}"
 
 PROJECT_ID="${PROJECT_ID:-libhipcxx}"
@@ -183,7 +186,7 @@ HIP_HIPCC_EXECUTABLE="${HIP_HIPCC_EXECUTABLE:-${ROCM_PATH:-/opt/rocm}/bin/hipcc}
 if [ -n "${install_to_conda_prefix:-}" ]; then
   resolved_install_prefix="${CONDA_PREFIX}"
 else
-  resolved_install_prefix="${CMAKE_INSTALL_PREFIX:-}"
+  resolved_install_prefix="${CMAKE_INSTALL_PREFIX:-${INSTALL_DIR}}"
 fi
 package_prefix="${CPACK_PACKAGING_INSTALL_PREFIX:-${resolved_install_prefix}}"
 
@@ -200,8 +203,8 @@ cmake_options=(
   ${AMDGPU_TARGETS:+"-DCMAKE_HIP_ARCHITECTURES=${AMDGPU_TARGETS}"}
   ${AMDGPU_TARGETS:+"-DGPU_TARGETS=${AMDGPU_TARGETS}"}
   ${AMDGPU_TARGETS:+"-DAMDGPU_TARGETS=${AMDGPU_TARGETS}"}
-  ${resolved_install_prefix:+"-DCMAKE_INSTALL_PREFIX=${resolved_install_prefix}"}
-  ${package_prefix:+"-DCPACK_PACKAGING_INSTALL_PREFIX=${package_prefix}"}
+  "-DCMAKE_INSTALL_PREFIX=${resolved_install_prefix}"
+  "-DCPACK_PACKAGING_INSTALL_PREFIX=${package_prefix}"
 )
 
 bash ./ci/build_libhipcxx.sh -cmake-options "${cmake_options[*]}"
