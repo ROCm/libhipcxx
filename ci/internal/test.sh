@@ -95,7 +95,23 @@ fi
 cmake --version && ctest --version
 
 if [ "${LIBHIPCXX_DETECT_ARCH:-false}" == "true" ]; then
-  AMDGPU_TARGETS="$(offload-arch | tail -n1)"
+  # Match on ^gfx rather than taking the last line: a bare `| tail -n1` returns tail's
+  # exit status, so a failing detector slips past `set -e` and leaves AMDGPU_TARGETS
+  # empty, which silently drops the three -D flags below and builds every arch.
+  # Discard gfx000 (the CPU agent) before picking a line, not after: selecting first
+  # and filtering second yields nothing on a host that reports the CPU agent ahead of
+  # the GPU.
+  detect_gfx() { "$@" 2>/dev/null | grep -E '^gfx[0-9a-f]+' | grep -v '^gfx000$' | head -n1; }
+  AMDGPU_TARGETS="$(detect_gfx offload-arch || true)"
+  if [ -z "${AMDGPU_TARGETS}" ]; then
+    AMDGPU_TARGETS="$(detect_gfx rocm_agent_enumerator || true)"
+  fi
+  if [ -z "${AMDGPU_TARGETS}" ]; then
+    echo "error: LIBHIPCXX_DETECT_ARCH=true but neither offload-arch nor rocm_agent_enumerator" \
+         "returned a gfx target; refusing to fall back to an all-arch build" >&2
+    exit 1
+  fi
+  echo "detected AMDGPU_TARGETS=${AMDGPU_TARGETS}"
 fi
 
 HIP_HIPCC_EXECUTABLE="${HIP_HIPCC_EXECUTABLE:-${ROCM_PATH:-/opt/rocm}/bin/hipcc}"
