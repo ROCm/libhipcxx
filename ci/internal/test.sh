@@ -28,7 +28,9 @@
 # the tests tarball.
 #
 # Required environment variables:
-#   BUILD_DIR  Scratch directory the build tree was created in.
+#   BUILD_DIR    Scratch directory the build tree was created in.
+#   INSTALL_DIR  Prefix handed to the test configure step, matching the one the
+#                build was configured with.
 #
 # Optional environment variables:
 #   PROJECT_ID              Checkout directory name (default: libhipcxx).
@@ -38,7 +40,7 @@
 #                           runner with offload-arch instead of using
 #                           AMDGPU_TARGETS.
 #   AMDGPU_TARGETS          GPU architectures to test.
-#   CMAKE_INSTALL_PREFIX    Install prefix handed to the test configure step.
+#   CMAKE_INSTALL_PREFIX    Install prefix, overriding INSTALL_DIR.
 #   HIP_HIPCC_EXECUTABLE    Defaults to ${ROCM_PATH}/bin/hipcc.
 #   CMAKE_VERSION           Only used to note that build.sh created a venv.
 #   ROCM_PATH
@@ -46,6 +48,7 @@
 set -xeu
 
 : "${BUILD_DIR:?BUILD_DIR must be set}"
+: "${INSTALL_DIR:?INSTALL_DIR must be set}"
 
 PROJECT_ID="${PROJECT_ID:-libhipcxx}"
 build_src_dir="${BUILD_DIR}/${PROJECT_ID}"
@@ -96,6 +99,8 @@ HIP_HIPCC_EXECUTABLE="${HIP_HIPCC_EXECUTABLE:-${ROCM_PATH:-/opt/rocm}/bin/hipcc}
 # on the default loader path. c2h binaries have no RPATH, so set it here.
 export LD_LIBRARY_PATH="${ROCM_PATH:-/opt/rocm}/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
 
+install_prefix="${CMAKE_INSTALL_PREFIX:-${INSTALL_DIR}}"
+
 cmake_options=(
   "-DHIP_HIPCC_EXECUTABLE=${HIP_HIPCC_EXECUTABLE}"
   # No fetching during a test run: the build already satisfied all dependencies.
@@ -103,7 +108,7 @@ cmake_options=(
   ${AMDGPU_TARGETS:+"-DCMAKE_HIP_ARCHITECTURES=${AMDGPU_TARGETS}"}
   ${AMDGPU_TARGETS:+"-DGPU_TARGETS=${AMDGPU_TARGETS}"}
   ${AMDGPU_TARGETS:+"-DAMDGPU_TARGETS=${AMDGPU_TARGETS}"}
-  ${CMAKE_INSTALL_PREFIX:+"-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"}
+  "-DCMAKE_INSTALL_PREFIX=${install_prefix}"
 )
 
 # Test libhipcxx without hiprtc; writes its config into build/libcudacxx-cpp17
