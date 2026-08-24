@@ -83,10 +83,10 @@ if (libcudacxx_ENABLE_CODEGEN)
 endif()
 
 # NOTE(HIP/AMD): libhipcxx-specific cmake test option (not in upstream CCCL).
+# The subdirectory itself is added further down, once LIBCUDACXX_ENABLE_HIP and
+# find_package(hip) have run -- it needs both to pick hipcc for the exported-package
+# consumer project.
 option(libhipcxx_ENABLE_CMAKE_TESTS "Enable ctest-based testing." ON)
-if (libhipcxx_ENABLE_CMAKE_TESTS)
-  add_subdirectory(cmake/test)
-endif()
 
 list(PREPEND CMAKE_MODULE_PATH "${libcudacxx_SOURCE_DIR}/cmake")
 set(LLVM_PATH "${libcudacxx_SOURCE_DIR}" CACHE STRING "" FORCE)
@@ -134,6 +134,10 @@ elseif (LIBCUDACXX_ENABLE_HIP)
   find_package(hip REQUIRED)
   enable_language(HIP)
 endif ()
+
+if (libhipcxx_ENABLE_CMAKE_TESTS)
+  add_subdirectory(cmake/test)
+endif()
 
 # For Windows we should avoid symlinks by copying the file content (test, utils, and include/hip folder)
 function(libhipcxx_path_is_link_like path out_var)
