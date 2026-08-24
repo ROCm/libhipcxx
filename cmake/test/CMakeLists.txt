@@ -31,14 +31,24 @@ set(cmake_opts
 # not the host compiler (amdclang++ on a plain .cxx fails just like g++).
 set(_libhipcxx_test_export_cxx "${CMAKE_CXX_COMPILER}")
 if (LIBCUDACXX_ENABLE_HIP)
+  # HIP_HIPCC_EXECUTABLE is this project's own spelling (set by ci/internal/test.sh);
+  # hip_HIPCC_EXECUTABLE is the one find_package(hip) defines. CMake variables are
+  # case-sensitive, so both have to be checked or the lookup silently falls through
+  # to the host compiler and the consumer project fails on undeclared HIP builtins.
   if (HIP_HIPCC_EXECUTABLE)
     set(_libhipcxx_test_export_cxx "${HIP_HIPCC_EXECUTABLE}")
+  elseif (hip_HIPCC_EXECUTABLE)
+    set(_libhipcxx_test_export_cxx "${hip_HIPCC_EXECUTABLE}")
   else()
     find_program(_libhipcxx_hipcc NAMES hipcc
       HINTS ENV ROCM_PATH "${ROCM_PATH}" "/opt/rocm"
       PATH_SUFFIXES bin)
     if (_libhipcxx_hipcc)
       set(_libhipcxx_test_export_cxx "${_libhipcxx_hipcc}")
+    else()
+      message(WARNING
+        "No hipcc found for the exported-package tests; falling back to "
+        "${CMAKE_CXX_COMPILER}, which cannot compile the HIP device builtins they use.")
     endif()
   endif()
 endif()
