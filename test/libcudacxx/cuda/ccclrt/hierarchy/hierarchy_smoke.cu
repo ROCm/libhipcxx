@@ -440,7 +440,13 @@ C2H_TEST("Dims queries indexing and ambient hierarchy", "[hierarchy]")
     cuda::make_hierarchy(cuda::block_dims<16, 2, 4>(), cuda::grid_dims<2, 3, 4>()),
     cuda::make_hierarchy(cuda::block_dims(dim3(8, 4, 2)), cuda::grid_dims<4, 5, 6>()),
 #if defined(NDEBUG)
+// NOTE(HIP/AMD): HIP sizes the dispatch grid in work-items, not blocks, and it is 32-bit.
+// Upstream's ((1 << 30) - 2) * 32 overflows it; clamp to what fits.
+#  if defined(__HIP_PLATFORM_AMD__)
+    cuda::make_hierarchy(cuda::block_dims<32>(), cuda::grid_dims<(1 << 26) - 2>()),
+#  else // ^^^ __HIP_PLATFORM_AMD__ ^^^ / vvv !__HIP_PLATFORM_AMD__ vvv
     cuda::make_hierarchy(cuda::block_dims<32>(), cuda::grid_dims<(1 << 30) - 2>()),
+#  endif // !__HIP_PLATFORM_AMD__
 #endif
     cuda::make_hierarchy(cuda::block_dims<8, 2, 4>(), cuda::grid_dims(dim3(5, 4, 3))));
 
@@ -449,6 +455,9 @@ C2H_TEST("Dims queries indexing and ambient hierarchy", "[hierarchy]")
       auto [grid, block] = cuda::get_launch_dimensions(hierarchy);
 
       kernel<<<grid, block>>>(hierarchy);
+      // NOTE(HIP/AMD): on HIP a rejected launch is sticky and hipDeviceSynchronize()
+      // neither reports nor clears it, so check the launch itself.
+      CUDART(cudaGetLastError());
       CUDART(cudaDeviceSynchronize());
     },
     hierarchies);
@@ -483,10 +492,13 @@ C2H_TEST("On device rank calculation", "[hierarchy]")
 
   const auto hierarchy_static = cuda::make_hierarchy(cuda::block_dims<256>(), cuda::grid_dims(dim3(2, 2, 2)));
   rank_kernel<<<dim3(2, 2, 2), 256>>>(hierarchy_static, ptr);
+  CUDART(cudaGetLastError());
   CUDART(cudaDeviceSynchronize());
   rank_kernel_cg<<<dim3(2, 2, 2), 256>>>(hierarchy_static, ptr);
+  CUDART(cudaGetLastError());
   CUDART(cudaDeviceSynchronize());
   rank_kernel_optimized<<<dim3(2, 2, 2), 256>>>(hierarchy_static, ptr);
+  CUDART(cudaGetLastError());
   CUDART(cudaDeviceSynchronize());
   CUDART(cudaFree(ptr));
 }
