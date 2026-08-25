@@ -64,8 +64,10 @@
 #                             explicitly so nothing tries to detect a local GPU.
 #   HIP_HIPCC_EXECUTABLE      Defaults to ${ROCM_PATH}/bin/hipcc. Required with
 #                             a TheRock ROCm installation.
-#   CMAKE_VERSION             When set, cmake of that version plus the other
-#                             python build tools are installed into a venv.
+#   CMAKE_VERSION             Version of the cmake package to install into the
+#                             venv that supplies cmake, cpack, ctest and the
+#                             other python build tools. Unset means whatever is
+#                             on PATH, e.g. from a conda environment.
 #   ROCM_PATH, CMAKE_PREFIX_PATH
 #   CMAKE_BUILD_PARALLEL_LEVEL, MAX_JOBS   Build and lit parallelism.
 
@@ -162,17 +164,19 @@ mkdir -p ${BUILD_ARTIFACTS_DIR}
 
 cd ${build_src_dir}
 
-# The pipeline pins these per build; the Docker images ship their own.
+# cmake, cpack, ctest and the test tooling come from this venv.
 if [ -n "${CMAKE_VERSION:-}" ]; then
+  python3 --version
   python3 -m venv _venv # note: a venv keeps this out of the conda env
   . _venv/bin/activate
   pip3 install --upgrade pip
-  pip3 install cmake==${CMAKE_VERSION}
-  pip3 install lit==${LIBHIPCXX_LIT_VERSION} # specific requirement for libhipcxx testing
+  pip3 install "cmake==${CMAKE_VERSION}"
+  pip3 install "lit==${LIBHIPCXX_LIT_VERSION}" # specific requirement for libhipcxx testing
   pip3 install ninja
   pip3 install sccache
   pip3 install psutil
 fi
+cmake --version && cpack --version && ctest --version
 
 export CMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH:-}${ROCM_PATH:+:${ROCM_PATH}/lib/cmake}"
 
@@ -222,5 +226,6 @@ fi
 # The tester images extract this at / and drive ci/internal/test.sh out of the
 # source tree it carries, so the archive keeps absolute paths. The build tree
 # and the original source tree are archived as two separate entries.
-tar --exclude=.git -czf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} ${build_src_dir} ${src_dir}
+# _venv is excluded; ci/internal/test.sh builds its own.
+tar --exclude=.git --exclude=_venv -czf ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name} ${build_src_dir} ${src_dir}
 du -sh ${BUILD_ARTIFACTS_DIR}/${tests_tarball_name}

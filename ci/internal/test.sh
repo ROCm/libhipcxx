@@ -42,7 +42,9 @@
 #   AMDGPU_TARGETS          GPU architectures to test.
 #   CMAKE_INSTALL_PREFIX    Install prefix, overriding INSTALL_DIR.
 #   HIP_HIPCC_EXECUTABLE    Defaults to ${ROCM_PATH}/bin/hipcc.
-#   CMAKE_VERSION           Only used to note that build.sh created a venv.
+#   CMAKE_VERSION           Version of the cmake package to install into the
+#                           venv this script builds, which also supplies ctest.
+#   LIBHIPCXX_LIT_VERSION   lit version for that venv.
 #   ROCM_PATH
 
 set -xeu
@@ -81,13 +83,16 @@ export CXX="${CXX_FOR_TESTS:-hipcc}"
 # build artifact <build>/test/lit.site.cfg
 cd "${build_src_dir}"
 
-# build.sh only creates this venv when the caller pins CMAKE_VERSION; it holds
-# cmake and the lit version the tests need.
-if [ -f _venv/bin/activate ]; then
+# cmake, ctest and the lit version the tests need come from this venv.
+if [ -n "${CMAKE_VERSION:-}" ]; then
+  python3 --version
+  python3 -m venv --clear _venv
   # shellcheck disable=SC1091
   . _venv/bin/activate
-  pip3 install psutil
+  pip3 install --upgrade pip
+  pip3 install "cmake==${CMAKE_VERSION}" "lit==${LIBHIPCXX_LIT_VERSION}" psutil
 fi
+cmake --version && ctest --version
 
 if [ "${LIBHIPCXX_DETECT_ARCH:-false}" == "true" ]; then
   AMDGPU_TARGETS="$(offload-arch | tail -n1)"
