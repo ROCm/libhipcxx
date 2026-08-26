@@ -213,6 +213,13 @@ cmake_options=(
 
 bash ./ci/build_libhipcxx.sh -cmake-options "${cmake_options[*]}"
 
+# NOTE(HIP/AMD): the hiprtc preset needs its own build tree, configured and packed
+# into the tests tarball here -- the test stage cannot produce one, so without this
+# the hiprtc suite fails. Configure only; hiprtcc compiles the tests at runtime.
+if [ "${LIBHIPCXX_HIPRTC_TESTS:-true}" == "true" ]; then
+  bash ./ci/hiprtc_libhipcxx.sh -configure -cmake-options "${cmake_options[*]}"
+fi
+
 #### package and install
 
 cmake --build ${build_build_dir} --target package
