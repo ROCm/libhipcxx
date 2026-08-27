@@ -1,0 +1,61 @@
+// MIT License
+//
+// Copyright (c) 2026 Advanced Micro Devices, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+#ifndef _CUDA___BARRIER_BARRIER_NATIVE_HANDLE_HIP_H
+#define _CUDA___BARRIER_BARRIER_NATIVE_HANDLE_HIP_H
+
+#include <cuda/std/detail/__config>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
+#include <cuda/__barrier/barrier_hip_config.h>
+#include <cuda/__fwd/barrier.h>
+#include <cuda/std/__atomic/scopes.h>
+#include <cuda/std/cstdint>
+
+_LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE
+
+/// @brief Returns a raw pointer to the barrier's active native state.
+///
+/// For the HIP block-scope empty-completion specialization on gfx1250,
+/// shared-memory barriers use the LDS phase object. Non-shared barriers retain
+/// the software state as their active phase object.
+_CCCL_DEVICE inline _CUDA_VSTD::uint64_t*
+barrier_native_handle(barrier<thread_scope_block>& __b)
+{
+#if defined(__HIP_DEVICE_COMPILE__) && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
+  if (__builtin_amdgcn_is_shared(reinterpret_cast<const void*>(&__b))) {
+    return reinterpret_cast<_CUDA_VSTD::uint64_t*>(&__b.__tx_barrier.value);
+  }
+#endif
+  return reinterpret_cast<_CUDA_VSTD::uint64_t*>(&__b);
+}
+
+_LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE
+
+#endif // _CUDA___BARRIER_BARRIER_NATIVE_HANDLE_HIP_H

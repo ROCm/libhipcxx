@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,12 +33,26 @@
 #ifndef _CUDA_BARRIER
 #define _CUDA_BARRIER
 
-// NOTE(HIP/AMD): barrier is not supported on AMD hardware
-#ifdef __HIP_PLATFORM_AMD__
-#error barrier is not supported on AMD hardware and should not be included
-#endif
-
 #include <cuda/std/detail/__config>
+#include <cuda/__memcpy_async/memcpy_async.h>
+#include <cuda/__barrier/barrier.h>
+#include <cuda/__barrier/aligned_size.h>
+
+#ifdef _LIBCUDACXX_HAS_NO_THREADS
+#  error <cuda/barrier> is not supported on this single threaded system
+#endif // _LIBCUDACXX_HAS_NO_THREADS
+
+
+#ifdef __HIP_PLATFORM_AMD__
+// Hip-native barrier implementation for AMD targets.
+// Provides block-scope and thread-scope barriers using HIP atomics.
+#  include <cuda/__barrier/barrier_hip_config.h>
+#  include <cuda/__barrier/barrier_hip_block_scope.h>
+#  include <cuda/__barrier/barrier_hip_thread_scope.h>
+#  include <cuda/__barrier/barrier_hip_native_handle.h>
+
+#else // ^^^ __HIP_PLATFORM_AMD__ ^^^ / vvv !__HIP_PLATFORM_AMD__ vvv
+
 
 #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
 #  pragma GCC system_header
@@ -52,18 +66,12 @@
 #  error "CUDA synchronization primitives are only supported for sm_70 and up."
 #endif // __CUDA_ARCH__ < 700
 
-#ifdef _LIBCUDACXX_HAS_NO_THREADS
-#  error <cuda/barrier> is not supported on this single threaded system
-#endif // _LIBCUDACXX_HAS_NO_THREADS
 
-#include <cuda/__barrier/aligned_size.h>
-#include <cuda/__barrier/barrier.h>
 #include <cuda/__barrier/barrier_arrive_tx.h>
 #include <cuda/__barrier/barrier_block_scope.h>
 #include <cuda/__barrier/barrier_expect_tx.h>
 #include <cuda/__barrier/barrier_native_handle.h>
 #include <cuda/__barrier/barrier_thread_scope.h>
-#include <cuda/__memcpy_async/memcpy_async.h>
 #include <cuda/__memcpy_async/memcpy_async_tx.h>
 #include <cuda/ptx>
 #include <cuda/std/barrier>
@@ -286,4 +294,5 @@ inline _CCCL_DEVICE void cp_async_bulk_wait_group_read()
 
 _LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL
 
+#endif // !__HIP_PLATFORM_AMD__
 #endif // _CUDA_BARRIER
