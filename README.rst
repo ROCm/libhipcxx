@@ -264,8 +264,9 @@ Libhipcxx supports the following AMD device architectures:
 -  gfx942 (MI300)
 -  gfx950 (MI355)
 
-
-RDNA architectures have only experimental support.
+Libhipcxx supports the following AMD device architectures experimentally: 
+-  gfx1250 (MI450)
+-  RDNA architectures
 
 Host Architectures
 ~~~~~~~~~~~~~~~~~~
