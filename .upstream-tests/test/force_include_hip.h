@@ -7,7 +7,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -44,6 +44,8 @@
 // C++ standard library.
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <functional>
 
 #define HIP_CALL(err, ...) \
     do { \
@@ -86,21 +88,44 @@ void list_devices()
     }
 }
 
+#if !defined(NO_MAIN_REPLACEMENT)
 
 __host__ __device__
 int fake_main(int, char**);
 
+#ifndef LIBHIPCXX_GPU_COUNT
+#define LIBHIPCXX_GPU_COUNT 1
+#endif
+static constexpr int HIP_GPU_COUNT = LIBHIPCXX_GPU_COUNT;
+
+/********************************** GLOBALS ***********************************/
+// All of these will have usable defaults, but can be redefined in tests
+// for more interesting logic.
+
+// Kernel launch parameters
+int cuda_block_count = 1;
 int cuda_thread_count = 1;
+size_t cuda_shared_memory_size = 0;
+
+// Global data to be accessed by any test (host or device side code)
+__managed__ void* pRawGlobalData = nullptr;
+// Index of currently running gpu. Determined by host for access on device.
+__device__ int hip_gpu_index     = 0;
+// Unique error code per device
+__device__ int errorCodes[HIP_GPU_COUNT];
+// Callback for host participation in tests
+std::function<int()> hostSideWorkFunc = []() {return 0;};
 
 __global__
 void fake_main_kernel(int * ret)
 {
-   *ret = fake_main(0, NULL);
+  atomicCAS(ret, 0, fake_main(0, NULL));
 }
 
+// Unified main function - handles both standard and cooperative launch
 int main(int argc, char** argv)
 {
-    // Check if the HIP driver/runtime are installed and working for sanity.
+    // Common initialization
     cudaError_t err;
     HIP_CALL(err, cudaDeviceSynchronize());
 
@@ -112,17 +137,139 @@ int main(int argc, char** argv)
         return ret;
     }
 
+    // Allocate one result slot per GPU so each kernel writes to its own int
     int * hip_ret = 0;
-    HIP_CALL(err, cudaMalloc(&hip_ret, sizeof(int)));
+    HIP_CALL(err, hipMalloc(&hip_ret, sizeof(int[HIP_GPU_COUNT])));
+    HIP_CALL(err, hipMemset(hip_ret, 0, sizeof(int[HIP_GPU_COUNT])));
 
-    fake_main_kernel<<<1, cuda_thread_count>>>(hip_ret);
-     
-    HIP_CALL(err, cudaGetLastError());
-    HIP_CALL(err, cudaDeviceSynchronize());
-    HIP_CALL(err, cudaMemcpy(&ret, hip_ret, sizeof(int), cudaMemcpyDeviceToHost));
-    HIP_CALL(err, cudaFree(hip_ret));
+    // Zero the per-device errorCodes symbol on each GPU before launches
+    for (int gpuIndex = 0; gpuIndex < HIP_GPU_COUNT; ++gpuIndex)
+    {
+        HIP_CALL(err, hipSetDevice(gpuIndex));
+        int zeroes[HIP_GPU_COUNT] = {0};
+        HIP_CALL(err, hipMemcpyToSymbol(HIP_SYMBOL(errorCodes), zeroes, sizeof(zeroes)));
+    }
 
-    return ret;
+    // Enable peer access between all GPUs
+    for (int gpuIndex = 0; gpuIndex < HIP_GPU_COUNT; ++gpuIndex)
+    {
+        HIP_CALL(err, hipSetDevice(gpuIndex));
+        for (int peerIndex = 0; peerIndex < HIP_GPU_COUNT; ++peerIndex)
+        {
+            if (peerIndex == gpuIndex)
+                continue;
+            HIP_CALL(err, hipDeviceEnablePeerAccess(peerIndex, 0));
+        }
+    }
+
+    // Launch kernel on each GPU
+    for (int gpuIndex = 0; gpuIndex < HIP_GPU_COUNT; ++gpuIndex)
+    {
+        HIP_CALL(err, hipSetDevice(gpuIndex));
+        HIP_CALL(err, hipMemcpyToSymbol(HIP_SYMBOL(hip_gpu_index), &gpuIndex, sizeof(int)));
+
+#if defined(USE_COOPERATIVE_LAUNCH)
+        // ========== COOPERATIVE LAUNCH PATH ==========
+
+        // Validate device supports cooperative launch
+        cudaDeviceProp prop;
+        HIP_CALL(err, cudaGetDeviceProperties(&prop, gpuIndex));
+
+        if (prop.cooperativeLaunch == 0)
+        {
+            printf("[ERROR] Device %d does not support cooperative launch (cooperativeLaunch=0)\n", gpuIndex);
+            printf("[ERROR] Device: %s\n", prop.name);
+            printf("[ERROR] Test requires device with cooperativeLaunch=1\n");
+            fflush(stdout);
+            return -1;
+        }
+
+        // Check occupancy limits
+        int maxBlocksPerSM = 0;
+        err = hipOccupancyMaxActiveBlocksPerMultiprocessor(
+            &maxBlocksPerSM,
+            fake_main_kernel,
+            cuda_thread_count,
+            cuda_shared_memory_size
+        );
+
+        if (err == hipSuccess)
+        {
+            int maxConcurrentBlocks = maxBlocksPerSM * prop.multiProcessorCount;
+            if (cuda_block_count > maxConcurrentBlocks)
+            {
+                printf("[ERROR] Block count %d exceeds device limit %d\n",
+                       cuda_block_count, maxConcurrentBlocks);
+                printf("[ERROR] Device: %s (MPs: %d, max blocks/MP: %d)\n",
+                       prop.name, prop.multiProcessorCount, maxBlocksPerSM);
+                fflush(stdout);
+                cudaFree(hip_ret);
+                return -1;
+            }
+        }
+        // Note: Silently ignore occupancy API failures - not critical
+
+        // Prepare kernel arguments
+        int * hip_ret_gpu = &hip_ret[gpuIndex];
+        void* args[] = {&hip_ret_gpu};
+
+        // Launch kernel cooperatively
+        err = hipLaunchCooperativeKernel(
+            (void*)fake_main_kernel,
+            dim3(cuda_block_count),
+            dim3(cuda_thread_count),
+            args,
+            cuda_shared_memory_size,
+            nullptr  // Default stream
+        );
+
+        if (err != hipSuccess)
+        {
+            printf("[ERROR] hipLaunchCooperativeKernel failed: %d (%s)\n",
+                   (int)err, cudaGetErrorString(err));
+            printf("[ERROR] Launch parameters: blocks=%d, threads=%d, shared_mem=%lu\n",
+                   cuda_block_count, cuda_thread_count, cuda_shared_memory_size);
+            fflush(stdout);
+            return -1;
+        }
+
+#else
+        // ========== STANDARD LAUNCH PATH ==========
+
+        fake_main_kernel<<<cuda_block_count, cuda_thread_count, cuda_shared_memory_size>>>(&hip_ret[gpuIndex]);
+
+        HIP_CALL(err, cudaGetLastError());
+#endif
+    }
+
+    auto hostWorkerErr = hostSideWorkFunc();
+    if (hostWorkerErr != 0)
+    {
+      printf("[ERROR] CPU worker returned %d\n", hostWorkerErr);
+      return hostWorkerErr;
+    }
+
+    // Synchronize all GPUs
+    for (int gpuIndex = 0; gpuIndex < HIP_GPU_COUNT; ++gpuIndex)
+    {
+        HIP_CALL(err, hipSetDevice(gpuIndex));
+        HIP_CALL(err, hipDeviceSynchronize());
+    }
+
+    // Retrieve all per-GPU results and return the first failure
+    int host_ret[HIP_GPU_COUNT];
+    HIP_CALL(err, hipMemcpy(host_ret, hip_ret, sizeof(int[HIP_GPU_COUNT]), hipMemcpyDeviceToHost));
+    HIP_CALL(err, hipFree(hip_ret));
+
+    for (int i = 0; i < HIP_GPU_COUNT; ++i)
+    {
+        if (host_ret[i] != 0)
+        {
+            printf("[ERROR] GPU %d kernel returned %d\n", i, host_ret[i]);
+            return host_ret[i];
+        }
+    }
+    return 0;
 }
 
 #if defined(__HIP_PLATFORM_AMD__)
@@ -131,4 +278,5 @@ int main(int argc, char** argv)
 #define main fake_main
 #endif
 
-#endif
+#endif // !defined(NO_MAIN_REPLACEMENT)
+#endif // LIBCUDACXX_FORCE_INCLUDE_HIP
