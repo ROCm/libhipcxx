@@ -11,7 +11,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,13 +44,25 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/__barrier/barrier_hip_config.h>
 #include <cuda/__barrier/barrier.h>
+#include <cuda/__memcpy_async/completion_mechanism.h>
+
+#if defined(__HIP_PLATFORM_AMD__)
+#include <cuda/__memcpy_async/dispatch_hip_memcpy_async.h>
+#include <cuda/__barrier/barrier_hip_block_scope.h>
+#include <cuda/__barrier/barrier_hip_thread_scope.h>
+#include <cuda/__memcpy_async/hip_memcpy_completion.h>
+
+#else
+
+#include <cuda/__memcpy_async/dispatch_memcpy_async.h>
 #include <cuda/__barrier/barrier_block_scope.h>
 #include <cuda/__barrier/barrier_thread_scope.h>
-#include <cuda/__memcpy_async/completion_mechanism.h>
-#include <cuda/__memcpy_async/dispatch_memcpy_async.h>
-#include <cuda/__memcpy_async/is_local_smem_barrier.h>
 #include <cuda/__memcpy_async/memcpy_completion.h>
+#endif
+
+#include <cuda/__memcpy_async/is_local_smem_barrier.h>
 #include <cuda/__memcpy_async/try_get_barrier_handle.h>
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__type_traits/is_trivially_copyable.h>
@@ -129,9 +141,31 @@ _LIBCUDACXX_HIDE_FROM_ABI async_contract_fulfillment __memcpy_async_barrier(
 
   // 2. Issue actual copy instructions.
   _CUDA_VSTD::uint64_t* __bh = nullptr;
+
+#if defined(__HIP_DEVICE_COMPILE__) && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
+  bool const __hip_can_use_async_copy = static_cast<_CUDA_VSTD::size_t>(__size) != 0
+                                     && __hip_memcpy_async_has_accelerated_direction(__dest_char, __src_char);
+  _CUDA_VSTD::uint32_t const __hip_allowed_completions = __hip_can_use_async_copy
+    ? __allowed_completions
+    : _CUDA_VSTD::uint32_t(__completion_mechanism::__sync);
+
+  __bh = (__hip_can_use_async_copy && __is_local_smem_barrier(__barrier)) ? __try_get_barrier_handle(__barrier) : nullptr;
+
+  if (__bh != nullptr
+      && (__hip_allowed_completions & _CUDA_VSTD::uint32_t(__completion_mechanism::__mbarrier_complete_tx)))
+  {
+    ::cuda::__add_tx_expectation(__barrier, 1);
+  }
+
+  auto __hip_cm = __dispatch_memcpy_async<__align>(__group, __dest_char, __src_char, __size, __hip_allowed_completions, __bh);
+
+  // HIP completion tracking is one tx event per participating caller's queued copy work, not per byte.
+  return __memcpy_completion_impl::__defer(__hip_cm, __group, 1, __barrier);
+#endif // __HIP_DEVICE_COMPILE__ && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
+
 #if __cccl_ptx_isa >= 800
   NV_IF_TARGET_LIBHIPCXX(NV_PROVIDES_SM_90,
-               (__bh = __is_local_smem_barrier(__barrier) ? __try_get_barrier_handle(__barrier) : nullptr;))
+             (__bh = __is_local_smem_barrier(__barrier) ? __try_get_barrier_handle(__barrier) : nullptr;))
 #endif // __cccl_ptx_isa >= 800
   auto __cm = __dispatch_memcpy_async<__align>(__group, __dest_char, __src_char, __size, __allowed_completions, __bh);
 

@@ -9,6 +9,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_PTX__MEMCPY_ASYNC_MEMCPY_ASYNC_H_
 #define _CUDA_PTX__MEMCPY_ASYNC_MEMCPY_ASYNC_H_
 
@@ -22,13 +44,15 @@
 #  pragma system_header
 #endif // no system header
 
-#if _CCCL_HAS_CUDA_COMPILER()
+#if _CCCL_HAS_CUDA_COMPILER() || defined(__HIP_DEVICE_COMPILE__)
 
 #  include <cuda/__barrier/aligned_size.h>
 #  include <cuda/__barrier/async_contract_fulfillment.h>
 #  include <cuda/__barrier/barrier.h>
+#  if !defined(__HIP_PLATFORM_AMD__)
 #  include <cuda/__barrier/barrier_block_scope.h>
 #  include <cuda/__barrier/barrier_thread_scope.h>
+#  endif // !defined(__HIP_PLATFORM_AMD__)
 #  include <cuda/__memcpy_async/memcpy_async_barrier.h>
 #  include <cuda/std/__atomic/scopes.h>
 #  include <cuda/std/__type_traits/void_t.h>
@@ -161,6 +185,5 @@ memcpy_async(void* __destination, void const* __source, _Size __size, barrier<_S
 
 _LIBCUDACXX_END_NAMESPACE_CUDA
 
-#endif // _CCCL_CUDA_COMPILER
-
+#endif // _CCCL_HAS_CUDA_COMPILER() || defined(__HIP_DEVICE_COMPILE__)
 #endif // _CUDA_PTX__MEMCPY_ASYNC_MEMCPY_ASYNC_H_
