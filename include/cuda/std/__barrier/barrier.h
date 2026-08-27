@@ -21,6 +21,7 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/std/__barrier/barrier_atomic_wrappers.h>
 #include <cuda/std/__barrier/empty_completion.h>
 #include <cuda/std/__barrier/poll_tester.h>
 #include <cuda/std/__chrono/duration.h>
@@ -57,7 +58,7 @@ private:
 
   [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait(arrival_token __old) const
   {
-    return __phase.load(memory_order_acquire) != __old;
+    return __barrier_atomics::load_acquire<bool, _Sco>(__phase) != __old;
   }
   [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait_parity(bool __parity) const
   {
@@ -82,7 +83,7 @@ public:
   /*discard*/ _CCCL_HOST_DEVICE_API arrival_token arrive(ptrdiff_t __update = 1)
   {
     auto const __old_phase    = __phase.load(memory_order_relaxed);
-    auto const __result       = __arrived.fetch_sub(__update, memory_order_acq_rel) - __update;
+    auto const __result       = __barrier_atomics::fetch_sub_acq_rel<ptrdiff_t, _Sco>(__arrived, __update) - __update;
     auto const __new_expected = __expected.load(memory_order_relaxed);
 
     _CCCL_ASSERT(__result >= 0, "");
@@ -91,7 +92,7 @@ public:
     {
       __completion();
       __arrived.store(__new_expected, memory_order_relaxed);
-      __phase.store(!__old_phase, memory_order_release);
+      __barrier_atomics::store_release<bool, _Sco>(__phase, !__old_phase);
       __atomic_notify_all(&__phase.__a, __scope_to_tag<_Sco>{});
     }
     return __old_phase;
@@ -149,7 +150,7 @@ private:
   }
   [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait_phase(uint64_t __phase) const
   {
-    uint64_t const __current = __phase_arrived_expected.load(memory_order_acquire);
+    uint64_t const __current = __barrier_atomics::load_acquire<uint64_t, _Sco>(__phase_arrived_expected);
     return ((__current & __phase_bit) != __phase);
   }
   [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait(arrival_token __old) const
@@ -178,7 +179,7 @@ public:
   /*discard*/ _CCCL_HOST_DEVICE_API arrival_token arrive(ptrdiff_t __update = 1)
   {
     auto const __inc = __arrived_unit * __update;
-    auto const __old = __phase_arrived_expected.fetch_add(__inc, memory_order_acq_rel);
+    auto const __old = __barrier_atomics::fetch_add_acq_rel<uint64_t, _Sco>(__phase_arrived_expected, __inc);
     if ((__old ^ (__old + __inc)) & __phase_bit)
     {
       __phase_arrived_expected.fetch_add((__old & __expected_mask) << 32, memory_order_relaxed);
@@ -201,7 +202,21 @@ public:
   }
   _CCCL_HOST_DEVICE_API void arrive_and_drop()
   {
+#if defined(__HIP_PLATFORM_AMD__) && defined(__HIP_DEVICE_COMPILE__)
+    // Use DS atomics for LDS barriers and FLAT atomics for global barriers.
+    if (__builtin_amdgcn_is_shared(&__phase_arrived_expected))
+    {
+      __attribute__((address_space(3))) uint64_t* __lds_ptr =
+        (__attribute__((address_space(3))) uint64_t*) ((void*) &__phase_arrived_expected);
+      __atomic_fetch_add(__lds_ptr, __expected_unit, __ATOMIC_RELAXED);
+    }
+    else
+    {
+      __phase_arrived_expected.fetch_add(__expected_unit, memory_order_relaxed);
+    }
+#else
     __phase_arrived_expected.fetch_add(__expected_unit, memory_order_relaxed);
+#endif
     arrive();
   }
 

@@ -33,11 +33,6 @@
 #ifndef _CUDA_BARRIER
 #define _CUDA_BARRIER
 
-// NOTE(HIP/AMD): barrier is not supported on AMD hardware
-#ifdef __HIP_PLATFORM_AMD__
-#error barrier is not supported on AMD hardware and should not be included
-#endif
-
 #include <cuda/std/detail/__config>
 
 #if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
@@ -47,6 +42,16 @@
 #elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
 #  pragma system_header
 #endif // no system header
+
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <cuda/__barrier/barrier.h>
+#  include <cuda/__barrier/barrier_hip_config.h>
+#  include <cuda/__barrier/barrier_hip_block_scope.h>
+#  include <cuda/__barrier/barrier_hip_thread_scope.h>
+#  include <cuda/__barrier/barrier_hip_native_handle.h>
+#  include <cuda/__memory/aligned_size.h>
+#  include <cuda/__memcpy_async/memcpy_async.h>
+#else // ^^^ __HIP_PLATFORM_AMD__ ^^^ / vvv !__HIP_PLATFORM_AMD__ vvv
 
 #if _CCCL_DEVICE_COMPILATION() && _CCCL_PTX_ARCH() < 700 && !_CCCL_CUDA_COMPILER(NVHPC)
 #  error "CUDA synchronization primitives are only supported for sm_70 and up."
@@ -317,5 +322,7 @@ cp_async_bulk_wait_group_read()
 _CCCL_END_NAMESPACE_CUDA_DEVICE_EXPERIMENTAL
 
 #include <cuda/std/__cccl/epilogue.h>
+
+#endif // !__HIP_PLATFORM_AMD__
 
 #endif // _CUDA_BARRIER
