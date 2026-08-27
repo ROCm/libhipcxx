@@ -89,7 +89,6 @@ function section_separator {
 LIBCXX_LOG=$(mktemp)
 LIBCUDACXX_LOG=$(mktemp)
 
-
 function report_and_exit {
   # If any of the lines searched for below aren't present in the log files, the
   # grep commands will return nothing, and the variables will be empty. Bash

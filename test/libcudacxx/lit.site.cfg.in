@@ -55,6 +55,7 @@ config.debug_build              = False
 config.libcxxabi_shared         = False
 config.cxx_ext_threads          = False
 config.maxIndividualTestTime    = @LIBCUDACXX_TEST_TIMEOUT@
+config.additional_features      = "@LIBCUDACXX_LIT_ADDITIONAL_FEATURES@"
 
 # Let the main config do the real work.
 config.loaded_site_config = True
