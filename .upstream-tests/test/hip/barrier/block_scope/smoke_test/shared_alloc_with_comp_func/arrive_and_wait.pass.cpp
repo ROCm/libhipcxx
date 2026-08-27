@@ -1,0 +1,56 @@
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+// UNSUPPORTED: nvcc, nvhpc, nvc++
+
+// <cuda/barrier>
+// Verify arrive_and_wait() for __shared__ barriers with completion function.
+
+#include <cuda/barrier>
+#include "test_macros.h"
+#include "../../../hip_barrier_test_utils.h"
+#include "../../../smoke_test_common/arrive_and_wait_impl.h"
+
+using namespace hip_test;
+
+using barrier_t = hip::barrier<hip::thread_scope_block, void (*)()>;
+
+__device__ int test()
+{
+  __shared__ alignas(barrier_t) hip::std::byte raw[2 * sizeof(barrier_t)];
+  auto* ba = reinterpret_cast<barrier_t*>(raw);
+  auto* bb = reinterpret_cast<barrier_t*>(raw + sizeof(barrier_t));
+  int result = 0;
+  result |= test_arrive_and_wait_advances_phase(*ba, barrier_no_op_completion);
+  result |= test_arrive_and_wait_phase_cycles_back(*bb, barrier_no_op_completion);
+  return result;
+}
+
+int main(int, char**)
+{
+  int result = 0;
+  NV_IF_TARGET(NV_IS_DEVICE, (result = test();))
+  return result;
+}
