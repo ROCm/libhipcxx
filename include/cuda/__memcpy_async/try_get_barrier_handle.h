@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,9 +42,16 @@
 #elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
 #  pragma system_header
 #endif // no system header
+#if defined(__HIP_PLATFORM_AMD__)
+#include <cuda/__barrier/barrier_hip_block_scope.h>
+#include <cuda/__barrier/barrier_hip_native_handle.h>
+
+#else
 
 #include <cuda/__barrier/barrier_block_scope.h>
 #include <cuda/__barrier/barrier_native_handle.h>
+
+#endif
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__barrier/barrier.h>
 #include <cuda/std/__barrier/empty_completion.h>

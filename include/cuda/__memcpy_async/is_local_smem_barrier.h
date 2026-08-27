@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,7 @@
 #endif // no system header
 
 #include <cuda/__barrier/barrier.h>
+#include <cuda/__barrier/barrier_hip_config.h>
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__barrier/empty_completion.h>
 #include <cuda/std/__type_traits/is_same.h>
@@ -59,7 +60,19 @@ template <thread_scope _Sco,
                            && _CCCL_TRAIT(_CUDA_VSTD::is_same, _CompF, _CUDA_VSTD::__empty_completion)>
 _LIBCUDACXX_HIDE_FROM_ABI bool __is_local_smem_barrier(barrier<_Sco, _CompF>& __barrier)
 {
+#if defined(__HIP_DEVICE_COMPILE__)
+#  if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX,
+    (return _Is_mbarrier && __builtin_amdgcn_is_shared(reinterpret_cast<const void*>(&__barrier));),
+    (return false;));
+#  else
+  (void) __barrier;
+  return false;
+#  endif
+#else
   NV_IF_ELSE_TARGET(NV_IS_DEVICE_LIBHIPCXX, (return _Is_mbarrier && __isShared(&__barrier);), (return false;));
+#endif // __HIP_DEVICE_COMPILE__
+
 }
 
 _LIBCUDACXX_END_NAMESPACE_CUDA
