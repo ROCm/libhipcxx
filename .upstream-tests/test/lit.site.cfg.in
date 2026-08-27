@@ -1,4 +1,4 @@
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -53,6 +53,7 @@ config.debug_build              = False
 config.libcxxabi_shared         = False
 config.cxx_ext_threads          = False
 config.maxIndividualTestTime    = @LIBCUDACXX_TEST_TIMEOUT@
+config.additional_features      = "@LIBCUDACXX_LIT_ADDITIONAL_FEATURES@"
 
 # Let the main config do the real work.
 config.loaded_site_config = True

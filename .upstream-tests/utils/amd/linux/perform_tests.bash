@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -89,7 +89,7 @@ function section_separator {
 LIBCXX_LOG=$(mktemp)
 LIBCUDACXX_LOG=$(mktemp)
 
-KNOWN_COMPUTE_ARCHS="gfx940 gfx941 gfx942 gfx90a gfx908 gfx1030 gfx1100 gfx1101 gfx1200 gfx1201"
+KNOWN_COMPUTE_ARCHS="gfx940 gfx941 gfx942 gfx90a gfx908 gfx1030 gfx1100 gfx1101 gfx1200 gfx1201 gfx1250"
 
 function report_and_exit {
   # If any of the lines searched for below aren't present in the log files, the

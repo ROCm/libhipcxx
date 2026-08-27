@@ -49,12 +49,15 @@ class LibcxxTestFormat(object):
     Custom test format handler for use with the test format use by libc++.
 
     Tests fall into two categories:
-      FOO.pass.cpp - Executable test which should compile, run, and exit with
-                     code 0.
-      FOO.fail.cpp - Negative test case which is expected to fail compilation.
+      FOO.pass.cpp    - Executable test which should compile, run, and exit with
+                        code 0.
+      FOO.fail.cpp    - Negative test case which is expected to fail compilation.
       FOO.runfail.cpp - Negative test case which is expected to compile, run,
                         and exit with non-zero exit code.
-      FOO.sh.cpp   - A test that uses LIT's ShTest format.
+      FOO.timeout.cpp - Documentation test expected to deadlock/hang. A process
+                        timeout is the PASS condition; unexpected completion
+                        (any exit code) is a FAIL.
+      FOO.sh.cpp      - A test that uses LIT's ShTest format.
     """
 
     def __init__(self, cxx, use_verify_for_fail, execute_external, executor, exec_env):
@@ -73,6 +76,9 @@ class LibcxxTestFormat(object):
             IntegratedTestKeywordParser(
                 "MODULES_DEFINES:", ParserKind.LIST, initial_value=[]
             ),
+            IntegratedTestKeywordParser(
+                "ADDITIONAL_COMPILE_FLAGS:", ParserKind.LIST, initial_value=[]
+            ), 
         ]
 
     @staticmethod
@@ -117,6 +123,7 @@ class LibcxxTestFormat(object):
         is_pass_test = name.endswith(".pass.cpp") or name.endswith(".pass.mm")
         is_fail_test = name.endswith(".fail.cpp") or name.endswith(".fail.mm")
         is_runfail_test = name.endswith(".runfail.cpp") or name.endswith(".runfail.mm")
+        is_timeout_test = name.endswith(".timeout.cpp") or name.endswith(".timeout.mm")
         assert (
             is_sh_test or name_ext == ".cpp" or name_ext == ".mm"
         ), "non-cpp file must be sh test"
@@ -164,6 +171,7 @@ class LibcxxTestFormat(object):
                     contents = f.read()
                 if b"#define _CCCL_ASSERT" in contents:
                     test_cxx.useModules(False)
+        test_cxx.compile_flags += self._get_parser("ADDITIONAL_COMPILE_FLAGS:", parsers).getValue()
 
         # Dispatch the test based on its suffix.
         if is_sh_test:
@@ -185,6 +193,11 @@ class LibcxxTestFormat(object):
             return self._evaluate_pass_test(
                 test, tmpBase, lit_config, test_cxx, parsers, run_should_pass=False
             )
+        elif is_timeout_test:
+            return self._evaluate_pass_test(
+                test, tmpBase, lit_config, test_cxx, parsers,
+                run_should_pass=False, timeout_is_expected=True
+            )
         else:
             # No other test type is supported
             assert False
@@ -193,7 +206,8 @@ class LibcxxTestFormat(object):
         libcudacxx.util.cleanFile(exec_path)
 
     def _evaluate_pass_test(
-        self, test, tmpBase, lit_config, test_cxx, parsers, run_should_pass=True
+        self, test, tmpBase, lit_config, test_cxx, parsers,
+        run_should_pass=True, timeout_is_expected=False
     ):
         execDir = os.path.dirname(test.getExecPath())
         source_path = test.getSourcePath()
@@ -239,19 +253,40 @@ class LibcxxTestFormat(object):
                         for f in os.listdir(local_cwd)
                         if f.endswith(".dat")
                     ]
-                    cmd, out, err, rc = self.executor.run(
-                        exec_path, [exec_path], local_cwd, data_files, env
-                    )
+
+                    # Use shorter timeout for .timeout.cpp tests (expected to hang)
+                    # UNLESS user explicitly overrode via -DmaxIndividualTestTime
+                    original_timeout = self.executor.timeout
+                    if timeout_is_expected:
+                        # .timeout.cpp tests are expected to hang - use a short timeout
+                        # to fail fast and move to next test
+                        # BUT: User override takes precedence over default short timeout
+                        if not original_timeout or original_timeout == 0:
+                            # No timeout specified by user, use default for .timeout.cpp
+                            self.executor.timeout = 15
+                        # else: Keep original_timeout (user has final say)
+
+                    try:
+                        cmd, out, err, rc = self.executor.run(
+                            exec_path, [exec_path], local_cwd, data_files, env
+                        )
+                    finally:
+                        # Restore original timeout if we modified it
+                        # (only happens for .timeout.cpp when no user timeout specified)
+                        if timeout_is_expected and (not original_timeout or original_timeout == 0):
+                            self.executor.timeout = original_timeout
                     report = "Compiled With: '%s'\n" % " ".join(compile_cmd)
                     report += libcudacxx.util.makeReport(cmd, out, err, rc)
-                    result_expected = (rc == 0) == run_should_pass
+                    # .timeout.cpp: any completion is unexpected (timeout is the PASS condition)
+                    result_expected = False if timeout_is_expected else (rc == 0) == run_should_pass
                 except (libcudacxx.util.ExecuteCommandTimeoutException, lit.util.ExecuteCommandTimeoutException) as e:
                     err = str(e)
                     rc = -42
                     out = "None"
                     report = "Compiled With: '%s'\n" % " ".join(compile_cmd)
                     report += libcudacxx.util.makeReport(compile_cmd, out, err, rc)
-                    result_expected = False
+                    # .timeout.cpp: timeout is the expected PASS outcome
+                    result_expected = timeout_is_expected
                     time_out_detected = True
                 if result_expected:
                     res = lit.Test.PASS if retry_count == 0 else lit.Test.FLAKYPASS
@@ -262,7 +297,9 @@ class LibcxxTestFormat(object):
                 ):
                     max_retry += 1
                 elif retry_count >= max_retry:
-                    if run_should_pass:
+                    if timeout_is_expected:
+                        report += f"Compiled test completed unexpectedly after {retry_count} attempt(s) (expected deadlock/timeout)!"
+                    elif run_should_pass:
                         report += f"Compiled test failed unexpectedly after {retry_count} retry attempt(s)!"
                     else:
                         report += f"Compiled test succeeded unexpectedly after {retry_count} retry attempt(s)!"
@@ -350,7 +387,7 @@ class LibcxxTestFormat(object):
                     continue
             else:
                 if check_rc(rc):
-                    res = lit.Test.PASS if retry_count == 0 else lit.Test.FLAKYPASS
+                    res = lit.Test.PASS if retry_count == 0 else lit.Test.FLAKYPASS  # retry_count is 0-based here (range)
                     return lit.Test.Result(res, report)
                 else:
                     report += (
