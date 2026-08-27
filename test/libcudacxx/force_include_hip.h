@@ -101,7 +101,11 @@ __device__ void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t
         { \
             printf("HIP ERROR, line %d: %s: %s\n", __LINE__,\
                    cudaGetErrorName(err), cudaGetErrorString(err)); \
-            exit(1); \
+            fflush(nullptr); \
+            /* abort(), not exit(1): exit() runs static destructors, and the \
+               heterogeneous suite registers one that calls _Exit(0) to dodge a \
+               HIP teardown spin. That would turn a GPU failure into a pass. */ \
+            abort(); \
         } \
     } while (false)
 
