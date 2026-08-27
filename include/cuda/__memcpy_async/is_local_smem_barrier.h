@@ -44,6 +44,7 @@
 #endif // no system header
 
 #include <cuda/__barrier/barrier.h>
+#include <cuda/__barrier/barrier_hip_config.h>
 #include <cuda/__memory/address_space.h>
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__barrier/empty_completion.h>
@@ -62,10 +63,18 @@ template <thread_scope _Sco,
                            && ::cuda::std::is_same_v<_CompF, ::cuda::std::__empty_completion>>
 _CCCL_HOST_DEVICE_API inline bool __is_local_smem_barrier([[maybe_unused]] barrier<_Sco, _CompF>& __barrier)
 {
+#if defined(__HIP_DEVICE_COMPILE__)
+#  if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
+  return _Is_mbarrier && __builtin_amdgcn_is_shared(reinterpret_cast<const void*>(&__barrier));
+#  else
+  return false;
+#  endif
+#else
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE,
     (return _Is_mbarrier && ::cuda::device::is_object_from(__barrier, ::cuda::device::address_space::shared);),
     (return false;));
+#endif
 }
 
 _CCCL_END_NAMESPACE_CUDA

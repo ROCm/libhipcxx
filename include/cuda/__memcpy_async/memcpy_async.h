@@ -51,12 +51,14 @@
 // chain and would otherwise fail to compile under HIP.
 #include <cuda/__memory/aligned_size.h>
 
-#if _CCCL_CUDA_COMPILATION()
+#if _CCCL_CUDA_COMPILATION() || defined(__HIP_PLATFORM_AMD__)
 
 #  include <cuda/__barrier/async_contract_fulfillment.h>
 #  include <cuda/__barrier/barrier.h>
-#  include <cuda/__barrier/barrier_block_scope.h>
-#  include <cuda/__barrier/barrier_thread_scope.h>
+#  if !defined(__HIP_PLATFORM_AMD__)
+#    include <cuda/__barrier/barrier_block_scope.h>
+#    include <cuda/__barrier/barrier_thread_scope.h>
+#  endif
 #  include <cuda/__memcpy_async/check_preconditions.h>
 #  include <cuda/__memcpy_async/memcpy_async_barrier.h>
 #  include <cuda/std/__atomic/scopes.h>
@@ -202,6 +204,6 @@ _CCCL_END_NAMESPACE_CUDA
 
 #  include <cuda/std/__cccl/epilogue.h>
 
-#endif // _CCCL_CUDA_COMPILATION()
+#endif // _CCCL_CUDA_COMPILATION() || defined(__HIP_PLATFORM_AMD__)
 
 #endif // _CUDA___MEMCPY_ASYNC_MEMCPY_ASYNC_H_

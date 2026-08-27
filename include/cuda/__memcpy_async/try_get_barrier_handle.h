@@ -43,7 +43,12 @@
 #  pragma system_header
 #endif // no system header
 
-#include <cuda/__barrier/barrier_block_scope.h>
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <cuda/__barrier/barrier_hip_block_scope.h>
+#  include <cuda/__barrier/barrier_hip_native_handle.h>
+#else
+#  include <cuda/__barrier/barrier_block_scope.h>
+#endif
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__barrier/barrier.h>
 #include <cuda/std/__barrier/empty_completion.h>

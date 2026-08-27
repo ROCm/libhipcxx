@@ -45,12 +45,20 @@
 #endif // no system header
 
 #include <cuda/__barrier/barrier.h>
-#include <cuda/__barrier/barrier_block_scope.h>
-#include <cuda/__barrier/barrier_thread_scope.h>
 #include <cuda/__memcpy_async/completion_mechanism.h>
-#include <cuda/__memcpy_async/dispatch_memcpy_async.h>
+#if defined(__HIP_PLATFORM_AMD__)
+#  include <cuda/__barrier/barrier_hip_config.h>
+#  include <cuda/__barrier/barrier_hip_block_scope.h>
+#  include <cuda/__barrier/barrier_hip_thread_scope.h>
+#  include <cuda/__memcpy_async/dispatch_hip_memcpy_async.h>
+#  include <cuda/__memcpy_async/hip_memcpy_completion.h>
+#else
+#  include <cuda/__barrier/barrier_block_scope.h>
+#  include <cuda/__barrier/barrier_thread_scope.h>
+#  include <cuda/__memcpy_async/dispatch_memcpy_async.h>
+#  include <cuda/__memcpy_async/memcpy_completion.h>
+#endif
 #include <cuda/__memcpy_async/is_local_smem_barrier.h>
-#include <cuda/__memcpy_async/memcpy_completion.h>
 #include <cuda/__memcpy_async/try_get_barrier_handle.h>
 #include <cuda/__memory/aligned_size.h>
 #include <cuda/__type_traits/is_trivially_copyable.h>
@@ -102,6 +110,31 @@ _CCCL_HOST_DEVICE_API inline async_contract_fulfillment __memcpy_async_barrier(
 
   // 2. Issue actual copy instructions.
   ::cuda::std::uint64_t* __bh = nullptr;
+
+#if defined(__HIP_DEVICE_COMPILE__) && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
+  bool const __hip_can_use_async_copy =
+    static_cast<::cuda::std::size_t>(__size) != 0
+    && ::cuda::__hip_memcpy_async_has_accelerated_direction(__dest_char, __src_char);
+  ::cuda::std::uint32_t const __hip_allowed_completions =
+    __hip_can_use_async_copy ? __allowed_completions : ::cuda::std::uint32_t(__completion_mechanism::__sync);
+
+  __bh = (__hip_can_use_async_copy && ::cuda::__is_local_smem_barrier(__barrier))
+         ? ::cuda::__try_get_barrier_handle(__barrier)
+         : nullptr;
+
+  if (__bh != nullptr
+      && (__hip_allowed_completions & ::cuda::std::uint32_t(__completion_mechanism::__mbarrier_complete_tx)))
+  {
+    ::cuda::__add_tx_expectation(__barrier, 1);
+  }
+
+  auto __hip_cm = ::cuda::__dispatch_memcpy_async<__align>(
+    __group, __dest_char, __src_char, __size, __hip_allowed_completions, __bh);
+
+  // HIP completion tracking is one transaction per caller, not per byte.
+  return ::cuda::__memcpy_completion_impl::__defer(__hip_cm, __group, 1, __barrier);
+#endif // __HIP_DEVICE_COMPILE__ && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
+
 #if __cccl_ptx_isa >= 800
   NV_IF_TARGET(
     NV_PROVIDES_SM_90,
