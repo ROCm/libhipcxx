@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef __LIBCUDACXX___BARRIER_BARRIER_H
 #define __LIBCUDACXX___BARRIER_BARRIER_H
 
@@ -21,6 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
+#include <cuda/std/__barrier/barrier_atomic_wrappers.h>
 #include <cuda/std/__barrier/empty_completion.h>
 #include <cuda/std/__barrier/poll_tester.h>
 #include <cuda/std/__new_>
@@ -55,7 +78,7 @@ private:
 
   _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait(arrival_token __old) const
   {
-    return __phase.load(memory_order_acquire) != __old;
+    return __barrier_atomics::load_acquire<bool, _Sco>(__phase) != __old;
   }
   _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait_parity(bool __parity) const
   {
@@ -80,7 +103,7 @@ public:
   _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI arrival_token arrive(ptrdiff_t __update = 1)
   {
     auto const __old_phase    = __phase.load(memory_order_relaxed);
-    auto const __result       = __arrived.fetch_sub(__update, memory_order_acq_rel) - __update;
+    auto const __result       = __barrier_atomics::fetch_sub_acq_rel<ptrdiff_t, _Sco>(__arrived, __update) - __update;
     auto const __new_expected = __expected.load(memory_order_relaxed);
 
     _CCCL_ASSERT(__result >= 0, "");
@@ -89,7 +112,7 @@ public:
     {
       __completion();
       __arrived.store(__new_expected, memory_order_relaxed);
-      __phase.store(!__old_phase, memory_order_release);
+      __barrier_atomics::store_release<bool, _Sco>(__phase, !__old_phase);
       __atomic_notify_all(&__phase.__a, __scope_to_tag<_Sco>{});
     }
     return __old_phase;
@@ -147,7 +170,7 @@ private:
   }
   _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait_phase(uint64_t __phase) const
   {
-    uint64_t const __current = __phase_arrived_expected.load(memory_order_acquire);
+    uint64_t const __current = __barrier_atomics::load_acquire<uint64_t, _Sco>(__phase_arrived_expected);
     return ((__current & __phase_bit) != __phase);
   }
   _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait(arrival_token __old) const
@@ -176,7 +199,7 @@ public:
   _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI arrival_token arrive(ptrdiff_t __update = 1)
   {
     auto const __inc = __arrived_unit * __update;
-    auto const __old = __phase_arrived_expected.fetch_add(__inc, memory_order_acq_rel);
+    auto const __old = __barrier_atomics::fetch_add_acq_rel<uint64_t, _Sco>(__phase_arrived_expected, __inc);
     if ((__old ^ (__old + __inc)) & __phase_bit)
     {
       __phase_arrived_expected.fetch_add((__old & __expected_mask) << 32, memory_order_relaxed);
@@ -199,7 +222,18 @@ public:
   }
   _LIBCUDACXX_HIDE_FROM_ABI void arrive_and_drop()
   {
+#if defined(__HIP_PLATFORM_AMD__) && defined(__HIP_DEVICE_COMPILE__)
+    // Use DS atomics for LDS barriers, FLAT atomics for global barriers
+    if (__builtin_amdgcn_is_shared(&__phase_arrived_expected)) {
+      __attribute__((address_space(3))) uint64_t* __lds_ptr =
+        (__attribute__((address_space(3))) uint64_t*)((void*)&__phase_arrived_expected);
+      __atomic_fetch_add(__lds_ptr, __expected_unit, __ATOMIC_RELAXED);
+    } else {
+      __phase_arrived_expected.fetch_add(__expected_unit, memory_order_relaxed);
+    }
+#else
     __phase_arrived_expected.fetch_add(__expected_unit, memory_order_relaxed);
+#endif
     (void) arrive();
   }
 
