@@ -296,6 +296,18 @@ class Configuration(object):
         # Security note: eval() is used here for intentional code execution to instantiate
         # executor objects from configuration. This is a known limitation of the lit config
         # system. Only use trusted configuration files.
+
+        # Diagnostic: Show timeout source
+        if exec_timeout and exec_timeout != "None":
+            if "maxIndividualTestTime" in self.lit_config.params:
+                self.lit_config.note(
+                    "Timeout overridden via -DmaxIndividualTestTime=%s" % exec_timeout
+                )
+            else:
+                self.lit_config.note(
+                    "Using default timeout from config: %ss" % exec_timeout
+                )
+
         te = eval(exec_str)  # nosec B307 - Intentional executor instantiation from config
         if te:
             self.lit_config.note("Using executor: %r" % exec_str)
@@ -728,8 +740,8 @@ class Configuration(object):
         # Insert the platform name into the available features as a lower case.
         self.config.available_features.add(target_platform)
 
-        # Simulator testing can take a really long time for some of these tests
-        # so add a feature check so we can REQUIRES: long_tests in them
+        # Testing can take a really long time for some of these tests
+        # so add a feature check so we can REQUIRES: long_tests in them for really long tests. 
         self.long_tests = self.get_lit_bool("long_tests")
         if self.long_tests is None:
             # Default to running long tests.
@@ -850,6 +862,7 @@ class Configuration(object):
         pre_gfx1101 = True
         pre_gfx1200 = True
         pre_gfx1201 = True
+        pre_gfx1250 = True
         # TODO(HIP/AMD): does it make sense to add variants for gfx941 and gfx942?
         if compute_archs and (self.cxx.type == 'nvcc' or self.cxx.type == 'clang' or self.cxx.type == 'nvrtcc'):
             pre_gfx90a = False
@@ -860,6 +873,7 @@ class Configuration(object):
             pre_gfx1101 = False
             pre_gfx1200 = False
             pre_gfx1201 = False
+            pre_gfx1250 = False
             pre_sm_32 = False
             pre_sm_60 = False
             pre_sm_70 = False
@@ -907,6 +921,7 @@ class Configuration(object):
             pre_gfx1101 = False
             pre_gfx1200 = False
             pre_gfx1201 = False
+            pre_gfx1250 = False
             pre_sm_32  = False
             pre_sm_60  = False
             pre_sm_70  = False
@@ -914,7 +929,13 @@ class Configuration(object):
             pre_sm_90  = False
             compute_archs = set(sorted(re.split('\s|;|,', compute_archs)))
             for arch in compute_archs:
-                if arch == "gfx908": 
+                # Pre-gfx1250: Any architecture without hardware LDS barrier support
+                # Hardware LDS barrier: gfx1250 only
+                if arch != "gfx1250":
+                    pre_gfx1250 = True
+
+                # Specific architecture ordering for other pre-* features
+                if arch == "gfx908":
                     pre_gfx90a = True
                     pre_gfx942 = True
                     pre_gfx1200 = True
@@ -931,6 +952,8 @@ class Configuration(object):
                 elif arch == "gfx1100" or arch == "gfx1101": # RDNA3
                     pre_gfx1200 = True
                     pre_gfx1201 = True
+                elif arch == "gfx1200" or arch == "gfx1201": # RDNA4
+                    pre_gfx1250 = True
                 # Add --offload-arch for all valid gfx architectures
                 if arch.startswith("gfx"):
                     arch_flag = '--offload-arch={0}'.format(arch)
@@ -951,6 +974,8 @@ class Configuration(object):
             self.config.available_features.add("pre-gfx1200")
         if pre_gfx1201:
             self.config.available_features.add("pre-gfx1201")
+        if pre_gfx1250:
+            self.config.available_features.add("pre-gfx1250")
         if pre_sm_32:
             self.config.available_features.add("pre-sm-32")
         if pre_sm_60:
