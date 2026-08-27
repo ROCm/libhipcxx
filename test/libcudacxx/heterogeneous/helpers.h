@@ -31,12 +31,32 @@
 #include <cuda/std/type_traits>
 
 #include <cstdio>
+#include <cstdlib>
 #include <new>
 #include <thread>
 #include <vector>
 
 #include "meta.h"
 #include "test_macros.h"
+
+// The HIP runtime's DSO destructor (libamdhip64, reached via _dl_fini ->
+// __cxa_finalize) busy-spins for 10+ minutes when many of these test processes
+// tear down concurrently, which is what makes this suite dominate CI wall time.
+// The tests hold no state that needs static destruction, and every failure path
+// aborts rather than returning a status -- HETEROGENEOUS_SAFE_CALL and assert
+// here, and HIP_CALL in force_include_hip.h, which uses abort() precisely so
+// this destructor cannot mask it. Static destructors run before _dl_fini, so
+// this fires first; abort() skips them entirely, so a failure still exits
+// non-zero via SIGABRT.
+struct skip_hip_teardown_t
+{
+  ~skip_hip_teardown_t()
+  {
+    std::fflush(nullptr);
+    std::_Exit(0);
+  }
+};
+static skip_hip_teardown_t skip_hip_teardown_instance;
 
 #define DEFINE_ASYNC_TRAIT(...)                                             \
   template <typename T, typename = cuda::std::true_type>                    \
