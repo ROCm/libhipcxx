@@ -94,6 +94,18 @@ __device__ void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t
 #  pragma clang diagnostic pop
 #endif // defined(__HIP_PLATFORM_AMD__)
 
+// NOTE(HIP/AMD): single switch for the ROCm 7.14 HIP teardown-spin workaround, so
+// its two halves cannot be removed independently: the _Exit(0) destructor in
+// heterogeneous/helpers.h, and the abort() here that stops that destructor turning
+// a failed HIP call into a pass. Not reproducible on ROCm 10; drop with 7.x.
+#if LIBHIPCXX_ROCM_VERSION_EQ(7, 14)
+#  define LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR 1
+#  define LIBHIPCXX_TEST_FAIL_EXIT()      abort()
+#else
+#  define LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR 0
+#  define LIBHIPCXX_TEST_FAIL_EXIT()      exit(1)
+#endif
+
 #define HIP_CALL(err, ...) \
     do { \
         err = __VA_ARGS__; \
@@ -102,10 +114,7 @@ __device__ void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t
             printf("HIP ERROR, line %d: %s: %s\n", __LINE__,\
                    cudaGetErrorName(err), cudaGetErrorString(err)); \
             fflush(nullptr); \
-            /* abort(), not exit(1): exit() runs static destructors, and the \
-               heterogeneous suite registers one that calls _Exit(0) to dodge a \
-               HIP teardown spin. That would turn a GPU failure into a pass. */ \
-            abort(); \
+            LIBHIPCXX_TEST_FAIL_EXIT(); \
         } \
     } while (false)
 
