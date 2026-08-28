@@ -47,10 +47,6 @@
 #  include <cuda/std/__fwd/get.h>
 #  include <cuda/std/__type_traits/enable_if.h>
 #  include <cuda/std/__type_traits/is_constructible.h>
-#  if _CCCL_HIP_COMPILATION()
-// NOTE(HIP/AMD): for the static_assert on the trivially copyable storage stand-in below.
-#    include <cuda/std/__type_traits/is_trivially_copyable.h>
-#  endif // _CCCL_HIP_COMPILATION()
 
 // todo: find a way to get rid of this include
 #  if _CCCL_HOSTED()
