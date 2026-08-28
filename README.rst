@@ -182,6 +182,34 @@ Extended Work Stealing Library             `<cuda/work_stealing>`   The header i
 PTX API                                    `<cuda/ptx>`             The `cuda::ptx` namespace contains functions that map to Nvidia PTX instructions. 
 =========================================  =======================  ========================================================================================
 
+Parallel algorithms (experimental)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The parallel algorithms in ``<cuda/std/execution>`` -- ``cuda::std::reduce``,
+``sort``, ``transform`` and friends taking an execution policy -- are **not
+supported** on HIP and are not declared by default. Calling one is a compile
+error (``no matching function``).
+
+Upstream implements them on top of NVIDIA CUB. hipCUB does not yet provide
+several of the primitives CUB 3.x expects (for example
+``DeviceTransform::Generate`` and ``DeviceTransform::TransformIf``, and there is
+no two-output ``DevicePartition``), so libhipcxx carries a shim that supplies
+the missing pieces over rocPRIM. That shim is experimental: it is not covered by
+the same testing as the rest of the library and its API surface may change.
+
+To opt in, define ``LIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM`` when compiling
+your own code::
+
+    hipcc -DLIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM ...
+
+When building libhipcxx itself, the equivalent CMake option is
+``-DLIBCUDACXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM=ON``. Note that this option only
+affects libhipcxx's own build tree -- consuming an installed libhipcxx requires
+defining the macro in your build.
+
+The flag will be removed and the algorithms enabled unconditionally once hipCUB
+provides the missing primitives.
+
 Licensing
 ---------
 
