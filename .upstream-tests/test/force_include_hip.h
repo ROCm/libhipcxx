@@ -45,8 +45,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <functional>
-
 #define HIP_CALL(err, ...) \
     do { \
         err = __VA_ARGS__; \
@@ -114,7 +112,7 @@ __device__ int hip_gpu_index     = 0;
 // Unique error code per device
 __device__ int errorCodes[HIP_GPU_COUNT];
 // Callback for host participation in tests
-std::function<int()> hostSideWorkFunc = []() {return 0;};
+int (*hostSideWorkFunc)() = []() {return 0;};
 
 __global__
 void fake_main_kernel(int * ret)
