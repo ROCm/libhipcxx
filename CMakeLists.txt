@@ -95,6 +95,17 @@ set(LLVM_PATH "${libcudacxx_SOURCE_DIR}" CACHE STRING "" FORCE)
 option(LIBCUDACXX_ENABLE_CUDA "Enable the CUDA language support." OFF)
 option(LIBCUDACXX_ENABLE_HIP "Enable the HIP language support." ON)
 
+# NOTE(HIP/AMD): the hipCUB-backed pstl device backend is experimental and off by
+# default -- see the rationale in <cuda/std/__internal/pstl_config.h>. Turning this
+# on defines LIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM for everything that links
+# libcudacxx.compiler_interface. Consumers of an installed libhipcxx are not
+# covered by this option and must define the macro in their own build.
+option(
+  LIBCUDACXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM
+  "Enable the experimental hipCUB-backed parallel algorithm backend."
+  OFF
+)
+
 if (LIBCUDACXX_ENABLE_CUDA AND LIBCUDACXX_ENABLE_HIP)
   message(FATAL_ERROR "HIP and CUDA compilers cannot be used at the same time, CMake will exit." )
 endif()
