@@ -28,6 +28,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import contextlib
 import copy
 import errno
 import os
@@ -42,6 +43,28 @@ import libcudacxx.util
 
 # pylint: disable=import-error
 from libcudacxx.test.executor import LocalExecutor as LocalExecutor
+
+
+@contextlib.contextmanager
+def _timeout_override(executor, timeout_is_expected, short_timeout=15):
+    """Temporarily set a short timeout on a LocalExecutor for .timeout.cpp tests.
+
+    Only activates when executor is a LocalExecutor, timeout_is_expected is True,
+    and the executor has no user-specified timeout. Restores the original on exit.
+    """
+    should_override = (
+        isinstance(executor, LocalExecutor)
+        and timeout_is_expected
+        and (not executor.timeout or executor.timeout == 0)
+    )
+    if should_override:
+        original_timeout = executor.timeout
+        executor.timeout = short_timeout
+    try:
+        yield
+    finally:
+        if should_override:
+            executor.timeout = original_timeout
 
 
 class LibcxxTestFormat(object):
@@ -254,27 +277,10 @@ class LibcxxTestFormat(object):
                         if f.endswith(".dat")
                     ]
 
-                    # Use shorter timeout for .timeout.cpp tests (expected to hang)
-                    # UNLESS user explicitly overrode via -DmaxIndividualTestTime
-                    original_timeout = self.executor.timeout
-                    if timeout_is_expected:
-                        # .timeout.cpp tests are expected to hang - use a short timeout
-                        # to fail fast and move to next test
-                        # BUT: User override takes precedence over default short timeout
-                        if not original_timeout or original_timeout == 0:
-                            # No timeout specified by user, use default for .timeout.cpp
-                            self.executor.timeout = 15
-                        # else: Keep original_timeout (user has final say)
-
-                    try:
+                    with _timeout_override(self.executor, timeout_is_expected):
                         cmd, out, err, rc = self.executor.run(
                             exec_path, [exec_path], local_cwd, data_files, env
                         )
-                    finally:
-                        # Restore original timeout if we modified it
-                        # (only happens for .timeout.cpp when no user timeout specified)
-                        if timeout_is_expected and (not original_timeout or original_timeout == 0):
-                            self.executor.timeout = original_timeout
                     report = "Compiled With: '%s'\n" % " ".join(compile_cmd)
                     report += libcudacxx.util.makeReport(cmd, out, err, rc)
                     # .timeout.cpp: any completion is unexpected (timeout is the PASS condition)
