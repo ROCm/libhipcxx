@@ -101,6 +101,37 @@ The following APIs from libcudacxx are **not** supported in libhipcxx:
     - Hardware-specific device functions including warp shuffles, barrier operations with
       transaction counts, and async memory operations. These require NVIDIA PTX instructions
       and SM-specific hardware features not available on AMD GPUs.
+  * - Parallel Algorithms
+    - ``<cuda/std/execution>``
+    - Overloads of the standard algorithms that take an execution policy such as
+      ``cuda::execution::gpu``. These overloads are not declared by default. See
+      :ref:`libhipcxx-experimental-parallel-algorithms` for the experimental opt-in.
   * - PTX API
     - ``<cuda/ptx>``
     - The ``cuda::ptx`` namespace contains functions that map to NVIDIA PTX instructions.
+
+.. _libhipcxx-experimental-parallel-algorithms:
+
+Parallel algorithms (experimental)
+==================================
+
+The parallel algorithms in ``<cuda/std/execution>`` — ``cuda::std::reduce``, ``sort``, ``transform``, and the
+other overloads that take an execution policy — are not supported on HIP and are not declared by default.
+Calling one is a compile error (``no matching function``).
+
+Upstream implements them on top of NVIDIA CUB. hipCUB does not yet provide several of the primitives CUB 3.x
+expects, including ``DeviceTransform::Generate``, ``DeviceTransform::TransformIf``, and a two-output
+``DevicePartition``. libhipcxx carries a shim that supplies the missing pieces over rocPRIM. That shim is
+experimental: it is not covered by the same testing as the rest of the library, and its API surface may change.
+
+To opt in, define ``LIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM`` when compiling your own code:
+
+.. code-block:: bash
+
+   hipcc -DLIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM ...
+
+When building libhipcxx itself, the equivalent CMake option is
+``-DLIBCUDACXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM=ON``. This option only affects libhipcxx's own build tree.
+Code that consumes an installed libhipcxx must define the macro in its own build.
+
+The flag will be removed and the algorithms enabled unconditionally once hipCUB provides the missing primitives.
