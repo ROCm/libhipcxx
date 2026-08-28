@@ -89,7 +89,7 @@ function(
   parent_target
   with_ctk
 )
-  # NOTE(HIP/AMD): on HIP builds tag the host header-test TUs LANGUAGE HIP so the
+  # FIXME(HIP/AMD): on HIP builds tag the host header-test TUs LANGUAGE HIP so the
   # HIP/clang front-end compiles them. The clang-only flags come from hip::device
   # (-x hip, --offload-arch=<gfx>; see hip-config-amd.cmake), not from the
   # hip::host that cccl_c2h_attach_hip_deps() links below -- hip::host carries
