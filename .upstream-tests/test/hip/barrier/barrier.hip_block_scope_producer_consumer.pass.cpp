@@ -30,10 +30,7 @@
 // <hip/barrier>
 // Verify a two-wave producer-consumer workflow with double buffering.
 
-#include <thrust/device_vector.h>
-
 #include <cassert>
-#include <iostream>
 
 #include "test_macros.h"
 #include "hip_wavefront_size.h"
@@ -121,15 +118,18 @@ int main(int argc, char** argv)
 
   size_t sharedMemSize = 2 * WAVE_SIZE * sizeof(float);
 
-  thrust::device_vector<float> dOut(NUM_ELEMS);
-  producer_consumer_pattern<<<1, 2 * WAVE_SIZE, sharedMemSize>>>(NUM_ELEMS, dOut.data().get());
+  float* dOut;
+  HIP_CALL(err, hipMalloc(&dOut, NUM_ELEMS * sizeof(float)));
+
+  producer_consumer_pattern<<<1, 2 * WAVE_SIZE, sharedMemSize>>>(NUM_ELEMS, dOut);
   HIP_CALL(err, hipDeviceSynchronize());
   HIP_CALL(err, hipGetLastError());
 
-  for (int i = 0; i < dOut.size(); ++i)
+  for (int i = 0; i < NUM_ELEMS; ++i)
   {
     assert(dOut[i] == i);
   }
 
+  HIP_CALL(err, hipFree(dOut));
   return 0;
 }
