@@ -45,8 +45,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <functional>
-
 // NOTE(HIP/AMD): clang-hip's device runtime provides operator new/delete(size_t)
 // but NOT the C++17 over-aligned variants (operator new/delete with
 // std::align_val_t), so device code that allocates over-aligned types (e.g.
@@ -176,7 +174,7 @@ __device__ int hip_gpu_index     = 0;
 // Unique error code per device
 __device__ int errorCodes[HIP_GPU_COUNT];
 // Callback for host participation in tests
-std::function<int()> hostSideWorkFunc = []() {return 0;};
+int (*hostSideWorkFunc)() = []() {return 0;};
 
 __global__
 void fake_main_kernel(int * ret)
