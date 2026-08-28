@@ -10,7 +10,7 @@
 
 // MIT License
 //
-// Modifications Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -37,10 +37,10 @@
 #endif
 #include <cuda/std/__cccl/version.h> // IWYU pragma: export
 
-#define _LIBCUDACXX_CUDA_API_VERSION       CCCL_VERSION
-#define _LIBCUDACXX_CUDA_API_VERSION_MAJOR CCCL_MAJOR_VERSION
-#define _LIBCUDACXX_CUDA_API_VERSION_MINOR CCCL_MINOR_VERSION
-#define _LIBCUDACXX_CUDA_API_VERSION_PATCH CCCL_PATCH_VERSION
+#define _LIBCUDACXX_CUDA_API_VERSION       HIPCCL_VERSION
+#define _LIBCUDACXX_CUDA_API_VERSION_MAJOR HIPCCL_MAJOR_VERSION
+#define _LIBCUDACXX_CUDA_API_VERSION_MINOR HIPCCL_MINOR_VERSION
+#define _LIBCUDACXX_CUDA_API_VERSION_PATCH HIPCCL_PATCH_VERSION
 
 #ifndef _LIBCUDACXX_CUDA_ABI_VERSION_LATEST
 #  define _LIBCUDACXX_CUDA_ABI_VERSION_LATEST 4
