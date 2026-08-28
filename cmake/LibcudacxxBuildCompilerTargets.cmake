@@ -42,6 +42,12 @@ function(libcudacxx_build_compiler_targets)
   )
 
   add_library(libcudacxx.compiler_interface INTERFACE)
+  if (LIBCUDACXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM)
+    target_compile_definitions(
+      libcudacxx.compiler_interface
+      INTERFACE LIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM
+    )
+  endif()
   target_link_libraries(
     libcudacxx.compiler_interface
     INTERFACE
