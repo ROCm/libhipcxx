@@ -140,16 +140,18 @@ TEST_FUNC constexpr bool test()
   test<int, bidirectional_iterator<int*>>();
   test<int, random_access_iterator<int*>>();
   test<int, int*>();
-// TODO(HIP/AMD): ROCm 7.14 fails register allocation for these two instantiations on gfx90a with
-// "unhandled SGPR spill to memory". They take the forward_iterator_tag path of __shift_left over a
-// non-trivially-copyable type, which is the heaviest instantiation here. ROCm 7.13 compiles them
-// fine and no other gfx9 target is affected (gfx900/906/908/942/950 all pass), so this is a 7.14
-// backend regression rather than a library issue. Device pass only -- the host pass still runs
-// them, as does constant evaluation.
-#if !(defined(__gfx90a__) && (LIBHIPCXX_ROCM_VERSION_EQ(7, 14)))
+// FIXME(HIP/AMD): ROCm 7.14 and later fail register allocation for these two instantiations on
+// gfx90a with "unhandled SGPR spill to memory". They take the forward_iterator_tag path of
+// __shift_left over a non-trivially-copyable type, the heaviest instantiation here. ROCm 7.13
+// compiles them fine and no other gfx9 target is affected (gfx900/906/908/942/950 all pass), so
+// this is an AMDGPU backend regression rather than a library issue. Device pass only -- the host
+// pass still runs them, as does constant evaluation. Tracked as #380; restore the unconditional
+// calls once fixed. The gate was 7.14-only until 7.15 regressed again, so it stays open-ended
+// until a fixed version is known.
+#if !(defined(__gfx90a__) && (LIBHIPCXX_ROCM_VERSION_GE(7, 14)))
   test<MoveOnly, forward_iterator<MoveOnly*>>();
   test<MoveOnly, bidirectional_iterator<MoveOnly*>>();
-#endif // !(gfx90a && ROCm 7.14)
+#endif // !(gfx90a && ROCm >= 7.14)
   test<MoveOnly, random_access_iterator<MoveOnly*>>();
   test<MoveOnly, MoveOnly*>();
 
