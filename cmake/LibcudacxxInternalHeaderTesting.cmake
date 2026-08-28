@@ -123,7 +123,15 @@ function(libcudacxx_add_internal_header_test_target target_name)
     HEADERS ${ARGN}
   )
 
-  target_compile_definitions(${target_name} PRIVATE _CCCL_HEADER_TEST)
+  # NOTE(HIP/AMD): compile the pstl backend headers even when the experimental
+  # hipCUB shim is off by default, so turning it off does not silently drop
+  # cuda/std/__pstl/cuda/* from header-test coverage (they would become empty TUs).
+  target_compile_definitions(
+    ${target_name}
+    PRIVATE #
+      _CCCL_HEADER_TEST
+      $<$<BOOL:${LIBCUDACXX_ENABLE_HIP}>:LIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM>
+  )
   target_link_libraries(
     ${target_name}
     PUBLIC #

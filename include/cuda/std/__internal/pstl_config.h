@@ -61,7 +61,18 @@
 // only for full hipcc compilation, NOT HIPRTC -- exactly mirroring the way
 // _CCCL_HAS_BACKEND_CUDA() excludes NVRTC. Use this instead of a bare
 // _CCCL_HIP_COMPILATION() wherever a hipCUB include path is gated.
-#define _CCCL_HAS_BACKEND_HIP() (_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC))
+//
+// The backend is additionally opt-in. hipCUB does not implement several of the
+// primitives CUB 3.x expects, so <cuda/std/__pstl/cuda/__hipcub.h> supplies them
+// over rocPRIM. Until hipCUB catches up that shim is experimental and off by
+// default: define LIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM to opt in. With it
+// unset, _CCCL_HAS_PSTL_BACKEND() is 0 on HIP and <cuda/std/execution> declares
+// no parallel algorithms, exactly as on a build with no backend at all.
+#if defined(LIBHIPCXX_ENABLE_EXPERIMENTAL_HIPCUB_SHIM)
+#  define _CCCL_HAS_BACKEND_HIP() (_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC))
+#else // ^^^ shim opted in ^^^ / vvv shim off (default) vvv
+#  define _CCCL_HAS_BACKEND_HIP() 0
+#endif // ^^^ shim off (default) ^^^
 
 // HIP uses the __cuda execution backend enum value (already gated by
 // _CCCL_HIP_COMPILATION() in __fwd/execution_policy.h) and routes dispatch
