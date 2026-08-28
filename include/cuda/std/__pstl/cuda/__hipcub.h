@@ -67,6 +67,7 @@
 #  include <rocprim/iterator/transform_output_iterator.hpp>
 #  include <rocprim/types.hpp>
 
+#  include <cuda/__functional/always_true_false.h>
 #  include <cuda/__functional/call_or.h>
 #  include <cuda/__stream/get_stream.h>
 #  include <cuda/__stream/stream_ref.h>
@@ -133,6 +134,16 @@ using ::hipcub::DeviceSelect;
 //
 // TransformReduce is forwarded unchanged — hipCUB's signature matches CUB's, and
 // its reduction/transform ops ARE forwarded (not dropped), so any op is supported.
+// Both cub::DeviceTransform::TransformIf overloads below drop the predicate and
+// forward to a plain hipcub Transform, which is only correct when the predicate
+// selects everything. Every call site passes ::cuda::always_true today, but
+// copy_n's _UnaryPred is a defaulted template parameter, so a frontend that ever
+// exposes it would silently get an unconditional transform. Reject anything else
+// at compile time instead, exactly as __hipcub_argextremum_pred_ok does above.
+template <class _Pred>
+inline constexpr bool __hipcub_transformif_pred_ok =
+  ::cuda::std::is_same_v<::cuda::std::remove_cvref_t<_Pred>, ::cuda::always_true>;
+
 template <class _Pred, class _T>
 inline constexpr bool __hipcub_argextremum_pred_ok =
   ::cuda::std::__is_one_of_v<::cuda::std::remove_cvref_t<_Pred>,
@@ -454,6 +465,10 @@ struct DeviceTransform : ::hipcub::DeviceTransform
   static hipError_t TransformIf(
     _InTuple __inputs, _OutIt __out, _OffsetT __count, _Pred /*__pred*/, _Op __op, hipStream_t __stream)
   {
+    static_assert(__hipcub_transformif_pred_ok<_Pred>,
+                  "cub::DeviceTransform::TransformIf: the HIP shim forwards to hipCUB's "
+                  "unconditional Transform and cannot honour a predicate. Only "
+                  "::cuda::always_true is supported.");
     // Convert cuda::std::tuple to hipcub::tuple by extracting the single element.
     // The call site passes cuda::std::tuple{src_ptr} (one input pointer).
     // hipcub::DeviceTransform::Transform(hipcub::tuple<Ins...>, out, n, op, stream)
@@ -476,6 +491,10 @@ struct DeviceTransform : ::hipcub::DeviceTransform
   static hipError_t TransformIf(
     _InTuple __inputs, _OutIt __out, _OffsetT __count, _Pred /*__pred*/, _Op __op, const _Policy& __policy)
   {
+    static_assert(__hipcub_transformif_pred_ok<_Pred>,
+                  "cub::DeviceTransform::TransformIf: the HIP shim forwards to hipCUB's "
+                  "unconditional Transform and cannot honour a predicate. Only "
+                  "::cuda::always_true is supported.");
     ::cuda::stream_ref __sref =
       ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStreamPerThread}, __policy);
     return ::hipcub::DeviceTransform::Transform(
