@@ -90,7 +90,10 @@ if [ -n "${CMAKE_VERSION:-}" ]; then
   # shellcheck disable=SC1091
   . _venv/bin/activate
   pip3 install --upgrade pip
-  pip3 install "cmake==${CMAKE_VERSION}" "lit==${LIBHIPCXX_LIT_VERSION}" psutil
+  # ninja too: the presets generate Ninja, and the build trees shipped in the tests
+  # tarball cache CMAKE_MAKE_PROGRAM as a path into this venv, which build.sh excludes
+  # from the tarball. Without it the reconfigure fails on a dangling ninja path.
+  pip3 install "cmake==${CMAKE_VERSION}" "lit==${LIBHIPCXX_LIT_VERSION}" ninja psutil
 fi
 cmake --version && ctest --version
 
