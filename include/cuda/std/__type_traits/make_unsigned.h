@@ -54,9 +54,13 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-#if _CCCL_CHECK_BUILTIN(make_unsigned)
+// NOTE(HIP/AMD): excluded for hipRTC. gcc-8's libstdc++ <type_traits>, pulled in
+// transitively there, declares `namespace std { struct __make_unsigned; }`, which makes
+// clang revert its own builtin to a plain identifier for the rest of the TU. The
+// reversion is invisible to _CCCL_CHECK_BUILTIN, so exclude hipRTC outright.
+#if _CCCL_CHECK_BUILTIN(make_unsigned) && !defined(_CCCL_COMPILER_HIPRTC)
 #  define _CCCL_BUILTIN_MAKE_UNSIGNED(...) __make_unsigned(__VA_ARGS__)
-#endif // _CCCL_CHECK_BUILTIN(make_unsigned)
+#endif // _CCCL_CHECK_BUILTIN(make_unsigned) && !_CCCL_COMPILER_HIPRTC
 
 // __make_unsigned doesn't work with clang < 20 or clang + nvcc
 #if _CCCL_COMPILER(CLANG, <, 20) || (_CCCL_COMPILER(CLANG) && _CCCL_CUDA_COMPILER(NVCC))
@@ -68,20 +72,6 @@
 #  undef _CCCL_BUILTIN_MAKE_UNSIGNED
 #endif // _CCCL_COMPILER(NVRTC, <, 13, 3)
 
-// NOTE(HIP/AMD): under hipRTC, libhipcxx transitively pulls the host <new> ->
-// <type_traits> (via construct_at.h / __host_stdlib/new). gcc-8's libstdc++
-// <type_traits> declares `namespace std { struct __make_unsigned; }`, which
-// makes clang revert its own __make_unsigned builtin to a plain identifier for
-// the rest of the TU (clang's RevertibleTypeTrait mechanism). That reversion is
-// invisible to _CCCL_CHECK_BUILTIN above (__has_builtin stays 1, __is_identifier
-// stays 0), so the check still selects the now-non-functional builtin and it
-// fails with "unknown type name '__make_unsigned'" (seen on the manylinux/gcc-8
-// CI image; newer libstdc++ instead drops __has_builtin to 0, and plain hipcc
-// doesn't pull host <type_traits>, so both avoid it). The revert cannot be
-// detected at preprocessor time, so force the manual fallback for all hipRTC.
-#if defined(_CCCL_COMPILER_HIPRTC)
-#  undef _CCCL_BUILTIN_MAKE_UNSIGNED
-#endif // _CCCL_COMPILER_HIPRTC
 
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
