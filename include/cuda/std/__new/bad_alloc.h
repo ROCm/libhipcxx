@@ -41,7 +41,8 @@
 
 #include <cuda/std/__exception/terminate.h>
 
-#ifndef _CCCL_NO_EXCEPTIONS
+// NOTE(HIP/AMD): We need to include new header to get the correct device definitions.
+#if !defined(_CCCL_NO_EXCEPTIONS) || defined(__HIPCC_RTC__)
 #  include <new>
 #endif // _CCCL_NO_EXCEPTIONS
 
