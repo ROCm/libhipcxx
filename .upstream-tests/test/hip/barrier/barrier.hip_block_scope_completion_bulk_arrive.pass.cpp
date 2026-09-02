@@ -61,7 +61,7 @@ __device__ int test()
   if (lane_id == 0)
   {
     auto token = bar->arrive(k_wave_size);
-    bar->wait(std::move(token));
+    bar->wait(cuda::std::move(token));
   }
   else
   {
