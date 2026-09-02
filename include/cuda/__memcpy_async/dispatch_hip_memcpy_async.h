@@ -156,7 +156,7 @@ _CCCL_NODISCARD _CCCL_DEVICE inline __completion_mechanism __dispatch_memcpy_asy
     __attribute__((address_space(3))) _CUDA_VSTD::int64_t* __tmpHandle = (__attribute__((address_space(3))) _CUDA_VSTD::int64_t*)(__bar_handle);
 
     __builtin_amdgcn_fence(__ATOMIC_RELEASE, "workgroup");
-    __builtin_amdgcn_ds_atomic_async_barrier_arrive_b64(__tmpHandle);
+    __builtin_amdgcn_ds_atomic_async_barrier_arrive_b64(reinterpret_cast<long*>(__tmpHandle));
 
     return __completion_mechanism::__mbarrier_complete_tx;
   }
