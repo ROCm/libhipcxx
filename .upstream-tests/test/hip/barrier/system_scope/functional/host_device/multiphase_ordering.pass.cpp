@@ -32,7 +32,7 @@
 // host has id k_wave_size. The host's mirror is thread 0 — they write into
 // each other's slots across the host/GPU boundary. Runs 4 phases.
 
-#include <cstdlib>
+#include <cuda/std/cstdlib>
 #include <hip/barrier>
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>

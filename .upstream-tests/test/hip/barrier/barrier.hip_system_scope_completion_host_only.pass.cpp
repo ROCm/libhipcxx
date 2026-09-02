@@ -30,7 +30,7 @@
 // The host is the sole participant and is guaranteed to be the last to arrive,
 // so calling a __host__ completion function is safe.
 
-#include <cstdlib>
+#include <cuda/std/cstdlib>
 #include <hip/barrier>
 #include <hip/hip_runtime.h>
 
