@@ -32,7 +32,7 @@
 // 2 waves per GPU (4 total). 2N payload (all ones), expected_sum = 2 * n_threads.
 // thread_id = gpu_index * k_waves_per_gpu * wave_size + threadIdx.x.
 
-#include <cstdlib>
+#include <cuda/std/cstdlib>
 #include <hip/barrier>
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>

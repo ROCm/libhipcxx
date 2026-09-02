@@ -36,7 +36,7 @@
 // - A system scope barrier with a CPU participant may only utilize a completion function if the program guarantees that
 //   the host will be the one to complete the barrier
 
-#include <cstdlib>
+#include <cuda/std/cstdlib>
 #include <hip/barrier>
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>

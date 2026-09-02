@@ -33,7 +33,7 @@
 // mirror's slot across the GPU boundary, arrives, verifies the token phase,
 // waits, then verifies the mirror's write is visible. Runs 4 phases.
 
-#include <cstdlib>
+#include <cuda/std/cstdlib>
 #include <hip/barrier>
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>

@@ -34,7 +34,7 @@
 // Final phase: CPU folds into data[0] and drops; GPU wave arrive_and_waits, does intra-wave, checks.
 // expected_sum = 2 * (k_n_gpu + k_n_cpu_virt)
 
-#include <cstdlib>
+#include <cuda/std/cstdlib>
 #include <hip/barrier>
 #include <hip/hip_runtime.h>
 #include <hip/hip_runtime_api.h>

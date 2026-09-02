@@ -34,7 +34,7 @@
 #include <cuda/std/cstddef>
 #include <cuda/std/cstdint>
 #include <cuda/std/type_traits>
-#include <cstdlib>
+#include <cuda/std/cstdlib>
 #include "hip_barrier_test_utils.h"
 
 using namespace hip_test;
