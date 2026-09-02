@@ -132,7 +132,7 @@ __host__ int hostSideWork()
       g->barrier.arrive_and_drop();
     }
     auto token = g->barrier.arrive(half_cpu);
-    g->barrier.wait(std::move(token));
+    g->barrier.wait(cuda::std::move(token));
 
     active_cpu  = half_cpu;
     active_gpu /= 2;

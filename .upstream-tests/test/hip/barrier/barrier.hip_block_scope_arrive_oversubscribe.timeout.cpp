@@ -54,7 +54,7 @@ __device__ int test()
     // Invalid over-arrival; the packed phase state may be corrupted.
     auto token = bar->arrive(100);
 
-    bar->wait(std::move(token));
+    bar->wait(cuda::std::move(token));
   }
 
   return 1;

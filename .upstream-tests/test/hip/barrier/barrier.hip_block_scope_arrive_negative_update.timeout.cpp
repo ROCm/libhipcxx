@@ -53,7 +53,7 @@ __device__ int test()
   {
     // Invalid update; wait() may spin if no valid phase completion occurs.
     auto token = bar->arrive(-1);
-    bar->wait(std::move(token));
+    bar->wait(cuda::std::move(token));
   }
 
   return 1;  // Never reached

@@ -57,7 +57,7 @@ __device__ int test()
 
   auto token = bar->arrive();
 
-  bar->wait(std::move(token));
+  bar->wait(cuda::std::move(token));
 
   if (completion_flag != 99) return 1;
 
