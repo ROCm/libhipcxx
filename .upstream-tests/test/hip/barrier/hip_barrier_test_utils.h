@@ -27,6 +27,18 @@
 #ifndef LIBHIPCXX_HIP_BARRIER_TEST_UTILS
 #define LIBHIPCXX_HIP_BARRIER_TEST_UTILS
 
+// EXIT_x codes not defined in hip/std/cstdlib (unlike plain host cstdlib)
+#ifdef EXIT_SUCCESS
+  #warning "Redefinition of EXIT_SUCCESS"
+#endif
+#define EXIT_SUCCESS 0
+
+#ifdef EXIT_FAILURE
+  #warning "Redefinition of EXIT_FAILURE"
+#endif
+#define EXIT_FAILURE 1
+
+
 namespace hip_test {
 
 static constexpr int k_num_host_arrivals = 1;
