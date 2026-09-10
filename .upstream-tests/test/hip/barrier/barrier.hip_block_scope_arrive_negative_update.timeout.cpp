@@ -23,7 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// UNSUPPORTED: nvcc, nvhpc, nvc++
+// TODO(HIP/AMD): hiprtc is unsupported because the test scaffolding is much simpler for hiprtc (single thread, etc). See internal issue #383.
+// UNSUPPORTED: nvcc, nvhpc, nvc++, hiprtc
 // REQUIRES: enable_undefined_behavior_tests
 
 // <cuda/barrier>
