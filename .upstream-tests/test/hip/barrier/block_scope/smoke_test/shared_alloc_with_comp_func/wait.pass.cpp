@@ -39,7 +39,7 @@ using barrier_t = hip::barrier<hip::thread_scope_block, void (*)()>;
 
 __device__ void test()
 {
-  __shared__ alignas(barrier_t) hip::std::byte raw[2 * sizeof(barrier_t)];
+  alignas(barrier_t) __shared__ hip::std::byte raw[2 * sizeof(barrier_t)];
   auto* ba = reinterpret_cast<barrier_t*>(raw);
   auto* bb = reinterpret_cast<barrier_t*>(raw + sizeof(barrier_t));
   test_wait_unblocks_after_single_arrive(*ba, barrier_no_op_completion);

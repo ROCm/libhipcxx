@@ -42,7 +42,7 @@ __device__ void test()
 {
   __shared__ barrier_t bar;
   __shared__ barrier_t zero;
-  __shared__ alignas(barrier_t) hip::std::byte raw[sizeof(barrier_t)];
+  alignas(barrier_t) __shared__ hip::std::byte raw[sizeof(barrier_t)];
 
   test_default_init_and_init(bar);
   test_placement_new<Scope>(raw);
