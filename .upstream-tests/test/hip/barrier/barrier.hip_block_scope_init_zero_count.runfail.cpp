@@ -37,7 +37,7 @@
 __device__ int test()
 {
   using barrier_t = cuda::barrier<cuda::thread_scope_block>;
-  __shared__ alignas(barrier_t) char bar_storage[sizeof(barrier_t)];
+  alignas(barrier_t) __shared__ char bar_storage[sizeof(barrier_t)];
   barrier_t* bar = reinterpret_cast<barrier_t*>(bar_storage);
   __shared__ int result;
 

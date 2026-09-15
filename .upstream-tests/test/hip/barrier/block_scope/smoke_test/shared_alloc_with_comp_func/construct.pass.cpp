@@ -40,7 +40,7 @@ using barrier_t = hip::barrier<Scope, void (*)()>;
 
 __device__ void test()
 {
-  __shared__ alignas(barrier_t) hip::std::byte raw[3 * sizeof(barrier_t)];
+  alignas(barrier_t) __shared__ hip::std::byte raw[3 * sizeof(barrier_t)];
   auto * const bar = reinterpret_cast<barrier_t*>(raw + sizeof(barrier_t));
   auto * const zero = reinterpret_cast<barrier_t*>(raw + 2 * sizeof(barrier_t));
 

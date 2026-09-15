@@ -48,7 +48,7 @@ __device__ void kernel(int /*gpuIndex*/, int* pErrCode)
   int const k_wave_size   = get_wavefront_size();
   int const k_n_threads   = k_n_waves * k_wave_size;
 
-  __shared__ alignas(barrier_t) hip::std::byte bar_raw[sizeof(barrier_t)];
+  alignas(barrier_t) __shared__ hip::std::byte bar_raw[sizeof(barrier_t)];
   auto* bar = reinterpret_cast<barrier_t*>(bar_raw);
   extern __shared__ int payload[];
 
