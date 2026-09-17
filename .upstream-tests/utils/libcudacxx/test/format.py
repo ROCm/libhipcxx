@@ -101,7 +101,7 @@ class LibcxxTestFormat(object):
             ),
             IntegratedTestKeywordParser(
                 "ADDITIONAL_COMPILE_FLAGS:", ParserKind.LIST, initial_value=[]
-            ), 
+            ),
         ]
 
     @staticmethod

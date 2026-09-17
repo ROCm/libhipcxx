@@ -35,7 +35,7 @@
 //   expected_sum - data[0] value after reduction (typically 2 * n_threads).
 //
 // Each inter-wave phase: data[tid] += data[tid + active_threads], upper half drops.
-// Final intra-wave phase folds within the surviving wave (no barrier needed).
+// Final intra-wave phase folds within the surviving wave with wave synchronization.
 
 #ifndef LIBHIPCXX_BARRIER_FUNCTIONAL_ARRIVE_AND_DROP_REDUCE_IMPL_H
 #define LIBHIPCXX_BARRIER_FUNCTIONAL_ARRIVE_AND_DROP_REDUCE_IMPL_H
@@ -74,9 +74,9 @@ __host__ __device__ void test_arrive_and_drop_reduce(
     bar.arrive_and_wait();
   }
 
-  // No need for sync because all threads in a wave are in lock-step
   for (int half = wave_size; half > 0; half /= 2)
   {
+    __syncwarp();
     if (thread_id < half)
     {
       data[thread_id] += data[thread_id + half];
@@ -84,6 +84,7 @@ __host__ __device__ void test_arrive_and_drop_reduce(
   }
 
   // One wave remains. Thread 0 checks the accumulated sum.
+  __syncwarp();
   if (thread_id == 0)
   {
     recordIfNeq(data[0], expected_sum, 1, pErrCode);

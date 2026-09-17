@@ -73,6 +73,7 @@ __device__ int copy_and_consume()
   cuda::memcpy_async(
     dest, g_src, cuda::aligned_size_t<16>(sizeof(dest)), bar);
 
+  // Independent work that does not read dest may run here.
   bar.arrive_and_wait();
 
   for (int index = 0; index < k_count; ++index) {

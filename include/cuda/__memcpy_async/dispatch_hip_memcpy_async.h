@@ -1,17 +1,6 @@
-// -*- C++ -*-
-//===----------------------------------------------------------------------===//
-//
-// Part of libcu++, the C++ Standard Library for your entire system,
-// under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-// SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES.
-//
-//===----------------------------------------------------------------------===//
-
 // MIT License
 //
-// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2026 Advanced Micro Devices, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +36,11 @@
 #include <cuda/__barrier/barrier_hip_config.h>
 
 #if defined(__HIP_DEVICE_COMPILE__) && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
-#  include <hip/amd_detail/amd_hip_cooperative_groups_memcpy.h> //(HIP/AMD TODO): update once dependent PR lands
+// Only HIP device builds with LDS phase-object barriers compile the accelerated
+// cooperative-group copy helpers below. Other group copies use the generic
+// fallback and do not require this header. TODO(HIP/AMD): update this include
+// when the corresponding HIP cooperative-groups integration lands.
+#  include <hip/amd_detail/amd_hip_cooperative_groups_memcpy.h>
 #endif
 #include <cuda/__memcpy_async/completion_mechanism.h>
 #include <cuda/__memcpy_async/cp_async_fallback.h>

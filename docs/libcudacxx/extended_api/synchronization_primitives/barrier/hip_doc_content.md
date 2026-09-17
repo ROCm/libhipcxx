@@ -28,9 +28,9 @@ As with the rest of libhipcxx, the main goal of `hip::barrier` is to maintain pa
 The purpose of this document is to highlight where HIP differs from CUDA and to explain common development and porting pitfalls to watch out for.
 
 ## Overview
-`hip::barrier` is a synchronization primitive used to coordinate selected groups of threads and synchronize memory operations across specified scopes. It implements split barrier semantics, meaning a thread can arrive and continue performing unrelated work up to it's wait call that guards some sensitive resource, unlike `__syncthreads` which block immediately. `hip::barrier` makes two important guarantees when barrier::wait() returns:
-1. All threads participating in the barrier have completed their barrier::arrive().
-2. All writes by participating threads sequenced before barrier::arrive() at the specified barrier scope (and smaller [see LLVM AMDGPU Backend Sync Scopes](https://llvm.org/docs/AMDGPUUsage.html#amdgpu-amdhsa-llvm-sync-scopes-table)) are visible to all threads participating in the barrier.
+`hip::barrier` is a synchronization primitive used to coordinate selected groups of threads and synchronize memory operations across specified scopes. It implements split barrier semantics, meaning a thread can arrive and continue performing unrelated work up to its wait call that guards some sensitive resource, unlike `__syncthreads` which blocks immediately. `hip::barrier` makes two important guarantees when `barrier::wait()` returns:
+1. All threads participating in the barrier have completed their `barrier::arrive()`.
+2. All writes by participating threads sequenced before `barrier::arrive()` at the specified barrier scope (and smaller [see LLVM AMDGPU Backend Sync Scopes](https://llvm.org/docs/AMDGPUUsage.html#amdgpu-amdhsa-llvm-sync-scopes-table)) are visible to all threads participating in the barrier.
 
 ### Initialization
 `hip::barrier` is default-constructed and must be initialized via the `init()` function before any other use. The barrier must be visible to all participants before it is used, which requires a synchronization after initialization. At block scope, a simple `__syncthreads()` suffices, but for consistency across multiple scopes we recommend using [cooperative_groups'](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/hip_runtime_api/modules/cooperative_groups_reference.html#cooperative-groups) `cooperative_groups::thread_group::sync()` with the appropriate `cooperative_groups::thread_group` subtype where possible. This provides safety guarantees that are hazardous to implement by hand at larger scopes, but does require launching your kernel via the proper [cooperative kernel launch function](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/hip_runtime_api/modules/cooperative_groups_reference.html#cooperative-kernel-launches).
@@ -126,15 +126,16 @@ __device__ void exampleBlockReduceKernel(int* output)
     }
   }
 
-  // No need for sync because all threads in a wave are in lock-step
   for (int half = WAVE_SIZE / 2; half > 0; half /= 2)
   {
+    __syncwarp();
     if (tid < half)
     {
       lds[tid] += lds[tid + half];
     }
   }
 
+  __syncwarp();
   if (block.thread_rank() == 0)
   {
     output[0] = lds[0];

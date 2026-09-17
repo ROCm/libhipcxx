@@ -1,16 +1,6 @@
-//===----------------------------------------------------------------------===//
-//
-// Part of libcu++, the C++ Standard Library for your entire system,
-// under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-// SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES.
-//
-//===----------------------------------------------------------------------===//
-
 // MIT License
 //
-// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2026 Advanced Micro Devices, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,14 +74,6 @@ struct __memcpy_completion_impl
 
     switch (__cm)
     {
-      case __completion_mechanism::__async_group:
-      {
-          (void) __group;
-          // Track one completion event for this caller's queued async copy work.
-          ::cuda::__add_tx_expectation(__barrier, 1);
-          __barrier.__async_arrive_tx();
-          return async_contract_fulfillment::async;
-      }
       case __completion_mechanism::__async_bulk_group:
       {
         // This completion mechanism should not be used with a shared
