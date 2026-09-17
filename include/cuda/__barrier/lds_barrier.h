@@ -47,11 +47,6 @@
 
 _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 
-#if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
-extern "C" _CCCL_DEVICE void llvm_amdgcn_s_wait_dscnt(unsigned short)
-  __asm("llvm.amdgcn.s.wait.dscnt");
-#endif // _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
-
 /// @brief AMD LDS barrier helper with bitfield layout
 ///
 /// 64-bit packed word matching AMD LDS barrier hardware layout:
@@ -98,9 +93,9 @@ struct alignas(8) __lds_barrier_t
     return (__attribute__((address_space(3))) _CUDA_VSTD::uint64_t*)(&value);
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE __attribute__((address_space(3))) _CUDA_VSTD::uint64_t* __lds_word_ptr() const
+  _CCCL_FORCEINLINE _CCCL_DEVICE __attribute__((address_space(3))) const _CUDA_VSTD::uint64_t* __lds_word_ptr() const
   {
-    return (__attribute__((address_space(3))) _CUDA_VSTD::uint64_t*)(&const_cast<__lds_barrier_t*>(this)->value);
+    return (__attribute__((address_space(3))) const _CUDA_VSTD::uint64_t*)(&value);
   }
 
   _CCCL_FORCEINLINE _CCCL_DEVICE static _CUDA_VSTD::uint64_t __phase_from_value(_CUDA_VSTD::uint64_t __value)
@@ -128,11 +123,10 @@ struct alignas(8) __lds_barrier_t
     }
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE _CUDA_VSTD::uint64_t __arrive_rtn(_CUDA_VSTD::uint32_t __update) const
+  _CCCL_FORCEINLINE _CCCL_DEVICE _CUDA_VSTD::uint64_t __arrive_rtn(_CUDA_VSTD::uint32_t __update)
   {
     _CUDA_VSTD::uint64_t __old = __builtin_amdgcn_ds_atomic_barrier_arrive_rtn_b64(
       reinterpret_cast<__attribute__((address_space(3))) long*>(__lds_word_ptr()), __update);
-    llvm_amdgcn_s_wait_dscnt(0);
     return __old;
   }
 
@@ -153,14 +147,12 @@ struct alignas(8) __lds_barrier_t
     __lds_barrier_t __increment = {};
     __increment.pending_count = __count;
     __scoped_atomic_fetch_add(__lds_word_ptr(), __increment.value, __ATOMIC_RELAXED, __MEMORY_SCOPE_WRKGRP);
-    llvm_amdgcn_s_wait_dscnt(0);
   }
 
   _CCCL_FORCEINLINE _CCCL_DEVICE void __decrement_init_count()
   {
     constexpr _CUDA_VSTD::uint64_t __drop_expected_update = ~((_CUDA_VSTD::uint64_t{1} << 32) - 1);
     __scoped_atomic_fetch_add(__lds_word_ptr(), __drop_expected_update, __ATOMIC_RELAXED, __MEMORY_SCOPE_WRKGRP);
-    llvm_amdgcn_s_wait_dscnt(0);
   }
 
   _CCCL_FORCEINLINE _CCCL_DEVICE void __async_arrive()

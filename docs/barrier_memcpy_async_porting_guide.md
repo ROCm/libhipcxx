@@ -34,7 +34,7 @@ The [HIP barrier API guide](../include/cuda/__barrier/hip_doc_content.md) and
 define the detailed API and copy-completion behavior. This document maps CUDA
 source shapes to the HIP surface. `Supported` means the public call is available
 with the stated ordering contract. `Unsupported` means it is not exposed by the
-HIP public headers.
+libhipcxx public headers.
 
 ## Quick Rules
 
