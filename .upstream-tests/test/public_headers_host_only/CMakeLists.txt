@@ -41,6 +41,7 @@ endif()
 function(libcudacxx_add_std_header_test header)
   # ${header} contains the "/" from the subfolder, replace by "_" for actual names
   string(REPLACE "/" "_" header_name "${header}")
+  libhipcxx_headertest_name(header_name "${header}" "${header_name}")
 
   # NOTE(HIP/AMD): Skip unsupported headers for AMD devices (no support as of November 2025).
   string(REGEX MATCH "ptx|barrier|latch|semaphore|annotated_ptr|pipeline|memcpy_async" match "${header}")

@@ -50,6 +50,7 @@ endforeach()
 function(libcudacxx_add_public_header_test header)
   # ${header} contains the "/" from the subfolder, replace by "_" for actual names
   string(REPLACE "/" "_" header_name "${header}")
+  libhipcxx_headertest_name(header_name "${header}" "${header_name}")
 
   # Create the source file for the header target from the template and add the file to the global project
   set(headertest_src "headers/${header_name}")

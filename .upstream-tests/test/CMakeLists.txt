@@ -328,6 +328,8 @@ else()
   set(headertest_warning_levels_host -Wall -Werror)
 endif()
 
+include(LibhipcxxHeaderTestPaths)
+
 # Libcudacxx auto-generated internal header tests
 add_subdirectory(internal_headers)
 
