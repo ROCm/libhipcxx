@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,30 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-.. _libcudacxx-contributing:
+.. meta::
+  :description: libhipcxx conformance and ABI evolution
+  :keywords: libhipcxx, ROCm, HIP, conformance, ABI, versioning, C++ standard
 
-Contributing
-============
+.. _libhipcxx-conformance:
 
-.. toctree::
-   :maxdepth: 1
+********************************************************************
+Conformance and ABI evolution
+********************************************************************
 
-   contributing/code_of_conduct
+Conformance
+===========
 
-We welcome contributions - just send us a pull request!
+libhipcxx aims to be a conforming implementation of the C++ Standard,
+`ISO/IEC IS 14882 <https://eel.is/c++draft>`_, Clause 16 through 32.
 
-libhipcxx uses the `Apache License v2.0 with LLVM Exceptions <https://llvm.org/LICENSE.txt>`_.
+ABI evolution
+=============
+
+libhipcxx does not maintain long-term ABI stability. Promising long-term ABI stability would prevent
+fixing mistakes and providing best in class performance, so no such promises are made.
+
+The ABI is broken at every major release. The life cycle of an ABI version is approximately one
+year, and long-term support for an ABI version ends after approximately two years.
+
+The latest ABI version is always the default. For the ABI version associated with each release, see
+the :ref:`releases <libcudacxx-releases>` section.

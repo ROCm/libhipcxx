@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -25,13 +25,13 @@
 
 .. START_OVERVIEW
 
-libhip++:
-=========
+libhipcxx: The C++ Standard Library for Your Entire System
+==========================================================
 
-``libhip++`` (``libhipcxx``) provides fundamental, idiomatic C++ abstractions that aim to make the lives of HIP C++
+``libhipcxx`` (``libhipcxx``) provides fundamental, idiomatic C++ abstractions that aim to make the lives of HIP C++
 developers easier. Libhipcxx is derived from libcudacxx and aims to support the same APIs on AMD GPUs.
 
-Specifically, ``libhip++`` provides:
+Specifically, ``libhipcxx`` provides:
 
    - C++ Standard Library features useable in both host and device code
    - Extensions to C++ Standard Library features
@@ -55,7 +55,7 @@ By default, these abstractions aren't available when writing HIP C++ device code
 ``__host__ __device__`` decorators, and their implementation may not be suitable for using in and across host and device
 code.
 
-libhip++ aims to solve this problem by providing an opt-in, incremental, heterogeneous implementation of C++
+libhipcxx aims to solve this problem by providing an opt-in, incremental, heterogeneous implementation of C++
 Standard Library features:
 
    1. **Opt-in**: It does not replace the Standard Library provided by your host compiler (aka anything in ``std::``)
@@ -63,7 +63,7 @@ Standard Library features:
    3. **Heterogeneous**: It works in both host and device code, as well as passing between host and device code.
 
 If you know how to use things like the ``<atomic>`` or ``<type_traits>`` headers from the C++ Standard Library, then
-you know how to use libhip++.
+you know how to use libhipcxx.
 
 All you have to do is add ``cuda/std/`` to the start of your includes and ``cuda::`` before any uses of ``std::``:
 
@@ -75,19 +75,19 @@ All you have to do is add ``cuda/std/`` to the start of your includes and ``cuda
 ..
     .. note::
 
-    libhip++ does not provide its own documentation for Standard Library features. Instead, libhip++
+    libhipcxx does not provide its own documentation for Standard Library features. Instead, libhipcxx
     :ref:`documents which Standard Library headers <libhipcxx-standard-api>` are made available, and defers documentation of
     individual features within those headers to other sources like `cppreference <https://en.cppreference.com/w/>`_.
 
 C++ Standard Library Extensions
 -------------------------------
 
-libhip++ provides HIP C++ developers with familiar Standard Library utilities to improve productivity and flatten the
+libhipcxx provides HIP C++ developers with familiar Standard Library utilities to improve productivity and flatten the
 learning curve of learning HIP. However, there are many aspects of writing high-performance HIP C++ code that cannot
-be expressed through purely Standard conforming APIs. For these cases, libhip++ also provides *extensions* of Standard
+be expressed through purely Standard conforming APIs. For these cases, libhipcxx also provides *extensions* of Standard
 Library utilities.
 
-For example, libhip++ extends ``atomic<T>`` and other synchronization primitives with the notion of a “thread scope”
+For example, libhipcxx extends ``atomic<T>`` and other synchronization primitives with the notion of a “thread scope”
 that controls the strength of the memory fence.
 
 To use utilities that are extensions to Standard Library features, drop the ``std``:
@@ -103,7 +103,7 @@ To use utilities that are extensions to Standard Library features, drop the ``st
 Fundamental HIP-specific Abstractions
 --------------------------------------
 
-Some abstractions that libhip++ provide have no equivalent in the C++ Standard Library, but are otherwise abstractions
+Some abstractions that libhipcxx provide have no equivalent in the C++ Standard Library, but are otherwise abstractions
 fundamental to the HIP C++ programming model.
 
 ..
@@ -120,10 +120,10 @@ Instead of using ``cuda::`` and ``cuda::std::`` it is also possible to use ``hip
 Both include variants (via ``hip`` or ``cuda``) can be used interchangeably.
 
 Summary: ``std::``, ``cuda::``/ ``hip::`` and ``cuda::std::``/ ``hip::std::``
---------------------------------------------------
+-----------------------------------------------------------------------------
 
 -  ``std::`` / ``<*>``: This is your host compiler's Standard Library that works in ``__host__`` code only.
-   libhip++ does not replace or interfere with host compiler's Standard Library.
+   libhipcxx does not replace or interfere with host compiler's Standard Library.
 -  ``cuda::std::`` / ``hip::std::`` / ``<cuda/std/*>`` / ``<hip/std/*>``: Conforming implementations of facilities from the Standard Library that work in
    ``__host__`` and  ``__device__`` code.
 -  ``cuda::`` / ``hip::`` / ``<cuda/*>`` / ``<hip/*>``: Conforming extensions to the Standard Library that work in ``__host__`` and ``__device__`` code.
@@ -185,19 +185,19 @@ PTX API                                    `<cuda/ptx>`            The `cuda::pt
 Licensing
 ---------
 
-libhip++ is an open source project developed on `GitHub <https://github.com/ROCm/libhipcxx>`_. It is derived from `libcudacxx <https://github.com/nvidia/cccl>`_ and
+libhipcxx is an open source project developed on `GitHub <https://github.com/ROCm/libhipcxx>`_. It is derived from `libcudacxx <https://github.com/nvidia/cccl>`_ and
 `LLVM's libc++ <https://libcxx.llvm.org>`_. The original `libcudacxx <https://github.com/nvidia/cccl>`_ and `LLVM's libc++ <https://libcxx.llvm.org>`_ are distributed under the Apache License v2.0 with LLVM Exceptions. Any new files and modifications made to existing files by AMD are distributed under MIT.
 
 Conformance
 -----------
 
-libhip++ aims to be a conforming implementation of the C++ Standard, `ISO/IEC IS 14882 <https://eel.is/c++draft>`_,
+libhipcxx aims to be a conforming implementation of the C++ Standard, `ISO/IEC IS 14882 <https://eel.is/c++draft>`_,
 Clause 16 through 32.
 
 ABI Evolution
 -------------
 
-libhip++ does not maintain long-term ABI stability. Promising long-term ABI stability would prevent us from fixing
+libhipcxx does not maintain long-term ABI stability. Promising long-term ABI stability would prevent us from fixing
 mistakes and providing best in class performance. So, we make no such promises.
 
 Every major release, the ABI will be broken. The life cycle of an ABI version is approximately one year.
@@ -284,7 +284,7 @@ systems:
 Build and Test Requirements
 ---------------------------
 
-To build and test libhip++ yourself, you will need the following in
+To build and test libhipcxx yourself, you will need the following in
 addition to the usage requirements:
 
 -  `CMake <https://cmake.org>`_ >=3.12.
@@ -302,13 +302,13 @@ addition to the usage requirements:
 
 .. START_GETTING
 
-Getting libhip++
-================
+Getting libhipcxx
+=================
 
 GitHub
 ------
 
-libhip++ is an open source project developed on GitHub, which is where
+libhipcxx is an open source project developed on GitHub, which is where
 you'll find the latest versions and the development branch. Our GitHub
 repository is `github.com/ROCm/libhipcxx <https://github.com/ROCm/libhipcxx>`_.
 

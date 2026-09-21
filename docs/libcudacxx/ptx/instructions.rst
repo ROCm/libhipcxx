@@ -1,3 +1,26 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
 .. _libcudacxx-ptx-instructions:
 
 PTX Instructions
@@ -62,7 +85,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `sad <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#integer-arithmetic-instructions-sad>`__
      - No
    * - `div <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#integer-arithmetic-instructions-div>`__
@@ -105,7 +128,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `add.cc <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#extended-precision-arithmetic-instructions-add-cc>`__
      - No
    * - `addc <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#extended-precision-arithmetic-instructions-addc>`__
@@ -124,7 +147,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `testp <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#floating-point-instructions-testp>`__
      - No
    * - `copysign <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#floating-point-instructions-copysign>`__
@@ -175,7 +198,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `add <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#half-precision-floating-point-instructions-add>`__
      - No
    * - `sub <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#half-precision-floating-point-instructions-sub>`__
@@ -202,7 +225,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `set <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#comparison-and-selection-instructions-set>`__
      - No
    * - `setp <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#comparison-and-selection-instructions-setp>`__
@@ -217,7 +240,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `set <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#half-precision-comparison-instructions-set>`__
      - No
    * - `setp <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#half-precision-comparison-instructions-setp>`__
@@ -228,7 +251,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `and <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#logic-and-shift-instructions-and>`__
      - No
    * - `or <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#logic-and-shift-instructions-or>`__
@@ -253,7 +276,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `mov <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-mov-2>`__
      - No
    * - `shfl <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-shfl-deprecated>`__
@@ -302,7 +325,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `cp.async <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async>`__
      - No
    * - `cp.async.commit_group <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-cp-async-commit-group>`__
@@ -333,7 +356,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `tex <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#texture-instructions-tex>`__
      - No
    * - `tld4 <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#texture-instructions-tld4>`__
@@ -348,7 +371,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `suld <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#surface-instructions-suld>`__
      - No
    * - `sust <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#surface-instructions-sust>`__
@@ -363,7 +386,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `{} <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#control-flow-instructions-curly-braces>`__
      - No
    * - `@ <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#control-flow-instructions-at>`__
@@ -384,7 +407,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `bar, barrier <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-bar-barrier>`__
      - No
    * - `bar.warp.sync <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-bar-warp-sync>`__
@@ -421,7 +444,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - :ref:`mbarrier.init <libcudacxx-ptx-instructions-mbarrier-init>`
      - CCCL 2.5.0 / CUDA Future
    * - `mbarrier.inval <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-mbarrier-inval>`__
@@ -456,7 +479,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `wmma.load <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#warp-level-matrix-load-instruction-wmma-load>`__
      - No
    * - `wmma.store <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#warp-level-matrix-store-instruction-wmma-store>`__
@@ -479,7 +502,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `wgmma.mma_async <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#asynchronous-multiply-and-accumulate-instruction-wgmma-mma-async>`__
      - No
    * - `wgmma.mma_async.sp <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#asynchronous-multiply-and-accumulate-instruction-wgmma-mma-async-sp>`__
@@ -496,7 +519,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `tcgen05.alloc <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tensorcore-5th-generation-instructions-tcgen05-alloc-tcgen05-dealloc-tcgen05-relinquish-alloc-permit>`__
      - CCCL 2.8 / CUDA 12.9
    * - `tcgen05.commit <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tensorcore-5th-generation-instructions-tcgen05-alloc-tcgen05-commit>`__
@@ -524,7 +547,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `stacksave <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#stack-manipulation-instructions-stacksave>`__
      - No
    * - `stackrestore <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#stack-manipulation-instructions-stackrestore>`__
@@ -537,7 +560,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `vadd, vsub, vabsdiff, vmin, vmax <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#scalar-video-instructions-vadd-vsub-vabsdiff-vmin-vmax>`__
      - No
    * - `vshl, vshr <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#scalar-video-instructions-vshl-vshr>`__
@@ -552,7 +575,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `vadd2, vsub2, vavrg2, vabsdiff2, vmin2, vmax2 <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#simd-video-instructions-vadd2-vsub2-vavrg2-vabsdiff2-vmin2-vmax2>`__
      - No
    * - `vset2 <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#simd-video-instructions-vset2>`__
@@ -567,7 +590,7 @@ Instructions by section
    :header-rows: 1
 
    * - Instruction
-     - Available in libcu++
+     - Available in libhipcxx
    * - `brkpt <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#miscellaneous-instructions-brkpt>`__
      - No
    * - `nanosleep <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#miscellaneous-instructions-nanosleep>`__
@@ -586,7 +609,7 @@ Instructions by section
    * - Instruction
      - PTX ISA
      - SM Version
-     - Available in libcu++
+     - Available in libhipcxx
    * - `tid <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#special-registers-tid>`__
      - 20
      - All

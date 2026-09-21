@@ -1,3 +1,26 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
 .. _libcudacxx-extended-api-memory-resources-properties:
 
 Properties
@@ -37,7 +60,7 @@ If C++20 is not available, the function can instead be constrained via SFINAE
    template<class MemoryResource, class = cuda::std::enable_if_t<cuda::has_property<MemoryResource, cuda::mr::device_accessible>>>
    void function_that_dispatches_to_device(MemoryResource& resource);
 
-For now, libcu++ provides various commonly used properties:
+For now, libhipcxx provides various commonly used properties:
 
 -  ``cuda::mr::device_accessible`` and ``cuda::mr::host_accessible`` indicate whether memory allocated using a
    memory resource is accessible from host or device respectively.
@@ -45,7 +68,7 @@ For now, libcu++ provides various commonly used properties:
 More properties may be added as the library and the hardware capabilities evolve. However, a user library is free to
 define custom properties.
 
-Note that currently the libcu++ provided properties are stateless. However, properties can also provide stateful
+Note that currently the libhipcxx provided properties are stateless. However, properties can also provide stateful
 information that is retrieved via the ``get_property`` free function. In order to communicate the desired type of the
 carried state, a stateful property must define the ``value_type`` alias. A library can constrain interfaces that
 require a stateful property with ``cuda::has_property_with`` as shown in the example below

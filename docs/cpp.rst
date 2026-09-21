@@ -1,3 +1,26 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
 .. _cccl-cpp-libraries:
 
 CUDA C++ Core Libraries
@@ -7,7 +30,7 @@ CUDA C++ Core Libraries
    :hidden:
    :maxdepth: 3
 
-   libcu++ <https://nvidia.github.io/cccl/libcudacxx/>
+   libhipcxx <https://nvidia.github.io/cccl/libhipcxx/>
    CUB <https://nvidia.github.io/cccl/cub/>
    Thrust <https://nvidia.github.io/cccl/thrust/>
    Cuda Experimental <https://nvidia.github.io/cccl/cudax/>
@@ -15,13 +38,13 @@ CUDA C++ Core Libraries
 Welcome to the CUDA Core Compute Libraries (CCCL) libraries for C++.
 
 The concept for the  CCCL C++ librarires grew organically out of the Thrust,
-CUB, and libcudacxx projects that were developed independently over the years
+CUB, and libhipcxx projects that were developed independently over the years
 with a similar goal: to provide high-quality, high-performance, and
 easy-to-use C++ abstractions for CUDA developers. Naturally, there was a lot
 of overlap among the three projects, and it became clear the community would
 be better served by unifying them into a single repository.
 
-- `libcu++ <https://nvidia.github.io/cccl/libcudacxx/>`__
+- `libhipcxx <https://nvidia.github.io/cccl/libhipcxx/>`__
   is the CUDA C++ Standard Library. It provides an implementation of the C++
   Standard Library that works in both host and device code. Additionally, it
   provides abstractions for CUDA-specific hardware features like

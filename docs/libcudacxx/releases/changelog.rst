@@ -1,15 +1,38 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
 .. _libcudacxx-releases-changelog:
 
 Changelog
 =========
 
-libcu++ 2.1.0
--------------
+libhipcxx 2.1.0
+---------------
 
 Adds ``<cuda/std/span>``, ``<cuda/std/mdspan>``, and
-``<cuda/std/concepts>`` to libcu++.
+``<cuda/std/concepts>`` to libhipcxx.
 
-We are excited to announce the release of libcudacxx 2.1. While there
+We are excited to announce the release of libhipcxx 2.1. While there
 are no breaking changes in this release, we are increasing the semantic
 major version to better synchronize our release versions with
 `Thrust <https://github.com/NVIDIA/thrust>`_ and
@@ -68,7 +91,7 @@ Issues Fixed
 -  #330: Modularize ``<iterator>``.
 -  #345: Fix warning about unqualified move.
 -  #342: Silence deprecation and attribute warnings when building
-   libcu++.
+   libhipcxx.
 -  #344: Remove invalid qualification of ``initializer_list``.
 -  #347: Fix errors in atomic with small aggregates and enum classes.
 -  #352: Make lerp usable on device.
@@ -101,8 +124,8 @@ Issues Fixed
 -  #384: Move the ``unused`` helper function into ``test_macros.h``.
 -  #391: Fix issues in mdspan found on MSVC.
 
-libcu++ 1.9.0
--------------
+libhipcxx 1.9.0
+---------------
 
 Adds ``float`` and ``double`` support to ``cuda::std::atomic`` and
 ``cuda::atomic``. This release also adds workflows for contributors
@@ -156,10 +179,10 @@ Issues Fixed
 -  #304: Fix ``<chrono>`` and ``<atomic>`` build errors with clang-cuda.
 -  #324: Also disable tests on ``windows && pre-sm-70``.
 
-libcu++ 1.8.1
--------------
+libhipcxx 1.8.1
+---------------
 
-libcu++ 1.8.1 is a minor release. It fixes minor issues in source,
+libhipcxx 1.8.1 is a minor release. It fixes minor issues in source,
 tests, and documentation.
 
 Supported ABI Versions: 4 (default), 3, and 2.
@@ -170,7 +193,7 @@ Issues Fixed
 ~~~~~~~~~~~~
 
 -  #268: Remove NVIDIA internal paths from CMake includes.
--  #265: Move pipeline into libcudacxx. Previously was a separate CTK
+-  #265: Move pipeline into libhipcxx. Previously was a separate CTK
    component.
 -  #264: Fix builds using NVHPC by adding a new line.
 
@@ -190,15 +213,15 @@ Issues Fixed
    -  Thanks Bradley Dice for this contribution.
 
 -  #259: Add system_header pragma to portions of
--  #249: Documentation update for building libcudacxx.
+-  #249: Documentation update for building libhipcxx.
 -  #247: Update godbolt links in examples.
 
    -  Thanks Asher Mancinelli for this contribution.
 
-libcu++ 1.8.0
--------------
+libhipcxx 1.8.0
+---------------
 
-libcu++ 1.8.0 is a major release. It adds several ``constexpr`` bit
+libhipcxx 1.8.0 is a major release. It adds several ``constexpr`` bit
 manipulation functions from C++20's ``<bit>`` to C++11 and up. Also
 added is ``cuda::std::array`` providing fixed size arrays and iterators
 for both host and device code.
@@ -224,7 +247,7 @@ Issues Fixed
 
    -  Thanks Royil Damer for this contribution.
 
--  #241: Fix octal notation of libcudacxx version number.
+-  #241: Fix octal notation of libhipcxx version number.
 -  #242: Add support for ``find_package`` and ``add_subdirectory`` in
    CMake.
 -  #244: Merge build system improvements from NVC++ branch.
@@ -238,10 +261,10 @@ Issues Fixed
    Clang 13.
 -  #256: Fix SM detection in the ``perform_tests`` script.
 
-libcu++ 1.7.0
--------------
+libhipcxx 1.7.0
+---------------
 
-libcu++ 1.7.0 is a major release. It adds ``cuda::std::atomic_ref`` for
+libhipcxx 1.7.0 is a major release. It adds ``cuda::std::atomic_ref`` for
 integral types. ``cuda::std::atomic_ref`` may potentially replace uses
 of CUDA specific ``atomicOperator(_Scope)`` calls and provides a
 singular API for host and device code.
@@ -287,10 +310,10 @@ Issues Fixed
 -  #219: Change ``atomic/atomic_ref`` ctors to prevent copy
    construction.
 
-libcu++ 1.6.0 (CUDA Toolkit 11.5)
----------------------------------
+libhipcxx 1.6.0 (CUDA Toolkit 11.5)
+-----------------------------------
 
-libcu++ 1.6.0 is a major release. It changes the default alignment of
+libhipcxx 1.6.0 is a major release. It changes the default alignment of
 ``cuda::std::complex`` for better code generation and changes
 ``cuda::std::atomic`` to use ``<nv/target>`` as the primary dispatch
 mechanism.
@@ -338,10 +361,10 @@ Issues Fixed
 
    -  Thanks to Royil Damer for this contribution.
 
-libcu++ 1.5.0 (CUDA Toolkit 11.4)
----------------------------------
+libhipcxx 1.5.0 (CUDA Toolkit 11.4)
+-----------------------------------
 
-libcu++ 1.5.0 is a major release. It adds ``<nv/target>``, the library
+libhipcxx 1.5.0 is a major release. It adds ``<nv/target>``, the library
 support header for the new ``if target`` target specialization
 mechanism.
 
@@ -362,16 +385,16 @@ New Features
 Issues Fixed
 ~~~~~~~~~~~~
 
--  `Documentation <https://nvidia.github.io/libcudacxx>`_: Several typo
+-  `Documentation <https://nvidia.github.io/libhipcxx>`_: Several typo
    fixes.
 -  #126: Compiler warnings in .
 
    -  Thanks to anstellaire for this contribution.
 
-libcu++ 1.4.1 (CUDA Toolkit 11.3)
----------------------------------
+libhipcxx 1.4.1 (CUDA Toolkit 11.3)
+-----------------------------------
 
-libcu++ 1.4.1 is a minor bugfix release.
+libhipcxx 1.4.1 is a minor bugfix release.
 
 Supported ABI versions: 3 (default) and 2.
 
@@ -380,7 +403,7 @@ Included in: CUDA Toolkit 11.3.
 Other Enhancements
 ~~~~~~~~~~~~~~~~~~
 
--  `Documentation <https://nvidia.github.io/libcudacxx>`_: Several
+-  `Documentation <https://nvidia.github.io/libhipcxx>`_: Several
    enhancements and fixed a few broken links.
 -  #108: Added ``constexpr`` to synchronization object constructors.
 
@@ -397,10 +420,10 @@ Issues Fixed
 -  #118: Renamed ``__is_convertible``, which NVCC treats as a context
    sensitive keyword.
 
-libcu++ 1.4.0
--------------
+libhipcxx 1.4.0
+---------------
 
-libcu++ 1.4.0 adds ``<cuda/std/complex>``, NVCC + MSVC support for
+libhipcxx 1.4.0 adds ``<cuda/std/complex>``, NVCC + MSVC support for
 ``<cuda/std/tuple>``, and backports of C++20 ``<cuda/std/chrono>`` and
 C++17 ``<cuda/std/type_traits>`` features to C++14.
 
@@ -438,12 +461,12 @@ New Features
 Other Enhancements
 ~~~~~~~~~~~~~~~~~~
 
--  `Documentation <https://nvidia.github.io/libcudacxx>`_ has been
+-  `Documentation <https://nvidia.github.io/libhipcxx>`_ has been
    improved and reorganized.
 -  #43: Atomics on MSVC have been decoupled from host Standard Library.
 -  #78: Fixed header licensing.
 -  #31: Revamped `examples and
-   benchmarks <https://github.com/NVIDIA/libcudacxx/tree/main/examples>`_.
+   benchmarks <https://github.com/NVIDIA/libhipcxx/tree/main/examples>`_.
 
    -  Thanks to Jake Hemstad for this contribution.
 
@@ -464,12 +487,12 @@ Issues Fixed
 
    -  Thanks to Jake Hemstad and Paul Taylor for this contribution.
 
-libcu++ 1.3.0 (CUDA Toolkit 11.2)
----------------------------------
+libhipcxx 1.3.0 (CUDA Toolkit 11.2)
+-----------------------------------
 
-libcu++ 1.3.0 adds ``<cuda/std/tuple>`` and ``cuda::std::pair``,
+libhipcxx 1.3.0 adds ``<cuda/std/tuple>`` and ``cuda::std::pair``,
 although they are not supported with NVCC + MSVC. It also adds
-`documentation <https://nvidia.github.io/libcudacxx>`_.
+`documentation <https://nvidia.github.io/libhipcxx>`_.
 
 Supported ABI versions: 3 (default) and 2.
 
@@ -491,7 +514,7 @@ New Features
 Other Enhancements
 ~~~~~~~~~~~~~~~~~~
 
--  `Documentation <https://nvidia.github.io/libcudacxx>`_.
+-  `Documentation <https://nvidia.github.io/libhipcxx>`_.
 
 .. _issues-fixed-9:
 
@@ -504,10 +527,10 @@ Issues Fixed
    which have inconsistent qualifiers. Thanks to Gonzalo Brito Gadeschi
    for this contribution.
 
-libcu++ 1.2.0 (CUDA Toolkit 11.1)
----------------------------------
+libhipcxx 1.2.0 (CUDA Toolkit 11.1)
+-----------------------------------
 
-libcu++ 1.2.0 adds ``<cuda/pipeline>``/``cuda::pipeline``, a facility
+libhipcxx 1.2.0 adds ``<cuda/pipeline>``/``cuda::pipeline``, a facility
 for coordinating ``cuda::memcpy_async`` operations. This release
 introduces ABI version 3, which is now the default.
 
@@ -521,7 +544,7 @@ ABI Breaking Changes
 -  ABI version 3 has been introduced and is now the default. A new ABI
    version was necessary to improve the performance of
    ``cuda::[std::]barrier`` by changing its alignment. Users may define
-   ``_LIBCUDACXX_CUDA_ABI_VERSION=2`` before including any libcu++ or
+   ``_LIBCUDACXX_CUDA_ABI_VERSION=2`` before including any libhipcxx or
    CUDA headers to use ABI version 2, which was the default for the
    1.1.0 / CUDA 11.0 release. Both ABI version 3 and ABI version 2 will
    be supported until the next major CUDA release.
@@ -556,10 +579,10 @@ Other Enhancements
 -  NVCC + GCC 10 support.
 -  NVCC + Clang 10 support.
 
-libcu++ 1.1.0 (CUDA Toolkit 11.0)
----------------------------------
+libhipcxx 1.1.0 (CUDA Toolkit 11.0)
+-----------------------------------
 
-libcu++ 1.1.0 introduces the world's first implementation of the
+libhipcxx 1.1.0 introduces the world's first implementation of the
 `Standard C++20 synchronization library <https://wg21.link/P1135>`_:
 ``<cuda/[std/]barrier>``, ``<cuda/std/latch>``,
 ``<cuda/std/semaphore>``, ``cuda::[std::]atomic_flag::test``,
@@ -630,10 +653,10 @@ Issues Fixed
 -  Made ``__cuda_memcmp`` inline to fix ODR violations when compiling
    multiple translation units.
 
-libcu++ 1.0.0 (CUDA Toolkit 10.2)
----------------------------------
+libhipcxx 1.0.0 (CUDA Toolkit 10.2)
+-----------------------------------
 
-libcu++ 1.0.0 is the first release of libcu++, the C++ Standard Library
+libhipcxx 1.0.0 is the first release of libhipcxx, the C++ Standard Library
 for your entire system. It brings C++ atomics to CUDA:
 ``<cuda/[std/]atomic>``. It also introduces ``<cuda/std/type_traits>``,
 ``<cuda/std/cassert>``, ``<cuda/std/cfloat>``, ``<cuda/std/cstddef>``,
@@ -667,6 +690,6 @@ Known Issues
 ~~~~~~~~~~~~
 
 -  Due to circumstances beyond our control, the NVIDIA-provided Debian
-   packages install libcu++ to the wrong path. This makes libcu++
+   packages install libhipcxx to the wrong path. This makes libhipcxx
    unusable if installed from the NVIDIA-provided Debian packages and
    may interfere with the operation of your host C++ Standard Library.

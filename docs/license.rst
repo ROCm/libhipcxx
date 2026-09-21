@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,16 +21,21 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
-.. _libcudacxx-contributing:
+.. meta::
+  :description: libhipcxx license
+  :keywords: libhipcxx, ROCm, license, Apache, MIT, LLVM exceptions
 
-Contributing
-============
+.. _libhipcxx-license:
 
-.. toctree::
-   :maxdepth: 1
+******************************************
+License
+******************************************
 
-   contributing/code_of_conduct
+libhipcxx is an open source project developed on `GitHub <https://github.com/ROCm/libhipcxx>`_. It
+is derived from `libcudacxx <https://github.com/NVIDIA/cccl>`_ and
+`LLVM's libc++ <https://libcxx.llvm.org>`_. The original libcudacxx and LLVM's libc++ are
+distributed under the Apache License v2.0 with LLVM Exceptions. Any new files and modifications made
+to existing files by AMD are distributed under the MIT license.
 
-We welcome contributions - just send us a pull request!
-
-libhipcxx uses the `Apache License v2.0 with LLVM Exceptions <https://llvm.org/LICENSE.txt>`_.
+.. include:: ../LICENSE.TXT
+  :literal:

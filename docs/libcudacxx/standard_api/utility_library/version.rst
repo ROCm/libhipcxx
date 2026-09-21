@@ -22,4 +22,4 @@ Restrictions
 ------------
 
 When using NVCC, the definition of C++ feature test macros is provided
-by the host Standard Library, not libcu++.
+by the host Standard Library, not libhipcxx.

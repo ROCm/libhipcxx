@@ -1,3 +1,26 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
 .. _libcudacxx-standard-api-utility:
 
 Utility Library
@@ -39,22 +62,22 @@ the information about the individual features for details.
      - CCCL 2.9.0 / CUDA 12.9
    * - :ref:`libcudacxx-standard-api-utility-memory`
      - Function objects and function wrappers
-     - libcu++ 1.1.0 / CCCL 2.0.0 / CUDA 11.2
+     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.2
    * - :ref:`libcudacxx-standard-api-utility-optional`
      - Optional value
      - CCCL 2.3.0 / CUDA 12.4
    * - :ref:`libcudacxx-standard-api-utility-tuple`
      - Fixed-sized heterogeneous container
-     - libcu++ 1.3.0 / CCCL 2.0.0 / CUDA 11.2
+     - libhipcxx 1.3.0 / CCCL 2.0.0 / CUDA 11.2
    * - :ref:`libcudacxx-standard-api-utility-type-traits`
      - Compile-time type introspection
-     - libcu++ 1.0.0 / CCCL 2.0.0 / CUDA 10.2
+     - libhipcxx 1.0.0 / CCCL 2.0.0 / CUDA 10.2
    * - :ref:`libcudacxx-standard-api-utility-utility`
      - Various utility components
-     - libcu++ 1.3.0 / CCCL 2.0.0 / CUDA 11.2
+     - libhipcxx 1.3.0 / CCCL 2.0.0 / CUDA 11.2
    * - :ref:`libcudacxx-standard-api-utility-variant`
      - Type safe union type
      - CCCL 2.4.0 / CUDA 12.5
    * - :ref:`libcudacxx-standard-api-utility-version`
      - Compile-time version information and feature test macros
-     - libcu++ 1.2.0 / CCCL 2.0.0 / CUDA 11.1
+     - libhipcxx 1.2.0 / CCCL 2.0.0 / CUDA 11.1

@@ -1,17 +1,17 @@
 # MIT License
-# 
-# Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
-# 
+#
+# Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,51 +20,76 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
-# Variables of the form ${<variable>} are substituted, currently the following
-# list is supported:
-#   - ${branch} (or {branch}) the name of the current branch
-#   - ${url} (or {url}) github url of the current project
-#   - ${project:<project_name>} base url of the documentation of <project_name>
-#     based on intersphinx_mapping.
-# These comments will also be removed.
+# rocm-docs-core external-ToC source template. Variable substitution
+# (${branch}, ${url}, ${project:<name>}) is performed by rocm-docs-core
+# at build time and the result is written to .sphinx/_toc.yml, which
+# sphinx-external-toc then consumes.
+#
+# This ToC drives the sidebar / breadcrumb navigation of the rendered
+# documentation. The per-page toctree:: directives inside individual
+# .rst files continue to drive in-page section navigation, but the
+# top-level navigation here takes precedence.
+#
+# NOTE(HIP/AMD): the API reference pages still live in the on-disk
+# subdirectory ``docs/libcudacxx/`` (not ``docs/libhipcxx/``) on purpose
+# -- it mirrors upstream NVIDIA cccl's docs layout so that future
+# cherry-picks of upstream docs changes apply with minimal friction. The
+# textual ``libcu++``/``libcudacxx`` -> ``libhipcxx`` rebrand is only
+# inside the file contents; the path is kept.
+#
+# Do NOT declare the children of ``libcudacxx/standard_api``,
+# ``libcudacxx/extended_api``, or ``libcudacxx/ptx`` here. Each of those
+# pages already carries a ``:hidden:`` ``toctree::`` directive that
+# enumerates its own children; declaring them in BOTH places renders
+# every link twice in the rocm-docs-core sidebar (sphinx-external-toc
+# contributes via _toc.yml, AND the rst ``toctree::`` directive
+# contributes independently via sphinx's native ToC).
 defaults:
   numbered: False
   maxdepth: 6
-root: overview.md
+root: index
 subtrees:
-  - entries: 
-      - file: setup.md
-        subtrees:
-        - entries:
-          - file: setup/requirements.md
-          - file: setup/getting.md
-          - file: setup/building_and_testing.md
+  - caption: Install
+    entries:
+      - file: install/install
+        title: Install libhipcxx
+      - file: install/source-build
+        title: Build from source
 
-  - entries:
-      - file: standard_api.md 
-        subtrees:
-        - entries:
-          - file: standard_api/time_library.md
-            subtrees: 
-            - entries:
-              - file: standard_api/time_library/chrono.md
-          - file: standard_api/numerics_library.md
-          - file: standard_api/utility_library.md
-            subtrees: 
-            - entries:
-              - file: standard_api/utility_library/functional.md
-              - file: standard_api/utility_library/utility.md
-              - file: standard_api/utility_library/version.md
+  - caption: Conceptual
+    entries:
+      - file: conceptual/libhipcxx-standard-library-features
+        title: C++ Standard Library features
+      - file: conceptual/libhipcxx-extensions
+        title: C++ Standard Library extensions
+      - file: conceptual/libhipcxx-hip-abstractions
+        title: HIP-specific abstractions and namespaces
 
-   #  - entries:
-   #   - file: extended_api.md 
-   #     subtrees:
-   #     - entries:
-   #       - file: extended_api/memory_model.md
-   #       - file: extended_api/thread_groups.md
-   #       - file: extended_api/shapes.md
-   #       - file: extended_api/synchronization_primitives.md
-   #       - file: extended_api/asynchronous_operations.md
-   #       - file: extended_api/memory_access_properties.md
-   #       - file: extended_api/functional.md
+  - caption: How to
+    entries:
+      - file: how-to/use-libhipcxx-in-a-project
+        title: Add libhipcxx to a CMake project
+      - file: how-to/run-libhipcxx-tests
+        title: Run the libhipcxx tests
+
+  - caption: API reference
+    entries:
+      - file: libcudacxx/standard_api
+        title: Standard API
+      - file: libcudacxx/extended_api
+        title: Extended API
+      - file: libcudacxx/ptx
+        title: PTX API
+      - file: reference/libhipcxx-limitations
+        title: Limitations and unsupported APIs
+      - file: reference/libhipcxx-conformance
+        title: Conformance and ABI evolution
+      - file: libcudacxx/releases
+        title: Releases
+
+  - caption: About
+    entries:
+      - file: libcudacxx/contributing
+        title: Contributing
+      - file: license
+        title: License
