@@ -25,7 +25,6 @@
 
 //
 // NOTE(HIP/AMD): semaphore is not supported on AMD hardware
-// UNSUPPORTED: hipcc, hiprtc
 // UNSUPPORTED: libcpp-has-no-threads
 // UNSUPPORTED: pre-sm-70
 

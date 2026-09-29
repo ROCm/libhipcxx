@@ -33,11 +33,6 @@
 #ifndef _CUDA_SEMAPHORE
 #define _CUDA_SEMAPHORE
 
-// NOTE(HIP/AMD): semaphore is not supported on AMD hardware
-#ifdef __HIP_PLATFORM_AMD__
-#error semaphore is not supported on AMD hardware and should not be included
-#endif
-
 #if defined(__CUDA_ARCH__) && __CUDA_ARCH__ < 700
 #  error "CUDA synchronization primitives are only supported for sm_70 and up."
 #endif

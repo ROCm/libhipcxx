@@ -166,6 +166,7 @@ Limitations/Unsupported Features/APIs
 - Libhipcxx does not support CUDA backend/NVIDIA hardware.
 - Libhipcxx does not support the Windows OS.
 - `cuda::std::chrono::system_clock::now()` does not return a UNIX timestamp, host system clock and device system clock are not synchronized and they may run at different clock rates.
+- `<cuda/std/semaphore>` and `<cuda/semaphore>` are supported. Blocking `acquire()` spins until the count is positive; on AMD hardware threads in a single wavefront do not have independent forward-progress guarantees, so a blocking `acquire()` that waits on a `release()` performed by another thread of the same wavefront (`thread_scope_block` used within one wavefront) can deadlock. Coordinate across separate wavefronts/blocks (`thread_scope_device`, `thread_scope_system`) where the producer and consumer can make progress independently. The timed `try_acquire_for`/`try_acquire_until` share this limitation when the releaser is in the same wavefront; they return without acquiring once the timeout elapses instead of deadlocking, but on AMD hardware the deadline is measured against a device timestamp counter that is not synchronized with the host clock (see the `system_clock` note above).
 - The following APIs from [libcudacxx] are *NOT* supported in libhipcxx:
 
 =========================================  ======================  ========================================================================================
@@ -173,10 +174,8 @@ Group                                      API                     Header  Descr
 =========================================  ======================  ========================================================================================
 Synchronization Library                    `<cuda/std/latch>`      Single-phase asynchronous thread-coordination mechanism
 Synchronization Library                    `<cuda/std/barrier>`    Multi-phase asynchronous thread-coordination mechanism
-Synchronization Library                    `<cuda/std/semaphore>`  Primitives for constraining concurrent access
 Extended Synchronization Library           `<cuda/latch>`          System-wide `cuda::std::latch` single-phase asynchronous thread coordination mechanism.
 Extended Synchronization Library           `<cuda/barrier>`        System-wide `cuda::std::barrier` multi-phase asynchronous thread coordination mechanism.
-Extended Synchronization Library           `<cuda/semaphore>`      System-wide primitives for constraining concurrent access.
 Extended Synchronization Library           `<cuda/pipeline>`       Coordination mechanisms to sequence asynchronous operations.
 Extended Memory Access Properties Library  `<cuda/annotated_ptr>`  Memory access properties for pointers.
 PTX API                                    `<cuda/ptx>`            The `cuda::ptx` namespace contains functions that map to Nvidia PTX instructions. 
