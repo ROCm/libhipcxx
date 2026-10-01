@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::for_each_canceled_block, which enables dynamic work-stealing at thread-block granularity for improved GPU load balancing in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, work stealing, for_each_canceled_block, thread block, load balancing, dynamic work distribution
+
 .. _libcudacxx-extended-api-work-stealing:
 
 Work stealing
 =============
+
+This page documents the ``cuda::for_each_canceled_block`` API for dynamic work stealing at thread-block granularity.
 
 Defined in header ``<cuda/work_stealing>`` if the CUDA compiler supports at least PTX ISA 8.7:
 
@@ -14,37 +43,39 @@ Defined in header ``<cuda/work_stealing>`` if the CUDA compiler supports at leas
 
    } // namespace cuda
 
-**Note**: On devices with compute capability 10.0 or higher, this function may leverage hardware acceleration.
+.. note:: 
+  
+  On devices with compute capability 10.0 or higher, this function may leverage hardware acceleration.
 
 This API is primarily intended for implementing work-stealing at the thread-block level.
 
 
 Compared to alternative work distribution techniques, such as  `grid-stride loops <https://developer.nvidia.com/blog/cuda-pro-tip-write-flexible-kernels-grid-stride-loops/>`__, which distribute work statically, or dynamic work distribution methods relying on global memory concurrency, this API offers several advantages:
 
-   - It enables dynamic work-stealing: thread blocks that complete their tasks sooner can take on additional work from slower thread blocks.
-   - It may cooperate with the GPU work scheduler to respect work priorities and improve load balancing.
-   - It may reduce work-stealing latency compared to global memory atomics.
+- It enables dynamic work-stealing: thread blocks that complete their tasks sooner can take on additional work from slower thread blocks.
+- It may cooperate with the GPU work scheduler to respect work priorities and improve load balancing.
+- It may reduce work-stealing latency compared to global memory atomics.
 
 For better performance, extract the shared thread-block prologue and epilogue outside the lambda and reuse them across thread-block iterations:
 
-  - Prologue: Thread-block initialization code and data common to all thread blocks, such as ``__shared__`` memory allocation and initialization.
-  - Epilogue: Epilogue: Thread-block finalization code common to all thread blocks, such as writing shared memory back to global memory..
+- Prologue: Thread-block initialization code and data common to all thread blocks, such as ``__shared__`` memory allocation and initialization.
+- Epilogue: Thread-block finalization code common to all thread blocks, such as writing shared memory back to global memory.
 
 **Mandates**:
 
-   - ``ThreadBlockRank`` equals the rank of the thread block: ``1``, ``2``, or ``3`` for one-dimensional, two-dimensional, and three-dimensional thread blocks, respectively.
-   - ``is_invokable_r_v<UnaryFunction, void, dim3>`` is true.
+- ``ThreadBlockRank`` equals the rank of the thread block: ``1``, ``2``, or ``3`` for one-dimensional, two-dimensional, and three-dimensional thread blocks, respectively.
+- ``is_invokable_r_v<UnaryFunction, void, dim3>`` is true.
 
 **Preconditions**:
 
-   - All threads within a thread block shall call ``for_each_canceled_block`` **exactly once**.
+- All threads within a thread block shall call ``for_each_canceled_block`` exactly once.
 
 **Effects**:
 
-   - Invokes ``uf`` with ``blockIdx`` and then repeatedly attempts to cancel the launch of another thread block within the current grid:
+- Invokes ``uf`` with ``blockIdx`` and then repeatedly attempts to cancel the launch of another thread block within the current grid:
 
-      - If successful: invokes ``uf`` with the canceled thread block's ``blockIdx`` and repeats.
-      - Otherwise, the function returns; it failed to cancel the launch of another thread block.
+ - If successful: invokes ``uf`` with the canceled thread block's ``blockIdx`` and repeats.
+ - Otherwise, the function returns; it failed to cancel the launch of another thread block.
 
 Example
 -------

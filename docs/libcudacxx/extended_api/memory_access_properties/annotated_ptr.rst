@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::annotated_ptr, a pointer type that binds an access property to enable persistent memory access hints across ABI boundaries in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, annotated_ptr, access_property, pointer, cache, persisting, streaming
+
 .. _libcudacxx-extended-api-memory-access-properties-annotated-ptr:
 
-cuda::annotated_ptr
+``cuda::annotated_ptr``
 =======================
+
+This page documents ``cuda::annotated_ptr``, a pointer type that binds a cache access property to enable persistent memory access hints across ABI boundaries.
 
 Defined in header ``<cuda/annotated_ptr>``:
 
@@ -145,20 +174,20 @@ Constructor from pointer
 -  if ``Property`` is :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-shared>` then ``ptr``
    must be a generic pointer that is valid to cast to a pointer to the
    shared memory address space.
--  if ``Property`` is :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-global>`,
-   :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-normal>`,
-   :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-streaming>`,
-   :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-persisting>`, or
+-  if ``Property`` is :ref:`cuda::access_property::global <libcudacxx-extended-api-memory-access-properties-access-property-global>`,
+   :ref:`cuda::access_property::normal <libcudacxx-extended-api-memory-access-properties-access-property-normal>`,
+   :ref:`cuda::access_property::streaming <libcudacxx-extended-api-memory-access-properties-access-property-streaming>`,
+   :ref:`cuda::access_property::persisting <libcudacxx-extended-api-memory-access-properties-access-property-persisting>`, or
    :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>` then ``ptr`` must be a generic pointer
    that is valid to cast to a pointer to the global memory address
    space.
 
-**Effects**:  Constructs an ``annotated_ptr`` requesting associating
+**Effects**: Constructs an ``annotated_ptr`` requesting association of
 ``ptr`` with ``Property``. If ``Property`` is
 :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>` then ``prop`` is initialized with
-:ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-global>`.
+:ref:`cuda::access_property::global <libcudacxx-extended-api-memory-access-properties-access-property-global>`.
 
-**Note**: in **Preconditions** “valid” means that casting the generic
+**Note**: in **Preconditions** "valid" means that casting the generic
 pointer to the corresponding address space does not introduce undefined
 behavior.
 
@@ -173,10 +202,10 @@ Constructor from pointer and access property
 **Mandates**:
 
 -  ``Property`` is :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>`.
--  ``RuntimeProperty`` is any of :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-global>`,
-   :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-normal>`,
-   :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-streaming>`,
-   :ref:`cuda::access_property::shared <libcudacxx-extended-api-memory-access-properties-access-property-persisting>`, or
+-  ``RuntimeProperty`` is any of :ref:`cuda::access_property::global <libcudacxx-extended-api-memory-access-properties-access-property-global>`,
+   :ref:`cuda::access_property::normal <libcudacxx-extended-api-memory-access-properties-access-property-normal>`,
+   :ref:`cuda::access_property::streaming <libcudacxx-extended-api-memory-access-properties-access-property-streaming>`,
+   :ref:`cuda::access_property::persisting <libcudacxx-extended-api-memory-access-properties-access-property-persisting>`, or
    :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>`.
 
 **Preconditions**: ``ptr`` is a pointer to a valid allocation in the

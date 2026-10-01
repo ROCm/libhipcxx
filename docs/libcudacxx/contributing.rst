@@ -26,6 +26,8 @@
 Contributing
 ============
 
+This page describes how to contribute to libhipcxx and links to the project code of conduct.
+
 .. toctree::
    :maxdepth: 1
 

@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Reference for libhipcxx asynchronous operations, including memcpy_async and memcpy_async_tx for non-blocking memory copies in HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, asynchronous operations, memcpy_async, pipeline, barrier
+
+
 .. _libcudacxx-extended-api-asynchronous-operations:
 
 Asynchronous Operations
 -----------------------
+
+This page covers the asynchronous operations extended API, providing non-blocking memory copy functions synchronized via barriers or pipelines.
 
 .. toctree::
    :hidden:
@@ -46,5 +53,5 @@ Asynchronous Operations
 
 .. note::
 
-  **Asynchronous operations** like `memcpy_async <libcudacxx-extended-api-asynchronous-operations-memcpy-async>`
-  are non-blocking operations performed as-if by a new thread of execution.
+   Asynchronous operations like `memcpy_async <libcudacxx-extended-api-asynchronous-operations-memcpy-async>`
+   are non-blocking operations performed as-if by a new thread of execution.

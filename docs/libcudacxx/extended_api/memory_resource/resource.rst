@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for the cuda::mr::resource and cuda::mr::async_resource concepts, which constrain memory resource types for synchronous and stream-ordered allocation in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, resource concept, async_resource, memory resource, allocate, deallocate, stream-ordered
+
 .. _libcudacxx-extended-api-memory-resources-resource:
 
 The ``cuda::resource`` concept
--------------------------------
+------------------------------
+
+This page documents the ``cuda::mr::resource`` and ``cuda::mr::async_resource`` concepts, which constrain memory resource types for synchronous and stream-ordered allocation.
 
 The `std::pmr::memory_resource <https://en.cppreference.com/w/cpp/header/memory_resource>`__ feature provides only a
 single ``allocate`` interface, which is sufficient for homogeneous memory systems. However, CUDA provides both
@@ -15,7 +44,7 @@ through an assert at run time, but should be checked by the compiler.
 The ``cuda::mr::resource`` concept provides basic type checks to ensure that a given memory resource provides the
 expected ``allocate`` / ``deallocate`` interface and is also equality comparable, which covers the whole API surface of
 `std::pmr::memory_resource <https://en.cppreference.com/w/cpp/header/memory_resource>`__.
-See below for different memory resources and potential pitfals.
+See below for different memory resources and potential pitfalls.
 
 To demonstrate, the following example defines several resources, only some of which are valid implementations of the
 ``cuda::mr::resource`` concept. The ``static_assertion``'s will result in compile-time errors for the invalid resources.

@@ -1,10 +1,39 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: Documents cuda::std::numbers in libhipcxx, providing mathematical constants such as pi and e available from C++14 onwards, with specializations for half and bfloat16 types.
+  :keywords: libhipcxx, ROCm, HIP, C++, numbers, mathematical constants, half, bfloat16, floating point
+
 .. _libcudacxx-standard-api-numerics-numbers:
 
 ``<cuda/std/numbers>``
 ======================
 
+This page documents ``cuda::std::numbers`` in libhipcxx, providing mathematical constants such as pi and e available from C++14 onwards, with specializations for extended floating-point types.
+
 Extensions
 ----------
 
--  All features of ``<numbers>`` are made available in C++14 onwards
--  Specializations for CUDA extended floating point types `__half` and `__nvbfloat16` are provided only on Linux systems
+- All features of ``<numbers>`` are made available in C++14 onwards.
+- Specializations for CUDA extended floating-point types `__half` and `__nvbfloat16` are provided only on Linux systems.

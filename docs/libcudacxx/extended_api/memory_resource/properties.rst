@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,11 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+
+.. meta::
+  :description: Documentation of the libhipcxx memory resource property system, enabling compile-time verification of memory accessibility and resource capabilities in HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, memory resource, properties, device_accessible, host_accessible, get_property, has_property
+
 
 .. _libcudacxx-extended-api-memory-resources-properties:
 

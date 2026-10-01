@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: libhipcxx conformance and ABI evolution
-  :keywords: libhipcxx, ROCm, HIP, conformance, ABI, versioning, C++ standard
+  :description: Learn about libhipcxx conformance with the C++ Standard and its ABI evolution policy, including ABI versioning and long-term support timelines.
+  :keywords: libhipcxx, ROCm, HIP, conformance, ABI, versioning, C++ standard, ABI stability, ISO
 
 .. _libhipcxx-conformance:
 
@@ -41,7 +41,7 @@ ABI evolution
 =============
 
 libhipcxx does not maintain long-term ABI stability. Promising long-term ABI stability would prevent
-fixing mistakes and providing best in class performance, so no such promises are made.
+fixing mistakes and achieving high performance, so no such promises are made.
 
 The ABI is broken at every major release. The life cycle of an ABI version is approximately one
 year, and long-term support for an ABI version ends after approximately two years.

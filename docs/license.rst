@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: libhipcxx license
-  :keywords: libhipcxx, ROCm, license, Apache, MIT, LLVM exceptions
+  :description: Learn about the libhipcxx license terms. libhipcxx is open source, derived from libcudacxx and LLVM's libc++, with AMD modifications under the MIT license.
+  :keywords: libhipcxx, ROCm, license, Apache, MIT, LLVM exceptions, open source
 
 .. _libhipcxx-license:
 

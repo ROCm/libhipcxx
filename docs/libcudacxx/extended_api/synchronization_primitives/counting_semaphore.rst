@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::counting_semaphore, a scoped counting semaphore for constraining concurrent access between GPU and CPU threads in libhipcxx for HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, counting_semaphore, semaphore, concurrent access, thread scope, synchronization
+
 .. _libcudacxx-extended-api-synchronization-counting-semaphore:
 
-cuda::counting_semaphore
+``cuda::counting_semaphore``
 ============================
+
+This page documents ``cuda::counting_semaphore``, a scoped counting semaphore for constraining concurrent access between GPU and CPU threads.
 
 Defined in header ``<cuda/semaphore>``:
 
@@ -22,10 +51,10 @@ Concurrency Restrictions
 An object of type ``cuda::counting_semaphore`` or ``cuda::std::counting_semaphore``, shall not be accessed concurrently
 by CPU and GPU threads unless:
 
-   - it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
-     is 1, or
-   - it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
-     is 1.
+- it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
+  is 1, or
+- it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
+  is 1.
 
 Note, for objects of scopes other than ``cuda::thread_scope_system`` this is a data-race, and therefore also prohibited
 regardless of memory characteristics.

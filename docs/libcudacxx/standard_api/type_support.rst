@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,14 +21,20 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Documents the type support library in libhipcxx, including climits for integral type limits and limits for querying properties of fundamental numeric types.
+  :keywords: libhipcxx, ROCm, HIP, C++, type support, climits, limits, numeric types, fundamental types
+
 .. _libcudacxx-standard-api-type-support:
 
 Type Support Library
-=======================
+====================
+
+This page covers the type support library headers available in libhipcxx, including climits and limits for querying properties of fundamental numeric types.
 
 .. toctree::
    :hidden:
-   :maxdepth: 1
+   :maxdepth: 0
 
 Any Standard C++ header not listed below is omitted.
 

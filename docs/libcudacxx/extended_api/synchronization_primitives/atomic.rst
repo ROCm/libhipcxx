@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::atomic, an extended form of std::atomic with thread scope support for system-wide, device-wide, and block-wide atomic operations in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, atomic, thread scope, fetch_min, fetch_max, atomic_thread_fence, memory order
+
 .. _libcudacxx-extended-api-synchronization-atomic:
 
-cuda::atomic
+``cuda::atomic``
 ================
+
+This page documents ``cuda::atomic``, an extended form of ``std::atomic`` with thread scope support for system-wide, device-wide, and block-wide atomic operations.
 
 .. toctree::
    :hidden:
@@ -42,18 +71,18 @@ Concurrency Restrictions
 An object of type ``cuda::atomic`` or `cuda::std::atomic <https://en.cppreference.com/w/cpp/atomic/atomic>`_
 shall not be accessed concurrently by CPU and GPU threads unless:
 
-  - it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
-    is 1, or
-  - it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
-    is 1.
+- it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
+  is 1, or
+- it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
+  is 1.
 
 Note, for objects of scopes other than ``cuda::thread_scope_system`` this is a data-race, and therefore also
 prohibited regardless of memory characteristics.
 
 Under CUDA Compute Capability 6 (Pascal), an object of type ``atomic`` may not be used:
 
-  - with automatic storage duration, or
-  - if ``is_always_lock_free()`` is ``false``.
+- with automatic storage duration, or
+- if ``is_always_lock_free()`` is ``false``.
 
 Under CUDA Compute Capability prior to 6 (Pascal), objects of type ``cuda::atomic`` or
 `cuda::std::atomic <https://en.cppreference.com/w/cpp/atomic/atomic>`_ may not be used.

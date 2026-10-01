@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Overview of the libhipcxx synchronization primitives extended API, including atomics, latches, barriers, semaphores, and pipelines for HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, synchronization, atomic, barrier, latch, semaphore, pipeline
+
+
 .. _libcudacxx-extended-api-synchronization:
 
 Synchronization Primitives
 ===========================
+
+This page covers the synchronization primitives extended API, including thread-scoped atomics, latches, barriers, semaphores, and pipelines for coordinating host and device threads.
 
 .. toctree::
    :hidden:

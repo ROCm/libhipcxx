@@ -1,5 +1,30 @@
-Code of Conduct
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+Code of conduct
 ===============
+
+This page defines the code of conduct followed and enforced for the NVIDIA C++ Core Compute Libraries community.
 
 Overview
 --------
@@ -7,14 +32,14 @@ Overview
 This document defines the Code of Conduct followed and enforced for
 NVIDIA C++ Core Compute Libraries.
 
-Intended Audience
+Intended audience
 ~~~~~~~~~~~~~~~~~
 
 -  Community
 -  Developers
 -  Project Leads
 
-Our Pledge
+Our pledge
 ----------
 
 In the interest of fostering an open and welcoming environment, we as
@@ -25,7 +50,7 @@ characteristics, gender identity and expression, level of experience,
 education, socio-economic status, nationality, personal appearance,
 race, religion, or sexual identity and orientation.
 
-Our Standards
+Our standards
 -------------
 
 Examples of behavior that contributes to creating a positive environment
@@ -48,7 +73,7 @@ Examples of unacceptable behavior by participants include:
    electronic address, without explicit permission.
 -  Other conduct which could reasonably be considered inappropriate.
 
-Our Responsibilities
+Our responsibilities
 --------------------
 
 Project maintainers are responsible for clarifying the standards of
@@ -95,8 +120,8 @@ RAPIDS <https://docs.rapids.ai/resources/conduct/>`_ project, which was
 adapted from the `Contributor Covenant version
 1.4 <https://www.contributor-covenant.org/version/1/4/code-of-conduct.html>`_.
 
-Please see this `FAQ <https://www.contributor-covenant.org/faq>`_ for
-answers to common questions about this Code of Conduct.
+See the `Contributor Covenant FAQ <https://www.contributor-covenant.org/faq>`_ for
+answers to common questions about this code of conduct.
 
 Contact
 -------

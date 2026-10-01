@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::atomic_thread_fence, a memory synchronization fence that establishes ordering of non-atomic and relaxed atomic accesses across a given thread scope in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, atomic_thread_fence, memory order, thread scope, fence, acquire, release
+
 .. _libcudacxx-extended-api-synchronization-atomic-atomic-thread-fence:
 
-cuda::atomic::atomic_thread_fence
+``cuda::atomic::atomic_thread_fence``
 =====================================
+
+This page documents ``cuda::atomic_thread_fence``, which establishes memory ordering of non-atomic and relaxed atomic accesses across a specified thread scope.
 
 Defined in header ``<cuda/atomic>``:
 

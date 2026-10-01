@@ -26,6 +26,8 @@
 Versioning
 ==========
 
+This page documents the API and ABI versioning scheme used by libhipcxx.
+
 libhipcxx is versioned along two axes:
 
 -  API Version: A 3-component semantic version for the programmatic
@@ -96,7 +98,7 @@ versioning <https://semver.org>`_. The versioning scheme,
    API-backwards-incompatible change do not trigger a new major release.
 -  ``mmm``/``_LIBCUDACXX_CUDA_API_VERSION_MINOR``: Minor version, an 8
    bit unsigned integer. When API-backwards-compatible features are
-   added are made, this component is incremented. Such changes may be
+   added, this component is incremented. Such changes may be
    made at any time.
 -  ``ppp``/``_LIBCUDACXX_CUDA_API_VERSION_PATCH``: Subminor version, an
    8 bit unsigned integer. When changes are made that do not qualify for
@@ -108,7 +110,7 @@ versioning <https://semver.org>`_. The versioning scheme,
 
 A single API version is supported in any given snapshot of the codebase.
 Only the latest API version is supported and maintained. For more
-information on specific API versions, [please see the changelog],
+information on specific API versions, see the changelog.
 
 When work completes on an API version on the main development branch, a
 release is snapped. The name of that release is the API version. After a
@@ -116,7 +118,7 @@ release is snapped, the API version on the main development branch is
 incremented and work begins on the next release.
 
 Application Binary Interface (ABI)
-----------------------------------
+-----------------------------------
 
 What is ABI?
 ~~~~~~~~~~~~
@@ -257,8 +259,8 @@ head <https://www.youtube.com/watch?v=tISy7EJQPzI&t=1032s>`_.
 
 Some NVIDIA C++ Standard Library facilities live in a nested
 ``experimental`` namespace. We make absolutely no guarantees about such
-features. Their API and ABI is subject to change or wholesale removeal
-at any time without any notice.
+features. Their API and ABI is subject to change or wholesale removal
+at any time without notice.
 
 Deprecation
 -----------

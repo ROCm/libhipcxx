@@ -22,41 +22,46 @@
     SOFTWARE.
 
 .. meta::
-  :description: libhipcxx HIP-specific abstractions and namespaces
-  :keywords: libhipcxx, ROCm, HIP, namespaces, hip aliasing, cuda, std, device
+  :description: Understand the libhipcxx namespace hierarchy, including cuda::std::, cuda::, cuda::device::, and their hip:: aliases, and how each tier maps to host and device code.
+  :keywords: libhipcxx, ROCm, HIP, namespaces, hip aliasing, cuda, std, device, AMD GPU, heterogeneous
 
 .. _libhipcxx-hip-abstractions:
 
-********************************************************************
-HIP-specific abstractions and namespaces
-********************************************************************
+********************************
+Namespace hierarchy in libhipcxx
+********************************
 
-Some abstractions that libhipcxx provides have no equivalent in the C++ Standard Library, but are
-fundamental to the HIP C++ programming model. These are provided alongside the Standard Library
-facilities and their extensions.
+libhipcxx organizes its APIs into three tiers, each reflecting where code can run and how closely
+it conforms to the C++ Standard. Understanding this hierarchy tells you which header to include
+and which namespace to use for any given facility.
 
-HIP aliasing
-============
+.. list-table::
+   :widths: 30 30 40
+   :header-rows: 1
 
-Instead of using ``cuda::`` and ``cuda::std::``, you can use ``hip::`` and ``hip::std::``. Both
-include variants, through ``hip`` or ``cuda``, can be used interchangeably and resolve to the same
-headers.
+   * - Namespace
+     - Include path
+     - Where it runs
+   * - ``std::``
+     - ``<*>``
+     - ``__host__`` only. Your host compiler's Standard Library. libhipcxx does not replace or
+       interfere with it.
+   * - ``cuda::std::`` / ``hip::std::``
+     - ``<cuda/std/*>`` / ``<hip/std/*>``
+     - ``__host__`` and ``__device__``. Conforming implementations of Standard Library facilities.
+   * - ``cuda::`` / ``hip::``
+     - ``<cuda/*>`` / ``<hip/*>``
+     - ``__host__`` and ``__device__``. Extensions to the Standard Library with GPU-specific
+       semantics.
+   * - ``cuda::device::`` / ``hip::device::``
+     - ``<cuda/warp>``, ``<cuda/work_stealing>`` (and their ``hip/`` equivalents)
+     - ``__device__`` only. Extensions that rely on GPU-only hardware features such as warp
+       intrinsics.
 
-Choosing a namespace
-====================
+The ``cuda::`` and ``hip::`` prefixes, and their include path equivalents, are interchangeable
+aliases that resolve to the same headers. Use whichever fits your project's conventions.
 
-The following list summarizes which namespace to use and where the facilities in it can run:
-
-* ``std::`` / ``<*>``: Your host compiler's Standard Library, which works in ``__host__`` code only.
-  libhipcxx does not replace or interfere with the host compiler's Standard Library.
-* ``cuda::std::`` / ``hip::std::`` / ``<cuda/std/*>`` / ``<hip/std/*>``: Conforming implementations
-  of facilities from the Standard Library that work in ``__host__`` and ``__device__`` code.
-* ``cuda::`` / ``hip::`` / ``<cuda/*>`` / ``<hip/*>``: Conforming extensions to the Standard Library
-  that work in ``__host__`` and ``__device__`` code.
-* ``cuda::device`` / ``hip::device`` / ``<cuda/device/*>`` / ``<hip/device/*>``: Conforming
-  extensions to the Standard Library that work only in ``__device__`` code.
-
-The following example shows the three variants side by side:
+The following example shows all three libhipcxx tiers side by side:
 
 .. code-block:: cpp
 

@@ -26,6 +26,8 @@
 Changelog
 =========
 
+This page documents the release history of libhipcxx, including new features, API changes, and bug fixes for each version.
+
 libhipcxx 2.1.0
 ---------------
 
@@ -62,8 +64,6 @@ New Features
 -  #313: Add ``cuda/std/span`` and backport it to C++14
 -  #299: Add ``cuda/std/mdspan`` and backport it to C++14.
 
-   -  Thanks Yu You for this contribution.
-
 -  #349: Add ``cuda/std/concepts`` and backport them to C++14. You will
    be able to utilize C++20 concepts already in C++14/17 through
    existing SFINAE techniques.
@@ -74,8 +74,6 @@ Issues Fixed
 ~~~~~~~~~~~~
 
 -  #328: Docs: Fix broken links.
-
-   -  Thanks chaosink for this contribution.
 
 -  #329: Block local memory tests on pascal.
 -  #332: Add support for clang-15.
@@ -116,9 +114,6 @@ Issues Fixed
 -  #383: Fix various issues in CPOs and ``tuple``.
 -  #386: Fix proclaim_return_type copy constructor.
 -  #389: Fix atomic_ref example in docs.
-
-   -  Thanks Daniel Jünger for this contribution.
-
 -  #388: Fix ``_EnableConstructor`` in ``cuda::std::tuple`` to be
    dependent on a template argument.
 -  #384: Move the ``unused`` helper function into ``test_macros.h``.
@@ -139,9 +134,6 @@ New Features
 ~~~~~~~~~~~~
 
 -  #286: Add atomics for floating point types.
-
-   -  Thanks Daniel Jünger for this contribution.
-
 -  #284: ``cuda::proclaim_return_type`` for use with extended lambda
    support in NVCC.
 -  #267: Docker refactor, parameterizes OS and compiler versions.
@@ -156,13 +148,7 @@ Issues Fixed
 -  #282: Prevent usage of cuda::atomic::fetch_max/min for non-integral
    types.
 -  #288: Fix shortcut in fetch_min CAS loop.
-
-   -  Thanks Daniel Jünger for this contribution.
-
 -  #291: Remove usage of find_path to locate cuda/std/detail/__config.
-
-   -  Thanks Robert Maynard for this contribution.
-
 -  #276: Delete tests for unsupported header ``<compare>``.
 -  #293: Fix failures in several tests unsupportable by NVRTC.
 -  #303: Move the emission of atomic errors on unsupported platforms to
@@ -196,27 +182,13 @@ Issues Fixed
 -  #265: Move pipeline into libhipcxx. Previously was a separate CTK
    component.
 -  #264: Fix builds using NVHPC by adding a new line.
-
-   -  Thanks Chengjie Wang and Royil Damer for this contribution.
-
 -  #261: Fix extra line in perform_tests.bash causing invalid test
    results.
-
-   -  Thanks Chengjie Wang and Royil Damer for this contribution.
-
 -  #246: Documentation fixes regarding atomics in GPU memory.
-
-   -  Thanks Daniel Lustig for this contribution.
-
 -  #258: Lock contrast of our documentation's search text field.
-
-   -  Thanks Bradley Dice for this contribution.
-
 -  #259: Add system_header pragma to portions of
 -  #249: Documentation update for building libhipcxx.
 -  #247: Update godbolt links in examples.
-
-   -  Thanks Asher Mancinelli for this contribution.
 
 libhipcxx 1.8.0
 ---------------
@@ -244,9 +216,6 @@ Issues Fixed
 -  #234: Fix building with GCC/Clang when NVCC was not being used.
 -  #240: Create a config for lit to generate a JSON output of the build
    status.
-
-   -  Thanks Royil Damer for this contribution.
-
 -  #241: Fix octal notation of libhipcxx version number.
 -  #242: Add support for ``find_package`` and ``add_subdirectory`` in
    CMake.
@@ -287,8 +256,6 @@ Issues Fixed
    dialects are used.
 -  #206: Fix compilation with ASAN enabled.
 
-   -  Thanks Janusz Lisiecki for this contribution.
-
 -  #207: Fix compilation of ``<cuda/std/atomic>`` for GCC/Clang.
 -  #208: Flip an internal directory symlink, fixes packaging issues for
    internal tools.
@@ -296,15 +263,11 @@ Issues Fixed
    choose pre-C++11 backend.
 -  #216: Annotated Pointer documentation.
 
-   -  Thanks Gonzalo Brito for this contribution.
-
 -  #215: Add SM87 awareness to ``<nv/target>``.
 -  #217: Fix how CUDACC version is calculated for ``__int128`` support.
 -  #228: Fix LLVM lit pattern matching in test score calculation.
 -  #227: Silence 4296 for type_traits.
 -  #225: Fix calculation of ``_LIBCUDACXX_CUDACC_VER`` broken from #217.
-
-   -  Thanks Robert Maynard for this contribution.
 
 -  #220: ``memcpy_async`` should cache only in L2 when possible.
 -  #219: Change ``atomic/atomic_ref`` ctors to prevent copy
@@ -347,8 +310,6 @@ Issues Fixed
 -  #177: Allows ``<nv/target>`` to build when compiled under C and
    C++98.
 
-   -  Thanks to David Olsen for this contribution.
-
 -  #172: Introduces ABI version 4.
 
    -  Forces ``cuda::std::complex`` alignment for enhanced performance.
@@ -358,8 +319,6 @@ Issues Fixed
 -  #165: For tests on some older distributions keep using Python 3, but
    downgrade lit.
 -  #164: Fixes testing issues related to Python 2/3 switch for lit.
-
-   -  Thanks to Royil Damer for this contribution.
 
 libhipcxx 1.5.0 (CUDA Toolkit 11.4)
 -----------------------------------
@@ -389,8 +348,6 @@ Issues Fixed
    fixes.
 -  #126: Compiler warnings in .
 
-   -  Thanks to anstellaire for this contribution.
-
 libhipcxx 1.4.1 (CUDA Toolkit 11.3)
 -----------------------------------
 
@@ -406,8 +363,6 @@ Other Enhancements
 -  `Documentation <https://nvidia.github.io/libhipcxx>`_: Several
    enhancements and fixed a few broken links.
 -  #108: Added ``constexpr`` to synchronization object constructors.
-
-   -  Thanks to Olivier Giroux for this contribution.
 
 .. _issues-fixed-7:
 
@@ -441,20 +396,12 @@ New Features
 
 -  #34: C++17/20 ``<cuda/std/chrono>`` backported to C++14.
 
-   -  Thanks to Jake Hemstad and Paul Taylor for this contribution.
-
 -  #44: C++17 ``<cuda/std/type_traits>`` backported to C++14.
-
-   -  Thanks to Jake Hemstad and Paul Taylor for this contribution.
 
 -  #66: C++17 ``cuda::std::byte`` (in ``<cuda/std/cstddef>``) backported
    to C++14.
 
-   -  Thanks to Jake Hemstad and Paul Taylor for this contribution.
-
 -  #76: C++20 ``cuda::std::is_constant_evaluated`` backported to C++11.
-
-   -  Thanks to Jake Hemstad and Paul Taylor for this contribution.
 
 .. _other-enhancements-1:
 
@@ -468,8 +415,6 @@ Other Enhancements
 -  #31: Revamped `examples and
    benchmarks <https://github.com/NVIDIA/libhipcxx/tree/main/examples>`_.
 
-   -  Thanks to Jake Hemstad for this contribution.
-
 .. _issues-fixed-8:
 
 Issues Fixed
@@ -479,13 +424,9 @@ Issues Fixed
    asynchronous operations API.
 -  #14: NVRTC missing definitions for several macros.
 
-   -  Thanks to Ben Barsdell for this contribution.
-
 -  #56: ``<cuda/std/tuple>`` now works on a set of most recent MSVC
    compilers.
 -  #66, #82: ``<cuda/std/chrono>``/``<cuda/std/type_traits>`` backports.
-
-   -  Thanks to Jake Hemstad and Paul Taylor for this contribution.
 
 libhipcxx 1.3.0 (CUDA Toolkit 11.2)
 -----------------------------------
@@ -524,8 +465,7 @@ Issues Fixed
 -  #21: Disable ``__builtin_is_constant_evaluated`` usage with NVCC in
    C++11 mode because it's broken.
 -  #25: Fix some declarations/definitions in ``__threading_support``
-   which have inconsistent qualifiers. Thanks to Gonzalo Brito Gadeschi
-   for this contribution.
+   which have inconsistent qualifiers.
 
 libhipcxx 1.2.0 (CUDA Toolkit 11.1)
 -----------------------------------

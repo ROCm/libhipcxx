@@ -26,6 +26,8 @@
 PTX Instructions
 ================
 
+This page lists all PTX instructions wrapped in the ``cuda::ptx`` namespace, with links to individual instruction reference pages.
+
 .. toctree::
    :maxdepth: 1
 

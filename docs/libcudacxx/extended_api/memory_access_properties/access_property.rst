@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::access_property, an opaque type encoding memory access properties such as normal, persisting, and streaming cache eviction hints in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, access_property, cache eviction, persisting, streaming, global memory, L2 cache
+
 .. _libcudacxx-extended-api-memory-access-properties-access-property:
 
-cuda::access_property
+``cuda::access_property``
 =========================
+
+This page documents ``cuda::access_property``, an opaque type encoding memory access properties such as normal, persisting, and streaming cache eviction hints.
 
 Defined in header ``<cuda/annotated_ptr>``:
 
@@ -110,19 +139,19 @@ of a memory access are provided:
    -  ``normal``, ``persisting``, ``streaming``: static memory residence control properties may be specified at runtime,
    -  ``interleaved``: choose a ``probability`` of memory addresses to be accessed with one property and the remaining
       ``1 - probability`` addresses with another,
-   -  ``range``: choose a partitioned memory range with memory accesses to the “middle” sub-partition using the
-      *primary* property, and memory accesess to the head and tail sub-partitions using the *secondary* property.
+   -  ``range``: choose a partitioned memory range with memory accesses to the "middle" sub-partition using the
+      *primary* property, and memory accesses to the head and tail sub-partitions using the *secondary* property.
 
-**Note**: the difference between ``cuda::access_property::global`` and ``cuda::access_property::normal``is subtle.
+**Note**: The difference between ``cuda::access_property::global`` and ``cuda::access_property::normal`` is subtle.
 The ``cuda::access_property::normal`` hints that the pointer points to the global address space *and* the memory will
-be accessed with “normal frequency”, while ``cuda::access_property::global`` only hints that the pointer points to
+be accessed with "normal frequency", while ``cuda::access_property::global`` only hints that the pointer points to
 the global address-space, it does not hint about how frequent the accesses will be.
 
 .. warning::
 
    The behavior of *requesting* the application of ``cuda::access_property`` to memory accesses, or their association
    with memory addresses, outside of the corresponding address space is *undefined*
-   (note: even if that address is not “used”).
+   (note: even if that address is not "used").
 
 Default constructor
 -------------------
@@ -183,8 +212,8 @@ Dynamic range global memory residence control property constructors
 
 **Preconditions**:
 
-   - ``ptr`` is a generic pointer that is *valid* to cast to a pointer to the global memory address space.
-   - ``0 < leading_bytes <= total_bytes <= 4GB``.
+- ``ptr`` is a generic pointer that is *valid* to cast to a pointer to the global memory address space.
+- ``0 < leading_bytes <= total_bytes <= 4GB``.
 
 **Postconditions**: memory accesses requesting the application of this
 property must be in range
@@ -194,7 +223,7 @@ property must be in range
 called *primary* and *secondary* properties. The overloads without a
 fifth argument use ``global`` as the *secondary* property. Constructs a
 *range* access property *requesting* the properties to be
-**approximately** applied to memory accesses as follows:
+approximately applied to memory accesses as follows:
 
 -  secondary property to accesses in address-range:
    ``[max(0, ptr + leading_bytes - total_bytes), ptr)``
@@ -213,7 +242,7 @@ fifth argument use ``global`` as the *secondary* property. Constructs a
    secondary properties by just not using this range to access any
    memory in range ``[max(0, ptr + leading_bytes - total_bytes), ptr)``.
 
-3. Primary range with secondary “halo” ranges (see example below). Given
+3. Primary range with secondary "halo" ranges (see example below). Given
    ``leading_bytes`` for the primary range, and ``halo_bytes`` for the
    size of each of the secondary ranges by using
    ``total_bytes == leading_bytes + halo_bytes``:
@@ -254,7 +283,7 @@ Mapping of access properties to NVVM-IR and the PTX ISA
 
 .. warning::
 
-   The implementation makes **no guarantees** about the content of this section; it can change any time.
+   The implementation makes no guarantees about the content of this section; it can change any time.
 
 When ``cuda::access_property`` is applied to memory operation, it
 sometimes matches with some of the cache eviction priorities and cache

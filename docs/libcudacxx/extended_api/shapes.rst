@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Overview of the libhipcxx shapes API, including size_t and aligned_size_t types that define byte extents for asynchronous memory operations in HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, shapes, aligned_size_t, size_t, memory extent, alignment, memcpy_async
+
+
 .. _libcudacxx-extended-api-memory-access-shapes:
 
 Shapes
 ======
+
+This page covers the shape types used to describe byte extents for asynchronous memory operations, including ``cuda::std::size_t`` and the alignment-aware ``cuda::aligned_size_t``.
 
 .. toctree::
    :hidden:

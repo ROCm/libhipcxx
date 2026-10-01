@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,22 +21,28 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Documents cuda::std::complex in libhipcxx, including omissions for long double and literals with NVCC, and extensions for infinity handling and half/bfloat16 floating-point type support.
+  :keywords: libhipcxx, ROCm, HIP, C++, complex numbers, half, bfloat16, constexpr, NVCC
+
 .. _libcudacxx-standard-api-numerics-complex:
 
 ``<cuda/std/complex>``
 ======================
 
+This page documents the ``cuda::std::complex`` support in libhipcxx, including omissions for long double and literals with NVCC, and extensions for infinity handling and half/bfloat16 types.
+
 Omissions
 ---------
 
-  When using libhipcxx with NVCC, ``complex`` does not support ``long double`` or ``complex`` literals (``_i``, ``_if``, and ``_il``).
-  NVCC warns on any usage of ``long double`` in device code, because ``long double`` will be demoted to ``double`` in device code.
-  This warning can be suppressed silenced with ``#pragma``\ s, but only globally, not just when using ``complex``.
-  User-defined floating-point literals must be specified in terms of ``long double``, so they lead to warnings
-  that are unable to be suppressed.
+When using libhipcxx with NVCC, ``complex`` does not support ``long double`` or ``complex`` literals (``_i``, ``_if``, and ``_il``).
+NVCC warns on any usage of ``long double`` in device code, because ``long double`` will be demoted to ``double`` in device code.
+This warning can be suppressed silenced with ``#pragma``\ s, but only globally, not just when using ``complex``.
+User-defined floating-point literals must be specified in terms of ``long double``, so they lead to warnings
+that are unable to be suppressed.
 
 Extensions
---------------
+----------
 
 - Handling of infinities
 
@@ -51,7 +57,7 @@ Extensions
 - Support for half and bfloat16 (since libhipcxx 2.4.0)
 
   Our implementation includes support for the ``__half`` type from ``<cuda_fp16.h>``, when the CUDA toolkit version is at
-  least 12.2, and when ``CCCL_DISABLE_FP16_SUPPORT`` is **not** defined.
+  least 12.2, and when ``CCCL_DISABLE_FP16_SUPPORT`` is not defined.
 
   This is detected automatically when compiling through NVCC. If you are compiling a host-only translation unit directly
   with the host compiler, you must define the macro ``LIBCUDACXX_ENABLE_HOST_NVFP16`` prior to including any libhipcxx headers,
@@ -59,6 +65,6 @@ Extensions
   12.2 or higher.
 
   Our implementation includes support for the ``__nv_bfloat16`` type from ``<cuda_bf16.h>``, when the conditions for the
-  support of ``__half`` are fulfilled, and when ``CCCL_DISABLE_BF16_SUPPORT`` and ``CCCL_DISABLE_FP16_SUPPORT`` are **not** defined.
+  support of ``__half`` are fulfilled, and when ``CCCL_DISABLE_BF16_SUPPORT`` and ``CCCL_DISABLE_FP16_SUPPORT`` are not defined.
 
 - C++20 constexpr ``<complex>`` is available in C++14.

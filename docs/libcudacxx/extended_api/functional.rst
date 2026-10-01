@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Overview of the libhipcxx functional extended API, including maximum, minimum, proclaim_return_type, proclaim_copyable_arguments, and get_device_address utilities.
+  :keywords: libhipcxx, ROCm, HIP, C++, functional, maximum, minimum, proclaim_return_type, get_device_address
+
+
 .. _libcudacxx-extended-api-functional:
 
 Functional
 ----------
+
+This page covers the functional extended API, including utilities for maximum and minimum computation, return-type proclamation, and obtaining device addresses.
 
 .. toctree::
    :hidden:

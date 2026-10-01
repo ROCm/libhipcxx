@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,10 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+
+.. meta::
+  :description: Documents the synchronization library headers in libhipcxx, including atomic operations, latches, barriers, and semaphores for heterogeneous GPU and CPU thread coordination.
+  :keywords: libhipcxx, ROCm, HIP, C++, synchronization, atomic, barrier, latch, semaphore
 
 .. _libcudacxx-standard-api-synchronization:
 

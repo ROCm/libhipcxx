@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: libhipcxx limitations and unsupported APIs
-  :keywords: libhipcxx, ROCm, HIP, limitations, unsupported, APIs
+  :description: Explore libhipcxx platform limitations and unsupported APIs, including which libcudacxx APIs are not available for AMD GPU development with HIP.
+  :keywords: libhipcxx, ROCm, HIP, limitations, unsupported, APIs, libcudacxx, AMD GPU, CUDA
 
 .. _libhipcxx-limitations:
 
@@ -34,8 +34,9 @@ Limitations and unsupported APIs
 Platform limitations
 ====================
 
+libhipcxx has the following platform limitations.
+
 * libhipcxx does not support the CUDA backend or NVIDIA hardware.
-* libhipcxx does not support the Windows operating system.
 * ``cuda::std::chrono::system_clock::now()`` does not return a UNIX timestamp. The host system clock
   and the device system clock are not synchronized and may run at different clock rates.
 

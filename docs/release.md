@@ -1,7 +1,7 @@
-..
+<!---
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,18 @@
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
+-->
 
-.. _libcudacxx-ptx-instructions-multimem-ld_reduce:
+:orphan:
 
-multimem.ld_reduce
-==================
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="libhipcxx release history">
+  <meta name="keywords" content="documentation, release history, ROCm, AMD">
+</head>
 
-This page documents the ``cuda::ptx`` wrappers for the multimem.ld_reduce PTX instruction, which performs a reduction across multicast memory and loads the result.
+# libhipcxx release history
 
--  PTX ISA:
-   `multimem.ld_reduce <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-multimem-ld-reduce-multimem-st-multimem-red>`__
-
-.. include:: generated/multimem_ld_reduce.rst
+| Version | Release date |
+| ------- | ------------ |
+| [2.1.0](https://rocm.docs.amd.com/projects/libhipcxx/en/docs-2.1.0/) | October 5, 2026 |

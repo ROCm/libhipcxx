@@ -26,6 +26,8 @@
 mapa
 ====
 
+This page documents the mapa PTX instruction, which maps a generic address to a cluster-relative shared memory address.
+
 -  PTX ISA:
    `mapa <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-mapa>`__
 

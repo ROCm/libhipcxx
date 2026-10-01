@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: libhipcxx installation
-  :keywords: install, libhipcxx, AMD, ROCm, installation, TheRock, ROCm Core SDK
+  :description: Learn how to install libhipcxx as part of the ROCm Core SDK or ROCm CCL package on Linux, with package installation instructions for all major distributions.
+  :keywords: install, libhipcxx, AMD, ROCm, installation, TheRock, ROCm Core SDK, apt, dnf, zypper, Linux
 
 .. _installation:
 
@@ -35,8 +35,8 @@ Starting with ROCm Core SDK 10.1, libhipcxx is distributed as part of the
 ROCm Core SDK.
 
 Before you begin, verify that your system is supported. For more information,
-see `ROCm Core SDK components
-<https://rocm.docs.amd.com/en/latest/about/release-components.html>`_.
+see `ROCm compatibility matrix
+<https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html>`_.
 
 For advanced workflows, source builds, or custom configurations, see
 :doc:`Build from source <./source-build>`.
@@ -47,8 +47,7 @@ Install the ROCm Core SDK
 =========================
 
 libhipcxx is included with the ROCm Core SDK on Linux. For the most complete
-installation, we recommend that developers use the ``amdrocm-core-sdk`` meta
-package.
+installation, use the ``amdrocm-core-sdk`` meta package.
 
 For instructions, see `Install AMD ROCm
 <https://rocm.docs.amd.com/en/latest/install/rocm.html>`_. Use the selector
@@ -124,3 +123,80 @@ The `TheRock <https://github.com/ROCm/TheRock>`_ build system also publishes
 nightly builds for the ROCm Core SDK and its components, including libhipcxx.
 See `Nightly release status
 <https://github.com/ROCm/TheRock#nightly-release-status>`_ for details.
+
+.. _libhipcxx-use-in-a-project:
+
+Add libhipcxx to a CMake project
+=================================
+
+libhipcxx is a header-only library, so adding it to your project means making its headers
+discoverable by the compiler — there is no shared library to link against and no ABI compatibility
+concern from libhipcxx itself. After this step, any target you link against
+``libhipcxx::libhipcxx`` can include libhipcxx headers without specifying the include path manually.
+
+Prerequisites
+-------------
+
+ROCm must be installed before configuring your project. libhipcxx ships as part of ROCm, so if
+ROCm is installed at its default prefix (``/opt/rocm``), no separate libhipcxx install step is
+needed. CMake integration also does not configure the HIP compiler for you; your
+``CMakeLists.txt`` must separately enable HIP, for example with ``enable_language(HIP)`` or by
+setting ``CMAKE_HIP_COMPILER``.
+
+CMake integration
+-----------------
+
+To use libhipcxx in your own project, add the following lines to your ``CMakeLists.txt`` file:
+
+.. code-block:: cmake
+
+    # "/opt/rocm" - default ROCm install prefix
+    find_package(libhipcxx REQUIRED)
+
+    # ...
+
+    # include the libhipcxx headers
+    target_link_libraries(your_target PRIVATE libhipcxx::libhipcxx)
+
+``libhipcxx::libhipcxx`` is an interface target, so linking against it only adds the libhipcxx
+include directories to your target.
+
+If you installed libhipcxx into a non-default location, set ``CMAKE_PREFIX_PATH`` to that install
+directory when you configure your project:
+
+.. code-block:: shell
+
+    cmake -DCMAKE_PREFIX_PATH=<path to libhipcxx install directory> ..
+
+Include the headers
+-------------------
+
+To use a Standard Library facility in host and device code, add ``cuda/std/`` to the start of the
+include and ``cuda::`` before the use of ``std::``:
+
+.. code-block:: cpp
+
+    #include <cuda/std/atomic>
+
+    cuda::std::atomic<int> x;
+
+To use an extension to a Standard Library facility, drop the ``std``:
+
+.. code-block:: cpp
+
+    #include <cuda/atomic>
+
+    cuda::atomic<int, cuda::thread_scope_device> x;
+
+You can also write these as ``hip/std/`` and ``hip::std::``, or ``hip/`` and ``hip::``. Both
+spellings resolve to the same headers and can be used interchangeably. For an explanation of when to
+use each namespace, see
+:doc:`Namespace hierarchy in libhipcxx <../conceptual/libhipcxx-hip-abstractions>`.
+
+If you are not using CMake, add the libhipcxx include root to your compiler flags directly.
+ROCm installs the libhipcxx headers under ``/opt/rocm/include/hipccl``, which is not on the
+compiler's default search path:
+
+.. code-block:: shell
+
+    hipcc -std=c++17 -I/opt/rocm/include/hipccl -c main.hip

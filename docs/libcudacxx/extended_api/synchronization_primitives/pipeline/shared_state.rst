@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: API reference for cuda::pipeline_shared_state, a storage type used to coordinate threads participating in a cuda::pipeline in libhipcxx for HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, pipeline_shared_state, pipeline, shared memory, thread coordination, stages
+
+
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-shared-state:
 
-cuda::pipeline_shared_state
+``cuda::pipeline_shared_state``
 ===============================
+
+This page documents ``cuda::pipeline_shared_state``, which holds the shared memory state required to coordinate a partitioned pipeline between producer and consumer threads.
 
 Defined in header ``<cuda/pipeline>``:
 

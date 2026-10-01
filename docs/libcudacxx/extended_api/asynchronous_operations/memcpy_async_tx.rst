@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::device::memcpy_async_tx, which asynchronously copies global memory to shared memory with manual barrier transaction accounting in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, memcpy_async_tx, barrier, shared memory, global memory, Hopper
+
 .. _libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx:
 
-cuda::device::memcpy_async_tx
-=================================
+``cuda::device::memcpy_async_tx``
+=====================================
+
+This page documents ``cuda::device::memcpy_async_tx``, which asynchronously copies global memory to shared memory while decrementing a barrier's transaction count.
 
 Defined in header ``<cuda/barrier>``:
 
@@ -29,7 +58,7 @@ Preconditions
 Requires
 --------
 
--  ``is_trivially_copyable_v<T>`` is true.
+``is_trivially_copyable_v<T>`` is true.
 
 Notes
 -----
@@ -38,10 +67,10 @@ This function can only be used under CUDA Compute Capability 9.0 (Hopper) or hig
 
 There is no feature flag to check if ``cuda::device::memcpy_async_tx`` is available.
 
-**Comparison to cuda::memcpy_async**: ``memcpy_async_tx`` supports a subset of the operations of ``memcpy_async``.
+Comparison to ``cuda::memcpy_async``: ``memcpy_async_tx`` supports a subset of the operations of ``memcpy_async``.
 It gives more control over the synchronization with a barrier than ``memcpy_async``.
-Currently, ``memcpy_async_tx`` has no synchronous fallback mechanism., i.e., it currently does not work on older hardware
-(pre-CUDA Compute Capability 9.0, i.e., Hopper).
+Currently, ``memcpy_async_tx`` has no synchronous fallback mechanism, i.e., it does not work on older hardware
+(pre-CUDA Compute Capability 9.0, i.e., pre-Hopper).
 
 Example
 -------

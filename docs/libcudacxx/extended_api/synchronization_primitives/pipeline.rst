@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::pipeline, a coordination mechanism that sequences asynchronous operations into stages for producer-consumer patterns in libhipcxx for HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, pipeline, producer, consumer, asynchronous operations, stages, memcpy_async
+
 .. _libcudacxx-extended-api-synchronization-pipeline:
 
-cuda::pipeline
+``cuda::pipeline``
 ==================
+
+This page documents ``cuda::pipeline``, a coordination mechanism that sequences asynchronous operations into stages for producer-consumer patterns.
 
 .. toctree::
    :hidden:
@@ -56,10 +85,10 @@ The class template ``cuda::pipeline`` provides a coordination mechanism which ca
 
 A thread interacts with a *pipeline stage* using the following pattern:
 
-  1. Acquire the pipeline stage.
-  2. Commit some operations to the stage.
-  3. Wait for the previously committed operations to complete.
-  4. Release the pipeline stage.
+1. Acquire the pipeline stage.
+2. Commit some operations to the stage.
+3. Wait for the previously committed operations to complete.
+4. Release the pipeline stage.
 
 For :ref:`cuda::thread_scope <libcudacxx-extended-api-memory-model-thread-scopes>` ``s`` other than
 ``cuda::thread_scope_thread``, a
@@ -103,7 +132,7 @@ producers and consumers. In a *partitioned pipeline*, each participating thread 
        specified timeout duration.
    * - :ref:`consumer_wait_until <libcudacxx-extended-api-synchronization-pipeline-pipeline-consumer-wait>`
      - Blocks the current thread until all operations committed to the current *pipeline stage* complete or until
-       specified time point has been reached.
+       the specified time point has been reached.
    * - :ref:`consumer_release <libcudacxx-extended-api-synchronization-pipeline-pipeline-consumer-release>`
      - Release the current *pipeline stage*.
    * - :ref:`quit <libcudacxx-extended-api-synchronization-pipeline-pipeline-quit>`
@@ -111,7 +140,7 @@ producers and consumers. In a *partitioned pipeline*, each participating thread 
 
 .. note::
 
-   - A thread role cannot change during the lifetime of the pipeline object.
+   A thread role cannot change during the lifetime of the pipeline object.
 
 .. rubric:: Example
 

@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: API reference for cuda::barrier, a multi-phase thread coordination mechanism with thread scope support, transaction counting, and extensions for shared memory barriers in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, barrier, thread scope, shared memory, arrive, transaction count, mbarrier
+
+
 .. _libcudacxx-extended-api-synchronization-barrier:
 
-cuda::barrier
+``cuda::barrier``
 =================
+
+This page documents ``cuda::barrier``, a multi-phase thread coordination mechanism with thread scope support, transaction counting, and extensions for shared memory barriers.
 
 .. toctree::
    :hidden:
@@ -49,7 +56,7 @@ that takes an additional :ref:`cuda::thread_scope <libcudacxx-extended-api-memor
 If ``!(scope == thread_block_scope && __isShared(this))``, then the semantics are the same as
 `cuda::std::barrier <https://en.cppreference.com/w/cpp/thread/barrier>`_, otherwise, see below.
 
-The ``cuda::barrier`` class templates extends ``cuda::std::barrier`` with the following additional operations:
+The ``cuda::barrier`` class template extends ``cuda::std::barrier`` with the following additional operations:
 
 .. list-table::
    :widths: 25 75
@@ -66,6 +73,8 @@ The ``cuda::barrier`` class templates extends ``cuda::std::barrier`` with the fo
 
 If ``scope == thread_scope_block && __isShared(this)``, then the semantics of `[thread.barrier.class] <http://eel.is/c++draft/thread.barrier.class>`_
 of ISO/IEC IS 14882 (the C++ Standard) are modified as follows:
+
+.. pull-quote::
 
    A barrier is a thread coordination mechanism whose lifetime consists
    of a sequence of barrier phases, where each phase allows at most an
@@ -107,12 +116,12 @@ To properly initialize a ``__shared__`` ``cuda::barrier``, use the
 
 An object of type ``cuda::barrier`` or ``cuda::std::barrier`` shall not be accessed concurrently by CPU and GPU threads unless:
 
-   - it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
-     is 1, or
-   - it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
-     is 1.
+- it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
+  is 1, or
+- it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
+  is 1.
 
-Note, for objects of scopes other than ``cuda::thread_scope_system`` this is a data-race, and therefore also prohibited
+Note: for objects of scopes other than ``cuda::thread_scope_system``, this is a data race, and is therefore also prohibited
 regardless of memory characteristics.
 
 Under CUDA Compute Capability 8 (Ampere) or above, when an object of type ``cuda::barrier<thread_scope_block>`` is
@@ -131,7 +140,7 @@ In addition to the arrival count, a ``cuda::barrier<thread_scope_block>`` object
 `tx-count <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#tracking-asynchronous-operations-by-the-mbarrier-object>`_,
 which is used for tracking the completion of some asynchronous memory operations or transactions.
 The tx-count tracks the number of asynchronous transactions, in units specified by the asynchronous memory operation
-(typically bytes), that are outstanding and yet to be complete. This capability is exposed, starting with the Hopper
+(typically bytes) that are outstanding and have not yet completed. This capability is exposed, starting with the Hopper
 architecture (CUDA Compute Capability 9).
 
 The tx-count of ``cuda::barrier`` must be set to the total amount of asynchronous memory operations, in units as

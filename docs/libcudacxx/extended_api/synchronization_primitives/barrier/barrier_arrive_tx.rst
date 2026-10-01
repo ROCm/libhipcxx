@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: API reference for cuda::device::barrier_arrive_tx, which arrives at a shared-memory barrier while decrementing the arrival count and incrementing the transaction count in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, barrier_arrive_tx, barrier, transaction count, shared memory, Hopper, mbarrier
+
+
 .. _libcudacxx-extended-api-synchronization-barrier-barrier-arrive-tx:
 
-cuda::device::barrier_arrive_tx
+``cuda::device::barrier_arrive_tx``
 ===================================
+
+This page documents ``cuda::device::barrier_arrive_tx``, which arrives at a shared memory barrier while decrementing the arrival count and incrementing the expected transaction count.
 
 Defined in header ``<cuda/barrier>``:
 
@@ -73,7 +80,7 @@ Return Value
 Example
 -------
 
-Below example shows only ``cuda::device::barrier_arrive_tx``. A more extensive example can be found in the
+The example below shows only ``cuda::device::barrier_arrive_tx``. A more extensive example can be found in the
 :ref:`cuda::device::memcpy_async_tx <libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx>` documentation.
 
 .. code:: cuda

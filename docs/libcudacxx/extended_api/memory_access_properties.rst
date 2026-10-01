@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Overview of the libhipcxx memory access properties extended API, including access_property, annotated_ptr, apply_access_property, associate_access_property, and discard_memory.
+  :keywords: libhipcxx, ROCm, HIP, C++, memory access properties, access_property, annotated_ptr, cache eviction, L2 cache
+
+
 .. _libcudacxx-extended-api-memory-access-properties:
 
 Memory access properties
 ------------------------
+
+This page covers the memory access properties extended API, providing types and functions for annotating memory accesses with cache residence hints such as access_property, annotated_ptr, and discard_memory.
 
 .. toctree::
    :hidden:

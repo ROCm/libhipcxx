@@ -1,25 +1,37 @@
 ..
-    Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+    MIT License
+
+    Modifications Copyright (C) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 
+.. meta::
+  :description: API reference for cuda::proclaim_return_type, which creates a forwarding call wrapper that declares the return type for extended device lambdas in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, proclaim_return_type, device lambda, callable, functional, return type
+
+..
 .. _libcudacxx-extended-api-functional-proclaim-return-type:
 
-cuda::proclaim_return_type
+``cuda::proclaim_return_type``
 ==============================
+
+This page documents ``cuda::proclaim_return_type``, which creates a forwarding call wrapper that declares the return type for extended device lambdas.
 
 Defined in the header ``<cuda/functional>``:
 
@@ -43,9 +55,9 @@ Template Parameters
    :header-rows: 0
 
    * - ``Ret``
-     - Return type that's being proclaimed
+     - Return type being proclaimed
    * - ``Fn``
-     - Callable object type that's being wrapped
+     - Callable object type being wrapped
 
 Parameters
 ----------
@@ -55,7 +67,7 @@ Parameters
    :header-rows: 0
 
    * - ``fn``
-     - Callable object that's being wrapped
+     - Callable object being wrapped
 
 Example
 -------

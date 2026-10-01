@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::device warp shuffle functions, which exchange data of arbitrary size between threads within a warp in libhipcxx for HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, warp_shuffle, warp_shuffle_idx, warp_shuffle_up, warp_shuffle_down, warp_shuffle_xor, shfl.sync
+
 .. _libcudacxx-extended-api-warp-warp-shuffle:
 
 Warp Shuffle
 ============
+
+The warp shuffle functions allow threads within a warp to exchange data of arbitrary size, including raw arrays, pointers, and structs.
 
 ``warp_shuffle_idx``:
 
@@ -83,8 +112,8 @@ Result type:
         __device__ operator T() const { return data; }
     };
 
-The functionality provides a generalized and safe alternative to CUDA warp shuffle intrinsics.
-The functions allow to exchange data of any data size, including raw arrays, pointers, and structs.
+The functionality provides a generalized, safe alternative to CUDA warp shuffle intrinsics.
+The functions allow threads to exchange data of any size, including raw arrays, pointers, and structs.
 
 **Parameters**
 
@@ -100,7 +129,7 @@ The functions allow to exchange data of any data size, including raw arrays, poi
 - ``data``: data of the destination lane.
 - ``pred``: ``true`` if the destination lane is within the source lane window. ``false`` otherwise.
 
-**Constrains**
+**Constraints**
 
 - ``Width`` must be a power of two in the range [1, 32]
 - ``T``: only ``void`` pointers are allowed to avoid bug-prone code

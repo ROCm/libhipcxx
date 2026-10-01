@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,16 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Documents the utility library headers in libhipcxx, including bitset, expected, functional, memory, optional, tuple, type_traits, utility, variant, and version.
+  :keywords: libhipcxx, ROCm, HIP, C++, utility, optional, tuple, variant, type_traits
+
 .. _libcudacxx-standard-api-utility:
 
 Utility Library
-=======================
+===============
+
+This page covers the utility library headers available in libhipcxx, including bitset, expected, functional, memory, optional, tuple, type_traits, utility, variant, and version.
 
 .. toctree::
    :hidden:

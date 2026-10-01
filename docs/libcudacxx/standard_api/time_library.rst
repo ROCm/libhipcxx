@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,16 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Documents cuda::std::chrono in libhipcxx, covering system_clock and high_resolution_clock behavior on heterogeneous CPU and GPU platforms, along with omissions such as steady_clock.
+  :keywords: libhipcxx, ROCm, HIP, C++, chrono, system_clock, high_resolution_clock, steady_clock, time
+
 .. _libcudacxx-standard-api-time:
 
 Time Library
-=======================
+============
+
+This page documents the time library headers available in libhipcxx, covering chrono clocks, durations, and time points.
 
 See the documentation of the standard header `\<chrono\> <https://en.cppreference.com/w/cpp/header/chrono>`_
 
@@ -54,12 +60,12 @@ To implement
 `std::chrono::system_clock <https://en.cppreference.com/w/cpp/chrono/system_clock>`_,
 we use:
 
--  `GetSystemTimePreciseAsFileTime <https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimepreciseasfiletime>`_ and
+- `GetSystemTimePreciseAsFileTime <https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimepreciseasfiletime>`_ and
    `GetSystemTimeAsFileTime <https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemtimeasfiletime>`_
    for host code on Windows.
--  `clock_gettime(CLOCK_REALTIME, ...) <https://man7.org/linux/man-pages/man3/clock_gettime.3.html>`_ and `gettimeofday <https://man7.org/linux/man-pages/man2/gettimeofday.2.html>`_
+- `clock_gettime(CLOCK_REALTIME, ...) <https://man7.org/linux/man-pages/man3/clock_gettime.3.html>`_ and `gettimeofday <https://man7.org/linux/man-pages/man2/gettimeofday.2.html>`_
    for host code on Linux, Android, and QNX.
--  `PTX's %globaltimer <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#special-registers-globaltimer>`_ for device code.
+- `PTX's %globaltimer <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#special-registers-globaltimer>`_ for device code.
 
 `PTX's %globaltimer <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#special-registers-globaltimer>`_
 is a system clock which also happens to be monotonically increasing on today's NVIDIA GPUs
@@ -79,13 +85,12 @@ time zone change.
 
 The requirements for `Clock <https://eel.is/c++draft/time.clock.req>`_ state:
 
-   ``C1`` denotes a clock type. ``t1`` and ``t2`` are values returned by
-   ``C1::now()`` where the call returning ``t1`` `happens before <http://eel.is/c++draft/intro.multithread#def:happens_before>`_
-   the call returning ``t2`` and both of these calls occur before
-   ``C1::time_point::max()``.
-
-   ``C1::is_steady`` is ``true`` if ``t1 <= t2`` is always true and the
-   time between clock ticks is constant, otherwise ``false``.
+- ``C1`` denotes a clock type. ``t1`` and ``t2`` are values returned by
+``C1::now()`` where the call returning ``t1`` `happens before <http://eel.is/c++draft/intro.multithread#def:happens_before>`_
+the call returning ``t2`` and both of these calls occur before
+``C1::time_point::max()``.
+- ``C1::is_steady`` is ``true`` if ``t1 <= t2`` is always true and the
+time between clock ticks is constant, otherwise ``false``.
 
 The property is true for our `std::chrono::system_clock <https://en.cppreference.com/w/cpp/chrono/system_clock>`_
 within device code, but it is not true for all threads. Therefore, in the NVIDIA C++ Standard Library today,
@@ -96,10 +101,7 @@ is ``false``.
 `std::chrono::high_resolution_clock <https://en.cppreference.com/w/cpp/chrono/high_resolution_clock>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The `std::chrono::high_resolution_clock specification <http://eel.is/c++draft/time.clock.hires>`_ states:
-
-   Objects of ``class high_resolution_clock`` represent clocks with the shortest tick period.
-   ``high_resolution_clock`` may be a synonym for ``system_clock`` or ``steady_clock``.
+The `std::chrono::high_resolution_clock specification <http://eel.is/c++draft/time.clock.hires>`_ states: Objects of ``class high_resolution_clock`` represent clocks with the shortest tick period. ``high_resolution_clock`` may be a synonym for ``system_clock`` or ``steady_clock``.
 
 In the NVIDIA C++ Standard Library, `std::chrono::high_resolution_clock <https://en.cppreference.com/w/cpp/chrono/high_resolution_clock>`_
 is an alias for `std::chrono::system_clock <https://en.cppreference.com/w/cpp/chrono/system_clock>`_.
@@ -115,9 +117,9 @@ Omissions
 The following facilities in section `time.syn <https://eel.is/c++draft/time.syn>`_ of ISO/IEC IS 14882 (the C++ Standard)
 are not available in the NVIDIA C++ Standard Library today:
 
--  `std::chrono::steady_clock <https://en.cppreference.com/w/cpp/chrono/steady_clock>`_
+- `std::chrono::steady_clock <https://en.cppreference.com/w/cpp/chrono/steady_clock>`_
    - a monotonically increasing clock.
--  `std::chrono::duration I/O operators <https://eel.is/c++draft/time.duration.io>`_.
+- `std::chrono::duration I/O operators <https://eel.is/c++draft/time.duration.io>`_.
 
 `std::chrono::steady_clock <https://en.cppreference.com/w/cpp/chrono/steady_clock>`_
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

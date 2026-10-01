@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::make_pipeline, which creates unified or partitioned producer-consumer pipelines for sequencing asynchronous operations in libhipcxx for HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, make_pipeline, pipeline, producer, consumer, thread group, shared state
+
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-make-pipeline:
 
-cuda::make_pipeline
+``cuda::make_pipeline``
 =======================
+
+This page documents ``cuda::make_pipeline``, which constructs a pipeline object for coordinating asynchronous operations between producer and consumer threads.
 
 Defined in header ``<cuda/pipeline>``:
 
@@ -78,10 +107,10 @@ A ``cuda::pipeline`` object.
 
 .. note::
 
-  - All threads in ``group`` acquire collective ownership of the ``shared_state`` storage.
-  - ``make_pipeline`` must be invoked by every threads in ``group`` such that ``group::sync`` may be invoked.
-  - ``shared_state`` and ``producer_count`` must be the same across all threads in ``group``, else the behavior is undefined.
-  - ``producer_count`` must be strictly inferior to ``group::size``, otherwise the behavior is undefined.
+   - All threads in ``group`` acquire collective ownership of the ``shared_state`` storage.
+   - ``make_pipeline`` must be invoked by every threads in ``group`` such that ``group::sync`` may be invoked.
+   - ``shared_state`` and ``producer_count`` must be the same across all threads in ``group``, else the behavior is undefined.
+   - ``producer_count`` must be strictly inferior to ``group::size``, otherwise the behavior is undefined.
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-make-pipeline-example:
 

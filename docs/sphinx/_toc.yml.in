@@ -49,6 +49,10 @@ defaults:
   maxdepth: 6
 root: index
 subtrees:
+  - entries:
+      - file: what-is-libhipcxx
+        title: What is libhipcxx?
+
   - caption: Install
     entries:
       - file: install/install
@@ -63,14 +67,12 @@ subtrees:
       - file: conceptual/libhipcxx-extensions
         title: C++ Standard Library extensions
       - file: conceptual/libhipcxx-hip-abstractions
-        title: HIP-specific abstractions and namespaces
+        title: Namespace hierarchy in libhipcxx
 
   - caption: How to
     entries:
-      - file: how-to/use-libhipcxx-in-a-project
-        title: Add libhipcxx to a CMake project
       - file: how-to/run-libhipcxx-tests
-        title: Run the libhipcxx tests
+        title: Run libhipcxx tests
 
   - caption: API reference
     entries:
@@ -78,18 +80,12 @@ subtrees:
         title: Standard API
       - file: libcudacxx/extended_api
         title: Extended API
-      - file: libcudacxx/ptx
-        title: PTX API
       - file: reference/libhipcxx-limitations
         title: Limitations and unsupported APIs
       - file: reference/libhipcxx-conformance
         title: Conformance and ABI evolution
-      - file: libcudacxx/releases
-        title: Releases
 
   - caption: About
     entries:
-      - file: libcudacxx/contributing
-        title: Contributing
       - file: license
         title: License

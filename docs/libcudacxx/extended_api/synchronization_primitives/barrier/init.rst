@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: API reference for cuda::barrier::init, a friend function used to initialize a shared memory cuda::barrier that cannot run its constructor in libhipcxx for HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, barrier init, shared memory, __shared__, NVCC, initialization, barrier
+
+
 .. _libcudacxx-extended-api-synchronization-barrier-barrier-init:
 
-cuda::barrier::init
+``cuda::barrier::init``
 =======================
+
+This page documents ``cuda::barrier::init``, a friend function used to initialize a shared memory ``cuda::barrier`` that cannot run its constructor.
 
 Defined in header ``<cuda/barrier>``:
 

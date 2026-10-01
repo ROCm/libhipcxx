@@ -21,30 +21,34 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+   :description: Explore the CUDA C++ Core Libraries (CCCL): libhipcxx, CUB, Thrust, and Cuda Experimental — high-quality C++ abstractions for GPU development.
+   :keywords: CCCL, CUDA, C++, libhipcxx, CUB, Thrust, GPU, HIP, ROCm, AMD
+
 .. _cccl-cpp-libraries:
 
-CUDA C++ Core Libraries
+CUDA C++ core libraries
 =======================
 
 .. toctree::
    :hidden:
    :maxdepth: 3
 
-   libhipcxx <https://nvidia.github.io/cccl/libhipcxx/>
+   libhipcxx <https://rocm.docs.amd.com/projects/libhipcxx/en/latest/>
    CUB <https://nvidia.github.io/cccl/cub/>
    Thrust <https://nvidia.github.io/cccl/thrust/>
    Cuda Experimental <https://nvidia.github.io/cccl/cudax/>
 
 Welcome to the CUDA Core Compute Libraries (CCCL) libraries for C++.
 
-The concept for the  CCCL C++ librarires grew organically out of the Thrust,
+The concept for the CCCL C++ libraries grew organically out of the Thrust,
 CUB, and libhipcxx projects that were developed independently over the years
 with a similar goal: to provide high-quality, high-performance, and
 easy-to-use C++ abstractions for CUDA developers. Naturally, there was a lot
 of overlap among the three projects, and it became clear the community would
 be better served by unifying them into a single repository.
 
-- `libhipcxx <https://nvidia.github.io/cccl/libhipcxx/>`__
+- `libhipcxx <https://rocm.docs.amd.com/projects/libhipcxx/en/latest/>`__
   is the CUDA C++ Standard Library. It provides an implementation of the C++
   Standard Library that works in both host and device code. Additionally, it
   provides abstractions for CUDA-specific hardware features like

@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::discard_memory, which discards modified cache lines without writing back to global memory, enabling scratch pad usage in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, discard_memory, cache, global memory, scratch pad, indeterminate
+
 .. _libcudacxx-extended-api-memory-access-properties-discard-memory:
 
-cuda::discard_memory
-====================
+``cuda::discard_memory``
+========================
+
+This page documents ``cuda::discard_memory``, which discards modified cache lines without writing back to global memory, enabling use of global memory as temporary scratch space.
 
 .. code:: cuda
 
@@ -12,7 +41,7 @@ cuda::discard_memory
 **Effects**: equivalent to ``memset(ptr, _indeterminate_, nbytes)``.
 
 **Hint**: to discard modified cache lines without writing back the cached data to memory. Enables using global memory
-as temporary scratch space. Does **not** generate any HW store operations.
+as temporary scratch space. Does not generate any HW store operations.
 
 Example
 -------

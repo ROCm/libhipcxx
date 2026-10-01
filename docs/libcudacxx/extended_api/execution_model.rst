@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: Documentation of the libhipcxx CUDA C++ execution model, covering forward progress guarantees for host threads, device threads, and CUDA API calls.
+  :keywords: libhipcxx, ROCm, HIP, C++, execution model, forward progress, device threads, host threads, CUDA API
+
 .. _libcudacxx-extended-api-execution-model:
 
 Execution model
 ===============
+
+This page documents the CUDA C++ execution model, covering forward progress guarantees for host threads, device threads, and concurrent execution across scopes.
 
 CUDA C++ aims to provide `parallel forward progress [intro.progress.9] <https://eel.is/c++draft/intro.progress#9>`__
 for all device threads of execution, facilitating the parallelization of pre-existing C++ applications with CUDA C++.
@@ -12,18 +41,22 @@ for all device threads of execution, facilitating the parallelization of pre-exi
       providing `concurrent forward progress guarantees <https://eel.is/c++draft/intro.progress#def:concurrent_forward_progress_guarantees>`__,
       the implementation ensures that the thread will eventually make progress for as long as it has not terminated.
 
-      [Note 5: This applies regardless of whether or not other threads of execution (if any) have been or are making progress.
-      To eventually fulfill this requirement means that this will happen in an unspecified but finite amount of time. — end note]
+      .. note::
+
+         This applies regardless of whether or not other threads of execution (if any) have been or are making progress.
+         To eventually fulfill this requirement means that this will happen in an unspecified but finite amount of time.
 
     - `[intro.progress.9] <https://eel.is/c++draft/intro.progress>`__: For a thread of execution providing
       `parallel forward progress guarantees <https://eel.is/c++draft/intro.progress#9>`__, the implementation is not required to ensure that
       the thread will eventually make progress if it has not yet executed any execution step; once this thread has executed a step,
       it provides concurrent forward progress guarantees.
 
-        [Note 6: This does not specify a requirement for when to start this thread of execution, which will typically be specified by the entity
-        that creates this thread of execution. For example, a thread of execution that provides concurrent forward progress guarantees and executes
-        tasks from a set of tasks in an arbitrary order, one after the other, satisfies the requirements of parallel forward progress for these
-        tasks. — end note]
+      .. note::
+
+         This does not specify a requirement for when to start this thread of execution, which will typically be specified by the entity
+         that creates this thread of execution. For example, a thread of execution that provides concurrent forward progress guarantees and executes
+         tasks from a set of tasks in an arbitrary order, one after the other, satisfies the requirements of parallel forward progress for these
+         tasks.
 
 
 The CUDA C++ Programming Language is an extension of the C++ Programming Language.
@@ -58,40 +91,46 @@ Once a device thread makes progress:
 - Otherwise, all device threads in its `thread-block cluster <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#thread-block-clusters>`__
   shall eventually make progress.
 
-    [Note: Threads in other thread-block clusters are not guaranteed to eventually make progress. - end note.]
+.. note::
 
-    [Note: This implies that all device threads within its thread block shall eventually make progress. - end note.]
+   Threads in other thread-block clusters are not guaranteed to eventually make progress.
+
+.. note::
+
+   This implies that all device threads within its thread block shall eventually make progress.
 
 
 Modify `[intro.progress.1] <https://eel.is/c++draft/intro.progress>`__ as follows (modifications in **bold**):
 
 The implementation may assume that any **host** thread will eventually do one of the following:
 
-    1. terminate,
-    2. invoke the function `std::this_thread::yield <https://en.cppreference.com/w/cpp/thread/yield>`__ (`[thread.thread.this] <http://eel.is/c++draft/thread.thread.this>`__),
-    3. make a call to a library I/O function,
-    4. perform an access through a volatile glvalue,
-    5. perform a synchronization operation or an atomic operation, or
-    6. continue execution of a trivial infinite loop (`[stmt.iter.general] <http://eel.is/c++draft/stmt.iter.general>`__).
+- Terminate
+- Invoke the function `std::this_thread::yield <https://en.cppreference.com/w/cpp/thread/yield>`__ (`[thread.thread.this] <http://eel.is/c++draft/thread.thread.this>`__)
+- Make a call to a library I/O function
+- Perform an access through a volatile glvalue
+- Perform a synchronization operation or an atomic operation
+- Continue execution of a trivial infinite loop (`[stmt.iter.general] <http://eel.is/c++draft/stmt.iter.general>`__)
 
-**The implementation may assume that any device thread will eventually do one of the following:**
+The implementation may assume that any device thread will eventually do one of the following:
 
-    1. **terminate**,
-    2. **make a call to a library I/O function**,
-    3. **perform an access through a volatile glvalue except if the designated object has automatic storage duration, or**
-    4. **perform a synchronization operation or an atomic read operation except if the designated object has automatic storage duration.**
+- Terminate
+- Make a call to a library I/O function
+- Perform an access through a volatile glvalue, except if the designated object has automatic storage duration
+- Perform a synchronization operation or an atomic read operation, except if the designated object has automatic storage duration
 
-    [Note: Some current limitations of device threads relative to host threads
-    are implementation defects known to us, that we may fix over time.
-    Examples include the undefined behavior that arises from device threads
-    that eventually only perform volatile or atomic operations
-    on automatic storage duration objects.
-    However, other limitations of device threads relative to host threads
-    are intentional choices.  They enable performance optimizations
-    that would not be possible if device threads followed the C++ Standard strictly.
-    For example, providing forward progress to programs
-    that eventually only perform atomic writes or fences
-    would degrade overall performance for little practical benefit. - end note.]
+.. note::
+
+   Some current limitations of device threads relative to host threads
+   are implementation defects known to us, that we may fix over time.
+   Examples include the undefined behavior that arises from device threads
+   that eventually only perform volatile or atomic operations
+   on automatic storage duration objects.
+   However, other limitations of device threads relative to host threads
+   are intentional choices. They enable performance optimizations
+   that would not be possible if device threads followed the C++ Standard strictly.
+   For example, providing forward progress to programs
+   that eventually only perform atomic writes or fences
+   would degrade overall performance for little practical benefit.
 
 .. dropdown:: Examples of forward progress guarantee differences between host and device threads due to modifications to `[intro.progress.1] <https://eel.is/c++draft/intro.progress#1>`__.
 
@@ -99,7 +138,7 @@ The implementation may assume that any **host** thread will eventually do one of
     using "host.threads.<id>" and "device.threads.<id>", respectively.
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.Device.0
         // Outcome: grid eventually terminates per device.threads.4 because the atomic object does not have automatic storage duration.
@@ -112,7 +151,7 @@ The implementation may assume that any **host** thread will eventually do one of
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.Device.1
         // Allowed outcome: No thread makes progress because device threads don't support host.threads.2.
@@ -121,7 +160,7 @@ The implementation may assume that any **host** thread will eventually do one of
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.Device.2
         // Allowed outcome: No thread makes progress because device threads don't support host.threads.4
@@ -132,7 +171,7 @@ The implementation may assume that any **host** thread will eventually do one of
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.Device.3
         // Allowed outcome: No thread makes progress because device threads don't support host.threads.5
@@ -143,7 +182,7 @@ The implementation may assume that any **host** thread will eventually do one of
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.Device.4
         // Allowed outcome: No thread makes progress because device threads don't support host.thread.6.
@@ -162,16 +201,20 @@ CUDA query functions (e.g. `cudaStreamQuery <https://docs.nvidia.com/cuda/cuda-r
 `cudaEventQuery <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EVENT.html#group__CUDART__EVENT_1g2bf738909b4a059023537eaa29d8a5b7>`__, etc.) shall not consistently
 return ``cudaErrorNotReady`` without a device thread making progress.
 
-  [Note: The device thread need not be "related" to the API call, e.g., an API operating on one stream or process may ensure progress of a device thread on another stream or process. - end note.]
+.. note::
 
-  [Note: A simple but not sufficient method to test a program for CUDA API Forward Progress conformance is to run them with following environment variables set: ``CUDA_DEVICE_MAX_CONNECTIONS=1 CUDA_LAUNCH_BLOCKING=1``, and then check that the program still terminates.
-  If it does not, the program has a bug.
-  This method is not sufficient because it does not catch all Forward Progress bugs, but it does catch many such bugs. - end note.]
+   The device thread need not be "related" to the API call, e.g., an API operating on one stream or process may ensure progress of a device thread on another stream or process.
+
+.. note::
+
+   A simple but not sufficient method to test a program for CUDA API Forward Progress conformance is to run them with following environment variables set: ``CUDA_DEVICE_MAX_CONNECTIONS=1 CUDA_LAUNCH_BLOCKING=1``, and then check that the program still terminates.
+   If it does not, the program has a bug.
+   This method is not sufficient because it does not catch all Forward Progress bugs, but it does catch many such bugs.
 
 .. dropdown:: Examples of CUDA API forward progress guarantees.
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.API.1
         // Outcome: if no other device threads (e.g., from other processes) are making progress,
@@ -189,7 +232,7 @@ return ``cudaErrorNotReady`` without a device thread making progress.
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.API.2
         // Allowed outcome: eventually, no thread makes progress.
@@ -206,7 +249,7 @@ return ``cudaErrorNotReady`` without a device thread making progress.
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.API.3
         // Allowed outcome: eventually, no thread makes progress.
@@ -223,7 +266,7 @@ return ``cudaErrorNotReady`` without a device thread making progress.
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.API.4
         // Outcome: terminates.
@@ -248,13 +291,15 @@ Dependencies
 
 A device thread shall not start until all its dependencies have completed.
 
-  [Note: Dependencies that prevent device threads from starting to make progress can be created, for example, via `CUDA Stream Commands <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#streams>`__ .
-  These may include dependencies on the completion of, among others, `CUDA Events <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#events>`__ and `CUDA Kernels <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#kernels>`__ . - end note.]
+.. note::
+
+   Dependencies that prevent device threads from starting to make progress can be created, for example, via `CUDA Stream Commands <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#streams>`__.
+   These may include dependencies on the completion of, among others, `CUDA Events <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#events>`__ and `CUDA Kernels <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#kernels>`__.
 
 .. dropdown:: Examples of CUDA API forward progress guarantees due to dependencies
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.Stream.0
         // Allowed outcome: eventually, no thread makes progress.
@@ -277,7 +322,7 @@ A device thread shall not start until all its dependencies have completed.
         }
 
     .. code:: cuda
-	:number-lines:
+       :number-lines:
 
         // Example: Execution.Model.Stream.1
         // Outcome: terminates.

@@ -24,8 +24,9 @@
 .. _libcudacxx-ptx:
 
 PTX
-=====
+===
 
+This page documents the ``cuda::ptx`` namespace, which provides C++ wrappers that map one-to-one to PTX instructions for fine-grained control of generated code.
 
 The ``cuda::ptx`` namespace contains functions that map one-to-one to
 `PTX instructions <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html>`__.
@@ -72,7 +73,7 @@ resolution as in the code below to ensure forward-compatibility:
      cuda::ptx::sem_release, cuda::ptx::scope_cta, cuda::ptx::space_shared, &bar, 1
    );
 
-**PTX ISA version and compute capability.** Each binding notes under
+PTX ISA version and compute capability: each binding notes under
 which PTX ISA version and SM version it may be used. Example:
 
 .. code:: cuda

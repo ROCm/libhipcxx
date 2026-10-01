@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: libhipcxx documentation
-  :keywords: libhipcxx, ROCm, HIP, C++, standard library, heterogeneous, documentation
+  :description: Explore libhipcxx, the C++ Standard Library for HIP on AMD GPUs. Find installation guides, API reference, conceptual topics, and how-to guides.
+  :keywords: libhipcxx, ROCm, HIP, C++, standard library, heterogeneous, AMD GPU, CUDA alternative, HIP C++, documentation
 
 .. _index:
 
@@ -39,7 +39,7 @@ libhipcxx is derived from `libcudacxx <https://github.com/NVIDIA/cccl>`_ and aim
 APIs on AMD GPUs. It is a header-only library, so there is nothing to compile or link against: you
 only need the headers on your include path. There is no CUDA backend for libhipcxx.
 
-The libhipcxx public repository is located at `https://github.com/ROCm/libhipcxx <https://github.com/ROCm/libhipcxx>`_.
+The libhipcxx public repository is located at `ROCm/libhipcxx <https://github.com/ROCm/libhipcxx>`_.
 
 .. grid:: 2
   :gutter: 3
@@ -51,14 +51,13 @@ The libhipcxx public repository is located at `https://github.com/ROCm/libhipcxx
 
   .. grid-item-card:: Conceptual
 
-    * :doc:`Standard library features <conceptual/libhipcxx-standard-library-features>`
-    * :doc:`Standard library extensions <conceptual/libhipcxx-extensions>`
-    * :doc:`HIP-specific abstractions and namespaces <conceptual/libhipcxx-hip-abstractions>`
+    * :doc:`C++ standard library features <conceptual/libhipcxx-standard-library-features>`
+    * :doc:`C++ standard library extensions <conceptual/libhipcxx-extensions>`
+    * :doc:`Namespace hierarchy in libhipcxx <conceptual/libhipcxx-hip-abstractions>`
 
   .. grid-item-card:: How to
 
-    * :doc:`Add libhipcxx to a CMake project <how-to/use-libhipcxx-in-a-project>`
-    * :doc:`Run the libhipcxx tests <how-to/run-libhipcxx-tests>`
+    * :doc:`Run libhipcxx tests <how-to/run-libhipcxx-tests>`
 
   .. grid-item-card:: API reference
 
@@ -73,4 +72,4 @@ To contribute to the documentation, refer to
 `Contributing to ROCm <https://rocm.docs.amd.com/en/latest/contribute/contributing.html>`_.
 
 You can find licensing information on the
-`Licensing <https://rocm.docs.amd.com/en/latest/about/license.html>`_ page.
+:doc:`Licensing <license>` page.

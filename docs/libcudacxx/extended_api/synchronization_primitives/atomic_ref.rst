@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::atomic_ref, an extended form of std::atomic_ref with thread scope support for atomic operations on existing non-atomic objects in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, atomic_ref, thread scope, fetch_min, fetch_max, atomic operations, Pascal
+
 .. _libcudacxx-extended-api-synchronization-atomic-ref:
 
-cuda::atomic_ref
+``cuda::atomic_ref``
 ====================
+
+This page documents ``cuda::atomic_ref``, an extended form of ``std::atomic_ref`` with thread scope support for atomic operations on existing non-atomic objects.
 
 .. toctree::
    :hidden:
@@ -44,9 +73,10 @@ No object or subobject of an object referenced by an ``atomic_­ref`` shall be c
 ``atomic_­ref`` that has a different ``Scope``.
 
 For ``cuda::atomic_ref<T>`` and ``cuda::std::atomic_ref<T>`` the type ``T`` must satisfy the following:
-  - ``4 <= sizeof(T) <= 8``.
-  - ``T`` must not have “padding bits”, i.e., T's `object representation <https://en.cppreference.com/w/cpp/language/object#Object_representation_and_value_representation>`_
-    must not have bits that do not participate in it's value representation.
+
+- ``4 <= sizeof(T) <= 8``.
+- ``T`` must not have "padding bits", i.e., T's `object representation <https://en.cppreference.com/w/cpp/language/object#Object_representation_and_value_representation>`_
+  must not have bits that do not participate in it's value representation.
 
 Concurrency Restrictions
 ------------------------
@@ -54,8 +84,9 @@ Concurrency Restrictions
 See :ref:`memory model <libcudacxx-extended-api-memory-model>` documentation for general restrictions on atomicity.
 
 With CUDA Compute Capability 6 (Pascal), an object of type ``atomic_ref`` may not be used:
-  - with a reference to an object with a automatic storage duration in a GPU thread, or
-  - if ``is_always_lock_free()`` is ``false``.
+
+- with a reference to an object with a automatic storage duration in a GPU thread, or
+- if ``is_always_lock_free()`` is ``false``.
 
 For CUDA Compute Capability prior to 6 (Pascal), objects of type ``cuda::atomic_ref`` or
 `cuda::std::atomic_ref <https://en.cppreference.com/w/cpp/atomic/atomic_ref>`_ may not be used.

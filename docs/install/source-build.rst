@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-   :description: Build and install libhipcxx from source
-   :keywords: install, building, libhipcxx, AMD, ROCm, TheRock, source code, cmake, Linux
+   :description: Learn how to build and install libhipcxx from source on Linux using CMake, including prerequisites, build options, and package generation steps.
+   :keywords: install, building, libhipcxx, AMD, ROCm, TheRock, source code, cmake, Linux, build from source
 
 .. _build-from-source:
 
@@ -31,9 +31,8 @@
 Build libhipcxx from source
 ***************************
 
-To build libhipcxx as part of the ROCm Core SDK, see `TheRock build
-instructions
-<https://github.com/ROCm/TheRock/blob/main/docs/development/README.md>`_.
+To build libhipcxx as part of the ROCm Core SDK, see `Install AMD ROCm
+<https://rocm.docs.amd.com/en/latest/install/rocm.html>`_.
 TheRock is the recommended way to build ROCm components from source.
 
 Alternatively, you can build libhipcxx standalone using the following
@@ -41,8 +40,8 @@ instructions.
 
 .. _libhipcxx-prerequisites:
 
-Prerequisites
-=============
+libhipcxx build prerequisites
+=============================
 
 On Linux, `ROCm <https://rocm.docs.amd.com/en/latest/install/rocm.html>`_ must
 be installed before libhipcxx is built.

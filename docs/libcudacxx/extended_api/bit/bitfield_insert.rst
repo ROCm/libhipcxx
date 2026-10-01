@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::bitfield_insert, which inserts a bitfield from one unsigned integer value into another at a specified position in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, bitfield_insert, bit manipulation, unsigned integer, BFI
+
 .. _libcudacxx-extended-api-bit-bitfield_insert:
 
 ``cuda::bitfield_insert``
 =========================
+
+This page documents ``cuda::bitfield_insert``, which inserts the lower bits of a source value into a destination value at a specified bit position and width.
 
 .. code:: cpp
 
@@ -13,24 +42,24 @@ The function extracts the lower bitfield of size ``width`` from ``source`` and i
 
 **Parameters**
 
-- ``dest``:   The value to insert the bitfield.
-- ``source``: The value from which extract the bitfield.
-- ``start``:  Initial position of the bitfield.
-- ``width``:  Width of the bitfield.
+- ``dest``: The value to insert the bitfield.
+- ``source``: The value from which to extract the bitfield.
+- ``start``: Initial position of the bitfield.
+- ``width``: Width of the bitfield.
 
 **Return value**
 
-- ``((value << start) & mask) | (source & ~mask)``, where ``mask`` is a bitmask of width ``width``.
+``((value << start) & mask) | (source & ~mask)``, where ``mask`` is a bitmask of width ``width``.
 
 **Constraints**
 
-- ``T`` is an unsigned integer type.
+``T`` is an unsigned integer type.
 
 **Preconditions**
 
-    - ``start >= 0 && start <= num_bits(T)``
-    - ``width >= 0 && width <= num_bits(T)``
-    - ``start + width <= num_bits(T)``
+- ``start >= 0 && start <= num_bits(T)``
+- ``width >= 0 && width <= num_bits(T)``
+- ``start + width <= num_bits(T)``
 
 **Performance considerations**
 
@@ -41,11 +70,11 @@ The function performs the following operations in CUDA for ``uint8_t``, ``uint16
 
 .. note::
 
-    When the input values are run-time values that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations, using the function could not be optimal.
+   When the input values are run-time values that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations, using the function could not be optimal.
 
 .. note::
 
-    GCC <= 8 uses a slow path with more instructions even in CUDA
+   GCC <= 8 uses a slow path with more instructions even in CUDA
 
 Example
 -------

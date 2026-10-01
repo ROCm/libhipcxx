@@ -1,7 +1,7 @@
 ..
     MIT License
 
-    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+    Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,17 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
 
+.. meta::
+  :description: Overview of the libhipcxx memory resource extended API, providing a standard C++ interface for heterogeneous, stream-ordered memory allocation in HIP and CUDA.
+  :keywords: libhipcxx, ROCm, HIP, C++, memory resource, cuda::mr, async_resource, resource_ref, stream-ordered allocation
+
+
 .. _libcudacxx-extended-api-memory-resources:
 
 Memory Resources
 ================
+
+This page covers the memory resource extended API, providing a standard C++ interface for heterogeneous, stream-ordered memory allocation in HIP and CUDA.
 
 .. toctree::
    :hidden:
