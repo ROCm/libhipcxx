@@ -59,6 +59,10 @@ The libhipcxx public repository is located at `ROCm/libhipcxx <https://github.co
 
     * :doc:`Run libhipcxx tests <how-to/run-libhipcxx-tests>`
 
+  .. grid-item-card:: Examples
+
+    * `libhipcxx examples <https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx>`_
+
   .. grid-item-card:: API reference
 
     * :doc:`Standard API <libcudacxx/standard_api>`

@@ -74,6 +74,11 @@ subtrees:
       - file: how-to/run-libhipcxx-tests
         title: Run libhipcxx tests
 
+  - caption: Examples
+    entries:
+      - url: https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx
+        title: libhipcxx examples
+
   - caption: API reference
     entries:
       - file: libcudacxx/standard_api
