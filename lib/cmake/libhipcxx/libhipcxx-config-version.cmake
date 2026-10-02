@@ -1,4 +1,4 @@
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -23,11 +23,18 @@ file(READ "${_libhipcxx_VERSION_INCLUDE_DIR}/cuda/std/__cccl/version.h"
 )
 
 string(REGEX MATCH
-  "#define[ \t]+CCCL_VERSION[ \t]+([0-9]+)" unused_var
+  "#define[ \t]+HIPCCL_VERSION[ \t]+([0-9]+)" unused_var
   "${libhipcxx_VERSION_HEADER}"
 )
 
 set(libhipcxx_VERSION_FLAT ${CMAKE_MATCH_1})
+if(NOT libhipcxx_VERSION_FLAT)
+  message(FATAL_ERROR
+    "Could not parse HIPCCL_VERSION from "
+    "${_libhipcxx_VERSION_INCLUDE_DIR}/cuda/std/__cccl/version.h"
+  )
+endif()
+
 math(EXPR libhipcxx_VERSION_MAJOR "${libhipcxx_VERSION_FLAT} / 1000000")
 math(EXPR libhipcxx_VERSION_MINOR "(${libhipcxx_VERSION_FLAT} / 1000) % 1000")
 math(EXPR libhipcxx_VERSION_PATCH "${libhipcxx_VERSION_FLAT} % 1000")
