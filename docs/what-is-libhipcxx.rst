@@ -46,7 +46,7 @@ high-performance HIP code. Without it, developers face a choice:
 libhipcxx eliminates both options by providing a single set of headers that work
 everywhere. Code written against ``cuda::std::atomic<T>`` compiles and runs
 correctly whether it is called from the host, from a HIP kernel, or from a function
-marked ``__host__ __device__``.
+marked ``__host__`` / ``__device__``.
 
 A secondary benefit is portability across GPU vendors. libhipcxx is derived from
 libcudacxx, NVIDIA's equivalent library for CUDA. Code written against the
@@ -70,7 +70,7 @@ ROCm is AMD's open-source GPU computing platform. It is organized into layers:
      - C++ Standard Library primitives for heterogeneous code
    * - Domain libraries (`rocBLAS <https://rocm.docs.amd.com/projects/rocBLAS/en/latest/>`__, `MIOpen <https://rocm.docs.amd.com/projects/MIOpen/en/latest/>`__, `rocFFT <https://rocm.docs.amd.com/projects/rocFFT/en/latest/>`__, and so on)
      - Optimized domain-specific algorithms built on the runtime
-   * - Frameworks (`PyTorch for ROCm <https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/3rd-party/pytorch-install.html>`__, `TensorFlow for ROCm <https://rocm.docs.amd.com/en/latest/compatibility/ml-compatibility/tensorflow-compatibility.html>`__, and so on)
+   * - Frameworks (`PyTorch for ROCm <https://rocm.docs.amd.com/projects/ai-ecosystem/en/latest/frameworks/pytorch/install.html>`__, `TensorFlow for ROCm <https://rocm.docs.amd.com/projects/ai-ecosystem/en/latest/frameworks/tensorflow/install.html>`__, and so on)
      - High-level ML and scientific computing frameworks
 
 libhipcxx sits between the HIP runtime and higher-level domain libraries. It
@@ -84,11 +84,11 @@ and rocPRIM.
 Definition and scope
 ====================
 
-The C++ Standard Library (`sometimes called "the STL" <https://stackoverflow.com/questions/5205491/whats-the-difference-between-stl-and-c-standard-library>`_) is the set of headers such as
+The C++ Standard Library (`sometimes called "the STL" <https://cppreference.com/cpp/standard_library>`_) is the set of headers such as
 ``<atomic>``, ``<type_traits>``, and ``<vector>`` that ship with every C++ compiler.
 These headers are not usable in GPU device code because:
 
-* They lack the ``__host__ __device__`` annotations that HIP requires for code
+* They lack the ``__host__`` / ``__device__`` annotations that HIP requires for code
   compiled for both CPU and GPU.
 * Their implementations often depend on OS services or compiler intrinsics that are
   unavailable on the GPU.

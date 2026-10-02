@@ -50,7 +50,7 @@ Standard Library Backports
 --------------------------
 
 C++ Standard versions include new language features and new library features. As the name implies, language features
-are new features of the language the require compiler support. Library features are simply new additions to the
+are new features of the language that require compiler support. Library features are simply new additions to the
 Standard Library that typically do not rely on new language features nor require compiler support and could conceivably
 be implemented in an older C++ Standard.
 

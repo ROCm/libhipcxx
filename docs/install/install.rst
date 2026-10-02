@@ -77,15 +77,15 @@ package. This includes libhipcxx, rocThrust, hipCUB, and rocPRIM.
 
    Where:
 
-   * ``<rocm_version>`` is the ROCm Core SDK version to install. Omit this
-     suffix to install the latest available version.
-
    * ``<dev/devel>`` specifies that the package includes library files and
      headers. libhipcxx is header-only, so a development package is required.
 
      * ``-dev`` is used on Debian-based distributions, including Ubuntu.
 
      * ``-devel`` is used on RPM-based distributions, including RHEL and SLES.
+
+   * ``<rocm_version>`` is the ROCm Core SDK version to install. Omit this
+     suffix to install the latest available version.
 
    * ``<llvm_target>`` (starting with ``gfx``) is used if you are installing
      for a single AMD GPU architecture. Omit this suffix to install for all
@@ -119,7 +119,7 @@ package. This includes libhipcxx, rocThrust, hipCUB, and rocPRIM.
 Install a nightly build
 =======================
 
-The `TheRock <https://github.com/ROCm/TheRock>`_ build system also publishes
+`TheRock <https://github.com/ROCm/TheRock>`_ build system also publishes
 nightly builds for the ROCm Core SDK and its components, including libhipcxx.
 See `Nightly release status
 <https://github.com/ROCm/TheRock#nightly-release-status>`_ for details.

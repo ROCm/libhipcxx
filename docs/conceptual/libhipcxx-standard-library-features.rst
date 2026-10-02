@@ -32,13 +32,13 @@ C++ Standard Library features in libhipcxx
 ******************************************
 
 If you are a C++ developer, then you know the C++ Standard Library (`sometimes referred to as "The
-STL" <https://stackoverflow.com/questions/5205491/whats-the-difference-between-stl-and-c-standard-library>`_)
+STL" <https://cppreference.com/cpp/standard_library>`_)
 as what comes along with your compiler and provides things like ``std::string``, ``std::vector``, or
 ``std::atomic``. It provides the fundamental abstractions that C++ developers need to build high
 quality applications and libraries.
 
 By default, these abstractions aren't available when writing HIP C++ device code because they don't
-have the necessary ``__host__ __device__`` decorators, and their implementation may not be suitable
+have the necessary ``__host__`` / ``__device__`` decorators, and their implementation may not be suitable
 for use in and across host and device code.
 
 libhipcxx solves this problem by providing an opt-in, incremental, heterogeneous implementation of

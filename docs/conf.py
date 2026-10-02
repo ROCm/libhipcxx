@@ -34,7 +34,7 @@ import shutil
 html_theme = "rocm_docs_theme"
 html_theme_options = {
     "flavor": "generic",
-    "header_title": "libhipcxx 2.1.0",
+    "header_title": "libhipcxx 3.0.2",
     "header_link": "",
     "version_list_link": "https://rocm.docs.amd.com/projects/libhipcxx/en/latest/release.html",
     "nav_secondary_items": {
@@ -63,7 +63,7 @@ html_context = {"docs_header_version": "3.15"}
 
 # This section turns on/off article info
 setting_all_article_info = True
-all_article_info_os = ["linux", "Windows"]
+all_article_info_os = ["linux", "windows"]
 all_article_info_author = ""
 
 # Dynamically extract component version
@@ -74,7 +74,7 @@ all_article_info_author = ""
 #    match = re.search(pattern, f.read())
 #    if not match:
 #        raise ValueError("VERSION not found!")
-version_number = "2.1.0"
+version_number = "3.0.2"
 
 # for PDF output on Read the Docs
 project = "libhipcxx"

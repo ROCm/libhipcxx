@@ -34,4 +34,4 @@
 
 | Version | Release date |
 | ------- | ------------ |
-| [2.1.0](https://rocm.docs.amd.com/projects/libhipcxx/en/docs-2.1.0/) | October 5, 2026 |
+| [3.0.2](https://rocm.docs.amd.com/projects/libhipcxx/en/docs-3.0.2/) | October 5, 2026 |

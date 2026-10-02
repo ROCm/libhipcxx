@@ -35,7 +35,7 @@ libhipcxx is the C++ Standard Library for HIP. It provides an opt-in, incrementa
 implementation of C++ Standard Library features that work in both host and device code, along with
 extensions to those features and abstractions that are fundamental to the HIP C++ programming model.
 
-libhipcxx is derived from `libcudacxx <https://github.com/NVIDIA/cccl>`_ and aims to support the same
+libhipcxx is derived from `libcudacxx <https://github.com/NVIDIA/cccl/tree/main/libcudacxx>`_ and aims to support the same
 APIs on AMD GPUs. It is a header-only library, so there is nothing to compile or link against: you
 only need the headers on your include path. There is no CUDA backend for libhipcxx.
 
@@ -63,10 +63,8 @@ The libhipcxx public repository is located at `ROCm/libhipcxx <https://github.co
 
     * :doc:`Standard API <libcudacxx/standard_api>`
     * :doc:`Extended API <libcudacxx/extended_api>`
-    * :doc:`PTX API <libcudacxx/ptx>`
     * :ref:`libhipcxx-limitations`
     * :ref:`libhipcxx-conformance`
-    * :ref:`genindex`
 
 To contribute to the documentation, refer to
 `Contributing to ROCm <https://rocm.docs.amd.com/en/latest/contribute/contributing.html>`_.

@@ -57,8 +57,8 @@ libhipcxx has these additional prerequisites to build and run the tests:
 * `LLVM <https://github.com/llvm/llvm-project>`_ version 18.1.8 or higher.
   Only its CMake modules are required.
 * `lit <https://pypi.org/project/lit/>`_ version 18.1.8
-* Ninja
-* sccache
+* `Ninja <https://github.com/ninja-build/ninja>`_
+* `sccache <https://github.com/mozilla/sccache>`_
 
 .. _libhipcxx-get-source:
 

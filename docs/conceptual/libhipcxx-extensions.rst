@@ -71,46 +71,46 @@ functionality. The following table lists each extension category with its key AP
      - APIs
      - Notes
    * - Thread-scope synchronization
-     - * ``cuda::atomic``
-       * ``cuda::atomic_ref``
+     - * ``cuda::atomic`` / ``hip::atomic``
+       * ``cuda::atomic_ref`` / ``hip::atomic_ref``
      - ``cuda::thread_scope`` controls memory fence strength across thread, block, device, or system
    * - Asynchronous operations
-     - * ``cuda::memcpy_async``
+     - * ``cuda::memcpy_async`` / ``hip::memcpy_async``
      - Overlaps compute and memory transfers
    * - Functional utilities
-     - * ``cuda::maximum``
-       * ``cuda::minimum``
-       * ``cuda::proclaim_return_type``
-       * ``cuda::get_device_address``
+     - * ``cuda::maximum`` / ``hip::maximum``
+       * ``cuda::minimum`` / ``hip::minimum``
+       * ``cuda::proclaim_return_type`` / ``hip::proclaim_return_type``
+       * ``cuda::get_device_address`` / ``hip::get_device_address``
      -
    * - Math utilities
-     - * ``cuda::ceil_div``
-       * ``cuda::round_up``
-       * ``cuda::round_down``
-       * ``cuda::ilog2``
-       * ``cuda::ilog10``
+     - * ``cuda::ceil_div`` / ``hip::ceil_div``
+       * ``cuda::round_up`` / ``hip::round_up``
+       * ``cuda::round_down`` / ``hip::round_down``
+       * ``cuda::ilog2`` / ``hip::ilog2``
+       * ``cuda::ilog10`` / ``hip::ilog10``
      -
    * - Bit utilities
-     - * ``cuda::bitmask``
-       * ``cuda::bit_reverse``
-       * ``cuda::bitfield_insert``
-       * ``cuda::bitfield_extract``
+     - * ``cuda::bitmask`` / ``hip::bitmask``
+       * ``cuda::bit_reverse`` / ``hip::bit_reverse``
+       * ``cuda::bitfield_insert`` / ``hip::bitfield_insert``
+       * ``cuda::bitfield_extract`` / ``hip::bitfield_extract``
      -
    * - Stream reference
-     - * ``cuda::stream_ref``
+     - * ``cuda::stream_ref`` / ``hip::stream_ref``
      - Type-safe wrapper around ``hipStream_t``
    * - Memory resources
-     - * ``cuda::mr::resource``
-       * ``cuda::mr::resource_ref``
+     - * ``cuda::mr::resource`` / ``hip::mr::resource``
+       * ``cuda::mr::resource_ref`` / ``hip::mr::resource_ref``
      - Experimental. Requires ``LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE``.
    * - Warp intrinsics
-     - * ``cuda::device::warp_shuffle_idx``
-       * ``cuda::device::warp_shuffle_up``
-       * ``cuda::device::warp_shuffle_down``
-       * ``cuda::device::warp_shuffle_xor``
+     - * ``cuda::device::warp_shuffle_idx`` / ``hip::device::warp_shuffle_idx``
+       * ``cuda::device::warp_shuffle_up`` / ``hip::device::warp_shuffle_up``
+       * ``cuda::device::warp_shuffle_down`` / ``hip::device::warp_shuffle_down``
+       * ``cuda::device::warp_shuffle_xor`` / ``hip::device::warp_shuffle_xor``
      - Device-only
    * - Work stealing
-     - * ``cuda::for_each_canceled_block``
+     - * ``cuda::for_each_canceled_block`` / ``hip::for_each_canceled_block``
      - Device-only. Dynamic block-level parallelism.
 
 For per-API documentation, see the :ref:`Extended API reference <libcudacxx-extended-api>`.
