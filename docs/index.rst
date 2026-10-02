@@ -60,6 +60,10 @@ The libhipcxx public repository is located at `https://github.com/ROCm/libhipcxx
     * :doc:`Add libhipcxx to a CMake project <how-to/use-libhipcxx-in-a-project>`
     * :doc:`Run the libhipcxx tests <how-to/run-libhipcxx-tests>`
 
+  .. grid-item-card:: Examples
+
+    * `libhipcxx examples <https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx>`_
+
   .. grid-item-card:: API reference
 
     * :doc:`Standard API <libcudacxx/standard_api>`
