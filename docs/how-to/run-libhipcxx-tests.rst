@@ -36,7 +36,7 @@ results on AMD GPU hardware. Run the tests when contributing to libhipcxx, valid
 against a specific ROCm version, or checking compatibility after a toolchain upgrade.
 
 The suite uses `lit <https://pypi.org/project/lit/>`_, the LLVM Integrated Tester, and contains
-approximately 2,400 test files organized into the following categories:
+approximately 3,500 tests organized into the following categories:
 
 .. list-table::
    :widths: 25 75
@@ -54,9 +54,11 @@ approximately 2,400 test files organized into the following categories:
    * - Heterogeneous (``heterogeneous/``)
      - Objects shared across host and device, and interoperability between the ``cuda::`` and
        ``hip::`` namespaces.
-   * - Public headers (``public_headers/``)
+   * - Header tests
      - Confirms that each public header is self-contained and compiles as a standalone HIP
-       translation unit.
+       translation unit. These are CMake targets rather than lit tests; build them with
+       ``ninja libcudacxx.test.public_headers``, ``ninja libcudacxx.test.public_headers_host_only``,
+       and ``ninja libcudacxx.test.internal_headers``.
    * - HIP aliasing (``hip/``)
      - Confirms that ``hip::std::`` and ``cuda::std::`` are interchangeable aliases.
 
@@ -81,7 +83,8 @@ and build libhipcxx as described in :doc:`Build from source <../install/source-b
 Choose a method
 ===============
 
-Three methods are available, suited to different situations:
+Three methods are available, suited to different situations. To run individual tests or
+subsets directly, see :ref:`Run individual tests with lit <libhipcxx-run-tests-lit>`.
 
 .. list-table::
    :widths: 20 40 40
@@ -118,19 +121,19 @@ From the ``build`` directory, run:
 Run the tests with the helper script
 ====================================
 
-The ``utils/amd/linux/perform_tests.bash`` helper script adds GPU architecture detection,
+The ``test/utils/amd/linux/perform_tests.bash`` helper script adds GPU architecture detection,
 controlled parallelism, and a summary score on top of the same lit suite. From the ``build``
 directory, run:
 
 .. code-block:: shell
 
-    bash ../utils/amd/linux/perform_tests.bash
+    bash ../test/utils/amd/linux/perform_tests.bash
 
 To run a specific subset of tests rather than the full suite, pass the test paths as arguments:
 
 .. code-block:: shell
 
-    bash ../utils/amd/linux/perform_tests.bash std/atomics cuda/atomic
+    bash ../test/utils/amd/linux/perform_tests.bash std/atomics cuda/atomic
 
 Useful flags include ``--verbose`` for full per-test output, ``--pretty`` for individual test
 results, ``--dry-run`` to preview commands without executing them, and
@@ -139,6 +142,38 @@ results, ``--dry-run`` to preview commands without executing them, and
 HIPRTC support is determined by your CMake configuration. If you passed
 ``-DLIBHIPCXX_TEST_WITH_HIPRTC=ON`` when configuring, the tests run with HIPRTC enabled;
 otherwise they run without it.
+
+.. _libhipcxx-run-tests-lit:
+
+Run individual tests with lit
+=============================
+
+You can also invoke lit directly on any test file or folder below ``test/libcudacxx``. lit
+locates the build through the ``LIBCUDACXX_SITE_CONFIG`` environment variable, which must point
+to the ``lit.site.cfg`` generated during configuration. From the ``build`` directory, run:
+
+.. code-block:: shell
+
+    export LIBCUDACXX_SITE_CONFIG=$PWD/test/libcudacxx/lit.site.cfg
+
+    # Build and run all tests for cuda::std::span
+    lit ../test/libcudacxx/std/containers/views/views.span -sv
+
+    # Build and run a single test
+    lit ../test/libcudacxx/std/containers/views/views.span/span.cons/array.pass.cpp -sv
+
+To only build the tests without running them, pass ``-Dexecutor="NoopExecutor()"``. This is
+useful on machines without a GPU or when targeting a different architecture:
+
+.. code-block:: shell
+
+    lit ../test/libcudacxx/std/containers/views/views.span -sv -Dexecutor="NoopExecutor()"
+
+To test a different C++ standard, pass ``--param=std=<standard>``, for example:
+
+.. code-block:: shell
+
+    lit ../test/libcudacxx/std/containers/views/views.span -sv --param=std=c++20
 
 Run the tests with the CI scripts
 =================================

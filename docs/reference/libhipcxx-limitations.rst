@@ -104,3 +104,13 @@ The following APIs from libcudacxx are **not** supported in libhipcxx:
   * - PTX API
     - ``<cuda/ptx>``
     - The ``cuda::ptx`` namespace contains functions that map to NVIDIA PTX instructions.
+  * - CUDA Tile
+    - Tile mode
+    - Support for compiling libcudacxx headers in NVIDIA CUDA Tile mode.
+  * - Runtime API
+    - ``<cuda/buffer>``
+    - ``cuda::buffer`` and the other stream-ordered containers.
+  * - Runtime API
+    - ``cuda::device::current_arch_id``, ``cuda::device::current_arch_traits``,
+      ``cuda::device::current_compute_capability``
+    - Queries for the architecture of the current device.
