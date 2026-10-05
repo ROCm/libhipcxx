@@ -300,6 +300,7 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
   foreach (include IN ITEMS ${CUDA_INCLUDE_DIR})
     string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " -I'${include}'")
   endforeach()
+  set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
   set(
     LIBCUDACXX_CUDA_COMPILER
     "${CMAKE_BINARY_DIR}/libcudacxx/test/utils/nvidia/nvrtc/nvrtcc"
@@ -317,7 +318,9 @@ if (LIBCUDACXX_TEST_WITH_NVRTC)
 elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
   # TODO: Use project properties to get path to binary.
   # Should also set up dependency on the project when NVRTC is enabled
-  set(CMAKE_CUDA_COMPILER_ID "HIPCC")
+  # HIPRTC is the AMD runtime; use the same HIP_PLATFORM-based compiler
+  # selection as the offline compilation path below.
+  set(CMAKE_CUDA_COMPILER_ID "AMDCLANG")
   set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_BINARY_DIR}/test/utils/amd/hiprtc/hiprtcc${CMAKE_EXECUTABLE_SUFFIX}")
   message(STATUS "LIBCUDACXX_CUDA_COMPILER: ${LIBCUDACXX_CUDA_COMPILER}")
   set(LIBCUDACXX_CUDA_COMPILER_ARG1 "")
@@ -387,10 +390,17 @@ else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
       LIBCUDACXX_FORCE_INCLUDE
       "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include_hip.h"
     )
-    #temporary workaround until we've found a way to make cmake find hipcc
-    set(LIBCUDACXX_CUDA_COMPILER "${HIP_HIPCC_EXECUTABLE}")
+    # Select compiler based on HIP_PLATFORM env var HIP_PLATFORM
+    # if HIP_PLAFORM=nvidia use nvcc; else use amdclang++.
+    if("$ENV{HIP_PLATFORM}" STREQUAL "nvidia" OR "$ENV{HIP_PLATFORM}" STREQUAL "nvcc")
+      find_program(NVCC_EXECUTABLE nvcc REQUIRED)
+      set(LIBCUDACXX_CUDA_COMPILER "${NVCC_EXECUTABLE}")
+      set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
+    else()
+      set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CXX_COMPILER}")
+      set(CMAKE_CUDA_COMPILER_ID "AMDCLANG")
+    endif()
     set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})
-    set(CMAKE_CUDA_COMPILER_ID "HIPCC")
     set(LIBCUDACXX_HIP_TEST_WITH_HIPRTC "False")
     # NOTE(HIP/AMD): hipcc does NOT predefine '__HIP_PLATFORM_AMD__' /
     # '__HIP_ROCclr__' on its own (verified via 'hipcc --offload-arch=...
@@ -493,7 +503,7 @@ elseif (${CMAKE_CUDA_COMPILER_ID} STREQUAL "NVHPC")
   string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS " -stdpar")
 endif()
 
-if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "HIPCC")
+if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
   message(STATUS "libcudacxx_SOURCE_DIR: ${libcudacxx_SOURCE_DIR}" )
   string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS
 #    "${LIBCUDACXX_TEST_COMPILER_FLAGS} \
@@ -501,8 +511,42 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "HIPCC")
     " -I${CMAKE_SOURCE_DIR}/include"
     " -I${libcudacxx_SOURCE_DIR}/include"
     " -I${libcudacxx_SOURCE_DIR}/include/libhipcxx"
+    " -O3"  # hipcc defaults to -O3; amdclang++ invoked directly does not
 #    " CACHE INTERNAL "Flags for libcxx testing."
   )
+  if (WIN32)
+    # On Windows, MxGPU virtual GPUs cause offload-arch.exe to return the
+    # wrong arch (e.g. gfx906). Add --offload-arch=native so amdclang++
+    # queries the HIP runtime directly at compile time to get the real GPU
+    # arch (e.g. gfx1101). lit's config.py ignores "native" for the hipcc
+    # compiler type, so this must be injected explicitly here.
+    string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " --offload-arch=native")
+  endif()
+  # hipcc used to add the HIP runtime library automatically; with amdclang++
+  # we must link it explicitly.
+  # On Windows, the DLL (amdhip64.dll) is in bin/ but the import library
+  # (amdhip64.lib) is in lib/. Try IMPORTED_IMPLIB variants first; if none
+  # are set, derive lib/ by going up from the DLL's bin/ directory.
+  set(_hip_lib_dir "")
+  foreach(_cfg "" "_RELEASE" "_DEBUG" "_RELWITHDEBINFO" "_MINSIZEREL")
+    get_target_property(_amdhip64_implib hip::amdhip64 "IMPORTED_IMPLIB${_cfg}")
+    if(_amdhip64_implib)
+      cmake_path(GET _amdhip64_implib PARENT_PATH _hip_lib_dir)
+      break()
+    endif()
+  endforeach()
+  if(NOT _hip_lib_dir)
+    get_target_property(_amdhip64_loc hip::amdhip64 LOCATION)
+    cmake_path(GET _amdhip64_loc PARENT_PATH _hip_lib_dir)
+    if(WIN32)
+      # DLL is in bin/, import lib is in lib/ — go up one and use lib/
+      cmake_path(GET _hip_lib_dir PARENT_PATH _hip_root_dir)
+      set(_hip_lib_dir "${_hip_root_dir}/lib")
+    endif()
+  endif()
+  string(APPEND LIBCUDACXX_TEST_LINKER_FLAGS
+    " -L${_hip_lib_dir}"
+    " -lamdhip64")
 endif()
 
 # NOTE(HIP/AMD): lit.site.cfg.in substitutes this into 'config.compute_archs',

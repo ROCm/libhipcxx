@@ -30,6 +30,8 @@
 ``cuda::apply_access_property``
 ===============================
 
+This page documents ``cuda::apply_access_property``, which prefetches a memory range while applying a cache residence property.
+
 Defined in header ``<cuda/annotated_ptr>``.
 
 .. code:: cuda

@@ -24,6 +24,7 @@ endif()
 set(cmake_opts
   -D "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
   -D "CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+  -D "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
 )
 
 # NOTE(HIP/AMD): version_check.cxx includes <cuda/std/atomic>, whose HIP device

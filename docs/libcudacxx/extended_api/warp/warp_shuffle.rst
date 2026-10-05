@@ -32,6 +32,8 @@
 
 Defined in ``<cuda/warp>`` header.
 
+The warp shuffle functions allow threads within a warp to exchange data of arbitrary size, including raw arrays, pointers, and structs.
+
 ``warp_shuffle_idx``:
 
 .. code:: cuda
@@ -132,8 +134,8 @@ Result type:
 
     } // namespace cuda::device
 
-The functionality provides a generalized and safe alternative to CUDA warp shuffle intrinsics.
-The functions allow to exchange data of any data size, including raw arrays, pointers, and structs.
+The functionality provides a generalized, safe alternative to CUDA warp shuffle intrinsics.
+The functions allow threads to exchange data of any size, including raw arrays, pointers, and structs.
 
 **Parameters**
 

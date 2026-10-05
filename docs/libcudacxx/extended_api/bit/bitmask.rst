@@ -80,7 +80,7 @@ Bitmask of size ``width`` starting at position ``start``.
 ..
    .. note::
 
-    GCC <= 8 uses a slow path with more instructions even in CUDA.
+   GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------
