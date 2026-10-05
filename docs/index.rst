@@ -67,6 +67,7 @@ The libhipcxx public repository is located at `ROCm/libhipcxx <https://github.co
 
     * :doc:`Standard API <libcudacxx/standard_api>`
     * :doc:`Extended API <libcudacxx/extended_api>`
+    * :doc:`Runtime API <libcudacxx/runtime>`
     * :ref:`libhipcxx-limitations`
     * :ref:`libhipcxx-conformance`
 

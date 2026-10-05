@@ -37,8 +37,8 @@
 # textual ``libcu++``/``libcudacxx`` -> ``libhipcxx`` rebrand is only
 # inside the file contents; the path is kept.
 #
-# Do NOT declare the children of ``libcudacxx/standard_api`` or
-# ``libcudacxx/extended_api`` here. Each of those
+# Do NOT declare the children of ``libcudacxx/standard_api``,
+# ``libcudacxx/extended_api``, or ``libcudacxx/runtime`` here. Each of those
 # pages already carries a ``:hidden:`` ``toctree::`` directive that
 # enumerates its own children; declaring them in BOTH places renders
 # every link twice in the rocm-docs-core sidebar (sphinx-external-toc
@@ -85,6 +85,8 @@ subtrees:
         title: Standard API
       - file: libcudacxx/extended_api
         title: Extended API
+      - file: libcudacxx/runtime
+        title: Runtime API
       - file: reference/libhipcxx-limitations
         title: Limitations and unsupported APIs
       - file: reference/libhipcxx-conformance

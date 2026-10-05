@@ -233,6 +233,18 @@ no Standard Library equivalent. Key extensions include:
 * **Math extensions** — utilities such as ``cuda::ceil_div`` and ``cuda::ilog2``
   that fill gaps in the Standard Library for GPU numeric code.
 
+Runtime API
+-----------
+
+The Runtime API provides C++ abstractions over the HIP runtime: streams and events
+for work submission and synchronization, kernel launch, memory resources, and
+algorithms such as ``cuda::copy_bytes`` and ``cuda::fill_bytes`` for basic data
+movement. These abstractions use RAII for lifetime management while remaining
+composable with code that uses the HIP runtime API directly. See
+:ref:`Runtime API <libcudacxx-runtime-api>` for details and
+:ref:`Limitations and unsupported APIs <libhipcxx-limitations>` for the parts that
+are not yet available on AMD GPUs.
+
 Who should use libhipcxx
 ========================
 
@@ -258,4 +270,4 @@ Getting started
 
 * To install libhipcxx as part of the ROCm Core SDK, see :doc:`Install libhipcxx <../install/install>`.
 * To add libhipcxx to an existing CMake project, see :ref:`Add libhipcxx to a CMake project <libhipcxx-use-in-a-project>`.
-* To understand the available APIs, see the :ref:`Standard API <libcudacxx-standard-api>` and :ref:`Extended API <libcudacxx-extended-api>` reference sections.
+* To understand the available APIs, see the :ref:`Standard API <libcudacxx-standard-api>`, :ref:`Extended API <libcudacxx-extended-api>`, and :ref:`Runtime API <libcudacxx-runtime-api>` reference sections.

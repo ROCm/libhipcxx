@@ -93,6 +93,8 @@ functionality. The following table lists each extension category with its key AP
      - Experimental. Requires ``LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE``.
 
 For per-API documentation, see the :ref:`Extended API reference <libcudacxx-extended-api>`.
+Abstractions over the HIP runtime, such as streams, events, and kernel launch, are documented in
+the :ref:`Runtime API reference <libcudacxx-runtime-api>`.
 
 Unsupported extensions
 ======================
