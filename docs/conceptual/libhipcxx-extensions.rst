@@ -86,11 +86,15 @@ functionality. The following table lists each extension category with its key AP
      -
    * - Stream reference
      - * ``cuda::stream_ref`` / ``hip::stream_ref``
-     - Type-safe wrapper around ``hipStream_t``
+     - Non-owning, type-safe wrapper around ``hipStream_t``. Part of the
+       :ref:`Runtime API <libcudacxx-runtime-api>` (``<cuda/stream>``).
    * - Memory resources
-     - * ``cuda::mr::resource`` / ``hip::mr::resource``
+     - * ``cuda::mr::synchronous_resource`` / ``hip::mr::synchronous_resource``
+       * ``cuda::mr::resource`` / ``hip::mr::resource``
+       * ``cuda::mr::synchronous_resource_ref`` / ``hip::mr::synchronous_resource_ref``
        * ``cuda::mr::resource_ref`` / ``hip::mr::resource_ref``
-     - Experimental. Requires ``LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE``.
+     - Concepts and type-erased references for synchronous and stream-ordered memory resources
+       (``<cuda/memory_resource>``).
 
 For per-API documentation, see the :ref:`Extended API reference <libcudacxx-extended-api>`.
 Abstractions over the HIP runtime, such as streams, events, and kernel launch, are documented in
@@ -109,7 +113,9 @@ depend on NVIDIA hardware. These include:
 - ``<cuda/annotated_ptr>`` — memory access properties for pointers
 - ``cuda::discard_memory`` — available, but has no effect on AMD GPUs
 - ``cuda::device::warp_shuffle_idx``, ``warp_shuffle_up``, ``warp_shuffle_down``,
-  ``warp_shuffle_xor`` — warp shuffles, which are only compiled for NVIDIA PTX targets
+  ``warp_shuffle_xor``, ``cuda::device::warp_match_all``, ``cuda::device::lane_mask`` — warp
+  functions, which are only compiled for NVIDIA PTX targets
+- ``<cuda/tma>`` — Tensor Memory Accelerator descriptors, an NVIDIA hardware feature
 - ``cuda::for_each_canceled_block`` — work stealing, which depends on NVIDIA hardware block
   cancellation. On AMD GPUs it invokes the function once for the current block.
 - ``<cuda/ptx>`` — NVIDIA PTX instruction wrappers
