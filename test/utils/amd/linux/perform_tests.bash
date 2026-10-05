@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -42,14 +42,14 @@ function usage {
   echo "                                   (specified as string) to target. If empty,"
   echo "                                   either the architecture is automatically"
   echo "                                   detected (for tests runs if detection isn't"
-  echo "                                   disabled) or all known SM architectures are"
-  echo "                                   targeted."
+  echo "                                   disabled) or the architectures configured"
+  echo "                                   in CMake are targeted."
   echo "                                 : Overrides \${LIBCUDACXX_COMPUTE_ARCHS}."
   echo
   echo "--libcxx-lit-site-config <file>     : Use <file> as the libc++ lit site config"
   echo "                                    : (default: \${LIBCUDACXX_PATH}/libcxx/build/test/lit.site.cfg)."
   echo "--libhipcxx-lit-site-config <file> : Use <file> as the libhip++ lit site config"
-  echo "                                    : (default: \${LIBCUDACXX_PATH}/build/libcxx/test/lit.site.cfg)."
+  echo "                                    : (default: \${LIBCUDACXX_PATH}/build/test/libcudacxx/lit.site.cfg)."
   echo
   echo "--verbose                           : Print SM architecture detection and test results"
   echo "                                    : to stdout in addition to log files."
@@ -89,7 +89,6 @@ function section_separator {
 LIBCXX_LOG=$(mktemp)
 LIBCUDACXX_LOG=$(mktemp)
 
-KNOWN_COMPUTE_ARCHS="gfx940 gfx941 gfx942 gfx90a gfx908 gfx1030 gfx1100 gfx1101 gfx1200 gfx1201"
 
 function report_and_exit {
   # If any of the lines searched for below aren't present in the log files, the
@@ -168,7 +167,7 @@ LIBCUDACXX_PATH=$(realpath ${SCRIPT_PATH}/../../../../)
 LIT_PREFIX="time"
 
 LIBCXX_LIT_SITE_CONFIG=${LIBCUDACXX_PATH}/libcxx/build/libcxx/test/lit.site.cfg
-LIBCUDACXX_LIT_SITE_CONFIG=${LIBCUDACXX_PATH}/build/test/lit.site.cfg
+LIBCUDACXX_LIT_SITE_CONFIG=${LIBCUDACXX_PATH}/build/test/libcudacxx/lit.site.cfg
 
 RAW_TEST_TARGETS=""
 
@@ -208,7 +207,7 @@ done
 # LIBCXX tests were removed but might come back later so we disable them here
 LIBCUDACXX_SKIP_LIBCXX_TESTS=1
 LIBCXX_TEST_TARGETS="${LIBCUDACXX_PATH}/libcxx/test"
-LIBCUDACXX_TEST_TARGETS="${LIBCUDACXX_PATH}/test"
+LIBCUDACXX_TEST_TARGETS="${LIBCUDACXX_PATH}/test/libcudacxx"
 
 if [ "${RAW_TEST_TARGETS:-all}" != "all" ]
 then
@@ -217,7 +216,7 @@ then
   for test in ${RAW_TEST_TARGETS}
   do
     LIBCXX_TEST_TARGETS="${LIBCXX_TEST_TARGETS:+${LIBCXX_TEST_TARGETS} }${LIBCUDACXX_PATH}/libcxx/test/${test}"
-    LIBCUDACXX_TEST_TARGETS="${LIBCUDACXX_TEST_TARGETS:+${LIBCUDACXX_TEST_TARGETS} }${LIBCUDACXX_PATH}/test/${test}"
+    LIBCUDACXX_TEST_TARGETS="${LIBCUDACXX_TEST_TARGETS:+${LIBCUDACXX_TEST_TARGETS} }${LIBCUDACXX_PATH}/test/libcudacxx/${test}"
   done
 fi
 
@@ -268,27 +267,24 @@ then
 
   echo "# TEST CDNA Architecture Detection"
 
-  ARCH_DETECTION_LOG=$(mktemp)
-  DETECTION_LIT_FLAGS="-vv -a"
-  if [ "${JSON_OUTPUT_TARGET}" != "0" ]
+  # Query the GPU agent directly (same approach as ci/internal/test.sh); the lit
+  # config no longer reports the selected device. Drop gfx000 (the CPU agent)
+  # before picking the first GPU.
+  detect_gfx() { "$@" 2>/dev/null | grep -E '^gfx[0-9a-f]+' | grep -v '^gfx000$' | head -n1; }
+  DEVICE_0_COMPUTE_ARCH=""
+  for detector in offload-arch rocm_agent_enumerator \
+                  "${ROCM_PATH:-/opt/rocm}/bin/offload-arch" \
+                  "${ROCM_PATH:-/opt/rocm}/bin/rocm_agent_enumerator"
+  do
+    DEVICE_0_COMPUTE_ARCH="$(detect_gfx "${detector}" || true)"
+    [ -n "${DEVICE_0_COMPUTE_ARCH}" ] && break
+  done
+  if [ -z "${DEVICE_0_COMPUTE_ARCH}" ]
   then
-    DETECTION_LIT_FLAGS="${DETECTION_LIT_FLAGS} -o ${JSON_OUTPUT_TARGET}/detect_gfx.log"
-  fi
-
-
-  LIBCUDACXX_SITE_CONFIG=${LIBCUDACXX_LIT_SITE_CONFIG} \
-  bash -c "lit ${DETECTION_LIT_FLAGS} ${LIBCUDACXX_PATH}/test/nothing_to_do.pass.cpp -Dcompute_archs=\"${KNOWN_COMPUTE_ARCHS}\"" \
-    > ${ARCH_DETECTION_LOG} 2>&1
-
-  if [ "${PIPESTATUS[0]}" != "0" ]
-  then
-    cat ${ARCH_DETECTION_LOG}
+    echo "error: neither offload-arch nor rocm_agent_enumerator reported a gfx target;" \
+         "pass --compute-archs or set LIBCUDACXX_COMPUTE_ARCHS" >&2
     report_and_exit 1
   fi
-
-  DEVICE_0_COMPUTE_ARCH=$(egrep '^Device 0:' ${ARCH_DETECTION_LOG} | sed 's/^Device 0: ".*", Selected, CDNA \(gfx[0-9a-f]\{3,4\}\).*/\1/')
-
-  rm -f ${ARCH_DETECTION_LOG}
 
   echo "# DETECTION CDNA Architecture : Device 0, ${DEVICE_0_COMPUTE_ARCH}"
   LIBCUDACXX_COMPUTE_ARCHS=${DEVICE_0_COMPUTE_ARCH}
