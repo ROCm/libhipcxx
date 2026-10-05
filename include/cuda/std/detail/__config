@@ -33,7 +33,12 @@
 #ifndef __cuda_std__
 #define __cuda_std__
 
-#if defined(__HIP_PLATFORM_AMD__)
+// NOTE(HIP/AMD): __HIP_PLATFORM_AMD__ is not predefined by the compiler; it is
+// defined by <hip/hip_runtime.h> (or by CMake's hip::host / hip::device). Key
+// the include on the compiler-defined __HIPCC__ as well, so that a plain
+// 'amdclang++/hipcc -c foo.hip' gets the macro here, before __cccl/compiler.h
+// and every other __HIP_PLATFORM_AMD__ check sees it.
+#if defined(__HIPCC__) || defined(__HIP_PLATFORM_AMD__)
 #include <libhipcxx/__amd/cuda_runtime.h>
 // NOTE(HIP/AMD): per-architecture HIP TSC clock-rate macros used by
 // the libhipcxx wall_clock64-based time / chrono / sleep code
