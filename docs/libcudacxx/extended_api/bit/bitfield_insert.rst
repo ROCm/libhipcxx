@@ -82,7 +82,7 @@ The function extracts the lower bitfield of size ``width`` from ``source`` and i
 ..
    .. note::
 
-    GCC <= 8 uses a slow path with more instructions even in CUDA.
+   GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------

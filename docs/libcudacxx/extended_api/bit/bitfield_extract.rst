@@ -77,12 +77,12 @@ The function extracts a bitfield from a value and returns it in the lower bits.
 
 .. note::
 
-    Using the function could not be optimal when the input is a run-time value that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations.
+   Using the function could not be optimal when the input is a run-time value that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations.
 
 ..
    .. note::
 
-    GCC <= 8 uses a slow path with more instructions even in CUDA.
+   GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------

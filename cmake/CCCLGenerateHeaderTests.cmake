@@ -50,6 +50,10 @@
 # - If no HEADER_TEMPLATE is provided, a default template will be used.
 # - The HEADER_TEMPLATE will be configured for each header, with the following variables:
 #   - @header@: The path to the target header, relative to <project_include_path>.
+# NOTE(HIP/AMD): provides libhipcxx_headertest_name(), which shortens the
+# generated header test sources on Windows without long-path support.
+include(${CMAKE_CURRENT_LIST_DIR}/LibhipcxxHeaderTestPaths.cmake)
+
 function(cccl_generate_header_tests target_name project_include_path)
   set(options NO_METATARGETS)
   set(oneValueArgs LANGUAGE HEADER_TEMPLATE)
@@ -174,9 +178,16 @@ function(cccl_generate_header_tests target_name project_include_path)
   # Configure header templates:
   set(header_srcs)
   foreach (header IN LISTS headers)
+    # NOTE(HIP/AMD): the target name and header path both end up in the object
+    # path; on Windows without long paths this exceeds CMAKE_OBJECT_PATH_MAX, so
+    # replace them by a hash there (see LibhipcxxHeaderTestPaths.cmake).
+    libhipcxx_headertest_name(header_test_name
+      "${target_name}/${header}"
+      "${target_name}/${header}"
+    )
     set(
       header_src
-      "${CMAKE_CURRENT_BINARY_DIR}/headers/${target_name}/${header}.${extension}"
+      "${CMAKE_CURRENT_BINARY_DIR}/headers/${header_test_name}.${extension}"
     )
     configure_file("${CGHT_HEADER_TEMPLATE}" "${header_src}" @ONLY)
     # NOTE(HIP/AMD): tag .cu sources as LANGUAGE HIP so CMake routes them

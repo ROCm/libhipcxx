@@ -30,6 +30,8 @@
 ``cuda::access_property``
 =========================
 
+This page documents ``cuda::access_property``, an opaque type encoding memory access properties such as normal, persisting, and streaming cache eviction hints.
+
 Defined in header ``<cuda/annotated_ptr>``.
 
 The class ``cuda::access_property`` provides an opaque encoding for *L2 cache memory residence* control and *memory space* properties. It is used in combination with :ref:`cuda::annotated_ptr <libcudacxx-extended-api-memory-access-properties-annotated-ptr>`, :ref:`cuda::associate_access_property <libcudacxx-extended-api-memory-access-properties-associate-access-property>` and :ref:`cuda::apply_access_property <libcudacxx-extended-api-memory-access-properties-apply-access-property>` to *request* the application of properties to memory operations.
@@ -192,7 +194,7 @@ Dynamic range global memory residence control property constructors
 
 **Postconditions**: memory accesses requesting the application of this property must be in range ``[ptr, ptr + total_bytes)``.
 
-**Effects**: the fourth and fifth arguments, access properties, are called *primary* and *secondary* properties. The overloads without a fifth argument use ``global`` as the *secondary* property. Constructs a *range* access property *requesting* the properties to be **approximately** applied to memory accesses as follows:
+**Effects**: the fourth and fifth arguments, access properties, are called *primary* and *secondary* properties. The overloads without a fifth argument use ``global`` as the *secondary* property. Constructs a *range* access property *requesting* the properties to be approximately applied to memory accesses as follows:
 
 -  *primary property* to accesses in address-range:   ``[ptr, ptr + leading_bytes)``
 -  *secondary property* to accesses in address-range: ``[ptr + leading_bytes, ptr + total_bytes)``

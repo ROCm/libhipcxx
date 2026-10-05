@@ -31,6 +31,8 @@
 The ``cuda::synchronous_resource`` concept
 -------------------------------------------
 
+This page documents the ``cuda::mr::synchronous_resource`` and ``cuda::mr::resource`` concepts, which constrain memory resource types for synchronous and stream-ordered allocation.
+
 The `std::pmr::memory_resource <https://en.cppreference.com/w/cpp/header/memory_resource>`__ feature provides only a
 single ``allocate`` interface, which is sufficient for homogeneous memory systems. However, HIP provides both
 synchronous and `stream-ordered allocation <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html>`__.

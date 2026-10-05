@@ -30,6 +30,9 @@
 ``cuda::memcpy_async``
 ======================
 
+This page documents ``cuda::memcpy_async``, which asynchronously copies a memory range and synchronizes completion via a barrier or pipeline.
+
+
 Defined in header ``<cuda/barrier>``:
 
 .. code:: cuda
@@ -111,31 +114,31 @@ Notes
 ``cuda::memcpy_async`` has similar constraints to `std::memcpy <https://en.cppreference.com/w/cpp/string/byte/memcpy>`_,
 namely:
 
-   - If the objects overlap, the behavior is undefined.
-   - If either ``destination`` or ``source`` is an invalid or null pointer, the behavior is undefined
-     (even if ``count`` is zero).
-   - If the objects are `potentially-overlapping <https://en.cppreference.com/w/cpp/language/object#Subobjects>`_
-     the behavior is undefined.
-   - If the objects are not of `TriviallyCopyable <https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable>`_
-     type the program is ill-formed, no diagnostic required.
+- If the objects overlap, the behavior is undefined.
+- If either ``destination`` or ``source`` is an invalid or null pointer, the behavior is undefined
+  (even if ``count`` is zero).
+- If the objects are `potentially-overlapping <https://en.cppreference.com/w/cpp/language/object#Subobjects>`_
+  the behavior is undefined.
+- If the objects are not of `TriviallyCopyable <https://en.cppreference.com/w/cpp/named_req/TriviallyCopyable>`_
+  type the program is ill-formed, no diagnostic required.
 
 Additionally:
 
-   - If *Shape* is :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-aligned-size>`, ``source``
-     and ``destination`` are both required to be aligned on ``cuda::aligned_size_t::align``, else the behavior is
-     undefined.
-   - If ``cuda::pipeline`` is in a *quitted state*
-     (see :ref:`cuda::pipeline::quit <libcudacxx-extended-api-synchronization-pipeline-pipeline-quit>`),
-     the behavior is undefined.
-   - For cooperative overloads (with a group parameter),
-     if the parameters are not the same across all threads in ``group``,
-     or not all threads represented by ``group`` call the overload, the behavior is undefined.
-   - The group of a cooperative overload can also represent a partition of the active threads calling the overload,
-     in which case a copy is cooperatively issued per partition of the active threads described by ``group``.
-     For example, if ``group`` is a ``cooperative_groups::thread_block_tile<32, ...>``
-     and the overload is called with 128 threads active, 4 copies will be issued, one cooperatively per warp.
-   - If a non-group overload is called with multiple threads active,
-     each thread issues its own copy and thus must have different arguments and the copies must not overlap.
+- If *Shape* is :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-aligned-size>`, ``source``
+  and ``destination`` are both required to be aligned on ``cuda::aligned_size_t::align``, else the behavior is
+  undefined.
+- If ``cuda::pipeline`` is in a *quitted state*
+  (see :ref:`cuda::pipeline::quit <libcudacxx-extended-api-synchronization-pipeline-pipeline-quit>`),
+  the behavior is undefined.
+- For cooperative overloads (with a group parameter),
+  if the parameters are not the same across all threads in ``group``,
+  or not all threads represented by ``group`` call the overload, the behavior is undefined.
+- The group of a cooperative overload can also represent a partition of the active threads calling the overload,
+  in which case a copy is cooperatively issued per partition of the active threads described by ``group``.
+  For example, if ``group`` is a ``cooperative_groups::thread_block_tile<32, ...>``
+  and the overload is called with 128 threads active, 4 copies will be issued, one cooperatively per warp.
+- If a non-group overload is called with multiple threads active,
+  each thread issues its own copy and thus must have different arguments and the copies must not overlap.
 
 
 Template Parameters

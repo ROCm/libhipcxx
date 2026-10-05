@@ -30,6 +30,8 @@
 ``cuda::bit_reverse``
 =====================
 
+This page documents ``cuda::bit_reverse``, which reverses the order of bits in an unsigned integer value.
+
 Defined in the ``<cuda/bit>`` header.
 
 .. code:: cuda
@@ -74,12 +76,12 @@ In host code the function uses ``__builtin_bitreverse<N>`` with clang.
 
 .. note::
 
-    Using the function could not be optimal when the input is a run-time value that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations.
+   Using the function could not be optimal when the input is a run-time value that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations.
 
 ..
    .. note::
 
-    GCC <= 8 uses a slow path with more instructions even in device code.
+   GCC <= 8 uses a slow path with more instructions even in device code.
 
 Example
 -------

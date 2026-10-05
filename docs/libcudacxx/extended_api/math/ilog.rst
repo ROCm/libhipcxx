@@ -30,6 +30,8 @@
 ``cuda::ilog2`` and ``cuda::ilog10``
 ====================================
 
+This page documents ``cuda::ilog2`` and ``cuda::ilog10``, which compute the integer logarithm to base 2 or base 10 of an integer value.
+
 Defined in the ``<cuda/cmath>`` header.
 
 .. code:: cuda

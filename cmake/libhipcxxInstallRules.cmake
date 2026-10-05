@@ -33,7 +33,7 @@ include(GNUInstallDirs)
 # NOTE(HIP): All libhipcxx headers are installed *under* '<inc>/libhipcxx/'
 # instead of directly into '<inc>/'. This keeps the whole payload self-contained
 # in a single subtree (so a single '-I<inc>/libhipcxx' resolves <cuda/...>,
-# <nv/...>, <amd/...> and <hip/...>) and avoids polluting/colliding with the
+# <nv/...>, <libhipcxx/__amd/...> and <hip/...>) and avoids polluting/colliding with the
 # top-level '<inc>/cuda' of a CUDA Toolkit or ROCm's own headers. Consumers must
 # pull in libhipcxx via find_package(libhipcxx) + libhipcxx::libhipcxx (which
 # carries the correct include dir); bare '#include <cuda/...>' off the default
@@ -59,22 +59,23 @@ endif()
 
 # Libhipcxx headers
 rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/cuda"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  FILES_MATCHING  
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
 rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/nv"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  FILES_MATCHING  
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}"
+  FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
 )
-# Install into '<inc>/libhipcxx/__amd' (not '<inc>/__amd') so the
+# Install into '<LIBHIPCXX_INSTALL_INCLUDEDIR>/libhipcxx/__amd' so the
 # '#include <libhipcxx/__amd/...>' references in the installed cuda/
-# headers resolve against '-I<inc>', matching the source-tree layout.
+# headers resolve against the exported include root, matching the
+# source-tree layout ('<src>/include/libhipcxx/__amd').
 rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/libhipcxx/__amd"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/libhipcxx"
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}/libhipcxx"
   FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE
@@ -87,7 +88,7 @@ rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/libhipcxx/__amd"
 # break builds of packages like hipDF which
 # create a Python wheel with setuptools.
 rocm_install(DIRECTORY "${libcudacxx_SOURCE_DIR}/include/cuda/"
-  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/libhipcxx/hip"
+  DESTINATION "${LIBHIPCXX_INSTALL_INCLUDEDIR}/hip"
   FILES_MATCHING
   PATTERN *
   PATTERN CMakeLists.txt EXCLUDE

@@ -41,7 +41,7 @@ Versioning
 ==========
 
 libhipcxx is a fork of libcu++ and follows its versioning. A libhipcxx release carries the version of the upstream
-`CCCL <https://github.com/NVIDIA/cccl>`_ release it is based on; the current version is 3.0.2.
+CCCL release it is based on; the current version is 3.4.0.
 
 API version
 -----------
@@ -53,7 +53,7 @@ The API version is a three-component semantic version, ``MAJOR.MINOR.PATCH``, ex
 - ``_LIBCUDACXX_CUDA_API_VERSION_MINOR`` is incremented when API-compatible features are added.
 - ``_LIBCUDACXX_CUDA_API_VERSION_PATCH`` is incremented for all other changes.
 - ``_LIBCUDACXX_CUDA_API_VERSION`` combines the three as ``MAJOR * 1000000 + MINOR * 1000 + PATCH``, which is
-  ``3000002`` for version 3.0.2.
+  ``3004000`` for version 3.4.0.
 
 A single API version is supported at a time.
 

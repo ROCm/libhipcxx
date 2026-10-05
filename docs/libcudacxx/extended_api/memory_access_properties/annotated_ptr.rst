@@ -30,6 +30,8 @@
 ``cuda::annotated_ptr``
 =======================
 
+This page documents ``cuda::annotated_ptr``, a pointer type that binds a cache access property to enable persistent memory access hints across ABI boundaries.
+
 Defined in header ``<cuda/annotated_ptr>``.
 
 ``cuda::annotated_ptr`` is a pointer annotated with an access property that *may* be applied to its memory operations.
@@ -173,7 +175,7 @@ Constructor from pointer
 
    constexpr explicit annotated_ptr(pointer ptr);
 
-Constructs an ``annotated_ptr`` requesting associating ``ptr`` with ``Property``.
+Constructs an ``annotated_ptr`` requesting association of ``ptr`` with ``Property``.
 
 **Constraints**:
 
