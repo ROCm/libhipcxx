@@ -49,7 +49,7 @@ be installed before libhipcxx is built.
 libhipcxx has the following prerequisites:
 
 * `CMake <https://cmake.org/>`_ version 3.21 or higher
-* `hipcc <https://rocm.docs.amd.com/projects/HIPCC/en/latest/index.html>`_
+* ``amdclang++`` from the `ROCm LLVM compiler <https://rocm.docs.amd.com/projects/llvm-project/en/latest/index.html>`_
 * A C++17 or C++20 host toolchain
 
 libhipcxx has these additional prerequisites to build and run the tests:
@@ -87,13 +87,15 @@ on your system.
 Build with CMake
 ================
 
-Set ``CXX`` to ``hipcc`` and set ``CMAKE_CXX_COMPILER`` to hipcc's absolute
-path. For example:
+Set ``CXX`` to the absolute path of ``amdclang++`` before configuring. CMake uses it as the C++
+compiler, and the lit test suite uses the same compiler to build the tests. For example:
 
 .. code-block:: shell
 
-   CXX=hipcc
-   CMAKE_CXX_COMPILER=/opt/rocm/bin/hipcc
+   export CXX=/opt/rocm/bin/amdclang++
+
+Alternatively, pass ``-DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++`` to the ``cmake`` command
+below.
 
 Create the ``build`` directory under the ``libhipcxx`` root directory, then
 change directory to the ``build`` directory:
