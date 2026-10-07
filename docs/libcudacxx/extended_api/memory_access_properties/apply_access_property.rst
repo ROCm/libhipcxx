@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::apply_access_property, which prefetches memory while applying a cache residence property in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::apply_access_property, which prefetches memory while applying a cache residence property in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, apply_access_property, prefetch, cache, persisting, normal, global memory
 
 .. _libcudacxx-extended-api-memory-access-properties-apply-access-property:
@@ -41,8 +41,8 @@ This page documents ``cuda::apply_access_property``, which prefetches a memory r
    __host__ __device__
    void apply_access_property(void const volatile* ptr, ShapeT shape, cuda::access_property::normal) noexcept;
 
-**Mandates**: :ref:`ShapeT <libcudacxx-extended-api-memory-access-shapes>` is either `std::size_t <https://en.cppreference.com/w/cpp/types/size_t>`_ or
-:ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-access-shapes-aligned-size>`.
+**Mandates**: ``ShapeT`` is either `std::size_t <https://en.cppreference.com/w/cpp/types/size_t>`_ or
+``cuda::aligned_size_t``.
 
 **Preconditions**: ``ptr`` points to a valid allocation for ``shape`` in the global memory address space.
 
@@ -60,7 +60,8 @@ that:
 -  for all offsets ``i`` in the extent of ``shape``, i.e., ``i`` in ``[0, shape)`` then the expression ``*(ptr + i)``
    does not exhibit undefined behavior.
 
-**Note**: currently ``apply_access_property`` is ignored by nvcc and nvc++ on the host.
+..
+   **Note**: currently ``apply_access_property`` is ignored by nvcc and nvc++ on the host.
 
 Example
 -------

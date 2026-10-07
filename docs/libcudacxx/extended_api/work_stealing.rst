@@ -32,7 +32,7 @@ Work stealing
 
 This page documents the ``cuda::for_each_canceled_block`` API for dynamic work stealing at thread-block granularity.
 
-Defined in header ``<cuda/work_stealing>`` if the CUDA compiler supports at least PTX ISA 8.7:
+Defined in header ``<cuda/work_stealing>``:
 
 .. code:: cuda
 
@@ -43,14 +43,17 @@ Defined in header ``<cuda/work_stealing>`` if the CUDA compiler supports at leas
 
    } // namespace cuda
 
-.. note:: 
-  
-  On devices with compute capability 10.0 or higher, this function may leverage hardware acceleration.
+.. note::
+
+..
+   On devices with compute capability 10.0 or higher, this function may leverage hardware acceleration.
+  On supported hardware, this function may leverage hardware acceleration.
 
 This API is primarily intended for implementing work-stealing at the thread-block level.
 
-
-Compared to alternative work distribution techniques, such as  `grid-stride loops <https://developer.nvidia.com/blog/cuda-pro-tip-write-flexible-kernels-grid-stride-loops/>`__, which distribute work statically, or dynamic work distribution methods relying on global memory concurrency, this API offers several advantages:
+..
+   Compared to alternative work distribution techniques, such as `grid-stride loops <https://developer.nvidia.com/blog/cuda-pro-tip-write-flexible-kernels-grid-stride-loops/>`__, which distribute work statically, or dynamic work distribution methods relying on global memory concurrency, this API offers several advantages:
+Compared to alternative work distribution techniques, such as grid-stride loops, which distribute work statically, or dynamic work distribution methods relying on global memory concurrency, this API offers several advantages:
 
 - It enables dynamic work-stealing: thread blocks that complete their tasks sooner can take on additional work from slower thread blocks.
 - It may cooperate with the GPU work scheduler to respect work priorities and improve load balancing.
@@ -116,9 +119,9 @@ This example demonstrates work-stealing at thread-block granularity using this A
    int main() {
     int N = 10000;
     int *a, *b, *c;
-    cudaMallocManaged(&a, N * sizeof(int));
-    cudaMallocManaged(&b, N * sizeof(int));
-    cudaMallocManaged(&c, N * sizeof(int));
+    hipMallocManaged(&a, N * sizeof(int));
+    hipMallocManaged(&b, N * sizeof(int));
+    hipMallocManaged(&c, N * sizeof(int));
     for (int i = 0; i < N; ++i) {
       a[i] = i;
       b[i] = 1;
@@ -129,7 +132,7 @@ This example demonstrates work-stealing at thread-block granularity using this A
     const int blocks_per_grid = cuda::ceil_div(N, threads_per_block);
 
     vec_add<<<blocks_per_grid, threads_per_block>>>(a, b, c, N);
-    cudaDeviceSynchronize();
+    hipDeviceSynchronize();
 
     bool success = true;
     for (int i = 0; i < N; ++i) {
@@ -138,9 +141,9 @@ This example demonstrates work-stealing at thread-block granularity using this A
 	success = false;
       }
     }
-    cudaFree(a);
-    cudaFree(b);
-    cudaFree(c);
+    hipFree(a);
+    hipFree(b);
+    hipFree(c);
 
     return success? 0 : 1;
    }

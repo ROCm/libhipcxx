@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::memcpy_async, which asynchronously copies memory ranges using barriers or pipelines in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::memcpy_async, which asynchronously copies memory ranges using barriers or pipelines in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, memcpy_async, asynchronous copy, barrier, pipeline, annotated_ptr
 
 .. _libcudacxx-extended-api-asynchronous-operations-memcpy-async:
@@ -124,7 +124,7 @@ namely:
   and ``destination`` are both required to be aligned on ``cuda::aligned_size_t::align``, else the behavior is
   undefined.
 - If ``cuda::pipeline`` is in a *quitted state*
-  (see :ref:`cuda::pipeline::quit <libcudacxx-extended-api-synchronization-pipeline-pipeline-quit>`),
+  (see ``cuda::pipeline::quit``),
   the behavior is undefined.
 - For cooperative variants, if the parameters are not the same across all threads in ``group``, the behavior is
   undefined.
@@ -181,4 +181,5 @@ Examples
      bar.arrive_and_wait();
    }
 
-`See it on Godbolt <https://godbolt.org/z/od6q9s8fq>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/od6q9s8fq>`_

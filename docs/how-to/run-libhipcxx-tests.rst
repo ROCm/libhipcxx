@@ -49,8 +49,8 @@ approximately 2,400 test files organized into the following categories:
        compile and run in GPU device code. Covers atomics, concepts, containers, iterators,
        numerics, ranges, utilities, and more.
    * - Extended API (``cuda/``)
-     - GPU-specific extensions in the ``cuda::`` namespace: ``atomic``, ``memcpy_async``,
-       ``stream_ref``, ``warp``, ``memory_resource``, ``work_stealing``, and others.
+     - GPU-specific extensions in the ``cuda::`` namespace: ``atomic``,
+       ``stream_ref``, ``memory_resource``, and others.
    * - Heterogeneous (``heterogeneous/``)
      - Objects shared across host and device, and interoperability between the ``cuda::`` and
        ``hip::`` namespaces.

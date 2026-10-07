@@ -40,6 +40,14 @@ libhipcxx has the following platform limitations.
 * ``cuda::std::chrono::system_clock::now()`` does not return a UNIX timestamp. The host system clock
   and the device system clock are not synchronized and may run at different clock rates.
 
+.. important::
+
+   Some APIs from libcudacxx may be missing or may not achieve the same performance on AMD GPUs
+   due to fundamental hardware architecture differences between AMD and NVIDIA GPUs. APIs that rely
+   on NVIDIA-specific hardware features (such as PTX instructions, tensor cores, or specific
+   compute capabilities) may be unavailable, provide degraded functionality, or fall back to
+   software implementations with reduced performance.
+
 Unsupported APIs
 ================
 
@@ -76,6 +84,23 @@ The following APIs from libcudacxx are **not** supported in libhipcxx:
   * - Extended Memory Access Properties Library
     - ``<cuda/annotated_ptr>``
     - Memory access properties for pointers.
+  * - Extended Memory Access Properties Library
+    - ``<cuda/discard_memory>``
+    - Discards modified cache lines without writing them back. The header is available, but
+      ``cuda::discard_memory`` has no effect on AMD GPUs.
+  * - Extended Warp Library
+    - ``<cuda/warp>``
+    - Warp shuffle functions. The header is available, but ``cuda::device::warp_shuffle_*`` are
+      only compiled for NVIDIA PTX targets.
+  * - Extended Work Stealing Library
+    - ``<cuda/work_stealing>``
+    - ``cuda::for_each_canceled_block`` for cancelling and stealing thread blocks. On AMD GPUs it
+      invokes the function once for the current block and does not cancel other blocks.
+  * - Device-Level APIs
+    - ``cuda::device::*``
+    - Hardware-specific device functions including warp shuffles, barrier operations with
+      transaction counts, and async memory operations. These require NVIDIA PTX instructions
+      and SM-specific hardware features not available on AMD GPUs.
   * - PTX API
     - ``<cuda/ptx>``
     - The ``cuda::ptx`` namespace contains functions that map to NVIDIA PTX instructions.

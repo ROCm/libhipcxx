@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::restrict_accessor and cuda::restrict_mdspan, which apply the restrict aliasing policy to mdspan accessors in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::restrict_accessor and cuda::restrict_mdspan, which apply the restrict aliasing policy to mdspan accessors in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, restrict_accessor, restrict_mdspan, aliasing policy, mdspan, __restrict__
 
 .. _libcudacxx-extended-api-mdspan-restrict-accessor:
@@ -39,7 +39,7 @@ This page documents ``cuda::restrict_accessor`` and ``cuda::restrict_mdspan``, w
 
 An alias type to create an accessor with the *restrict aliasing policy* starting from an existing accessor.
 
-More information related to the *restrict aliasing policy* can be found in the CUDA programming guide: `__restrict__ keyword <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#restrict>`_.
+More information related to the *restrict aliasing policy* can be found in the HIP documentation: `__restrict__ keyword <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_cpp_language_extensions.html#restrict>`_.
 
 ----
 
@@ -74,7 +74,7 @@ Traits:
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/mdspan>
 
@@ -106,4 +106,5 @@ Example
         restrict_aligned_mdspan mdD{mdC};
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/Wjco996z8>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/Wjco996z8>`_

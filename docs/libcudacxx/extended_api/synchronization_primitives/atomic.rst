@@ -42,7 +42,7 @@ This page documents ``cuda::atomic``, an extended form of ``std::atomic`` with t
 
 Defined in header ``<cuda/atomic>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, cuda::thread_scope Scope = cuda::thread_scope_system>
    class cuda::atomic;
@@ -71,21 +71,22 @@ Concurrency Restrictions
 An object of type ``cuda::atomic`` or `cuda::std::atomic <https://en.cppreference.com/w/cpp/atomic/atomic>`_
 shall not be accessed concurrently by CPU and GPU threads unless:
 
-- it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
+- it is in unified memory and the `concurrentManagedAccess property <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`_
   is 1, or
-- it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
+- it is in CPU memory and the `hostNativeAtomicSupported property <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`_
   is 1.
 
 Note, for objects of scopes other than ``cuda::thread_scope_system`` this is a data-race, and therefore also
 prohibited regardless of memory characteristics.
 
-Under CUDA Compute Capability 6 (Pascal), an object of type ``atomic`` may not be used:
+..
+   Under CUDA Compute Capability 6 (Pascal), an object of type ``atomic`` may not be used:
 
-- with automatic storage duration, or
-- if ``is_always_lock_free()`` is ``false``.
+   - with automatic storage duration, or
+   - if ``is_always_lock_free()`` is ``false``.
 
-Under CUDA Compute Capability prior to 6 (Pascal), objects of type ``cuda::atomic`` or
-`cuda::std::atomic <https://en.cppreference.com/w/cpp/atomic/atomic>`_ may not be used.
+   Under CUDA Compute Capability prior to 6 (Pascal), objects of type ``cuda::atomic`` or
+   `cuda::std::atomic <https://en.cppreference.com/w/cpp/atomic/atomic>`_ may not be used.
 
 Implementation-Defined Behavior
 -------------------------------
@@ -107,7 +108,7 @@ the value of ``cuda::atomic<T, S>::is_always_lock_free()`` is as follows:
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/atomic>
 
@@ -125,4 +126,5 @@ Example
      cuda::atomic<int, cuda::thread_scope_block> d;
    }
 
-`See it on Godbolt <https://godbolt.org/z/avo3Evbee>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/avo3Evbee>`_

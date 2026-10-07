@@ -45,9 +45,8 @@ Restrictions
 
 On device no exceptions are thrown in case of a bad access.
 
-CUDA-specific changes
----------------------
+Implementation notes
+--------------------
 
-``cuda::std::visit`` utilizes recursion instead of the usual function
-pointer array. This greatly improves runtime behavior, but comes at
-the cost of increased compile times.
+``cuda::std::visit`` uses recursion instead of the usual array of function pointers. This improves runtime behavior
+at the cost of longer compile times.

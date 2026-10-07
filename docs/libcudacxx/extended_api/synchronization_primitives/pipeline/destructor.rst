@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline::~pipeline, the destructor that calls quit if not already called and destroys the pipeline object in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline::~pipeline, the destructor that calls quit if not already called and destroys the pipeline object in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, pipeline destructor, pipeline, quit, destroy
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-destructor:

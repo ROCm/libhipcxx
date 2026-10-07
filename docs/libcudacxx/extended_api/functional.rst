@@ -42,30 +42,29 @@ This page covers the functional extended API, including utilities for maximum an
    functional/maximum_minimum
 
 .. list-table::
-   :widths: 25 45 30 30
-   :header-rows: 0
+   :widths: 25 45 30
+   :header-rows: 1
+
+   * - API
+     - Description
+     - Since
 
    * - :ref:`cuda::maximum <libcudacxx-extended-api-functional-maximum-minimum>`
      - Returns the maximum of two values
-     - CCCL 2.8.0
-     - CUDA 12.9
+     - libhipcxx 3.0
 
    * - :ref:`cuda::minimum <libcudacxx-extended-api-functional-maximum-minimum>`
      - Returns the minimum of two values
-     - CCCL 2.8.0
-     - CUDA 12.9
+     - libhipcxx 3.0
 
    * - :ref:`cuda::proclaim_return_type <libcudacxx-extended-api-functional-proclaim-return-type>`
      - Creates a forwarding call wrapper that proclaims return type
-     - libhipcxx 1.9.0 / CCCL 2.0.0
-     - CUDA 11.8
+     - libhipcxx 2.7
 
    * - ``cuda::proclaim_copyable_arguments``
      - Creates a forwarding call wrapper that proclaims that arguments can be freely copied before an invocation of the wrapped callable
-     - CCCL 2.8.0
-     - CUDA 12.9
+     - libhipcxx 3.0
 
    * - :ref:`cuda::get_device_address <libcudacxx-extended-api-functional-get-device-address>`
      - Returns a valid address to a device object
-     - CCCL 2.8.0
-     - CUDA 12.9
+     - libhipcxx 3.0

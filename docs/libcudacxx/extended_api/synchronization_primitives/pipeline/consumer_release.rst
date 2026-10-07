@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline::consumer_release, which releases the current pipeline stage for reuse by producer threads in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline::consumer_release, which releases the current pipeline stage for reuse by producer threads in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, consumer_release, pipeline, consumer, stage, release
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-consumer-release:

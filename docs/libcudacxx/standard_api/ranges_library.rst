@@ -44,10 +44,10 @@ See the documentation of the standard headers `\<iterator\> <https://en.cpprefer
      - Availability
    * - `\<cuda/std/iterator\> <https://en.cppreference.com/w/cpp/header/iterator>`_
      - Iterator related concepts and machinery such as ``cuda::std::forward_iterator``
-     - CCCL 2.3.0 / CUDA 12.4
+     - libhipcxx 2.7
    * - `\<cuda/std/ranges\> <https://en.cppreference.com/w/cpp/header/ranges>`_
      - Range related concepts and machinery such as ``cuda::std::ranges::forward_range`` and ``cuda::std::ranges::subrange``
-     - CCCL 2.4.0 / CUDA 12.5
+     - libhipcxx 2.7
 
 Extensions
 ----------
@@ -66,7 +66,6 @@ Restrictions
 ------------
 
 - Subsumption does not work prior to C++20.
-- Subsumption is only partially implemented in the compiler until nvcc 12.4.
 
 Omissions
 ---------

@@ -47,7 +47,7 @@ Any Standard C++ header not listed below is omitted.
      - Availability
    * - `\<cuda/std/climits\> <https://en.cppreference.com/w/cpp/header/climits>`_
      - Limits of integral types
-     - libhipcxx 1.0.0 / CCCL 2.0.0 / CUDA 10.2
+     - libhipcxx 2.7
    * - `\<cuda/std/limits\> <https://en.cppreference.com/w/cpp/header/limits>`_
      - Interface to query properties of all fundamental numeric types
-     - libhipcxx 1.0.0 / CCCL 2.0.0 / CUDA 10.2
+     - libhipcxx 2.7

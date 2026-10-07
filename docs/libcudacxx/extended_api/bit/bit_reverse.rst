@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::bit_reverse, which reverses the order of bits in an unsigned integer value in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::bit_reverse, which reverses the order of bits in an unsigned integer value in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, bit_reverse, bit manipulation, unsigned integer, BREV
 
 .. _libcudacxx-extended-api-bit-bit_reverse:
@@ -54,24 +54,28 @@ Value with reversed bits.
 
 **Performance considerations**
 
-The function performs the following operations:
+In host code the function uses ``__builtin_bitreverse<N>`` with clang.
 
-- Device:
+..
+   The function performs the following operations:
 
-  - ``uint8_t`` ``uint16_t``: ``PRMT``, ``BREV``
-  - ``uint32_t``: ``BREV``
-  - ``uint64_t``: ``BREV`` x2, ``MOV`` x2
-  - ``uint128_t``: ``BREV`` x4, ``MOV`` x4
+   - Device:
 
-- Host: ``__builtin_bitreverse<N>`` with clang
+     - ``uint8_t`` ``uint16_t``: ``PRMT``, ``BREV``
+     - ``uint32_t``: ``BREV``
+     - ``uint64_t``: ``BREV`` x2, ``MOV`` x2
+     - ``uint128_t``: ``BREV`` x4, ``MOV`` x4
+
+   - Host: ``__builtin_bitreverse<N>`` with clang
 
 .. note::
 
    When the input values are run-time values that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations, using the function could not be optimal.
 
-.. note::
+..
+   .. note::
 
-   GCC <= 8 uses a slow path with more instructions even in CUDA
+      GCC <= 8 uses a slow path with more instructions even in CUDA
 
 Example
 -------
@@ -88,8 +92,9 @@ Example
 
     int main() {
         bit_reverse_kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/K36dvoh58>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/K36dvoh58>`_

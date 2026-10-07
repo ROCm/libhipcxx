@@ -65,7 +65,8 @@ returned pointer *or* pointers derived from it *may* apply the access property.
 -  The association is *not* expected to hold through the ABI of an unknown function call, e.g., when the pointer is
    passed through a separately-compiled function interface, unless link-time optimizations are used.
 
-**Note**: currently ``associate_access_property`` is ignored by nvcc and nvc++ on the host; but this might change any time.
+..
+   **Note**: currently ``associate_access_property`` is ignored by nvcc and nvc++ on the host; but this might change any time.
 
 Example
 -------

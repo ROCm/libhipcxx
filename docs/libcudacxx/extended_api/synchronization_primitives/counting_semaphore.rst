@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::counting_semaphore, a scoped counting semaphore for constraining concurrent access between GPU and CPU threads in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::counting_semaphore, a scoped counting semaphore for constraining concurrent access between GPU and CPU threads in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, counting_semaphore, semaphore, concurrent access, thread scope, synchronization
 
 .. _libcudacxx-extended-api-synchronization-counting-semaphore:
@@ -98,4 +98,5 @@ Example
      cuda::counting_semaphore<cuda::thread_scope_block> d;
    }
 
-`See it on Godbolt <https://godbolt.org/z/3YrjjTvG6>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/3YrjjTvG6>`_

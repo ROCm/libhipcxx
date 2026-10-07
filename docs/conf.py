@@ -38,16 +38,16 @@ html_theme_options = {
     "header_link": "",
     "version_list_link": "https://rocm.docs.amd.com/projects/libhipcxx/en/latest/release.html",
     "nav_secondary_items": {
-        "GitHub": "https://github.com/AMD-AIOSS/libhipcxx",
+        "GitHub": "https://github.com/ROCm/libhipcxx",
         "Blogs": "https://rocm.blogs.amd.com/",
         "ROCm Developer Hub": "https://www.amd.com/en/developer/resources/rocm-hub.html",
         "Instinct™ Docs": "https://instinct.docs.amd.com/",
         "Infinity Hub": "https://www.amd.com/en/developer/resources/infinity-hub.html",
-        "Support": "https://github.com/AMD-AIOSS/libhipcxx/issues",
+        "Support": "https://github.com/ROCm/libhipcxx/issues",
     },
     "link_main_doc": False,
     "use_download_button": True,
-    "repository_url": "https://github.com/AMD-AIOSS/libhipcxx",
+    "repository_url": "https://github.com/ROCm/libhipcxx",
     "use_repository_button": True,
     "use_issues_button": True,
     # Add any additional theme options here
@@ -83,7 +83,42 @@ copyright = "Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved
 version = version_number
 release = version_number
 
-exclude_patterns = ['_includes/**']
+exclude_patterns = [
+    '_includes/**',
+    # Not supported in libhipcxx, see reference/libhipcxx-limitations.rst.
+    'libcudacxx/extended_api/synchronization_primitives/latch.rst',
+    'libcudacxx/extended_api/synchronization_primitives/barrier.rst',
+    'libcudacxx/extended_api/synchronization_primitives/barrier/**',
+    'libcudacxx/extended_api/synchronization_primitives/counting_semaphore.rst',
+    'libcudacxx/extended_api/synchronization_primitives/binary_semaphore.rst',
+    'libcudacxx/extended_api/synchronization_primitives/pipeline.rst',
+    'libcudacxx/extended_api/synchronization_primitives/pipeline/**',
+    'libcudacxx/extended_api/asynchronous_operations.rst',
+    'libcudacxx/extended_api/asynchronous_operations/**',
+    'libcudacxx/extended_api/shapes.rst',
+    'libcudacxx/extended_api/shapes/**',
+    'libcudacxx/extended_api/memory_access_properties.rst',
+    'libcudacxx/extended_api/memory_access_properties/**',
+    'libcudacxx/extended_api/warp.rst',
+    'libcudacxx/extended_api/warp/**',
+    'libcudacxx/extended_api/work_stealing.rst',
+    # Contains CUDA-specific forward progress guarantees and execution model details.
+    'libcudacxx/extended_api/execution_model.rst',
+    # NVIDIA/libcudacxx-specific: the upstream release table maps libcu++ versions to CUDA
+    # toolkit releases, and the changelog describes upstream releases. The libhipcxx version
+    # and ABI facts live in reference/libhipcxx-conformance.rst.
+    'libcudacxx/releases.rst',
+    'libcudacxx/releases/**',
+    # Upstream CCCL monorepo leftovers, unreachable from sphinx/_toc.yml.in. cpp.rst and
+    # python.rst are landing pages for CUB, Thrust and the cuda.* Python packages, which
+    # libhipcxx does not ship, and the code of conduct names the NVIDIA C++ Core Compute
+    # Libraries community and its contact address. VERSION.md is a stale version string.
+    'VERSION.md',
+    'cpp.rst',
+    'python.rst',
+    'libcudacxx/contributing.rst',
+    'libcudacxx/contributing/**',
+]
 
 # Generated at build time from sphinx/_toc.yml.in (rocm-docs-core). Keep it under
 # _build/html so sphinx-autobuild does not watch and rebuild in a loop.
@@ -113,3 +148,15 @@ extensions = [
 html_title = f"{project} {version_number} documentation"
 
 external_projects_current_project = "libhipcxx"
+
+# Override external projects to avoid broken intersphinx mappings
+external_projects = {}
+
+# Disable problematic intersphinx mappings
+intersphinx_mapping = {}
+
+# Make intersphinx failures non-fatal
+suppress_warnings = ['app.add_node', 'app.add_directive']
+
+# Configure Sphinx to continue on intersphinx errors
+nitpicky = False

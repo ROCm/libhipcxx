@@ -104,4 +104,5 @@ The example below shows only ``cuda::device::barrier_arrive_tx``. A more extensi
      bar.wait(cuda::std::move(token));
    }
 
-`See it on Godbolt <https://godbolt.org/z/1vxcGrT8j>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/1vxcGrT8j>`_

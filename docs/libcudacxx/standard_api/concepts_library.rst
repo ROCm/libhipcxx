@@ -41,7 +41,7 @@ This page documents the C++ concepts library support in libhipcxx, including fun
      - Availability
    * - `\<cuda/std/concepts\> <https://en.cppreference.com/w/cpp/header/concepts>`_
      - Fundamental library concepts
-     - CCCL 2.1.0 / CUDA 12.2
+     - libhipcxx 2.7
 
 Extensions
 ----------
@@ -71,5 +71,3 @@ Restrictions
 
     template<class Integer, cuda::std::enable_if_t<cuda::std::integral<Integer>, int> = 0>
     void is_always_ambiguous_in_cpp17(Integer&& i) {...}
-
-- Subsumption is only partially implemented in the compiler until nvcc 12.4. nvcc has issues detecting subsumption of concepts that are composed of multiple concepts.

@@ -59,31 +59,31 @@ the information about the individual features for details.
      - Availability
    * - :ref:`libcudacxx-standard-api-utility-bitset`
      - Fixed-size sequence of bits
-     - CCCL 2.8.0
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-expected`
      - Optional value with error channel
-     - CCCL 2.3.0 / CUDA 12.4
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-functional`
-     - General-purpose polymorphic function wrapper
-     - CCCL 2.9.0 / CUDA 12.9
-   * - :ref:`libcudacxx-standard-api-utility-memory`
      - Function objects and function wrappers
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.2
+     - libhipcxx 2.7
+   * - :ref:`libcudacxx-standard-api-utility-memory`
+     - Low-level memory management utilities
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-optional`
      - Optional value
-     - CCCL 2.3.0 / CUDA 12.4
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-tuple`
      - Fixed-sized heterogeneous container
-     - libhipcxx 1.3.0 / CCCL 2.0.0 / CUDA 11.2
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-type-traits`
      - Compile-time type introspection
-     - libhipcxx 1.0.0 / CCCL 2.0.0 / CUDA 10.2
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-utility`
      - Various utility components
-     - libhipcxx 1.3.0 / CCCL 2.0.0 / CUDA 11.2
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-variant`
      - Type safe union type
-     - CCCL 2.4.0 / CUDA 12.5
+     - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-version`
      - Compile-time version information and feature test macros
-     - libhipcxx 1.2.0 / CCCL 2.0.0 / CUDA 11.1
+     - libhipcxx 2.7

@@ -33,8 +33,8 @@ The ``cuda::resource`` concept
 This page documents the ``cuda::mr::resource`` and ``cuda::mr::async_resource`` concepts, which constrain memory resource types for synchronous and stream-ordered allocation.
 
 The `std::pmr::memory_resource <https://en.cppreference.com/w/cpp/header/memory_resource>`__ feature provides only a
-single ``allocate`` interface, which is sufficient for homogeneous memory systems. However, CUDA provides both
-synchronous and `stream-ordered allocation <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#stream-ordered-memory-allocator>`__.
+single ``allocate`` interface, which is sufficient for homogeneous memory systems. However, HIP provides both
+synchronous and `stream-ordered allocation <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html>`__.
 
 With `std::pmr::memory_resource <https://en.cppreference.com/w/cpp/header/memory_resource>`__ there is no way to tell
 whether a memory resource can utilize stream-ordered allocations. Even if the application knows it can, there is no way

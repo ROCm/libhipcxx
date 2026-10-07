@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx math extended API, including ceiling division, rounding, and integer logarithm utilities for HIP and CUDA.
+  :description: Overview of the libhipcxx math extended API, including ceiling division, rounding, and integer logarithm utilities for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, math, ceil_div, round_up, round_down, ilog2, ilog10
 
 .. _libcudacxx-extended-api-math:
@@ -42,35 +42,29 @@ This page covers the math extended API, providing integer arithmetic utilities i
    math/ilog
 
 .. list-table::
-   :widths: 25 45 30 30
+   :widths: 25 45 30
    :header-rows: 1
 
    * - **Header**
      - **Content**
-     - **CCCL Availability**
-     - **CUDA Toolkit Availability**
+     - **libhipcxx Availability**
 
    * - :ref:`ceil_div <libcudacxx-extended-api-math-ceil-div>`
      - Ceiling division
-     - CCCL 2.7.0
-     - CUDA 12.8
+     - libhipcxx 2.7
 
    * - :ref:`round_up <libcudacxx-extended-api-math-round-up>`
      - Round up to the next multiple
-     - CCCL 2.9.0
-     - CUDA 12.9
+     - libhipcxx 3.0
 
    * - :ref:`round_down <libcudacxx-extended-api-math-round-down>`
      - Round down to the previous multiple
-     - CCCL 2.9.0
-     - CUDA 12.9
+     - libhipcxx 3.0
 
    * - :ref:`ilog2 <libcudacxx-extended-api-math-ilog>`
      - Integer logarithm to the base 2
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
 
    * - :ref:`ilog10 <libcudacxx-extended-api-math-ilog>`
      - Integer logarithm to the base 10
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0

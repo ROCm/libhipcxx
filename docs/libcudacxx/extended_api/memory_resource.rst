@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx memory resource extended API, providing a standard C++ interface for heterogeneous, stream-ordered memory allocation in HIP and CUDA.
+  :description: Overview of the libhipcxx memory resource extended API, providing a standard C++ interface for heterogeneous, stream-ordered memory allocation in HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, memory resource, cuda::mr, async_resource, resource_ref, stream-ordered allocation
 
 
@@ -31,7 +31,7 @@
 Memory Resources
 ================
 
-This page covers the memory resource extended API, providing a standard C++ interface for heterogeneous, stream-ordered memory allocation in HIP and CUDA.
+This page covers the memory resource extended API, providing a standard C++ interface for heterogeneous, stream-ordered memory allocation in HIP.
 
 .. toctree::
    :hidden:
@@ -41,13 +41,16 @@ This page covers the memory resource extended API, providing a standard C++ inte
    Resources <memory_resource/resource>
    Resource wrapper <memory_resource/resource_ref>
 
+..
+   The ``<cuda/memory_resource>`` header provides a standard C++ interface for *heterogeneous*, *stream-ordered* memory
+   allocation tailored to the needs of CUDA C++ developers. This design builds off of the success of the `RAPIDS Memory Manager (RMM) <https://github.com/rapidsai/rmm>`__
+   project and evolves the design based on lessons learned.
 The ``<cuda/memory_resource>`` header provides a standard C++ interface for *heterogeneous*, *stream-ordered* memory
-allocation tailored to the needs of CUDA C++ developers. This design builds off of the success of the `RAPIDS Memory Manager (RMM) <https://github.com/rapidsai/rmm>`__
-project and evolves the design based on lessons learned.
+allocation tailored to the needs of HIP C++ developers.
 
-``<cuda/memory_resource>`` is not intended to replace RMM, but instead moves the definition of the memory allocation
-interface to a more centralized home in CCCL. RMM will remain as a collection of implementations of the ``cuda::mr``
-interfaces.
+``<cuda/memory_resource>`` only defines the memory allocation interface; it does not provide allocator
+implementations. For HIP developers, `hipMM <https://github.com/AMD-Ecosystem/hipMM>`__ provides implementations of
+the ``cuda::mr`` interfaces optimized for AMD GPUs.
 
 We are still experimenting with the design, so for now the contents of ``<cuda/memory_resource>`` are only available if
 ``LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE`` is defined.
@@ -56,18 +59,22 @@ At a high level, the header provides:
 
 .. list-table::
    :widths: 30 50 20
-   :header-rows: 0
+   :header-rows: 1
+
+   * - API
+     - Description
+     - Since
 
    * - :ref:`cuda::get_property <libcudacxx-extended-api-memory-resources-properties>`
      - Infrastructure to tag a user defined type with a given property
-     - CCCL 2.2.0 / CUDA 12.3
+     - libhipcxx 2.7
    * - :ref:`cuda::mr::{async}_resource <libcudacxx-extended-api-memory-resources-resource>` and
        :ref:`cuda::mr::{async}_resource_with <libcudacxx-extended-api-memory-resources-resource>`
      - Concepts that provide proper constraints for arbitrary memory resources.
-     - CCCL 2.2.0 / CUDA 12.3
+     - libhipcxx 2.7
    * - :ref:`cuda::mr::{async}_resource_ref <libcudacxx-extended-api-memory-resources-resource-ref>`
      - A non-owning type-erased memory resource wrapper that enables consumers to specify properties of resources that they expect.
-     - CCCL 2.2.0 / CUDA 12.3
+     - libhipcxx 2.7
 
 These features are an evolution of `std::pmr::memory_resource <https://en.cppreference.com/w/cpp/header/memory_resource>`__
 that was introduced in C++17. While ``std::pmr::memory_resource`` provides a polymorphic memory resource that can be
@@ -76,6 +83,6 @@ adopted through inheritance, it is not properly suited for heterogeneous systems
 With the current design it ranges from cumbersome to impossible to verify whether a memory resource provides allocations
 that are e.g. accessible on device, or whether it can utilize other allocation mechanisms.
 
-To better support asynchronous CUDA `stream-ordered allocations <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#stream-ordered-memory-allocator>`__
+To better support asynchronous HIP `stream-ordered allocations <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html>`__
 libhipcxx provides :ref:`cuda::stream_ref <libcudacxx-extended-api-streams-stream-ref>` as a wrapper around
-``cudaStream_t``. The definition of ``cuda::stream_ref`` can be found in the ``<cuda/stream_ref>`` header.
+``hipStream_t``. The definition of ``cuda::stream_ref`` can be found in the ``<cuda/stream_ref>`` header.

@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::bitmask, which generates a bitmask of a specified width starting at a given bit position in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::bitmask, which generates a bitmask of a specified width starting at a given bit position in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, bitmask, bit manipulation, unsigned integer, BMSK
 
 .. _libcudacxx-extended-api-bit-bitmask:
@@ -61,18 +61,20 @@ Bitmask of size ``width`` starting at ``start``.
 
 **Performance considerations**
 
-The function performs the following operations in device code:
+..
+   The function performs the following operations in device code:
 
-- ``uint8_t``, ``uint16_t``, ``uint32_t``: ``BMSK``
-- ``uint64_t``: ``SHL`` x4, ``ADD`` x2
+   - ``uint8_t``, ``uint16_t``, ``uint32_t``: ``BMSK``
+   - ``uint64_t``: ``SHL`` x4, ``ADD`` x2
 
 .. note::
 
    When the input values are run-time values that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations, using the function could not be optimal.
 
-.. note::
+..
+   .. note::
 
-   GCC <= 8 uses a slow path with more instructions even in CUDA
+      GCC <= 8 uses a slow path with more instructions even in CUDA
 
 Example
 -------
@@ -90,8 +92,9 @@ Example
 
     int main() {
         bitmask_kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/PPqP8rTPd>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/PPqP8rTPd>`_

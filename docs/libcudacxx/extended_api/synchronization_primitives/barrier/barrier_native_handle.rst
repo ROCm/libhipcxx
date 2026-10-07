@@ -72,4 +72,5 @@ Example
      // Equivalent to: `(void)b.arrive()`.
    }
 
-`See it on Godbolt <https://godbolt.org/z/dr4798Y76>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/dr4798Y76>`_

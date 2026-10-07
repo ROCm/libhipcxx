@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::maximum and cuda::minimum function objects, which compute the maximum or minimum of two values in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::maximum and cuda::minimum function objects, which compute the maximum or minimum of two values in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, maximum, minimum, function objects, functional, noexcept
 
 .. _libcudacxx-extended-api-functional-maximum-minimum:
@@ -32,7 +32,7 @@
 
 This page documents ``cuda::maximum`` and ``cuda::minimum``, function objects that compute the maximum or minimum of two values on host and device.
 
-.. code:: cuda
+.. code:: cpp
 
     template <typename T>
     struct maximum {
@@ -69,7 +69,7 @@ Function objects for performing maximum and minimum. The functions behave as ``n
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/functional>
     #include <cuda/std/cstdint>
@@ -85,10 +85,11 @@ Example
 
     int main() {
         maximum_minimum_kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         int array[] = {3, 7, 5, 2};
         printf("%d\n", std::accumulate(array, array + 4, 0, cuda::maximum{})); // 7
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/44fdTerre>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/44fdTerre>`_

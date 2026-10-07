@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::ilog2 and cuda::ilog10, which compute integer logarithms to base 2 and base 10 respectively in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::ilog2 and cuda::ilog10, which compute integer logarithms to base 2 and base 10 respectively in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, ilog2, ilog10, integer logarithm, math, FLO
 
 .. _libcudacxx-extended-api-math-ilog:
@@ -38,7 +38,7 @@ This page documents ``cuda::ilog2`` and ``cuda::ilog10``, which compute the inte
    [[nodiscard]] __host__ __device__ inline constexpr
    int ilog2(T value) noexcept;
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T>
    [[nodiscard]] __host__ __device__ inline constexpr
@@ -62,12 +62,13 @@ The logarithm to the base 2 and 10 respectively, rounded down to the nearest int
 
 ``value > 0``
 
-**Performance considerations**
+..
+   **Performance considerations**
 
-The function performs the following operations in device code:
+   The function performs the following operations in device code:
 
-- ``ilog2``: ``FLO``
-- ``ilog10``: ``FLO``, ``FMUL``, ``F2I``, constant memory lookup, ``SEL`` + ``IADD`` only if ``T == uint32_t`` or ``T == __uint128_t``
+   - ``ilog2``: ``FLO``
+   - ``ilog10``: ``FLO``, ``FMUL``, ``F2I``, constant memory lookup, ``SEL`` + ``IADD`` only if ``T == uint32_t`` or ``T == __uint128_t``
 
 Example
 -------
@@ -86,8 +87,9 @@ Example
 
     int main() {
         ilog_kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/nndYnTWer>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/nndYnTWer>`_

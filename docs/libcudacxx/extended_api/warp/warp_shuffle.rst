@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::device warp shuffle functions, which exchange data of arbitrary size between threads within a warp in libhipcxx for HIP and CUDA.
-  :keywords: libhipcxx, ROCm, HIP, C++, warp_shuffle, warp_shuffle_idx, warp_shuffle_up, warp_shuffle_down, warp_shuffle_xor, shfl.sync
+  :description: API reference for cuda::device warp shuffle functions, which exchange data of arbitrary size between threads within a warp in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, warp_shuffle, warp_shuffle_idx, warp_shuffle_up, warp_shuffle_down, warp_shuffle_xor
 
 .. _libcudacxx-extended-api-warp-warp-shuffle:
 
@@ -143,12 +143,11 @@ The functions allow threads to exchange data of any size, including raw arrays, 
 
 **Performance considerations**
 
-- The function calls the PTX instruction ``shfl.sync`` :math:`ceil\left(\frac{sizeof(data)}{4}\right)` times.
+- The function performs a 32-bit warp shuffle :math:`ceil\left(\frac{sizeof(data)}{4}\right)` times.
 
 **References**
 
-- `CUDA Warp Shuffle Intrinsics <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-shuffle>`_
-- `PTX Shfl.sync instruction <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-shfl-sync>`_
+- `HIP warp shuffle functions <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_cpp_language_extensions.html#warp-shuffle-functions>`_
 
 Example
 -------
@@ -167,7 +166,7 @@ Example
 
     __global__ void warp_shuffle_kernel() {
         cuda::std::integral_constant<int, 16> half_warp;
-        auto                     laneid      = cuda::ptx::get_sreg_laneid();
+        auto                     laneid      = __lane_id();
         int                      raw_array[] = {threadIdx.x, threadIdx.x + 1, threadIdx.x + 2};
         cuda::std::array<int, 3> array       = {threadIdx.x, threadIdx.x + 1, threadIdx.x + 2};
         MyStruct                 my_structs{static_cast<double>(threadIdx.x), threadIdx.x + 1};
@@ -188,8 +187,9 @@ Example
 
     int main() {
         warp_shuffle_kernel<<<1, 32>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/soWTaG6Eb>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/soWTaG6Eb>`_

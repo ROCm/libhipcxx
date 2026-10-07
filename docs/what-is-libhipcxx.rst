@@ -104,8 +104,7 @@ is:
   It focuses on the subset most useful for heterogeneous code: atomics, type traits,
   containers, and math utilities.
 * **Heterogeneous** — the Standard Library subset it provides works in ``__host__`` code,
-  ``__device__`` code, and code that passes data between the two. A small number of
-  extensions in ``cuda::device::`` are device-only.
+  ``__device__`` code, and code that passes data between the two.
 
 Relationship to libcudacxx
 ==========================
@@ -196,9 +195,6 @@ has a broader execution scope:
    * - ``cuda::`` / ``hip::``
      - ``<cuda/*>`` / ``<hip/*>``
      - Host and device; Standard Library extensions
-   * - ``cuda::device::`` / ``hip::device::``
-     - ``<cuda/warp>``, ``<cuda/work_stealing>``
-     - Device code only; extensions requiring GPU hardware features
 
 
 Features and components

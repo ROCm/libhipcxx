@@ -127,8 +127,6 @@ Summary: ``std::``, ``cuda::``/ ``hip::`` and ``cuda::std::``/ ``hip::std::``
 -  ``cuda::std::`` / ``hip::std::`` / ``<cuda/std/*>`` / ``<hip/std/*>``: Conforming implementations of facilities from the Standard Library that work in
    ``__host__`` and  ``__device__`` code.
 -  ``cuda::`` / ``hip::`` / ``<cuda/*>`` / ``<hip/*>``: Conforming extensions to the Standard Library that work in ``__host__`` and ``__device__`` code.
--  ``cuda::device`` / ``hip::device`` / ``<cuda/device/*>`` / ``<hip/device/*>``: Conforming extensions to the Standard Library that work only in
-   ``__device__`` code.
 
 .. code:: cpp
 
@@ -164,23 +162,25 @@ Limitations/Unsupported Features/APIs
 -------------------------------------
 
 - Libhipcxx does not support CUDA backend/NVIDIA hardware.
-- Libhipcxx does not support the Windows OS.
 - `cuda::std::chrono::system_clock::now()` does not return a UNIX timestamp, host system clock and device system clock are not synchronized and they may run at different clock rates.
 - The following APIs from [libcudacxx] are *NOT* supported in libhipcxx:
 
-=========================================  ======================  ========================================================================================
-Group                                      API                     Header  Description
-=========================================  ======================  ========================================================================================
-Synchronization Library                    `<cuda/std/latch>`      Single-phase asynchronous thread-coordination mechanism
-Synchronization Library                    `<cuda/std/barrier>`    Multi-phase asynchronous thread-coordination mechanism
-Synchronization Library                    `<cuda/std/semaphore>`  Primitives for constraining concurrent access
-Extended Synchronization Library           `<cuda/latch>`          System-wide `cuda::std::latch` single-phase asynchronous thread coordination mechanism.
-Extended Synchronization Library           `<cuda/barrier>`        System-wide `cuda::std::barrier` multi-phase asynchronous thread coordination mechanism.
-Extended Synchronization Library           `<cuda/semaphore>`      System-wide primitives for constraining concurrent access.
-Extended Synchronization Library           `<cuda/pipeline>`       Coordination mechanisms to sequence asynchronous operations.
-Extended Memory Access Properties Library  `<cuda/annotated_ptr>`  Memory access properties for pointers.
-PTX API                                    `<cuda/ptx>`            The `cuda::ptx` namespace contains functions that map to Nvidia PTX instructions. 
-=========================================  ======================  ========================================================================================
+=========================================  =======================  ========================================================================================
+Group                                      API                      Header  Description
+=========================================  =======================  ========================================================================================
+Synchronization Library                    `<cuda/std/latch>`       Single-phase asynchronous thread-coordination mechanism
+Synchronization Library                    `<cuda/std/barrier>`     Multi-phase asynchronous thread-coordination mechanism
+Synchronization Library                    `<cuda/std/semaphore>`   Primitives for constraining concurrent access
+Extended Synchronization Library           `<cuda/latch>`           System-wide `cuda::std::latch` single-phase asynchronous thread coordination mechanism.
+Extended Synchronization Library           `<cuda/barrier>`         System-wide `cuda::std::barrier` multi-phase asynchronous thread coordination mechanism.
+Extended Synchronization Library           `<cuda/semaphore>`       System-wide primitives for constraining concurrent access.
+Extended Synchronization Library           `<cuda/pipeline>`        Coordination mechanisms to sequence asynchronous operations.
+Extended Memory Access Properties Library  `<cuda/annotated_ptr>`   Memory access properties for pointers.
+Extended Memory Access Properties Library  `<cuda/discard_memory>`  The header is available, but `cuda::discard_memory` has no effect on AMD GPUs.
+Extended Warp Library                      `<cuda/warp>`            The header is available, but `cuda::device::warp_shuffle_*` are only compiled for NVIDIA PTX targets.
+Extended Work Stealing Library             `<cuda/work_stealing>`   The header is available, but `cuda::for_each_canceled_block` does not cancel blocks on AMD GPUs.
+PTX API                                    `<cuda/ptx>`             The `cuda::ptx` namespace contains functions that map to Nvidia PTX instructions. 
+=========================================  =======================  ========================================================================================
 
 Licensing
 ---------
@@ -252,6 +252,8 @@ When used with hipcc, Libhipcxx  supports the
 following host compilers:
 
 - hipcc
+
+At the moment, libhipcxx is only tested with ``amdclang++``.
 
 Device Architectures
 ~~~~~~~~~~~~~~~~~~~~

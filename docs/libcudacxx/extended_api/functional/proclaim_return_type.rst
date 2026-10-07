@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::proclaim_return_type, which creates a forwarding call wrapper that declares the return type for extended device lambdas in libhipcxx.
+  :description: API reference for cuda::proclaim_return_type, which creates a forwarding call wrapper that declares the return type for device lambdas in libhipcxx.
   :keywords: libhipcxx, ROCm, HIP, C++, proclaim_return_type, device lambda, callable, functional, return type
 
 ..
@@ -31,11 +31,11 @@
 ``cuda::proclaim_return_type``
 ==============================
 
-This page documents ``cuda::proclaim_return_type``, which creates a forwarding call wrapper that declares the return type for extended device lambdas.
+This page documents ``cuda::proclaim_return_type``, which creates a forwarding call wrapper that declares the return type for device lambdas.
 
 Defined in the header ``<cuda/functional>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <class Ret, class Fn>
    __host__ __device__
@@ -44,7 +44,7 @@ Defined in the header ``<cuda/functional>``:
    }
 
 ``cuda::proclaim_return_type`` creates a forwarding call wrapper that uses ``Ret`` as a return type.
-The wrapper is useful in the case of extended device lambdas since an attempt to determine the return type of
+The wrapper is useful in the case of device lambdas since an attempt to determine the return type of
 their ``operator()`` function may work incorrectly in host code.
 
 Template Parameters
@@ -72,7 +72,7 @@ Parameters
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/functional>
 

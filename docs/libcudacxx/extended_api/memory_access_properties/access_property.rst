@@ -59,13 +59,13 @@ to *request* the application of properties to memory operations.
 
        // Static global memory residence control property:
        struct normal {
-           __host__ __device__ constexpr operator cudaAccessProperty() const noexcept;
+           __host__ __device__ constexpr operator hipAccessProperty() const noexcept;
        };
        struct persisting {
-           __host__ __device__ constexpr operator cudaAccessProperty() const noexcept;
+           __host__ __device__ constexpr operator hipAccessProperty() const noexcept;
        };
        struct streaming {
-           __host__ __device__ constexpr operator cudaAccessProperty() const noexcept;
+           __host__ __device__ constexpr operator hipAccessProperty() const noexcept;
        };
 
        // Default constructor:
@@ -263,41 +263,20 @@ Conversion operators
 
 .. code:: cuda
 
-   __host__ __device__ constexpr access_property::normal::operator cudaAccessProperty() const noexcept;
-   __host__ __device__ constexpr access_property::streaming::operator cudaAccessProperty() const noexcept;
-   __host__ __device__ constexpr access_property::persisting::operator cudaAccessProperty() const noexcept;
+   __host__ __device__ constexpr access_property::normal::operator hipAccessProperty() const noexcept;
+   __host__ __device__ constexpr access_property::streaming::operator hipAccessProperty() const noexcept;
+   __host__ __device__ constexpr access_property::persisting::operator hipAccessProperty() const noexcept;
 
-**Returns**: corresponding CUDA Runtime
-`cudaAccessProperty <https://docs.nvidia.com/cuda/cuda-runtime-api>`_
+**Returns**: corresponding HIP runtime
+`hipAccessProperty <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html>`_
 value.
 
 **Note**: Allows ``constexpr cuda::access_property::normal{}``,
 ``cuda::access_property::streaming{}``, and
 ``cuda::access_property::persisting{}`` to be used in lieu of the
-corresponding CUDA Runtime
-`cudaAccessProperty <https://docs.nvidia.com/cuda/cuda-runtime-api>`_
+corresponding HIP runtime
+`hipAccessProperty <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html>`_
 enumerated values.
-
-Mapping of access properties to NVVM-IR and the PTX ISA
--------------------------------------------------------
-
-.. warning::
-
-   The implementation makes no guarantees about the content of this section; it can change any time.
-
-When ``cuda::access_property`` is applied to memory operation, it
-sometimes matches with some of the cache eviction priorities and cache
-hints introduced in the `PTX ISA Version 7.4 <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#changes-in-ptx-isa-version-7-4>`_.
-See `Cache Eviction Priority Hints <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#cache-eviction-priority-hints>`_
-
--  ``global``: ``evict_unchanged``
--  ``normal``: ``evict_normal``
--  ``persisting``: ``evict_last``
--  ``streaming``: ``evict_first``
-
-When using ``shared`` and ``global``, the pointer being accessed can be
-assumed to point to memory in the ``shared`` and ``global`` address
-spaces. This is exploited for optimization purposes in NVVM-IR.
 
 Example
 -------
