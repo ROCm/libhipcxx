@@ -20,4 +20,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
  
-rocm-docs-core==141.0
+-r https://raw.githubusercontent.com/ROCm/rocm-docs-core/new_data/env/sphinx/requirements.txt
