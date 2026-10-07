@@ -35,20 +35,12 @@ html_theme = "rocm_docs_theme"
 html_theme_options = {
     "flavor": "rocm",
     "version_list_link": "https://rocm.docs.amd.com/projects/libhipcxx/en/latest/release.html",
-    "flavor": "rocm",
     "repository_url": "https://github.com/ROCm/libhipcxx",
     "path_to_docs": "projects/libhipcxx/docs",
     "use_repository_button": True,
     "use_issues_button": True,
     "use_download_button": True,
 }
-
-'''
-docs_header_version is used to manually configure the version in the header. If
-there exists a non-null value mapped to docs_header_version, then the header in
-the documentation page will contain the given version string.
-'''
-html_context = {"docs_header_version": "3.15"}
 
 
 # This section turns on/off article info
