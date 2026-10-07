@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline_producer_commit, which binds pipeline operations to a barrier for completion notification in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline_producer_commit, which binds pipeline operations to a barrier for completion notification in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, pipeline_producer_commit, pipeline, barrier, producer, commit
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-pipeline-producer-commit:
@@ -86,4 +86,5 @@ current phase to account for the subsequent ``cuda::barrier::arrive``, resulting
      pipe.consumer_release();
    }
 
-`See it on Godbolt <https://godbolt.org/z/sGzKe9obf>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/sGzKe9obf>`_

@@ -22,15 +22,15 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx streams extended API, including the stream_ref wrapper around cudaStream_t for type-safe stream management in HIP and CUDA.
-  :keywords: libhipcxx, ROCm, HIP, C++, streams, stream_ref, cudaStream_t, stream-ordered, memory allocation
+  :description: Overview of the libhipcxx streams extended API, including the stream_ref wrapper around hipStream_t for type-safe stream management in HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, streams, stream_ref, hipStream_t, stream-ordered, memory allocation
 
 .. _libcudacxx-extended-api-streams:
 
 Streams
 =======
 
-This page covers the streams extended API, providing ``cuda::stream_ref`` as a type-safe wrapper around ``cudaStream_t`` that prevents common implicit-conversion pitfalls.
+This page covers the streams extended API, providing ``cuda::stream_ref`` as a type-safe wrapper around ``hipStream_t`` that prevents common implicit-conversion pitfalls.
 
 .. toctree::
    :hidden:
@@ -40,8 +40,12 @@ This page covers the streams extended API, providing ``cuda::stream_ref`` as a t
 
 .. list-table::
    :widths: 25 45 30
-   :header-rows: 0
+   :header-rows: 1
+
+   * - API
+     - Description
+     - Since
 
    * - :ref:`stream_ref <libcudacxx-extended-api-streams-stream-ref>`
-     - A wrapper around a ``cudaStream_t``
-     - CCCL 2.2.0 / CUDA 12.3
+     - A wrapper around a ``hipStream_t``
+     - libhipcxx 2.7

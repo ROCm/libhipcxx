@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx shapes API, including size_t and aligned_size_t types that define byte extents for asynchronous memory operations in HIP and CUDA.
+  :description: Overview of the libhipcxx shapes API, including size_t and aligned_size_t types that define byte extents for asynchronous memory operations in HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, shapes, aligned_size_t, size_t, memory extent, alignment, memcpy_async
 
 
@@ -45,7 +45,7 @@ This page covers the shape types used to describe byte extents for asynchronous 
 
    * - `cuda::std::size_t <https://en.cppreference.com/w/cpp/types/size_t>`_
      - Defines an extent of bytes
-     - libhipcxx 1.0.0 / CCCL 2.0.0 / CUDA 10.2
+     - libhipcxx 2.7
    * - :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-access-shapes-aligned-size>`
      - Defines an extent of bytes with a statically defined alignment.
-     - libhipcxx 1.2.0 / CCCL 2.0.0 / CUDA 11.1
+     - libhipcxx 2.7

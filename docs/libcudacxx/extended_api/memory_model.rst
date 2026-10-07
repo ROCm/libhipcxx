@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documentation of the libhipcxx CUDA C++ memory model, covering thread scopes, atomicity, data races, and synchronization primitives for HIP and CUDA.
+  :description: Documentation of the libhipcxx HIP C++ memory model, covering thread scopes, atomicity, data races, and synchronization primitives.
   :keywords: libhipcxx, ROCm, HIP, C++, memory model, thread scope, atomicity, data race, synchronization, atomic
 
 .. _libcudacxx-extended-api-memory-model:
@@ -32,10 +32,17 @@ Memory model
 
 Standard C++ presents a view that the cost to synchronize threads is uniform and low.
 
-CUDA C++ is different: the cost to synchronize threads grows as threads are further apart. It is low across threads
+..
+   CUDA C++ is different: the cost to synchronize threads grows as threads are further apart. It is low across threads
+   within a block, but high across arbitrary threads in the system running on multiple GPUs and CPUs.
+HIP C++ is different: the cost to synchronize threads grows as threads are further apart. It is low across threads
 within a block, but high across arbitrary threads in the system running on multiple GPUs and CPUs.
 
-To account for non-uniform thread synchronization costs that are not always low, CUDA C++ extends the standard C++
+..
+   To account for non-uniform thread synchronization costs that are not always low, CUDA C++ extends the standard C++
+   memory model and concurrency facilities in the ``cuda::`` namespace with thread scopes, retaining the syntax and
+   semantics of standard C++ by default.
+To account for non-uniform thread synchronization costs that are not always low, HIP C++ extends the standard C++
 memory model and concurrency facilities in the ``cuda::`` namespace with thread scopes, retaining the syntax and
 semantics of standard C++ by default.
 
@@ -45,10 +52,9 @@ Thread scopes
 -------------
 
 A thread scope specifies the kind of threads that can synchronize with each other using a synchronization primitive such
-as :ref:`atomic <libcudacxx-extended-api-synchronization-atomic>` or
-:ref:`barrier <libcudacxx-extended-api-synchronization-barrier>`.
+as :ref:`atomic <libcudacxx-extended-api-synchronization-atomic>`.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -68,10 +74,10 @@ Each program thread is related to each other program thread by one or more threa
 
 - Each thread in the system is related to each other thread in the system by the *system* thread scope:
   ``thread_scope_system``.
-- Each GPU thread is related to each other GPU thread in the same CUDA device and within the same `memory
-  synchronization domain <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#memory-synchronization-domains>`__
+- Each GPU thread is related to each other GPU thread in the same device and within the same memory
+  synchronization domain
   by the *device* thread scope: ``thread_scope_device``.
-- Each GPU thread is related to each other GPU thread in the same CUDA thread block by the *block* thread scope:
+- Each GPU thread is related to each other GPU thread in the same HIP thread block by the *block* thread scope:
   ``thread_scope_block``.
 - Each thread is related to itself by the ``thread`` thread scope: ``thread_scope_thread``.
 
@@ -89,40 +95,40 @@ An atomic operation is atomic at the scope it specifies if:
 - it specifies a scope other than ``thread_scope_system``, **or**
 - the scope is ``thread_scope_system`` and:
 
-  -  it affects an object in `system allocated memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-unified-memory-programming-hd>`__ and `pageableMemoryAccess <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html#group__CUDART__TYPES_1gg49e2f8c2c0bd6fe264f2fc970912e5cddc80992427a92713e699953a6d249d6f>`__ is ``1`` [0],  **or**
+  -  it affects an object in `system allocated memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html>`__ and `pageableMemoryAccess <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`__ is ``1`` [0],  **or**
   -  it affects an object in `managed
-     memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-unified-memory-programming-hd>`__
+     memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html#managed-memory>`__
      and
-     `concurrentManagedAccess <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`__
+     `concurrentManagedAccess <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`__
      is ``1``, **or**
   -  it affects an object in `mapped
-     memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#mapped-memory>`__ and
-     `hostNativeAtomicSupported <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`__
+     memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/host_memory.html#pinned-host-memory>`__ and
+     `hostNativeAtomicSupported <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`__
      is ``1``, **or**
   -  it is a load or store that affects a naturally-aligned object of
      sizes ``1``, ``2``, ``4``, ``8``, or ``16`` bytes on `mapped
-     memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#mapped-memory>`__ [1],
+     memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/host_memory.html#pinned-host-memory>`__ [1],
      **or**
   -  it affects an object in GPU memory, only GPU threads access it, and
 
-     - `p2pNativeAtomicSupported <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html#group__CUDART__TYPES_1gg2f597e2acceab33f60bd61c41fea0c1b8513982962e4439fa60f2a24348be587>`__ between each accessing GPU and the GPU where the object resides is ``1``, or
+     - `hipDevP2PAttrNativeAtomicSupported <https://rocm.docs.amd.com/projects/HIP/en/latest/reference/hip_runtime_api/modules/peer_to_peer_device_memory_access.html>`__ between each accessing GPU and the GPU where the object resides is ``1``, or
      - only GPU threads from a single GPU concurrently access it.
 
 .. note::
 
-   - [0] If `PageableMemoryAccessUsesHostPagetables <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html#group__CUDART__TYPES_1gg49e2f8c2c0bd6fe264f2fc970912e5cdc228cf8983c97d0e035da72a71494eaa>`__ is ``0`` then atomic operations to memory mapped file or ``hugetlbfs`` allocations are not atomic.
-   - [1] If `hostNativeAtomicSupported <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`__ is ``0``, atomic load or store operations at system scope that affect a
+   - [0] If `pageableMemoryAccessUsesHostPageTables <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`__ is ``0`` then atomic operations to memory mapped file or ``hugetlbfs`` allocations are not atomic.
+   - [1] If `hostNativeAtomicSupported <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`__ is ``0``, atomic load or store operations at system scope that affect a
      naturally-aligned 16-byte wide object in
-     `unified memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-unified-memory-programming-hd>`__ or
-     `mapped memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#mapped-memory>`__ require system
-     support. NVIDIA is not aware of any system that lacks this support and there is no CUDA API query available to
+     `unified memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html#unified-memory>`__ or
+     `mapped memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/host_memory.html#pinned-host-memory>`__ require system
+     support. AMD is not aware of any system that lacks this support and there is no HIP API query available to
      detect such systems.
 
-Refer to the `CUDA programming guide <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html>`__
+Refer to the `HIP memory management documentation <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management.html>`__
 for more information on
-`system allocated memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-unified-memory-programming-hd>`__,
-`managed memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-unified-memory-programming-hd>`__,
-`mapped memory <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#mapped-memory>`__,
+`system allocated memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html>`__,
+`managed memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html#managed-memory>`__,
+`mapped memory <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/host_memory.html#pinned-host-memory>`__,
 CPU memory, and GPU memory.
 
 Data races
@@ -247,6 +253,3 @@ threads of Block 0. However, the thread doing the loads is in Block 1,
 i.e., it is not in a scope included by the store operation performed in
 Block 0, causing the store and the load to not be "atomic", and
 introducing a data-race.
-
-For more examples see the `PTX memory consistency model litmus
-tests <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#axioms>`__.

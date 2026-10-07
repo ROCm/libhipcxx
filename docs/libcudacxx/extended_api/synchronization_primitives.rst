@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx synchronization primitives extended API, including atomics, latches, barriers, semaphores, and pipelines for HIP and CUDA.
-  :keywords: libhipcxx, ROCm, HIP, C++, synchronization, atomic, barrier, latch, semaphore, pipeline
+  :description: Overview of the libhipcxx synchronization primitives extended API, including system-wide atomics and atomic references for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, synchronization, atomic, atomic_ref
 
 
 .. _libcudacxx-extended-api-synchronization:
@@ -31,7 +31,10 @@
 Synchronization Primitives
 ===========================
 
-This page covers the synchronization primitives extended API, including thread-scoped atomics, latches, barriers, semaphores, and pipelines for coordinating host and device threads.
+This page covers the synchronization primitives extended API, providing thread-scoped atomics for coordinating host and device threads.
+
+``cuda::latch``, ``cuda::barrier``, ``cuda::counting_semaphore``, ``cuda::binary_semaphore``, and
+``cuda::pipeline`` are not supported in libhipcxx. See :ref:`libhipcxx-limitations`.
 
 .. toctree::
    :hidden:
@@ -39,6 +42,11 @@ This page covers the synchronization primitives extended API, including thread-s
 
    synchronization_primitives/atomic
    synchronization_primitives/atomic_ref
+
+..
+   Not supported in libhipcxx, see reference/libhipcxx-limitations.rst. The pages are
+   also listed in exclude_patterns in docs/conf.py.
+
    synchronization_primitives/latch
    synchronization_primitives/barrier
    synchronization_primitives/counting_semaphore
@@ -49,75 +57,82 @@ This page covers the synchronization primitives extended API, including thread-s
 
 .. list-table::
    :widths: 25 45 30
-   :header-rows: 0
+   :header-rows: 1
+
+   * - API
+     - Description
+     - Since
 
    * - :ref:`cuda::atomic <libcudacxx-extended-api-synchronization-atomic>`
      - System-wide `std::atomic <https://en.cppreference.com/w/cpp/atomic/atomic>`_ objects and operations
-     - libhipcxx 1.0.0 / CCCL 2.0.0 / CUDA 10.2
+     - libhipcxx 2.7
    * - :ref:`cuda::atomic_ref <libcudacxx-extended-api-synchronization-atomic-ref>`
      - System-wide `std::atomic_ref <https://en.cppreference.com/w/cpp/atomic/atomic_ref>`_ objects and operations
-     - libhipcxx 1.7.0 / CCCL 2.0.0 / CUDA 11.6
+     - libhipcxx 2.7
 
-.. rubric:: Latches
+..
+   Not supported in libhipcxx, see reference/libhipcxx-limitations.rst.
 
-.. list-table::
-   :widths: 25 45 30
-   :header-rows: 0
+   .. rubric:: Latches
 
-   * - :ref:`cuda::latch <libcudacxx-extended-api-synchronization-latch>`
-     - System-wide `std::latch <https://en.cppreference.com/w/cpp/thread/latch>`_ single-phase asynchronous
-       thread coordination mechanism
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
+   .. list-table::
+      :widths: 25 45 30
+      :header-rows: 0
 
-.. rubric:: Barriers
+      * - :ref:`cuda::latch <libcudacxx-extended-api-synchronization-latch>`
+        - System-wide `std::latch <https://en.cppreference.com/w/cpp/thread/latch>`_ single-phase asynchronous
+          thread coordination mechanism
+        - libhipcxx 2.7
 
-.. list-table::
-   :widths: 25 45 30
-   :header-rows: 0
+   .. rubric:: Barriers
 
-   * - :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`
-     - System wide `std::barrier <https://en.cppreference.com/w/cpp/thread/barrier>`_ multi-phase asynchronous
-       thread coordination mechanism
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
+   .. list-table::
+      :widths: 25 45 30
+      :header-rows: 0
 
-.. rubric:: Semaphores
+      * - :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`
+        - System wide `std::barrier <https://en.cppreference.com/w/cpp/thread/barrier>`_ multi-phase asynchronous
+          thread coordination mechanism
+        - libhipcxx 2.7
 
-.. list-table::
-   :widths: 25 45 30
-   :header-rows: 0
+   .. rubric:: Semaphores
 
-   * - :ref:`cuda::counting_semaphore <libcudacxx-extended-api-synchronization-counting-semaphore>`
-     - System wide `std::counting_semaphore <https://en.cppreference.com/w/cpp/thread/counting_semaphore>`_
-       primitive for constraining concurrent access
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
-   * - :ref:`cuda::binary_semaphore <libcudacxx-extended-api-synchronization-counting-semaphore>`
-     - System wide `std::binary_semaphore <https://en.cppreference.com/w/cpp/thread/counting_semaphore>`_
-       primitive for mutual exclusion
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
+   .. list-table::
+      :widths: 25 45 30
+      :header-rows: 0
 
-.. rubric:: Pipelines
+      * - :ref:`cuda::counting_semaphore <libcudacxx-extended-api-synchronization-counting-semaphore>`
+        - System wide `std::counting_semaphore <https://en.cppreference.com/w/cpp/thread/counting_semaphore>`_
+          primitive for constraining concurrent access
+        - libhipcxx 2.7
+      * - :ref:`cuda::binary_semaphore <libcudacxx-extended-api-synchronization-counting-semaphore>`
+        - System wide `std::binary_semaphore <https://en.cppreference.com/w/cpp/thread/counting_semaphore>`_
+          primitive for mutual exclusion
+        - libhipcxx 2.7
 
-The pipeline library is included in the CUDA Toolkit, but is not part of the open source libhipcxx distribution.
+   .. rubric:: Pipelines
 
-.. list-table::
-   :widths: 25 45 30
-   :header-rows: 0
+   The pipeline library is included in ROCm, but is not part of the open source libhipcxx distribution.
 
-   * - :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>`
-     - Coordination mechanism for sequencing asynchronous operations
-     - libhipcxx 1.2.0 / CCCL 2.0.0 / CUDA 11.1
-   * - :ref:`cuda::pipeline_shared_state <libcudacxx-extended-api-synchronization-pipeline-pipeline-shared-state>`
-     - :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>` shared state object
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
-   * - :ref:`cuda::pipeline_role <libcudacxx-extended-api-synchronization-pipeline-pipeline-role>`
-     - Defines producer/consumer role for a thread participating in a *pipeline*
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
-   * - :ref:`cuda::make_pipeline <libcudacxx-extended-api-synchronization-pipeline-pipeline-role>`
-     - Creates a :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>`
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
-   * - :ref:`cuda::pipeline_consumer_wait_prior <libcudacxx-extended-api-synchronization-pipeline-pipeline-consumer-wait-prior>`
-     - Blocks the current thread until all operations committed up to a prior *pipeline stage* complete
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
-   * - :ref:`cuda::pipeline_producer_commit <libcudacxx-extended-api-synchronization-pipeline-pipeline-producer-commit>`
-     - Binds operations previously issued by the current thread to a :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
+   .. list-table::
+      :widths: 25 45 30
+      :header-rows: 0
+
+      * - :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>`
+        - Coordination mechanism for sequencing asynchronous operations
+        - libhipcxx 2.7
+      * - :ref:`cuda::pipeline_shared_state <libcudacxx-extended-api-synchronization-pipeline-pipeline-shared-state>`
+        - :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>` shared state object
+        - libhipcxx 2.7
+      * - :ref:`cuda::pipeline_role <libcudacxx-extended-api-synchronization-pipeline-pipeline-role>`
+        - Defines producer/consumer role for a thread participating in a *pipeline*
+        - libhipcxx 2.7
+      * - :ref:`cuda::make_pipeline <libcudacxx-extended-api-synchronization-pipeline-pipeline-role>`
+        - Creates a :ref:`cuda::pipeline <libcudacxx-extended-api-synchronization-pipeline>`
+        - libhipcxx 2.7
+      * - :ref:`cuda::pipeline_consumer_wait_prior <libcudacxx-extended-api-synchronization-pipeline-pipeline-consumer-wait-prior>`
+        - Blocks the current thread until all operations committed up to a prior *pipeline stage* complete
+        - libhipcxx 2.7
+      * - :ref:`cuda::pipeline_producer_commit <libcudacxx-extended-api-synchronization-pipeline-pipeline-producer-commit>`
+        - Binds operations previously issued by the current thread to a :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`
+        - libhipcxx 2.7

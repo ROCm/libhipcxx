@@ -22,13 +22,13 @@
     SOFTWARE.
 
 .. meta::
-  :description: Learn about libhipcxx conformance with the C++ Standard and its ABI evolution policy, including ABI versioning and long-term support timelines.
+  :description: Learn about libhipcxx conformance with the C++ Standard and its API and ABI versioning scheme, including the version macros from <cuda/std/version>.
   :keywords: libhipcxx, ROCm, HIP, conformance, ABI, versioning, C++ standard, ABI stability, ISO
 
 .. _libhipcxx-conformance:
 
 ********************************************************************
-Conformance and ABI evolution
+Conformance and versioning
 ********************************************************************
 
 Conformance
@@ -37,14 +37,33 @@ Conformance
 libhipcxx aims to be a conforming implementation of the C++ Standard,
 `ISO/IEC IS 14882 <https://eel.is/c++draft>`_, Clause 16 through 32.
 
-ABI evolution
-=============
+Versioning
+==========
 
-libhipcxx does not maintain long-term ABI stability. Promising long-term ABI stability would prevent
-fixing mistakes and achieving high performance, so no such promises are made.
+libhipcxx is a fork of libcu++ and follows its versioning. A libhipcxx release carries the version of the upstream
+`CCCL <https://github.com/NVIDIA/cccl>`_ release it is based on; the current version is 3.0.2.
 
-The ABI is broken at every major release. The life cycle of an ABI version is approximately one
-year, and long-term support for an ABI version ends after approximately two years.
+API version
+-----------
 
-The latest ABI version is always the default. For the ABI version associated with each release, see
-the :ref:`releases <libcudacxx-releases>` section.
+The API version is a three-component semantic version, ``MAJOR.MINOR.PATCH``, exposed by four macros from
+``<cuda/std/version>``:
+
+- ``_LIBCUDACXX_CUDA_API_VERSION_MAJOR`` is incremented for API-breaking changes.
+- ``_LIBCUDACXX_CUDA_API_VERSION_MINOR`` is incremented when API-compatible features are added.
+- ``_LIBCUDACXX_CUDA_API_VERSION_PATCH`` is incremented for all other changes.
+- ``_LIBCUDACXX_CUDA_API_VERSION`` combines the three as ``MAJOR * 1000000 + MINOR * 1000 + PATCH``, which is
+  ``3000002`` for version 3.0.2.
+
+A single API version is supported at a time.
+
+ABI version
+-----------
+
+The ABI version is a single integer. libhipcxx supports exactly one ABI version, 4, so both
+``_LIBCUDACXX_CUDA_ABI_VERSION`` and ``_LIBCUDACXX_CUDA_ABI_VERSION_LATEST`` from ``<cuda/std/version>`` are 4.
+Defining ``_LIBCUDACXX_CUDA_ABI_VERSION`` to any other value is a compile-time error.
+
+libhipcxx makes no promise of long-term ABI stability. Promising long-term ABI stability would prevent fixing
+mistakes and achieving high performance, so no such promises are made. A program is ill-formed, no diagnostic
+required, if it links translation units that were compiled against different libhipcxx versions.

@@ -23,7 +23,7 @@
 
 .. meta::
   :description: Documents cuda::std::version in libhipcxx, providing compile-time version macros and C++ feature test macros for the libhipcxx API and ABI versions.
-  :keywords: libhipcxx, ROCm, HIP, C++, version, feature test macros, ABI, API, NVCC
+  :keywords: libhipcxx, ROCm, HIP, C++, version, feature test macros, ABI, API
 
 .. _libcudacxx-standard-api-utility-version:
 
@@ -37,7 +37,7 @@ See the documentation of the standard header `\<version\> <https://en.cppreferen
 Extensions
 ----------
 
-The following version macros, which are explained in the :ref:`versioning section <libcudacxx-releases-versioning>`,
+The following version macros, which are explained in the :ref:`versioning section <libhipcxx-conformance>`,
 are defined in this header:
 
 - ``_LIBCUDACXX_CUDA_API_VERSION``
@@ -50,5 +50,6 @@ are defined in this header:
 Restrictions
 ------------
 
-When using NVCC, the definition of C++ feature test macros is provided
-by the host Standard Library, not libhipcxx.
+``<cuda/std/version>`` includes the host standard library's ``<version>`` header, so the standard C++ feature test
+macros are defined by the host standard library, not by libhipcxx. libhipcxx defines its own ``__cccl_lib_*`` macros
+for the features it provides.

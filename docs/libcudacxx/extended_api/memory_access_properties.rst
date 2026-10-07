@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx memory access properties extended API, including access_property, annotated_ptr, apply_access_property, associate_access_property, and discard_memory.
-  :keywords: libhipcxx, ROCm, HIP, C++, memory access properties, access_property, annotated_ptr, cache eviction, L2 cache
+  :description: Overview of the libhipcxx memory access properties extended API, including access_property, apply_access_property, associate_access_property, and discard_memory.
+  :keywords: libhipcxx, ROCm, HIP, C++, memory access properties, access_property, cache eviction, L2 cache
 
 
 .. _libcudacxx-extended-api-memory-access-properties:
@@ -31,17 +31,19 @@
 Memory access properties
 ------------------------
 
-This page covers the memory access properties extended API, providing types and functions for annotating memory accesses with cache residence hints such as access_property, annotated_ptr, and discard_memory.
+This page covers the memory access properties extended API, providing types and functions for annotating memory accesses with cache residence hints such as access_property and discard_memory.
 
 .. toctree::
    :hidden:
    :maxdepth: 1
 
    memory_access_properties/access_property
-   memory_access_properties/annotated_ptr
    memory_access_properties/apply_access_property
    memory_access_properties/associate_access_property
    memory_access_properties/discard_memory
+
+..
+   memory_access_properties/annotated_ptr
 
 .. list-table::
    :widths: 25 45 30
@@ -49,16 +51,18 @@ This page covers the memory access properties extended API, providing types and 
 
    * - :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>`
      - Represents a memory access property
-     - libhipcxx 1.6.0 / CCCL 2.0.0 / CUDA 11.5
-   * - :ref:`cuda::annotated_ptr <libcudacxx-extended-api-memory-access-properties-annotated-ptr>`
-     - Binds an access property to a pointer
-     - libhipcxx 1.6.0 / CCCL 2.0.0 / CUDA 11.5
+     - libhipcxx 2.7
    * - :ref:`cuda::apply_access_property <libcudacxx-extended-api-memory-access-properties-apply-access-property>`
      - Applies access property to memory
-     - libhipcxx 1.6.0 / CCCL 2.0.0 / CUDA 11.5
+     - libhipcxx 2.7
    * - :ref:`cuda::associate_access_property <libcudacxx-extended-api-memory-access-properties-associate-access-property>`
      - Associates access property with raw pointer
-     - libhipcxx 1.6.0 / CCCL 2.0.0 / CUDA 11.5
+     - libhipcxx 2.7
    * - :ref:`cuda::discard_memory <libcudacxx-extended-api-memory-access-properties-discard-memory>`
      - Writes indeterminate values to memory
-     - libhipcxx 1.6.0 / CCCL 2.0.0 / CUDA 11.5
+     - libhipcxx 2.7
+
+..
+   * - :ref:`cuda::annotated_ptr <libcudacxx-extended-api-memory-access-properties-annotated-ptr>`
+     - Binds an access property to a pointer
+     - libhipcxx 2.7

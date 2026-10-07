@@ -63,18 +63,20 @@ The function extracts the lower bitfield of size ``width`` from ``source`` and i
 
 **Performance considerations**
 
-The function performs the following operations in CUDA for ``uint8_t``, ``uint16_t``, ``uint32_t``:
+..
+   The function performs the following operations in CUDA for ``uint8_t``, ``uint16_t``, ``uint32_t``:
 
-- ``SM < 70``: ``BFI``
-- ``SM >= 70``: ``BMSK``, bitwise operation x5
+   - ``SM < 70``: ``BFI``
+   - ``SM >= 70``: ``BMSK``, bitwise operation x5
 
 .. note::
 
    When the input values are run-time values that the compiler can resolve at compile-time, e.g. an index of a loop with a fixed number of iterations, using the function could not be optimal.
 
-.. note::
+..
+   .. note::
 
-   GCC <= 8 uses a slow path with more instructions even in CUDA
+      GCC <= 8 uses a slow path with more instructions even in CUDA
 
 Example
 -------
@@ -92,8 +94,9 @@ Example
 
     int main() {
         bitfield_insert_kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/Phs8czqes>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/Phs8czqes>`_

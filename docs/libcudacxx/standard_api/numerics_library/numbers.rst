@@ -22,18 +22,20 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documents cuda::std::numbers in libhipcxx, providing mathematical constants such as pi and e available from C++14 onwards, with specializations for half and bfloat16 types.
-  :keywords: libhipcxx, ROCm, HIP, C++, numbers, mathematical constants, half, bfloat16, floating point
+  :description: Documents cuda::std::numbers in libhipcxx, providing mathematical constants such as pi and e in host and device code, with specializations for the HIP bfloat16 type.
+  :keywords: libhipcxx, ROCm, HIP, C++, numbers, mathematical constants, bfloat16, floating point
 
 .. _libcudacxx-standard-api-numerics-numbers:
 
 ``<cuda/std/numbers>``
 ======================
 
-This page documents ``cuda::std::numbers`` in libhipcxx, providing mathematical constants such as pi and e available from C++14 onwards, with specializations for extended floating-point types.
+This page documents ``cuda::std::numbers`` in libhipcxx, which provides mathematical constants such as pi and e in
+host and device code.
 
 Extensions
 ----------
 
-- All features of ``<numbers>`` are made available in C++14 onwards.
-- Specializations for CUDA extended floating-point types `__half` and `__nvbfloat16` are provided only on Linux systems.
+- The C++20 ``<numbers>`` mathematical constants are available in C++17.
+- Specializations for the HIP extended floating-point type ``__hip_bfloat16`` are provided. Specializations for
+  ``__half`` are currently not provided.

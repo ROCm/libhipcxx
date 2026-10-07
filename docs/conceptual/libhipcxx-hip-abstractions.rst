@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Understand the libhipcxx namespace hierarchy, including cuda::std::, cuda::, cuda::device::, and their hip:: aliases, and how each tier maps to host and device code.
+  :description: Understand the libhipcxx namespace hierarchy, including cuda::std::, cuda::, and their hip:: aliases, and how each tier maps to host and device code.
   :keywords: libhipcxx, ROCm, HIP, namespaces, hip aliasing, cuda, std, device, AMD GPU, heterogeneous
 
 .. _libhipcxx-hip-abstractions:
@@ -53,10 +53,6 @@ and which namespace to use for any given facility.
      - ``<cuda/*>`` / ``<hip/*>``
      - ``__host__`` and ``__device__``. Extensions to the Standard Library with GPU-specific
        semantics.
-   * - ``cuda::device::`` / ``hip::device::``
-     - ``<cuda/warp>``, ``<cuda/work_stealing>`` (and their ``hip/`` equivalents)
-     - ``__device__`` only. Extensions that rely on GPU-only hardware features such as warp
-       intrinsics.
 
 The ``cuda::`` and ``hip::`` prefixes, and their include path equivalents, are interchangeable
 aliases that resolve to the same headers. Use whichever fits your project's conventions.

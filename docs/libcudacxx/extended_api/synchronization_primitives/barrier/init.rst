@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::barrier::init, a friend function used to initialize a shared memory cuda::barrier that cannot run its constructor in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::barrier::init, a friend function used to initialize a shared memory cuda::barrier that cannot run its constructor in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, barrier init, shared memory, __shared__, NVCC, initialization, barrier
 
 
@@ -80,4 +80,5 @@ Example
      init(&bar, 1);
    }
 
-`See it on Godbolt <https://godbolt.org/z/nK5q3xh34>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/nK5q3xh34>`_

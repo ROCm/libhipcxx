@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::get_device_address, which returns a valid device pointer to a device object, replacing uses of cudaGetSymbolAddress in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, get_device_address, device pointer, cudaGetSymbolAddress, functional
+  :description: API reference for cuda::get_device_address, which returns a valid device pointer to a device object, replacing uses of hipGetSymbolAddress in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, get_device_address, device pointer, hipGetSymbolAddress, functional
 
 .. _libcudacxx-extended-api-functional-get-device-address:
 
@@ -35,12 +35,12 @@ This page documents ``cuda::get_device_address``, which returns a valid device p
 Defined in the header ``<cuda/functional>``:
 
 ``cuda::get_device_address`` returns a valid pointer to a device object.
-It replaces uses of ``cudaGetSymbolAddress``, which requires an inout parameter.
+It replaces uses of ``hipGetSymbolAddress``, which requires an inout parameter.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
   #include <cuda/functional>
 
@@ -53,9 +53,9 @@ Example
     {
       T* host_address = cuda::std::addressof(device_object);
 
-      cudaPointerAttributes attributes;
-      cudaError_t status = cudaPointerGetAttributes(&attributes, host_address);
-      assert(status == cudaSuccess);
+      hipPointerAttribute_t attributes;
+      hipError_t status = hipPointerGetAttributes(&attributes, host_address);
+      assert(status == hipSuccess);
       assert(attributes.devicePointer == nullptr);
 
       // Calling a kernel with host_address would segfault
@@ -65,9 +65,9 @@ Example
     {
       T* device_address = cuda::get_device_address(device_object);
 
-      cudaPointerAttributes attributes;
-      cudaError_t status = cudaPointerGetAttributes(&attributes, device_address);
-      assert(status == cudaSuccess);
+      hipPointerAttribute_t attributes;
+      hipError_t status = hipPointerGetAttributes(&attributes, device_address);
+      assert(status == hipSuccess);
       assert(attributes.devicePointer == device_address);
 
       // Safe to call a kernel

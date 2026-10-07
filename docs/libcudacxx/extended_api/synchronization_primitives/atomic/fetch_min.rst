@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::atomic::fetch_min, which atomically computes and stores the minimum of the stored value and a given value in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::atomic::fetch_min, which atomically computes and stores the minimum of the stored value and a given value in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, fetch_min, atomic, minimum, memory order, thread scope
 
 .. _libcudacxx-extended-api-synchronization-atomic-atomic-fetch-min:
@@ -34,7 +34,7 @@ This page documents ``cuda::atomic::fetch_min``, which atomically computes and s
 
 Defined in header ``<cuda/atomic>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, cuda::thread_scope Scope>
    __host__ __device__
@@ -49,7 +49,7 @@ and ``val``. The minimum is found using
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/atomic>
 
@@ -60,4 +60,5 @@ Example
      assert(x == 1 && y == 0);
    }
 
-`See it on Godbolt <https://godbolt.org/z/vMj9e5hdv>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/vMj9e5hdv>`_

@@ -22,49 +22,45 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documents cuda::std::complex in libhipcxx, including omissions for long double and literals with NVCC, and extensions for infinity handling and half/bfloat16 floating-point type support.
-  :keywords: libhipcxx, ROCm, HIP, C++, complex numbers, half, bfloat16, constexpr, NVCC
+  :description: Documents cuda::std::complex in libhipcxx, including the omission of complex literals, the demotion of long double in device code, and extensions for infinity handling and half/bfloat16 support.
+  :keywords: libhipcxx, ROCm, HIP, C++, complex numbers, half, bfloat16, constexpr
 
 .. _libcudacxx-standard-api-numerics-complex:
 
 ``<cuda/std/complex>``
 ======================
 
-This page documents the ``cuda::std::complex`` support in libhipcxx, including omissions for long double and literals with NVCC, and extensions for infinity handling and half/bfloat16 types.
+This page documents the ``cuda::std::complex`` support in libhipcxx, including the omission of complex literals and extensions for infinity handling and half and bfloat16 types.
 
 Omissions
 ---------
 
-When using libhipcxx with NVCC, ``complex`` does not support ``long double`` or ``complex`` literals (``_i``, ``_if``, and ``_il``).
-NVCC warns on any usage of ``long double`` in device code, because ``long double`` will be demoted to ``double`` in device code.
-This warning can be suppressed silenced with ``#pragma``\ s, but only globally, not just when using ``complex``.
-User-defined floating-point literals must be specified in terms of ``long double``, so they lead to warnings
-that are unable to be suppressed.
+When a translation unit is compiled with hipcc, ``complex`` does not provide the complex literals ``i``, ``if``, and
+``il``. Their suffixes do not start with an underscore, a form that is reserved for the standard library. The literals
+are available when a translation unit is compiled directly with the host compiler.
+
+``complex<long double>`` is available, but ``long double`` is demoted to ``double`` in device code. The type therefore
+has a different size in host and device code and must not be shared between them.
 
 Extensions
 ----------
 
 - Handling of infinities
 
-  Our implementation by default recovers infinite values during multiplication and division. This adds a significant runtime overhead,
-  so we allow disabling that canonicalization if it is not desired.
+  Our implementation by default recovers infinite values during multiplication and division. The recovery only runs
+  when the unrecovered result is ``NaN`` in both components, but it enlarges the generated code considerably, so we
+  allow disabling that canonicalization if it is not desired.
 
   Definition of ``LIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_OPERATIONS`` disables canonicalization for both multiplication *and* division.
 
   Definition of ``LIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_MULTIPLICATION`` or ``LIBCUDACXX_ENABLE_SIMPLIFIED_COMPLEX_DIVISION`` disables
   canonicalization for multiplication or division individually.
 
-- Support for half and bfloat16 (since libhipcxx 2.4.0)
+- Support for half and bfloat16
 
-  Our implementation includes support for the ``__half`` type from ``<cuda_fp16.h>``, when the CUDA toolkit version is at
-  least 12.2, and when ``CCCL_DISABLE_FP16_SUPPORT`` is not defined.
+  Our implementation includes support for the ``__half`` type from ``<hip/hip_fp16.h>`` and the ``__hip_bfloat16``
+  type from ``<hip/hip_bf16.h>``. Both are available when the translation unit is compiled with hipcc, including
+  host-only translation units. They are not available when a translation unit is compiled directly with the host
+  compiler.
 
-  This is detected automatically when compiling through NVCC. If you are compiling a host-only translation unit directly
-  with the host compiler, you must define the macro ``LIBCUDACXX_ENABLE_HOST_NVFP16`` prior to including any libhipcxx headers,
-  and you must ensure that the ``<cuda_fp16.h>`` header that's found by the compiler comes from a CUDA toolkit version
-  12.2 or higher.
-
-  Our implementation includes support for the ``__nv_bfloat16`` type from ``<cuda_bf16.h>``, when the conditions for the
-  support of ``__half`` are fulfilled, and when ``CCCL_DISABLE_BF16_SUPPORT`` and ``CCCL_DISABLE_FP16_SUPPORT`` are not defined.
-
-- C++20 constexpr ``<complex>`` is available in C++14.
+- C++20 constexpr ``<complex>`` is available in C++17.

@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::round_up, which rounds an integer value up to the smallest multiple of a given base in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::round_up, which rounds an integer value up to the smallest multiple of a given base in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, round_up, ceiling rounding, integer math, multiple, enumerator
 
 .. _libcudacxx-extended-api-math-round-up:
@@ -32,7 +32,7 @@
 
 This page documents ``cuda::round_up``, which rounds an integral value up to the smallest multiple of a given base.
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, typename U>
    [[nodiscard]] __host__ __device__ inline constexpr
@@ -69,7 +69,7 @@ The function computes the round up to the smallest multiple of an integral or en
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/cmath>
     #include <cstdio>
@@ -82,8 +82,9 @@ Example
 
     int main() {
         round_up_kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/9vcxo3d8j>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/9vcxo3d8j>`_

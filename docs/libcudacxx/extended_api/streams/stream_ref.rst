@@ -22,32 +22,32 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::stream_ref, a type-safe wrapper around cudaStream_t that prevents implicit conversions and provides wait and ready member functions in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, stream_ref, cudaStream_t, stream, wait, ready, implicit conversion
+  :description: API reference for cuda::stream_ref, a type-safe wrapper around hipStream_t that prevents implicit conversions and provides wait and ready member functions in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, stream_ref, hipStream_t, stream, wait, ready, implicit conversion
 
 .. _libcudacxx-extended-api-streams-stream-ref:
 
-``cuda::stream_ref``: a wrapper around a ``cudaStream_t``
+``cuda::stream_ref``: a wrapper around a ``hipStream_t``
 ==========================================================
 
-This page documents ``cuda::stream_ref``, a type-safe wrapper around ``cudaStream_t`` that prevents implicit conversions and provides wait and ready member functions.
+This page documents ``cuda::stream_ref``, a type-safe wrapper around ``hipStream_t`` that prevents implicit conversions and provides wait and ready member functions.
 
-CUDA `stream-ordered allocations <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#stream-ordered-memory-allocator>`__
-rely on ``cudaStream_t`` as a handle to the cuda stream.
+HIP `stream-ordered allocations <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html>`__
+rely on ``hipStream_t`` as a handle to the HIP stream.
 
 However, as this is just an alias for a plain pointer type it carries with it common pitfalls around implicit
 conversions from, for example, ``nullptr`` or a literal ``0``.
 
-These hard to spot bugs can be avoided through ``cuda::stream_ref``, which is a simple wrapper around a ``cudaStream_t``
+These hard to spot bugs can be avoided through ``cuda::stream_ref``, which is a simple wrapper around a ``hipStream_t``
 that prevents implicit conversions. It also provides the ``wait()`` and ``ready()`` member functions to facilitate
 waiting for a stream to finish and checking whether it is finished.
 
 .. code:: cpp
 
-       cudaStream_t stream;
-       cudaStreamCreate(&stream);
+       hipStream_t stream;
+       hipStreamCreate(&stream);
        cuda::stream_ref ref{stream};
 
-       ref.wait();          // synchronizes the stream via cudaStreamSynchronize
-       assert(ref.ready()); // verifies that the stream has finished all operations via cudaStreamQuery
-       cudaStreamDestroy(stream);
+       ref.wait();          // synchronizes the stream via hipStreamSynchronize
+       assert(ref.ready()); // verifies that the stream has finished all operations via hipStreamQuery
+       hipStreamDestroy(stream);

@@ -45,15 +45,6 @@ include path and namespace:
 
     cuda::atomic<int, cuda::thread_scope_device> x;
 
-Extensions that only run on the GPU use the ``cuda::device::`` namespace:
-
-.. code-block:: cpp
-
-    #include <cuda/warp>
-
-    // Inside a __device__ function:
-    int val = cuda::device::warp_shuffle_idx(data, src_lane);
-
 For a full explanation of the namespace hierarchy, see
 :ref:`HIP-specific abstractions and namespaces <libhipcxx-hip-abstractions>`.
 
@@ -74,9 +65,6 @@ functionality. The following table lists each extension category with its key AP
      - * ``cuda::atomic`` / ``hip::atomic``
        * ``cuda::atomic_ref`` / ``hip::atomic_ref``
      - ``cuda::thread_scope`` controls memory fence strength across thread, block, device, or system
-   * - Asynchronous operations
-     - * ``cuda::memcpy_async`` / ``hip::memcpy_async``
-     - Overlaps compute and memory transfers
    * - Functional utilities
      - * ``cuda::maximum`` / ``hip::maximum``
        * ``cuda::minimum`` / ``hip::minimum``
@@ -103,15 +91,6 @@ functionality. The following table lists each extension category with its key AP
      - * ``cuda::mr::resource`` / ``hip::mr::resource``
        * ``cuda::mr::resource_ref`` / ``hip::mr::resource_ref``
      - Experimental. Requires ``LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE``.
-   * - Warp intrinsics
-     - * ``cuda::device::warp_shuffle_idx`` / ``hip::device::warp_shuffle_idx``
-       * ``cuda::device::warp_shuffle_up`` / ``hip::device::warp_shuffle_up``
-       * ``cuda::device::warp_shuffle_down`` / ``hip::device::warp_shuffle_down``
-       * ``cuda::device::warp_shuffle_xor`` / ``hip::device::warp_shuffle_xor``
-     - Device-only
-   * - Work stealing
-     - * ``cuda::for_each_canceled_block`` / ``hip::for_each_canceled_block``
-     - Device-only. Dynamic block-level parallelism.
 
 For per-API documentation, see the :ref:`Extended API reference <libcudacxx-extended-api>`.
 
@@ -123,7 +102,14 @@ depend on NVIDIA hardware. These include:
 
 - ``<cuda/latch>``, ``<cuda/barrier>``, ``<cuda/semaphore>``, ``<cuda/pipeline>`` — scoped
   synchronization primitives
+- ``cuda::memcpy_async``, ``cuda::memcpy_async_tx``, ``cuda::aligned_size_t`` — asynchronous
+  copies, which depend on ``<cuda/barrier>`` and ``<cuda/pipeline>``
 - ``<cuda/annotated_ptr>`` — memory access properties for pointers
+- ``cuda::discard_memory`` — available, but has no effect on AMD GPUs
+- ``cuda::device::warp_shuffle_idx``, ``warp_shuffle_up``, ``warp_shuffle_down``,
+  ``warp_shuffle_xor`` — warp shuffles, which are only compiled for NVIDIA PTX targets
+- ``cuda::for_each_canceled_block`` — work stealing, which depends on NVIDIA hardware block
+  cancellation. On AMD GPUs it invokes the function once for the current block.
 - ``<cuda/ptx>`` — NVIDIA PTX instruction wrappers
 
 For the complete list, see :ref:`Limitations and unsupported APIs <libhipcxx-limitations>`.

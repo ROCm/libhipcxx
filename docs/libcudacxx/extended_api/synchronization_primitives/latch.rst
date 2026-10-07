@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::latch, a single-phase asynchronous thread coordination mechanism with thread scope support in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::latch, a single-phase asynchronous thread coordination mechanism with thread scope support in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, latch, thread scope, synchronization, single-phase, count-down
 
 .. _libcudacxx-extended-api-synchronization-latch:
@@ -96,4 +96,5 @@ Example
      cuda::latch<cuda::thread_scope_block> d(10);
    }
 
-`See it on Godbolt <https://godbolt.org/z/8v4dcK7fa>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/8v4dcK7fa>`_

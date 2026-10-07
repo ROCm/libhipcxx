@@ -40,7 +40,7 @@ The page you're seeking could not be found. Here is a list of similar pages:
       import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.mjs'
       var localUri = window.location.pathname;
       var hostUrl = window.location.protocol + "//" + window.location.host
-      var pagelistUrl = hostUrl + "/cccl/pagelist.txt"
+      var pagelistUrl = hostUrl + "/libhipcxx/pagelist.txt"
 
       fetch(pagelistUrl)
         .then((response) => response.text())
@@ -54,7 +54,7 @@ The page you're seeking could not be found. Here is a list of similar pages:
             ignoreLocation: true
           }
 
-          // cccl/device_vector.html => 'cccl 'device 'vector
+          // libhipcxx/standard_api.html => 'libhipcxx 'standard 'api
           const query = localUri.replace(/\/|-|_/gi," '").replace(".html","")
           console.log("query:" + query)
           const fuse = new Fuse(pagelist, options)

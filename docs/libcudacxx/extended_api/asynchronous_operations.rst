@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Reference for libhipcxx asynchronous operations, including memcpy_async and memcpy_async_tx for non-blocking memory copies in HIP and CUDA.
+  :description: Reference for libhipcxx asynchronous operations, including memcpy_async and memcpy_async_tx for non-blocking memory copies in HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, asynchronous operations, memcpy_async, pipeline, barrier
 
 
@@ -46,10 +46,10 @@ This page covers the asynchronous operations extended API, providing non-blockin
 
    * - :ref:`cuda::memcpy_async <libcudacxx-extended-api-asynchronous-operations-memcpy-async>`
      - Asynchronously copies one range to another
-     - libhipcxx 1.1.0 / CCCL 2.0.0 / CUDA 11.0
+     - libhipcxx 2.7
    * - :ref:`cuda::memcpy_async_tx <libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx>`
      - Asynchronously copies one range to another with manual transaction accounting
-     - libhipcxx 1.2.0 / CCCL 2.0.0 / CUDA 11.1
+     - libhipcxx 2.7
 
 .. note::
 

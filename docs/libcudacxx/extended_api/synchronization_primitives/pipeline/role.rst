@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline_role, which specifies whether a thread is a producer or consumer in a partitioned pipeline in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline_role, which specifies whether a thread is a producer or consumer in a partitioned pipeline in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, pipeline_role, producer, consumer, pipeline, partitioned
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-role:

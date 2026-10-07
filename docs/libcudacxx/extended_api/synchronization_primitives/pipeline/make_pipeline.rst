@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::make_pipeline, which creates unified or partitioned producer-consumer pipelines for sequencing asynchronous operations in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::make_pipeline, which creates unified or partitioned producer-consumer pipelines for sequencing asynchronous operations in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, make_pipeline, pipeline, producer, consumer, thread group, shared state
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-make-pipeline:
@@ -151,4 +151,5 @@ A ``cuda::pipeline`` object.
        = cuda::make_pipeline(group, &pss2, thread_role);
    }
 
-`See it on Godbolt <https://godbolt.org/z/aPcGEr64j>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/aPcGEr64j>`_

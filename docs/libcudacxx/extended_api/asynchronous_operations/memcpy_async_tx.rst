@@ -107,4 +107,5 @@ Example
      smem_x[threadIdx.x] += 1;
    }
 
-`See it on Godbolt <https://godbolt.org/z/PGTa76Ef7>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/PGTa76Ef7>`_

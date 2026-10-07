@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::binary_semaphore, a scoped binary semaphore for mutual exclusion between GPU and CPU threads in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::binary_semaphore, a scoped binary semaphore for mutual exclusion between GPU and CPU threads in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, binary_semaphore, semaphore, mutual exclusion, thread scope, synchronization
 
 .. _libcudacxx-extended-api-synchronization-binary-semaphore:
@@ -102,4 +102,5 @@ Example
      cuda::binary_semaphore<cuda::thread_scope_block> d;
    }
 
-`See it on Godbolt <https://godbolt.org/z/eKfjYYz58>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/eKfjYYz58>`_

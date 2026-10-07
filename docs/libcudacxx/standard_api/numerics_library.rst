@@ -45,47 +45,40 @@ This page covers the numerics library headers available in libhipcxx, including 
 Any Standard C++ header not listed below is omitted.
 
 .. list-table::
-   :widths: 25 45 30 30 20
+   :widths: 25 45 30 20
    :header-rows: 1
 
    * - **Header**
      - **Content**
-     - **CCCL Availability**
-     - **CUDA Toolkit Availability**
+     - **libhipcxx Availability**
      - **C++ Reference**
 
    * - ``<cuda/std/ratio>``
      - Compile-time rational arithmetic
-     - CCCL 2.0.0
-     - CUDA 11.0
+     - libhipcxx 2.7
      - `\<ratio\> <https://en.cppreference.com/w/cpp/header/ratio>`_
 
    * - :ref:`\<cuda/std/bit\> <libcudacxx-standard-api-numerics-bit>`
      - Access, manipulate, and process individual bits and bit sequences.
-     - CCCL 2.0.0
-     - CUDA 11.7
+     - libhipcxx 2.7
      - `\<bit\> <https://en.cppreference.com/w/cpp/header/bit>`_
 
    * - :ref:`\<cuda/std/complex\> <libcudacxx-standard-api-numerics-complex>`
      - Complex number type
-     - CCCL 2.0.0
-     - CUDA 11.4
+     - libhipcxx 2.7
      - `\<complex\> <https://en.cppreference.com/w/cpp/header/complex>`_
 
    * - :ref:`\<cuda/std/linalg\> <libcudacxx-standard-api-numerics-linalg>`
      - Linear algebra layouts and accessors
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
      - `\<linalg\> <https://en.cppreference.com/w/cpp/header/linalg>`_
 
    * - :ref:`\<cuda/std/numbers\> <libcudacxx-standard-api-numerics-numbers>`
      - Numeric constants
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
      - `\<numbers\> <https://en.cppreference.com/w/cpp/header/numbers>`_
 
    * - :ref:`\<cuda/std/numeric\> <libcudacxx-standard-api-numerics-numeric>`
      - Numeric algorithms
-     - CCCL 2.5.0
-     - CUDA 12.6
+     - libhipcxx 2.7
      - `\<numeric\> <https://en.cppreference.com/w/cpp/header/numeric>`_

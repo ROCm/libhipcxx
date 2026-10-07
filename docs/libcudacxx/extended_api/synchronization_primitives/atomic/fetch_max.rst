@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::atomic::fetch_max, which atomically computes and stores the maximum of the stored value and a given value in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::atomic::fetch_max, which atomically computes and stores the maximum of the stored value and a given value in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, fetch_max, atomic, maximum, memory order, thread scope
 
 .. _libcudacxx-extended-api-synchronization-atomic-atomic-fetch-max:
@@ -34,7 +34,7 @@ This page documents ``cuda::atomic::fetch_max``, which atomically computes and s
 
 Defined in header ``<cuda/atomic>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, cuda::thread_scope Scope>
    __host__ __device__
@@ -49,7 +49,7 @@ and ``val``. The maximum is found using
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/atomic>
 
@@ -60,4 +60,5 @@ Example
      assert(x == 0 && y == 1);
    }
 
-`See it on Godbolt <https://godbolt.org/z/rexn5T78G>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/rexn5T78G>`_

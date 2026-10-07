@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documentation of the libhipcxx ThreadGroup concept, which defines the requirements for a type representing a group of cooperating threads in HIP and CUDA.
+  :description: Documentation of the libhipcxx ThreadGroup concept, which defines the requirements for a type representing a group of cooperating threads in HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, ThreadGroup, thread group, cooperative groups, size, thread_rank, sync
 
 .. _libcudacxx-extended-api-thread-groups:
@@ -30,9 +30,9 @@
 Thread Groups
 =============
 
-This page documents the ThreadGroup concept, which defines the requirements for a type representing a group of cooperating threads in CUDA.
+This page documents the ThreadGroup concept, which defines the requirements for a type representing a group of cooperating threads in HIP.
 
-.. code:: cuda
+.. code:: cpp
 
    struct ThreadGroup {
      static constexpr cuda::thread_scope thread_scope;
@@ -43,7 +43,7 @@ This page documents the ThreadGroup concept, which defines the requirements for 
 
 The *ThreadGroup concept* defines the requirements of a type that represents a group of cooperating threads.
 
-The `CUDA Cooperative Groups Library <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#group-collectives>`_
+The `HIP cooperative groups API <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/cooperative_groups.html>`_
 provides a number of types that satisfy this concept.
 
 Data Members
@@ -51,7 +51,10 @@ Data Members
 
 .. list-table::
    :widths: 25 75
-   :header-rows: 0
+   :header-rows: 1
+
+   * - Member
+     - Description
 
    * - ``thread_scope``
      - The scope at which ``ThreadGroup::sync()`` synchronizes memory operations and thread execution.
@@ -61,7 +64,10 @@ Member Functions
 
 .. list-table::
    :widths: 25 75
-   :header-rows: 0
+   :header-rows: 1
+
+   * - Function
+     - Description
 
    * - ``size``
      - Returns the number of participating threads.
@@ -77,7 +83,7 @@ Member Functions
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/atomic>
    #include <cuda/std/cstddef>
@@ -89,4 +95,5 @@ Example
      void sync() const {}
    };
 
-`See it on Godbolt <https://godbolt.org/z/6c16KxqY7>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/6c16KxqY7>`_

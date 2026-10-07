@@ -192,4 +192,5 @@ For each :ref:`cuda::thread_scope <libcudacxx-extended-api-memory-model-thread-s
      cuda::barrier<cuda::thread_scope_block> d(10);
    }
 
-`See it on Godbolt <https://godbolt.org/z/ehdrY8Kae>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/ehdrY8Kae>`_

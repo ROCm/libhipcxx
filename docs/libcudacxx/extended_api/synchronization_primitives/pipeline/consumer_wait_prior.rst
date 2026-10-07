@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline_consumer_wait_prior, which blocks the current thread until all pipeline operations up to a prior stage complete in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline_consumer_wait_prior, which blocks the current thread until all pipeline operations up to a prior stage complete in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, pipeline_consumer_wait_prior, pipeline, consumer, blocking, prior stage
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-consumer-wait-prior:
@@ -92,4 +92,5 @@ All stages up to *Stage* (exclusive) are implicitly released.
      pipe.consumer_release();
    }
 
-`See it on Godbolt <https://godbolt.org/z/aT5hb84PY>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/aT5hb84PY>`_

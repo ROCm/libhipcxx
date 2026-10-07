@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline_shared_state, a storage type used to coordinate threads participating in a cuda::pipeline in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline_shared_state, a storage type used to coordinate threads participating in a cuda::pipeline in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, pipeline_shared_state, pipeline, shared memory, thread coordination, stages
 
 
@@ -106,7 +106,8 @@ Construct a ``cuda::pipeline`` *shared state* object.
      __shared__ cuda::pipeline_shared_state<cuda::thread_scope_block, 2> shared_state;
    }
 
-`See it on Godbolt <https://godbolt.org/z/K4vKq4vd3>`__
+..
+   `See it on Godbolt <https://godbolt.org/z/K4vKq4vd3>`__
 
 .. rubric:: NVCC ``__shared__`` Initialization Warnings
 
@@ -145,4 +146,5 @@ It can be silenced using ``#pragma nv_diag_suppress static_var_with_dynamic_init
        new (sysmem_buffer) cuda::pipeline_shared_state<cuda::thread_scope_system, 2>;
    }
 
-`See it on Godbolt <https://godbolt.org/z/M9ah7r1Yx>`__
+..
+   `See it on Godbolt <https://godbolt.org/z/M9ah7r1Yx>`__

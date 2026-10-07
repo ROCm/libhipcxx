@@ -117,4 +117,5 @@ Example
      bar.arrive_and_wait();
    }
 
-`See it on Godbolt <https://godbolt.org/z/PWGdfTd7d>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/PWGdfTd7d>`_

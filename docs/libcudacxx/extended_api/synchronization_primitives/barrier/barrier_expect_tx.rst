@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::device::barrier_expect_tx, which increments the expected transaction count of a shared-memory barrier in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::device::barrier_expect_tx, which increments the expected transaction count of a shared-memory barrier in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, barrier_expect_tx, barrier, transaction count, shared memory, Hopper, mbarrier
 
 .. _libcudacxx-extended-api-synchronization-barrier-barrier-expect-tx:
@@ -96,4 +96,5 @@ Example
      smem_x[threadIdx.x] += 1;
    }
 
-`See it on Godbolt <https://godbolt.org/z/9Yj89P76z>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/9Yj89P76z>`_

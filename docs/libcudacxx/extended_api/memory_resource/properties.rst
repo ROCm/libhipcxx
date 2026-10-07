@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documentation of the libhipcxx memory resource property system, enabling compile-time verification of memory accessibility and resource capabilities in HIP and CUDA.
+  :description: Documentation of the libhipcxx memory resource property system, enabling compile-time verification of memory accessibility and resource capabilities in HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, memory resource, properties, device_accessible, host_accessible, get_property, has_property
 
 
@@ -48,7 +48,8 @@ device-accessible memory.
 A library can constrain interfaces with ``cuda::has_property`` to require that a passed memory resource provides the
 right kind of memory
 
-`See it on Godbolt <https://godbolt.org/z/5hjoEnerb>`__
+..
+   `See it on Godbolt <https://godbolt.org/z/5hjoEnerb>`__
 
 .. code:: cpp
 
@@ -58,7 +59,8 @@ right kind of memory
 
 If C++20 is not available, the function can instead be constrained via SFINAE
 
-`See it on Godbolt  <https://godbolt.org/z/11sGbr333>`__
+..
+   `See it on Godbolt  <https://godbolt.org/z/11sGbr333>`__
 
 .. code:: cpp
 
@@ -78,7 +80,8 @@ information that is retrieved via the ``get_property`` free function. In order t
 carried state, a stateful property must define the ``value_type`` alias. A library can constrain interfaces that
 require a stateful property with ``cuda::has_property_with`` as shown in the example below
 
-`See it on Godbolt  <https://godbolt.org/z/11sGbr333>`__
+..
+   `See it on Godbolt  <https://godbolt.org/z/11sGbr333>`__
 
 .. code:: cpp
 

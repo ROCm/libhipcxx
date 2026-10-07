@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::atomic_ref, an extended form of std::atomic_ref with thread scope support for atomic operations on existing non-atomic objects in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, atomic_ref, thread scope, fetch_min, fetch_max, atomic operations, Pascal
+  :keywords: libhipcxx, ROCm, HIP, C++, atomic_ref, thread scope, fetch_min, fetch_max, atomic operations
 
 .. _libcudacxx-extended-api-synchronization-atomic-ref:
 
@@ -42,7 +42,7 @@ This page documents ``cuda::atomic_ref``, an extended form of ``std::atomic_ref`
 
 Defined in header ``<cuda/atomic>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, cuda::thread_scope Scope = cuda::thread_scope_system>
    class cuda::atomic_ref;
@@ -78,18 +78,19 @@ For ``cuda::atomic_ref<T>`` and ``cuda::std::atomic_ref<T>`` the type ``T`` must
 - ``T`` must not have "padding bits", i.e., T's `object representation <https://en.cppreference.com/w/cpp/language/object#Object_representation_and_value_representation>`_
   must not have bits that do not participate in it's value representation.
 
-Concurrency Restrictions
-------------------------
+..
+   Concurrency Restrictions
+   ------------------------
 
-See :ref:`memory model <libcudacxx-extended-api-memory-model>` documentation for general restrictions on atomicity.
+   See :ref:`memory model <libcudacxx-extended-api-memory-model>` documentation for general restrictions on atomicity.
 
-With CUDA Compute Capability 6 (Pascal), an object of type ``atomic_ref`` may not be used:
+   With CUDA Compute Capability 6 (Pascal), an object of type ``atomic_ref`` may not be used:
 
-- with a reference to an object with a automatic storage duration in a GPU thread, or
-- if ``is_always_lock_free()`` is ``false``.
+   - with a reference to an object with a automatic storage duration in a GPU thread, or
+   - if ``is_always_lock_free()`` is ``false``.
 
-For CUDA Compute Capability prior to 6 (Pascal), objects of type ``cuda::atomic_ref`` or
-`cuda::std::atomic_ref <https://en.cppreference.com/w/cpp/atomic/atomic_ref>`_ may not be used.
+   For CUDA Compute Capability prior to 6 (Pascal), objects of type ``cuda::atomic_ref`` or
+   `cuda::std::atomic_ref <https://en.cppreference.com/w/cpp/atomic/atomic_ref>`_ may not be used.
 
 Implementation-Defined Behavior
 -------------------------------
@@ -111,7 +112,7 @@ For each type ``T`` and :ref:`cuda::thread_scope <libcudacxx-extended-api-memory
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/atomic>
 
@@ -130,4 +131,5 @@ Example
      cuda::atomic_ref<int, cuda::thread_scope_block> d(shared_v);
    }
 
-`See it on Godbolt <https://godbolt.org/z/fr4K7ErEh>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/fr4K7ErEh>`_

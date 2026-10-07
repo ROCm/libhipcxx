@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline, a coordination mechanism that sequences asynchronous operations into stages for producer-consumer patterns in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline, a coordination mechanism that sequences asynchronous operations into stages for producer-consumer patterns in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, pipeline, producer, consumer, asynchronous operations, stages, memcpy_async
 
 .. _libcudacxx-extended-api-synchronization-pipeline:
@@ -198,4 +198,5 @@ producers and consumers. In a *partitioned pipeline*, each participating thread 
 
    template void __global__ example_kernel<int>(int*, int*, cuda::std::size_t);
 
-`See it on Godbolt <https://godbolt.org/z/zc41bWvja>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/zc41bWvja>`_

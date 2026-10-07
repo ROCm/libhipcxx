@@ -34,7 +34,7 @@ This page documents ``cuda::atomic_thread_fence``, which establishes memory orde
 
 Defined in header ``<cuda/atomic>``:
 
-.. code:: cuda
+.. code:: cpp
 
    __host__ __device__
    void cuda::atomic_thread_fence(cuda::std::memory_order order,
@@ -49,7 +49,7 @@ Example
 
 The following code is an example of the :ref:`MessagePassing <libcudacxx-extended-api-memory-model-message-passing>` pattern:
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cstdio>
    #include <cuda/atomic>
@@ -77,4 +77,5 @@ The following code is an example of the :ref:`MessagePassing <libcudacxx-extende
      }
    }
 
-`See it on Godbolt <https://godbolt.org/z/aG37o5qxx>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/aG37o5qxx>`_

@@ -172,7 +172,7 @@ GPU-specific extensions
 
 Beyond the conforming Standard Library subset, libhipcxx provides GPU-specific extensions under the
 ``cuda::`` (or ``hip::`` — both are equivalent) namespace. These cover areas such as thread-scope
-atomics, warp intrinsics, async memory operations, and GPU math utilities that have no equivalent in
+atomics, stream and memory resource wrappers, and GPU math and bit utilities that have no equivalent in
 host-only C++.
 
 See :ref:`C++ Standard Library extensions in libhipcxx <libhipcxx-extensions>` for the full list,

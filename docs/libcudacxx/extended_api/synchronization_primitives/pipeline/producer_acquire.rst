@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::pipeline::producer_acquire, which blocks a producer thread until the next pipeline stage becomes available in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::pipeline::producer_acquire, which blocks a producer thread until the next pipeline stage becomes available in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, producer_acquire, pipeline, producer, blocking, stage
 
 .. _libcudacxx-extended-api-synchronization-pipeline-pipeline-producer-acquire:

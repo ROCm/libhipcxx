@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::ceil_div, which computes ceiling division between two integral or enumerator values in libhipcxx for HIP and CUDA.
+  :description: API reference for cuda::ceil_div, which computes ceiling division between two integral or enumerator values in libhipcxx for HIP.
   :keywords: libhipcxx, ROCm, HIP, C++, ceil_div, ceiling division, integer math, thread blocks
 
 .. _libcudacxx-extended-api-math-ceil-div:
@@ -32,7 +32,7 @@
 
 This page documents ``cuda::ceil_div``, which computes the ceiling division of two integral or enumerator values.
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, typename U>
    [[nodiscard]] __host__ __device__ inline constexpr
@@ -61,14 +61,14 @@ Divides ``value`` by ``divisor``. If ``value`` is not a multiple of ``divisor`` 
 **Performance considerations**
 
 - The function computes ``(value + divisor - 1) / divisor`` when the common type is a signed integer.
-- The function computes ``min(value, 1 + ((value - 1) / divisor)`` when the common type is an unsigned integer in CUDA, which generates less instructions than ``(value / divisor) + ((value / divisor) * divisor != value)``, especially for 64-bit types.
+- The function computes ``min(value, 1 + ((value - 1) / divisor)`` when the common type is an unsigned integer, which generates less instructions than ``(value / divisor) + ((value / divisor) * divisor != value)``, especially for 64-bit types.
 
 Example
 -------
 
 This API is very useful for determining the *number of thread blocks* required to process a fixed amount of work, given a fixed number of threads per block:
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/cmath>
     #include <cuda/std/span>
@@ -93,8 +93,9 @@ This API is very useful for determining the *number of thread blocks* required t
         cuda::std::span<float> d_span(d_ptr, num_items);
 
         vector_scale_kernel<<<num_thread_blocks, threads_per_block>>>(d_span, scale);
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/hbxscWGT9>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/hbxscWGT9>`_
