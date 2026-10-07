@@ -33,32 +33,14 @@ import shutil
 # Required settings
 html_theme = "rocm_docs_theme"
 html_theme_options = {
-    "flavor": "generic",
-    "header_title": "libhipcxx 3.0.2",
-    "header_link": "",
+    "flavor": "rocm",
     "version_list_link": "https://rocm.docs.amd.com/projects/libhipcxx/en/latest/release.html",
-    "nav_secondary_items": {
-        "GitHub": "https://github.com/ROCm/libhipcxx",
-        "Blogs": "https://rocm.blogs.amd.com/",
-        "ROCm Developer Hub": "https://www.amd.com/en/developer/resources/rocm-hub.html",
-        "Instinct™ Docs": "https://instinct.docs.amd.com/",
-        "Infinity Hub": "https://www.amd.com/en/developer/resources/infinity-hub.html",
-        "Support": "https://github.com/ROCm/libhipcxx/issues",
-    },
-    "link_main_doc": False,
-    "use_download_button": True,
     "repository_url": "https://github.com/ROCm/libhipcxx",
+    "path_to_docs": "projects/libhipcxx/docs",
     "use_repository_button": True,
     "use_issues_button": True,
-    # Add any additional theme options here
+    "use_download_button": True,
 }
-
-'''
-docs_header_version is used to manually configure the version in the header. If
-there exists a non-null value mapped to docs_header_version, then the header in
-the documentation page will contain the given version string.
-'''
-html_context = {"docs_header_version": "3.15"}
 
 
 # This section turns on/off article info
