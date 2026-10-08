@@ -23,8 +23,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// TODO(HIP/AMD): Multi-gpu tests are disabled until multi-gpu CI runners are provisioned. At that time, remove "true" from the UNSUPPORTED list
 // TODO(HIP/AMD): hiprtc is unsupported because the test scaffolding is much simpler for hiprtc (single thread, etc). See internal issue #383.
-// UNSUPPORTED: nvcc, nvhpc, nvc++, hiprtc
+// UNSUPPORTED: true, nvcc, nvhpc, nvc++, hiprtc
 // ADDITIONAL_COMPILE_FLAGS: -DLIBHIPCXX_GPU_COUNT=2
 
 // <hip/barrier>
