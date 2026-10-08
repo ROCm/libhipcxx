@@ -23,7 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// UNSUPPORTED: true
+// TODO(HIP/AMD): cooperative_groups is not supported on Windows
+// UNSUPPORTED: true, msvc
 // ADDITIONAL_COMPILE_FLAGS: -DUSE_COOPERATIVE_LAUNCH
 
 // <cuda/barrier>
