@@ -57,13 +57,14 @@ set(_libhipcxx_INCLUDE_DIR "${_libhipcxx_VERSION_INCLUDE_DIR}"
 unset(_libhipcxx_VERSION_INCLUDE_DIR CACHE) # Clear tmp variable from cache
 # NOTE(HIP): _libhipcxx_INCLUDE_DIR is the include root that contains <cuda/...>,
 # <nv/...> and <libhipcxx/__amd/...>.
-#  * Install tree: it points at '<inc>/libhipcxx', which also directly contains
-#    the 'hip/' alias tree, so this single dir resolves everything.
+#  * Install tree: it points at '<inc>/<subdir>' (LIBHIPCXX_INSTALL_INCLUDE_SUBDIR,
+#    default 'hipccl'), which also directly contains the 'hip/' alias tree, so
+#    this single dir resolves everything.
 #  * Source tree (add_subdirectory): it points at '<src>/include', where the
 #    'hip/' alias instead lives under '<src>/include/libhipcxx/hip'. In that case
 #    the extra '.../libhipcxx' dir below is required to resolve <hip/...>.
 # Probe for the 'hip/' alias itself rather than the '.../libhipcxx' dir: in the
-# install tree '<inc>/libhipcxx/libhipcxx' exists too (it holds '__amd/'), but
+# install tree '<inc>/<subdir>/libhipcxx' exists too (it holds '__amd/'), but
 # must not be added as an include root.
 target_include_directories(_libhipcxx_libhipcxx INTERFACE
   "${_libhipcxx_INCLUDE_DIR}"

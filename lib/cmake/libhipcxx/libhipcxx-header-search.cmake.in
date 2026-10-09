@@ -1,4 +1,4 @@
-# Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+# Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -25,7 +25,7 @@ set(from_install_prefix "@from_install_prefix@")
 # libhipcxxInstallRules.cmake), so the include root exported to consumers is that
 # subdirectory, not '<inc>' itself. @LIBHIPCXX_INSTALL_INCLUDEDIR@ is the exact
 # includedir-relative destination those install rules used (default
-# '<inc>/libhipcxx', overridable via LIBHIPCXX_INSTALL_INCLUDE_SUBDIR); baking
+# '<inc>/hipccl', overridable via LIBHIPCXX_INSTALL_INCLUDE_SUBDIR); baking
 # the same value in here keeps the probe path and the install layout in lockstep.
 find_path(_libhipcxx_VERSION_INCLUDE_DIR cuda/std/detail/__config
   NO_DEFAULT_PATH # Only search explicit paths below:

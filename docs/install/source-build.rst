@@ -126,6 +126,11 @@ The build options are:
   accepted.
 * ``CMAKE_INSTALL_PREFIX``: Set this to the installation directory. For
   example, use ``/opt/rocm`` to install alongside ROCm.
+* ``LIBHIPCXX_INSTALL_INCLUDE_SUBDIR``: Set this to the subdirectory of the
+  install include directory that receives the libhipcxx headers. Default is
+  ``hipccl``, which matches the ROCm layout. Set it to an empty string to
+  install the headers directly into the include directory. ``find_package(libhipcxx)``
+  finds the headers for any value.
 
 Build libhipcxx using the generated build files:
 
