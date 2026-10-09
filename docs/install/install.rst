@@ -195,7 +195,10 @@ use each namespace, see
 
 If you are not using CMake, add the libhipcxx include root to your compiler flags directly.
 ROCm installs the libhipcxx headers under ``/opt/rocm/include/hipccl``, which is not on the
-compiler's default search path. Pass the GPU architecture to compile for with ``--offload-arch``:
+compiler's default search path. A build from source installs them under
+``<install prefix>/include/hipccl`` by default; see the ``LIBHIPCXX_INSTALL_INCLUDE_SUBDIR``
+option in :doc:`Build from source <source-build>`. Pass the GPU architecture to compile for with
+``--offload-arch``:
 
 .. code-block:: shell
 

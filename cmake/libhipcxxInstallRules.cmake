@@ -30,9 +30,9 @@ include(GNUInstallDirs)
 # ROCm-cmake may generate an invalid install(*) command where COMPONENT comes
 # after PATTERN, which is not valid in CMake
 
-# NOTE(HIP): All libhipcxx headers are installed *under* '<inc>/libhipcxx/'
-# instead of directly into '<inc>/'. This keeps the whole payload self-contained
-# in a single subtree (so a single '-I<inc>/libhipcxx' resolves <cuda/...>,
+# NOTE(HIP): All libhipcxx headers are installed *under* '<inc>/hipccl/' (the
+# ROCm layout) instead of directly into '<inc>/'. This keeps the whole payload
+# self-contained in a single subtree (so a single '-I<inc>/hipccl' resolves <cuda/...>,
 # <nv/...>, <libhipcxx/__amd/...> and <hip/...>) and avoids polluting/colliding with the
 # top-level '<inc>/cuda' of a CUDA Toolkit or ROCm's own headers. Consumers must
 # pull in libhipcxx via find_package(libhipcxx) + libhipcxx::libhipcxx (which
@@ -46,7 +46,7 @@ include(GNUInstallDirs)
 # destinations below *and* for the consumer-side probe path baked into
 # libhipcxx-header-search.cmake.in (via configure_file), so the install layout
 # and the find_package() detection can never drift apart.
-set(LIBHIPCXX_INSTALL_INCLUDE_SUBDIR "libhipcxx"
+set(LIBHIPCXX_INSTALL_INCLUDE_SUBDIR "hipccl"
   CACHE STRING
   "Subdirectory under the install includedir that receives libhipcxx headers (empty = install directly into <includedir>)"
 )
