@@ -34,7 +34,7 @@ This page documents ``cuda::pipeline::consumer_wait``, which blocks the current 
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    // (1)
    template <cuda::thread_scope Scope>

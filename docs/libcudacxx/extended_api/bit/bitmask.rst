@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::bitmask, which generates a bitmask of a specified width starting at a given bit position in libhipcxx for HIP.
-  :keywords: libhipcxx, ROCm, HIP, C++, bitmask, bit manipulation, unsigned integer, BMSK
+  :keywords: libhipcxx, ROCm, HIP, C++, bitmask, bit manipulation, unsigned integer, mask generation
 
 .. _libcudacxx-extended-api-bit-bitmask:
 
@@ -34,7 +34,7 @@ This page documents ``cuda::bitmask``, which generates an integer bitmask of a s
 
 Defined in the ``<cuda/bit>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -70,8 +70,8 @@ Bitmask of size ``width`` starting at position ``start``.
 ..
    The function performs the following operations in device code:
 
-- ``uint8_t``, ``uint16_t``, ``uint32_t``: ``BMSK``.
-- ``uint64_t``: ``SHL`` x4, ``ADD`` x2.
+   - ``uint8_t``, ``uint16_t``, ``uint32_t``: ``BMSK``.
+   - ``uint64_t``: ``SHL`` x4, ``ADD`` x2.
 
 .. note::
 
@@ -80,12 +80,12 @@ Bitmask of size ``width`` starting at position ``start``.
 ..
    .. note::
 
-   GCC <= 8 uses a slow path with more instructions even in CUDA.
+      GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/bit>
     #include <cuda/std/cassert>
@@ -102,4 +102,5 @@ Example
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/habGohz7T>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/habGohz7T>`__

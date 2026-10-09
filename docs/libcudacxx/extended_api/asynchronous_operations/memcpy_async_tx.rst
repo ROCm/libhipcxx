@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::device::memcpy_async_tx, which asynchronously copies global memory to shared memory with manual barrier transaction accounting in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, memcpy_async_tx, barrier, shared memory, global memory, Hopper
+  :keywords: libhipcxx, ROCm, HIP, C++, memcpy_async_tx, barrier, shared memory, global memory
 
 .. _libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx:
 
@@ -35,7 +35,7 @@ This page documents ``cuda::device::memcpy_async_tx``, which asynchronously copi
 
 Defined in header ``<cuda/barrier>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, size_t Alignment>
    inline __device__
@@ -64,21 +64,27 @@ Requires
 Notes
 -----
 
-This function can only be used under CUDA Compute Capability 9.0 (Hopper) or higher.
+This function is not supported on AMD GPUs.
+
+..
+   This function can only be used under CUDA Compute Capability 9.0 (Hopper) or higher.
 
 There is no feature flag to check if ``cuda::device::memcpy_async_tx`` is available.
 
 Comparison to ``cuda::memcpy_async``: ``memcpy_async_tx`` supports a subset of the operations of ``memcpy_async``.
 It gives more control over the synchronization with a barrier than ``memcpy_async``.
-Currently, ``memcpy_async_tx`` has no synchronous fallback mechanism, i.e., it does not work on older hardware
-(pre-CUDA Compute Capability 9.0, i.e., pre-Hopper).
+Currently, ``memcpy_async_tx`` has no synchronous fallback mechanism.
+
+..
+   Currently, ``memcpy_async_tx`` has no synchronous fallback mechanism, i.e., it does not work on older hardware
+   (pre-CUDA Compute Capability 9.0, i.e., pre-Hopper).
 
 .. _libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx-example:
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
    #include <cuda/std/utility> // cuda::std::move
@@ -120,4 +126,5 @@ Example
      smem_x[threadIdx.x] += 1;
    }
 
-`See it on Godbolt <https://godbolt.org/z/M8zqnrz9b>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/M8zqnrz9b>`_

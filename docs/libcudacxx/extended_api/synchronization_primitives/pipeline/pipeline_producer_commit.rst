@@ -34,7 +34,7 @@ This page documents ``cuda::pipeline_producer_commit``, which commits all pendin
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope>
    __host__ __device__
@@ -63,7 +63,7 @@ current phase to account for the subsequent ``cuda::barrier::arrive``, resulting
 
 .. rubric:: Example
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/pipeline>
 

@@ -36,7 +36,7 @@ Defined in header ``<cuda/annotated_ptr>``.
 
 The class ``cuda::access_property`` provides an opaque encoding for *L2 cache memory residence* control and *memory space* properties. It is used in combination with :ref:`cuda::annotated_ptr <libcudacxx-extended-api-memory-access-properties-annotated-ptr>`, :ref:`cuda::associate_access_property <libcudacxx-extended-api-memory-access-properties-associate-access-property>` and :ref:`cuda::apply_access_property <libcudacxx-extended-api-memory-access-properties-apply-access-property>` to *request* the application of properties to memory operations.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -138,7 +138,7 @@ The L2 residence control can be specified in two ways:
 Default constructor
 -------------------
 
-.. code:: cuda
+.. code:: cpp
 
    access_property() noexcept = default;
 
@@ -147,7 +147,7 @@ Default constructor
 Static global memory residence control property constructors
 ------------------------------------------------------------
 
-.. code:: cuda
+.. code:: cpp
 
    __host__ __device__ constexpr access_property::access_property(global) noexcept;
    __host__ __device__ constexpr access_property::access_property(normal) noexcept;
@@ -159,7 +159,7 @@ Static global memory residence control property constructors
 Dynamic interleaved global memory residence control property constructors
 -------------------------------------------------------------------------
 
-.. code:: cuda
+.. code:: cpp
 
    __host__ __device__ constexpr access_property::access_property(normal,     float probability) noexcept;
    __host__ __device__ constexpr access_property::access_property(streaming,  float probability) noexcept;
@@ -174,7 +174,7 @@ Dynamic interleaved global memory residence control property constructors
 Dynamic range global memory residence control property constructors
 -------------------------------------------------------------------
 
-.. code:: cuda
+.. code:: cpp
 
    __host__ __device__ access_property::access_property(void* ptr, size_t leading_bytes, size_t total_bytes, normal) noexcept;
    __host__ __device__ access_property::access_property(void* ptr, size_t leading_bytes, size_t total_bytes, streaming) noexcept;
@@ -209,18 +209,21 @@ Dynamic range global memory residence control property constructors
 Conversion operators
 --------------------
 
-.. code:: cuda
+.. code:: cpp
 
-   __host__ __device__ constexpr access_property::normal::operator     cudaAccessProperty() const noexcept;
-   __host__ __device__ constexpr access_property::streaming::operator  cudaAccessProperty() const noexcept;
-   __host__ __device__ constexpr access_property::persisting::operator cudaAccessProperty() const noexcept;
+   __host__ __device__ constexpr access_property::normal::operator     hipAccessProperty() const noexcept;
+   __host__ __device__ constexpr access_property::streaming::operator  hipAccessProperty() const noexcept;
+   __host__ __device__ constexpr access_property::persisting::operator hipAccessProperty() const noexcept;
 
-Allows ``constexpr cuda::access_property::normal{}``, ``cuda::access_property::streaming{}``, and ``cuda::access_property::persisting{}`` to be used in lieu of the corresponding CUDA Runtime `cudaAccessProperty <https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html#group__CUDART__TYPES_1g4991a8bc9c2356a8da28d093a1da6758>`_. See also `L2 Policy for Persisting Accesses <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#l2-policy-for-persisting-accesses>`_.
+Allows ``constexpr cuda::access_property::normal{}``, ``cuda::access_property::streaming{}``, and ``cuda::access_property::persisting{}`` to be used in lieu of the corresponding HIP runtime `hipAccessProperty <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html>`_ enumerated values.
+
+..
+   See also `L2 Policy for Persisting Accesses <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#l2-policy-for-persisting-accesses>`_.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/access_property>
 

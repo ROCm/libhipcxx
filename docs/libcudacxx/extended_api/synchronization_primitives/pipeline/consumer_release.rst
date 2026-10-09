@@ -34,7 +34,7 @@ This page documents ``cuda::pipeline::consumer_release``, which releases the cur
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope>
    __host__ __device__

@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::bit_reverse, which reverses the order of bits in an unsigned integer value in libhipcxx for HIP.
-  :keywords: libhipcxx, ROCm, HIP, C++, bit_reverse, bit manipulation, unsigned integer, BREV
+  :keywords: libhipcxx, ROCm, HIP, C++, bit_reverse, bit manipulation, unsigned integer, bit reversal
 
 .. _libcudacxx-extended-api-bit-bit_reverse:
 
@@ -34,7 +34,7 @@ This page documents ``cuda::bit_reverse``, which reverses the order of bits in a
 
 Defined in the ``<cuda/bit>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -81,12 +81,12 @@ In host code the function uses ``__builtin_bitreverse<N>`` with clang.
 ..
    .. note::
 
-   GCC <= 8 uses a slow path with more instructions even in device code.
+      GCC <= 8 uses a slow path with more instructions even in device code.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/bit>
     #include <cuda/std/cassert>
@@ -102,4 +102,5 @@ Example
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/nW6qe5fT4>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/nW6qe5fT4>`__

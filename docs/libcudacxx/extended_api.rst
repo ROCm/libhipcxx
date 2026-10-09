@@ -37,7 +37,6 @@ This section documents the extended API provided by libhipcxx, covering bit mani
 
    extended_api/macros
    extended_api/bit
-   extended_api/execution_model
    extended_api/exceptions
    extended_api/memory_model
    extended_api/thread_groups
@@ -52,8 +51,23 @@ This section documents the extended API provided by libhipcxx, covering bit mani
    extended_api/memory_resource
    extended_api/math
    extended_api/mdspan
+   extended_api/utility
+
+..
+   Not supported in libhipcxx, see reference/libhipcxx-limitations.rst. The pages are also
+   listed in exclude_patterns in docs/conf.py.
+
+   - cuda::memcpy_async depends on <cuda/barrier> and <cuda/pipeline>.
+   - <cuda/annotated_ptr> and cuda::access_property are not provided.
+   - The warp functions in <cuda/warp> are only compiled for NVIDIA PTX targets.
+   - The TMA descriptor API in <cuda/tma> requires the NVIDIA Tensor Memory Accelerator.
+   - cuda::for_each_canceled_block does not cancel blocks on AMD GPUs.
+   - extended_api/execution_model documents CUDA forward progress guarantees that may not hold
+     on AMD GPUs.
+
+   extended_api/asynchronous_operations
+   extended_api/memory_access_properties
    extended_api/tma
    extended_api/warp
-   extended_api/utility
    extended_api/work_stealing
    extended_api/execution_model

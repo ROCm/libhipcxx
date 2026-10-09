@@ -34,7 +34,7 @@ This page documents ``cuda::make_pipeline``, which constructs a pipeline object 
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    // (1)
    __host__ __device__
@@ -116,7 +116,7 @@ A ``cuda::pipeline`` object.
 
 .. rubric:: Example
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/pipeline>
    #include <cooperative_groups.h>

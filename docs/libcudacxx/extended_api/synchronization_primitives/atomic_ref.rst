@@ -66,9 +66,12 @@ Limitations
 
 ``cuda::atomic_ref<T>`` and ``cuda::std::atomic_ref<T>`` may only be instantiated when ``T`` satisfies ``sizeof(T) <= 8`` or ``sizeof(T) <= 16`` when requirements are met.
 
-The operations available to ``T`` when ``sizeof(T) == 16`` depend on the architecture:
-  - On SM70 and later: ``load`` and ``store`` are supported.
-  - On SM90 and later: ``fetch_*`` and synchronization operations are supported, implemented via atomic compare-and-swap (CAS).
+..
+   NVIDIA-specific (SM versions), not applicable to AMD GPUs.
+
+   The operations available to ``T`` when ``sizeof(T) == 16`` depend on the architecture:
+     - On SM70 and later: ``load`` and ``store`` are supported.
+     - On SM90 and later: ``fetch_*`` and synchronization operations are supported, implemented via atomic compare-and-swap (CAS).
 
 No object or subobject of an object referenced by an ``atomic_­ref`` shall be concurrently referenced by any other
 ``atomic_­ref`` that has a different ``Scope``.

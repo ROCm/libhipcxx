@@ -22,15 +22,15 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx mdspan extended API, including restrict_accessor and restrict_mdspan for applying the restrict aliasing policy to multidimensional spans.
-  :keywords: libhipcxx, ROCm, HIP, C++, mdspan, restrict_accessor, restrict_mdspan, aliasing, accessor
+  :description: Overview of the libhipcxx mdspan extended API, including memory space accessors, layout_stride_relaxed, restrict_accessor, shared memory accessors, and DLPack conversions in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, mdspan, accessor, restrict_accessor, layout_stride_relaxed, DLPack
 
 .. _libcudacxx-extended-api-mdspan:
 
 Mdspan
 ======
 
-This page covers the mdspan extended API, providing the restrict_accessor and restrict_mdspan types for applying the restrict aliasing policy to multidimensional spans.
+This page covers the mdspan extended API, providing memory space aware accessors and ``mdspan`` aliases, the ``layout_stride_relaxed`` layout, the *restrict* aliasing policy, and conversions between ``mdspan`` and DLPack.
 
 .. toctree::
    :hidden:
@@ -52,31 +52,25 @@ This page covers the mdspan extended API, providing the restrict_accessor and re
      - **libhipcxx Availability**
 
    * - :ref:`host/device/managed mdspan and accessor <libcudacxx-extended-api-mdspan-host-device-accessor>`
-     - CUDA memory space ``mdspan`` and accessors
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - Host, device, and managed memory space ``mdspan`` and accessors
+     - libhipcxx 3.0
 
    * - :ref:`layout_stride_relaxed <libcudacxx-extended-api-mdspan-layout-stride-relaxed>`
      - Layout mapping policy with negative/zero strides and offset support
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
 
    * - :ref:`restrict mdspan and accessor <libcudacxx-extended-api-mdspan-restrict-accessor>`
      - ``mdspan`` and accessor with the *restrict* aliasing policy
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
 
    * - :ref:`shared_memory mdspan and accessor <libcudacxx-extended-api-mdspan-shared-memory-accessor>`
-     - ``mdspan`` and accessor for CUDA shared memory
-     - CCCL 3.2.0
-     - CUDA 13.2
+     - ``mdspan`` and accessor for shared memory
+     - libhipcxx 3.4
 
    * - :ref:`mdspan to dlpack <libcudacxx-extended-api-mdspan-mdspan-to-dlpack>`
      - Convert a ``mdspan`` to a ``DLTensor``
-     - CCCL 3.2.0
-     - CUDA 13.2
+     - libhipcxx 3.4
 
    * - :ref:`dlpack to mdspan <libcudacxx-extended-api-mdspan-dlpack-to-mdspan>`
      - Convert a ``DLTensor`` to a ``mdspan``
-     - CCCL 3.2.0
-     - CUDA 13.2
+     - libhipcxx 3.4

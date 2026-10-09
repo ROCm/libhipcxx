@@ -34,7 +34,7 @@ This page documents ``cuda::apply_access_property``, which prefetches a memory r
 
 Defined in header ``<cuda/annotated_ptr>``.
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename ShapeT>
    [[nodiscard]] __host__ __device__
@@ -48,7 +48,7 @@ Prefetch memory in the L2 cache starting at ``ptr`` applying a residence control
 
 **Constraints**
 
-- ``ShapeT`` is either ``size_t`` or :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-aligned-size>`.
+- ``ShapeT`` is either ``size_t`` or ``cuda::aligned_size_t``.
 - Two properties are supported:
 
     -  :ref:`cuda::access_property::persisting <libcudacxx-extended-api-memory-access-properties-access-property-persisting>`
@@ -68,7 +68,7 @@ Example
 
 Given three input and output vectors ``x``, ``y``, and ``z``, and two arrays of coefficients ``a`` and ``b``, all of length ``N``:
 
-.. code:: cuda
+.. code:: cpp
 
    size_t N;
    int* x, *y, *z;
@@ -76,7 +76,7 @@ Given three input and output vectors ``x``, ``y``, and ``z``, and two arrays of 
 
 the grid-strided kernel:
 
-.. code:: cuda
+.. code:: cpp
 
     __global__ void update(const int* x, const int* a, const int* b, size_t N) {
         auto g = cooperative_groups::this_grid();
@@ -87,7 +87,7 @@ the grid-strided kernel:
 
 updates ``x``, ``y``, and ``z`` as follows:
 
-.. code:: cuda
+.. code:: cpp
 
     update<<<grid, block>>>(x, a, b, N);
     update<<<grid, block>>>(y, a, b, N);
@@ -97,7 +97,7 @@ The elements of ``a`` and ``b`` are used in all kernels. For certain values of `
 
 With :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properties-access-property>` and :ref:`cuda::apply_access_property <libcudacxx-extended-api-memory-access-properties-apply-access-property>`, we can write kernels that specify that ``a`` and ``b`` are accessed more often in the ``pin`` kernel and with normal access in the ``unpin`` kernel:
 
-.. code:: cuda
+.. code:: cpp
 
     __global__ void pin(int* a, int* b, size_t N) {
         auto g = cooperative_groups::this_grid();
@@ -117,7 +117,7 @@ With :ref:`cuda::access_property <libcudacxx-extended-api-memory-access-properti
 
 which we can launch before and after the ``update`` kernels:
 
-.. code:: cuda
+.. code:: cpp
 
    pin<<<grid, block>>>(a, b, N);
    update<<<grid, block>>>(x, a, b, N);

@@ -30,6 +30,9 @@
 C Library
 =========
 
+This page covers the C standard library headers available in libhipcxx, which provide the C library facilities
+in the ``cuda::std`` namespace for host and device code.
+
 .. toctree::
    :hidden:
    :maxdepth: 1
@@ -105,6 +108,5 @@ Any Standard C++ header not listed below is omitted.
 
    * - ``<cuda/std/ctime>``
      - Provides ``clock``, ``difftime``, ``time`` and ``timespec_get`` functions
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
      - `\<ctime\> <https://en.cppreference.com/w/cpp/header/ctime>`_

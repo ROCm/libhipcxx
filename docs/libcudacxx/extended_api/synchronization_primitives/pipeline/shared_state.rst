@@ -35,7 +35,7 @@ This page documents ``cuda::pipeline_shared_state``, which holds the shared memo
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope, cuda::std::uint8_t StagesCount>
    class cuda::pipeline_shared_state {
@@ -82,7 +82,7 @@ in a ``cuda::pipeline``.
 
 .. rubric:: Constructor
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope, cuda::std::uint8_t StagesCount>
    __host__ __device__
@@ -96,7 +96,7 @@ in a ``cuda::pipeline``.
 
 Construct a ``cuda::pipeline`` *shared state* object.
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/pipeline>
 
@@ -109,21 +109,24 @@ Construct a ``cuda::pipeline`` *shared state* object.
 ..
    `See it on Godbolt <https://godbolt.org/z/K4vKq4vd3>`__
 
-.. rubric:: NVCC ``__shared__`` Initialization Warnings
+..
+   NVCC-specific, not applicable to HIP.
 
-When using libhipcxx with NVCC, a ``__shared__`` ``cuda::pipeline_shared_state`` will lead to the following warning
-because ``__shared__`` variables are not initialized:
+   .. rubric:: NVCC ``__shared__`` Initialization Warnings
 
-.. code:: bash
+   When using libhipcxx with NVCC, a ``__shared__`` ``cuda::pipeline_shared_state`` will lead to the following warning
+   because ``__shared__`` variables are not initialized:
 
-   warning: dynamic initialization is not supported for a function-scope static
-   __shared__ variable within a __device__/__global__ function
+   .. code:: bash
 
-It can be silenced using ``#pragma nv_diag_suppress static_var_with_dynamic_init``.
+      warning: dynamic initialization is not supported for a function-scope static
+      __shared__ variable within a __device__/__global__ function
+
+   It can be silenced using ``#pragma nv_diag_suppress static_var_with_dynamic_init``.
 
 .. rubric:: Example
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/pipeline>
 

@@ -34,7 +34,7 @@ This page documents ``cuda::device::barrier_native_handle``, which returns a poi
 
 Defined in header ``<cuda/barrier>``:
 
-.. code:: cuda
+.. code:: cpp
 
    __device__ cuda::std::uint64_t* cuda::device::barrier_native_handle(
      cuda::barrier<cuda::thread_scope_block>& bar);
@@ -57,7 +57,7 @@ object.
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
 

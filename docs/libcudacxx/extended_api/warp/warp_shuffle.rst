@@ -36,7 +36,7 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
 
 ``warp_shuffle_idx``:
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda::device {
 
@@ -57,7 +57,7 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
 
 ``warp_shuffle_up``:
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda::device {
 
@@ -78,7 +78,7 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
 
 ``warp_shuffle_down``:
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda::device {
 
@@ -99,7 +99,7 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
 
 ``warp_shuffle_xor``:
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda::device {
 
@@ -120,7 +120,7 @@ The warp shuffle functions allow threads within a warp to exchange data of arbit
 
 Result type:
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda::device {
 
@@ -134,7 +134,7 @@ Result type:
 
     } // namespace cuda::device
 
-The functionality provides a generalized, safe alternative to CUDA warp shuffle intrinsics.
+The functionality provides a generalized, safe alternative to the warp shuffle intrinsics.
 The functions allow threads to exchange data of any size, including raw arrays, pointers, and structs.
 
 **Parameters**
@@ -178,7 +178,7 @@ The functions allow threads to exchange data of any size, including raw arrays, 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/std/array>
     #include <cuda/std/type_traits>

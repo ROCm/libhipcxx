@@ -34,7 +34,7 @@ This page documents the ``cuda::for_each_canceled_block`` API for dynamic work s
 
 Defined in header ``<cuda/work_stealing>``:
 
-.. code:: cuda
+.. code:: cpp
 
   namespace cuda::device {
 
@@ -45,9 +45,10 @@ Defined in header ``<cuda/work_stealing>``:
 
 .. note::
 
+   On supported hardware, this function may leverage hardware acceleration.
+
 ..
    On devices with compute capability 10.0 or higher, this function may leverage hardware acceleration.
-  On supported hardware, this function may leverage hardware acceleration.
 
 This API is primarily intended for implementing work-stealing at the thread-block level.
 
@@ -85,7 +86,7 @@ Example
 
 This example demonstrates work-stealing at thread-block granularity using this API.
 
-.. code:: cuda
+.. code:: cpp
 
   // Before:
 
@@ -121,9 +122,9 @@ This example demonstrates work-stealing at thread-block granularity using this A
   int main() {
   int N = 10000;
   int *a, *b, *c;
-  cudaMallocManaged(&a, N * sizeof(int));
-  cudaMallocManaged(&b, N * sizeof(int));
-  cudaMallocManaged(&c, N * sizeof(int));
+  hipMallocManaged(&a, N * sizeof(int));
+  hipMallocManaged(&b, N * sizeof(int));
+  hipMallocManaged(&c, N * sizeof(int));
   for (int i = 0; i < N; ++i) {
     a[i] = i;
     b[i] = 1;
@@ -134,7 +135,7 @@ This example demonstrates work-stealing at thread-block granularity using this A
   const int blocks_per_grid = cuda::ceil_div(N, threads_per_block);
 
   vec_add<<<blocks_per_grid, threads_per_block>>>(a, b, c, N);
-  cudaDeviceSynchronize();
+  hipDeviceSynchronize();
 
   bool success = true;
   for (int i = 0; i < N; ++i) {
@@ -143,11 +144,12 @@ This example demonstrates work-stealing at thread-block granularity using this A
       success = false;
     }
   }
-  cudaFree(a);
-  cudaFree(b);
-  cudaFree(c);
+  hipFree(a);
+  hipFree(b);
+  hipFree(c);
 
   return success? 0 : 1;
   }
 
-[Try it live on Godbolt!](https://godbolt.org/z/Ksj4vsfWf)
+..
+   [Try it live on Godbolt!](https://godbolt.org/z/Ksj4vsfWf)

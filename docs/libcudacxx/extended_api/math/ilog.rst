@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::ilog2 and cuda::ilog10, which compute integer logarithms to base 2 and base 10 respectively in libhipcxx for HIP.
-  :keywords: libhipcxx, ROCm, HIP, C++, ilog2, ilog10, integer logarithm, math, FLO
+  :keywords: libhipcxx, ROCm, HIP, C++, ilog2, ilog10, integer logarithm, math, ceil_ilog2
 
 .. _libcudacxx-extended-api-math-ilog:
 
@@ -34,7 +34,7 @@ This page documents ``cuda::ilog2`` and ``cuda::ilog10``, which compute the inte
 
 Defined in the ``<cuda/cmath>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -76,14 +76,14 @@ The functions compute the logarithm to the base 2 and 10 of an integer value.
 
    The function performs the following operations in device code:
 
-- ``ilog2``: ``FLO``
-- ``ceil_ilog2``: ``FLO``, ``POPC``, ``ADD``, comparison
-- ``ilog10``: ``FLO``, ``FMUL``, ``F2I``, constant memory lookup, ``SEL`` + ``IADD`` only if ``T == uint32_t`` or ``T == __uint128_t``
+   - ``ilog2``: ``FLO``
+   - ``ceil_ilog2``: ``FLO``, ``POPC``, ``ADD``, comparison
+   - ``ilog10``: ``FLO``, ``FMUL``, ``F2I``, constant memory lookup, ``SEL`` + ``IADD`` only if ``T == uint32_t`` or ``T == __uint128_t``
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/cmath>
     #include <cuda/std/cassert>
@@ -103,4 +103,5 @@ Example
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/7W3WaGd3c>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/7W3WaGd3c>`__

@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for the cuda::mr::resource and cuda::mr::async_resource concepts, which constrain memory resource types for synchronous and stream-ordered allocation in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, resource concept, async_resource, memory resource, allocate, deallocate, stream-ordered
+  :description: API reference for the cuda::mr::synchronous_resource and cuda::mr::resource concepts, which constrain memory resource types for synchronous and stream-ordered allocation in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, resource concept, synchronous_resource, memory resource, allocate, deallocate, stream-ordered
 
 .. _libcudacxx-extended-api-memory-resources-resource:
 .. _libcudacxx-extended-api-memory-resources-synchronous-resource:

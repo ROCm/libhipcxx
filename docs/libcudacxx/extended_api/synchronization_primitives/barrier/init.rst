@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::barrier::init, a friend function used to initialize a shared memory cuda::barrier that cannot run its constructor in libhipcxx for HIP.
-  :keywords: libhipcxx, ROCm, HIP, C++, barrier init, shared memory, __shared__, NVCC, initialization, barrier
+  :keywords: libhipcxx, ROCm, HIP, C++, barrier init, shared memory, __shared__, initialization, barrier
 
 
 .. _libcudacxx-extended-api-synchronization-barrier-barrier-init:
@@ -35,7 +35,7 @@ This page documents ``cuda::barrier::init``, a friend function used to initializ
 
 Defined in header ``<cuda/barrier>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope,
              typename CompletionFunction = /* unspecified */>
@@ -52,23 +52,26 @@ Defined in header ``<cuda/barrier>``:
 The friend function ``cuda::barrier::init`` may be used to initialize an
 :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>` that has not been initialized.
 
-When using libhipcxx with NVCC, ``__shared__`` ``cuda::barrier`` will not have its constructors run because ``__shared__``
-variables are not initialized. ``cuda::barrier::init`` should be used to properly initialize such a
-:ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`.
+..
+   NVCC-specific, not applicable to HIP.
 
-An NVCC diagnostic warning about the ignored constructor will be emitted:
+   When using libhipcxx with NVCC, ``__shared__`` ``cuda::barrier`` will not have its constructors run because ``__shared__``
+   variables are not initialized. ``cuda::barrier::init`` should be used to properly initialize such a
+   :ref:`cuda::barrier <libcudacxx-extended-api-synchronization-barrier>`.
 
-.. code:: bash
+   An NVCC diagnostic warning about the ignored constructor will be emitted:
 
-   warning: dynamic initialization is not supported for a function-scope static
-   __shared__ variable within a __device__/__global__ function
+   .. code:: bash
 
-It can be silenced using ``#pragma nv_diag_suppress static_var_with_dynamic_init``.
+      warning: dynamic initialization is not supported for a function-scope static
+      __shared__ variable within a __device__/__global__ function
+
+   It can be silenced using ``#pragma nv_diag_suppress static_var_with_dynamic_init``.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
 

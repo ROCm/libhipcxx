@@ -44,7 +44,7 @@ This page documents ``cuda::barrier``, a multi-phase thread coordination mechani
 
 Defined in header ``<cuda/barrier>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope,
              typename CompletionFunction = /* unspecified */>
@@ -97,17 +97,20 @@ of ISO/IEC IS 14882 (the C++ Standard) are modified as follows:
    other than its destructor, do not introduce data races. The member functions ``arrive`` and ``arrive_and_drop``,
    **and the non-member function cuda::device::barrier_arrive_tx**, execute atomically.
 
-.. rubric:: NVCC ``__shared__`` Initialization Warnings
+..
+   NVCC-specific, not applicable to HIP.
 
-When using libhipcxx with NVCC, a ``__shared__`` ``cuda::barrier`` will lead to the following warning because
-``__shared__`` variables are not initialized:
+   .. rubric:: NVCC ``__shared__`` Initialization Warnings
 
-.. code:: bash
+   When using libhipcxx with NVCC, a ``__shared__`` ``cuda::barrier`` will lead to the following warning because
+   ``__shared__`` variables are not initialized:
 
-   warning: dynamic initialization is not supported for a function-scope static
-   __shared__ variable within a __device__/__global__ function
+   .. code:: bash
 
-It can be silenced using ``#pragma nv_diag_suppress static_var_with_dynamic_init``.
+      warning: dynamic initialization is not supported for a function-scope static
+      __shared__ variable within a __device__/__global__ function
+
+   It can be silenced using ``#pragma nv_diag_suppress static_var_with_dynamic_init``.
 
 To properly initialize a ``__shared__`` ``cuda::barrier``, use the
 :ref:`cuda::barrier::init <libcudacxx-extended-api-synchronization-barrier-barrier-init>` friend function.
@@ -116,39 +119,45 @@ To properly initialize a ``__shared__`` ``cuda::barrier``, use the
 
 An object of type ``cuda::barrier`` or ``cuda::std::barrier`` shall not be accessed concurrently by CPU and GPU threads unless:
 
-- it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
+- it is in unified memory and the `concurrentManagedAccess property <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`_
   is 1, or
-- it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
+- it is in CPU memory and the `hostNativeAtomicSupported property <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`_
   is 1.
 
 Note: for objects of scopes other than ``cuda::thread_scope_system``, this is a data race, and is therefore also prohibited
 regardless of memory characteristics.
 
-Under CUDA Compute Capability 8 (Ampere) or above, when an object of type ``cuda::barrier<thread_scope_block>`` is
-placed in ``__shared__`` memory, the member function ``arrive`` performs a reduction of the arrival count among
-`coalesced threads <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#coalesced-group-cg>`_ followed
-by the arrival operation in one thread. Programs shall ensure that this transformation would not introduce errors,
-for example relative to the requirements of `thread.barrier.class paragraph 12 <https://eel.is/c++draft/thread.barrier.class#12>`_
-of ISO/IEC IS 14882 (the C++ Standard).
+..
+   NVIDIA-specific (compute capability), not applicable to AMD GPUs.
 
-Under CUDA Compute Capability 6 (Pascal) or prior, an object of type ``cuda::barrier`` or ``cuda::std::barrier`` may
-not be used.
+   Under CUDA Compute Capability 8 (Ampere) or above, when an object of type ``cuda::barrier<thread_scope_block>`` is
+   placed in ``__shared__`` memory, the member function ``arrive`` performs a reduction of the arrival count among
+   `coalesced threads <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#coalesced-group-cg>`_ followed
+   by the arrival operation in one thread. Programs shall ensure that this transformation would not introduce errors,
+   for example relative to the requirements of `thread.barrier.class paragraph 12 <https://eel.is/c++draft/thread.barrier.class#12>`_
+   of ISO/IEC IS 14882 (the C++ Standard).
 
-.. rubric:: Shared memory barriers with transaction count
+   Under CUDA Compute Capability 6 (Pascal) or prior, an object of type ``cuda::barrier`` or ``cuda::std::barrier`` may
+   not be used.
 
-In addition to the arrival count, a ``cuda::barrier<thread_scope_block>`` object located in shared memory supports a
-`tx-count <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-mbarrier-tracking-async-operations>`_,
-which is used for tracking the completion of some asynchronous memory operations or transactions.
-The tx-count tracks the number of asynchronous transactions, in units specified by the asynchronous memory operation
-(typically bytes) that are outstanding and have not yet completed. This capability is exposed, starting with the Hopper
-architecture (CUDA Compute Capability 9).
+..
+   NVIDIA Hopper (TMA/mbarrier tx-count) specific, not applicable to AMD GPUs.
 
-The tx-count of ``cuda::barrier`` must be set to the total amount of asynchronous memory operations, in units as
-specified by the asynchronous operations, to be tracked by the current phase. This can be achieved with the
-:ref:`cuda::device::barrier_arrive_tx <libcudacxx-extended-api-synchronization-barrier-barrier-arrive-tx>` function call.
+   .. rubric:: Shared memory barriers with transaction count
 
-Upon completion of each of the asynchronous operations, the tx-count of the ``cuda::barrier`` will be updated and thus
-progress the ``cuda::barrier`` towards the completion of the current phase. This may complete the current phase.
+   In addition to the arrival count, a ``cuda::barrier<thread_scope_block>`` object located in shared memory supports a
+   `tx-count <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-mbarrier-tracking-async-operations>`_,
+   which is used for tracking the completion of some asynchronous memory operations or transactions.
+   The tx-count tracks the number of asynchronous transactions, in units specified by the asynchronous memory operation
+   (typically bytes) that are outstanding and have not yet completed. This capability is exposed, starting with the Hopper
+   architecture (CUDA Compute Capability 9).
+
+   The tx-count of ``cuda::barrier`` must be set to the total amount of asynchronous memory operations, in units as
+   specified by the asynchronous operations, to be tracked by the current phase. This can be achieved with the
+   :ref:`cuda::device::barrier_arrive_tx <libcudacxx-extended-api-synchronization-barrier-barrier-arrive-tx>` function call.
+
+   Upon completion of each of the asynchronous operations, the tx-count of the ``cuda::barrier`` will be updated and thus
+   progress the ``cuda::barrier`` towards the completion of the current phase. This may complete the current phase.
 
 .. rubric:: Implementation-Defined Behavior
 
@@ -174,7 +183,7 @@ For each :ref:`cuda::thread_scope <libcudacxx-extended-api-memory-model-thread-s
 
 .. rubric:: Example
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
 
@@ -192,138 +201,142 @@ For each :ref:`cuda::thread_scope <libcudacxx-extended-api-memory-model-thread-s
      cuda::barrier<cuda::thread_scope_block> d(10);
    }
 
-`See it on Godbolt <https://godbolt.org/z/7Kbz5qqhh>`__
+..
+   `See it on Godbolt <https://godbolt.org/z/7Kbz5qqhh>`__
 
-.. rubric:: Example: 1D TMA load of two buffers with arrival token (sm90+)
+..
+   NVIDIA Hopper (sm90+, TMA) specific examples, not applicable to AMD GPUs.
 
-The following example shows how to use TMA to load two tiles of data from global memory into shared memory:
+   .. rubric:: Example: 1D TMA load of two buffers with arrival token (sm90+)
 
-.. code:: cuda
+   The following example shows how to use TMA to load two tiles of data from global memory into shared memory:
 
-   #include <cuda/barrier>
-   #include <cuda/ptx>
+   .. code:: cpp
 
-   // selects a single leader thread from the block
-   __device__ bool elect_one() {
-     const unsigned int tid = threadIdx.x;
-     const unsigned int warp_id = tid / 32;
-     const unsigned int uniform_warp_id = __shfl_sync(0xFFFFFFFF, warp_id, 0); // broadcast from lane 0
-     return uniform_warp_id == 0 && cuda::ptx::elect_sync(0xFFFFFFFF); // elect a leader thread among warp 0
-   }
+      #include <cuda/barrier>
+      #include <cuda/ptx>
 
-   __global__ void example_kernel(int* gmem1, double* gmem2) {
-     constexpr int tile_size = 1024;
-     __shared__ alignas(16)    int smem1[tile_size];
-     __shared__ alignas(16) double smem2[tile_size];
+      // selects a single leader thread from the block
+      __device__ bool elect_one() {
+        const unsigned int tid = threadIdx.x;
+        const unsigned int warp_id = tid / 32;
+        const unsigned int uniform_warp_id = __shfl_sync(0xFFFFFFFF, warp_id, 0); // broadcast from lane 0
+        return uniform_warp_id == 0 && cuda::ptx::elect_sync(0xFFFFFFFF); // elect a leader thread among warp 0
+      }
 
-     #pragma nv_diag_suppress static_var_with_dynamic_init
-     __shared__  cuda::barrier<cuda::thread_scope_block> bar;
+      __global__ void example_kernel(int* gmem1, double* gmem2) {
+        constexpr int tile_size = 1024;
+        __shared__ alignas(16)    int smem1[tile_size];
+        __shared__ alignas(16) double smem2[tile_size];
 
-     // setup the barrier where each thread in the block arrives at
-     if (threadIdx.x == 0) {
-       init(&bar, blockDim.x);
-     }
-     __syncthreads(); // need to sync so other threads can arrive
+        #pragma nv_diag_suppress static_var_with_dynamic_init
+        __shared__  cuda::barrier<cuda::thread_scope_block> bar;
 
-     // select a single thread from the block and issue two TMA bulk copy operations
-     const auto elected = elect_one();
-     if (elected) {
-       cuda::device::memcpy_async_tx(smem1, gmem1, cuda::aligned_size_t<16>(tile_size * sizeof(int)   ), bar);
-       cuda::device::memcpy_async_tx(smem2, gmem2, cuda::aligned_size_t<16>(tile_size * sizeof(double)), bar);
-     }
+        // setup the barrier where each thread in the block arrives at
+        if (threadIdx.x == 0) {
+          init(&bar, blockDim.x);
+        }
+        __syncthreads(); // need to sync so other threads can arrive
 
-     // arrive at the barrier
-     // the elected thread also updates the barrier's expect_tx with the **total** number of loaded bytes
-     const int tx_count = elected ? tile_size * (sizeof(int) + sizeof(double)) : 0;
-     auto token = cuda::device::barrier_arrive_tx(bar, 1, tx_count);
+        // select a single thread from the block and issue two TMA bulk copy operations
+        const auto elected = elect_one();
+        if (elected) {
+          cuda::device::memcpy_async_tx(smem1, gmem1, cuda::aligned_size_t<16>(tile_size * sizeof(int)   ), bar);
+          cuda::device::memcpy_async_tx(smem2, gmem2, cuda::aligned_size_t<16>(tile_size * sizeof(double)), bar);
+        }
 
-     // wait for TMA copies to complete
-     bar.wait(cuda::std::move(token));
+        // arrive at the barrier
+        // the elected thread also updates the barrier's expect_tx with the **total** number of loaded bytes
+        const int tx_count = elected ? tile_size * (sizeof(int) + sizeof(double)) : 0;
+        auto token = cuda::device::barrier_arrive_tx(bar, 1, tx_count);
 
-     // process data in smem ...
-   }
+        // wait for TMA copies to complete
+        bar.wait(cuda::std::move(token));
 
-`See it on Godbolt <https://godbolt.org/z/ddhzGeWPE>`__
+        // process data in smem ...
+      }
 
-Data is loaded from the global memory pointers ``gmem1`` and ``gmem2``
-into the shared memory buffers ``smem1`` and ``smem2``.
-The shared memory buffers have to be aligned to 16 bytes.
-Additionally, a single barrier with block scope is setup by a single leader thread.
-Each thread will arrive at the barrier, so ``blockDim.x`` is passed as arrival count to ``init``.
-This barrier is used to synchronize the asynchronous TMA copies with the rest of the threads in the block.
-The leader initiates the TMA copies using ``ptx::cp_async_bulk``,
-and updates the barrier's tx-count with the total number of bytes transferred by the TMA copy operations
-while arriving at the barrier using ``cuda::device::barrier_arrive_tx``.
-All other threads just arrive normally at the barrier.
-All threads then wait on the barrier to complete the current phase by calling ``wait``.
-Once ``wait`` returns, all data is available in shared memory.
+   `See it on Godbolt <https://godbolt.org/z/ddhzGeWPE>`__
 
-.. rubric:: Example: 1D TMA load of two buffers with barrier phase parity check (sm90+)
+   Data is loaded from the global memory pointers ``gmem1`` and ``gmem2``
+   into the shared memory buffers ``smem1`` and ``smem2``.
+   The shared memory buffers have to be aligned to 16 bytes.
+   Additionally, a single barrier with block scope is setup by a single leader thread.
+   Each thread will arrive at the barrier, so ``blockDim.x`` is passed as arrival count to ``init``.
+   This barrier is used to synchronize the asynchronous TMA copies with the rest of the threads in the block.
+   The leader initiates the TMA copies using ``ptx::cp_async_bulk``,
+   and updates the barrier's tx-count with the total number of bytes transferred by the TMA copy operations
+   while arriving at the barrier using ``cuda::device::barrier_arrive_tx``.
+   All other threads just arrive normally at the barrier.
+   All threads then wait on the barrier to complete the current phase by calling ``wait``.
+   Once ``wait`` returns, all data is available in shared memory.
 
-.. code:: cuda
+   .. rubric:: Example: 1D TMA load of two buffers with barrier phase parity check (sm90+)
 
-   #include <cuda/barrier>
-   #include <cuda/ptx>
+   .. code:: cpp
 
-   // selects a single leader thread from the block
-   __device__ bool elect_one() {
-     const unsigned int tid = threadIdx.x;
-     const unsigned int warp_id = tid / 32;
-     const unsigned int uniform_warp_id = __shfl_sync(0xFFFFFFFF, warp_id, 0); // broadcast from lane 0
-     return uniform_warp_id == 0 && cuda::ptx::elect_sync(0xFFFFFFFF); // elect a leader thread among warp 0
-   }
+      #include <cuda/barrier>
+      #include <cuda/ptx>
 
-   __global__ void example_kernel(int* gmem1, double* gmem2) {
-     constexpr int tile_size = 1024;
-     __shared__ alignas(16)    int smem1[tile_size];
-     __shared__ alignas(16) double smem2[tile_size];
+      // selects a single leader thread from the block
+      __device__ bool elect_one() {
+        const unsigned int tid = threadIdx.x;
+        const unsigned int warp_id = tid / 32;
+        const unsigned int uniform_warp_id = __shfl_sync(0xFFFFFFFF, warp_id, 0); // broadcast from lane 0
+        return uniform_warp_id == 0 && cuda::ptx::elect_sync(0xFFFFFFFF); // elect a leader thread among warp 0
+      }
 
-     #pragma nv_diag_suppress static_var_with_dynamic_init
-     __shared__  cuda::barrier<cuda::thread_scope_block> bar;
+      __global__ void example_kernel(int* gmem1, double* gmem2) {
+        constexpr int tile_size = 1024;
+        __shared__ alignas(16)    int smem1[tile_size];
+        __shared__ alignas(16) double smem2[tile_size];
 
-     // setup the barrier where only the leader thread arrives
-     if (elect_one()) {
-       init(&bar, 1);
+        #pragma nv_diag_suppress static_var_with_dynamic_init
+        __shared__  cuda::barrier<cuda::thread_scope_block> bar;
 
-       // issue two TMA bulk copy operations
-       cuda::device::memcpy_async_tx(smem1, gmem1, cuda::aligned_size_t<16>(tile_size * sizeof(int)   ), bar);
-       cuda::device::memcpy_async_tx(smem2, gmem2, cuda::aligned_size_t<16>(tile_size * sizeof(double)), bar);
+        // setup the barrier where only the leader thread arrives
+        if (elect_one()) {
+          init(&bar, 1);
 
-       // arrive and update the barrier's expect_tx with the **total** number of loaded bytes
-       (void)cuda::device::barrier_arrive_tx(bar, 1, tile_size * (sizeof(int) + sizeof(double)));
-     }
-     __syncthreads(); // need to sync so the barrier is set up when the other threads arrive and wait
+          // issue two TMA bulk copy operations
+          cuda::device::memcpy_async_tx(smem1, gmem1, cuda::aligned_size_t<16>(tile_size * sizeof(int)   ), bar);
+          cuda::device::memcpy_async_tx(smem2, gmem2, cuda::aligned_size_t<16>(tile_size * sizeof(double)), bar);
 
-     // wait for the current barrier phase to complete
-     bar.wait_parity(0);
+          // arrive and update the barrier's expect_tx with the **total** number of loaded bytes
+          (void)cuda::device::barrier_arrive_tx(bar, 1, tile_size * (sizeof(int) + sizeof(double)));
+        }
+        __syncthreads(); // need to sync so the barrier is set up when the other threads arrive and wait
 
-     // process data in smem ...
-   }
+        // wait for the current barrier phase to complete
+        bar.wait_parity(0);
 
-`See it on Godbolt <https://godbolt.org/z/oq85PoKKj>`__
+        // process data in smem ...
+      }
 
-This is similar to the above example, but this time only the leader thread arrives at the barrier.
-This has the advantage that only one leader election is necessary
-and a single uniform datapath section is generated.
-This generally generates less instructions.
-Because now we don't get an arrival token in each thread, we cannot use ``wait(token)`` with all threads.
-Instead, we just wait until the end of the barrier's current phase using ``wait_parity(0)``
-(0 is the parity of the current phase).
+   `See it on Godbolt <https://godbolt.org/z/oq85PoKKj>`__
 
-Before CCCL 3.2, ``bar.wait_parity(0);`` contained additional logic which may have lead to unnecessary instructions.
-If you are using CCCL below 3.2, you may replace this line with:
+   This is similar to the above example, but this time only the leader thread arrives at the barrier.
+   This has the advantage that only one leader election is necessary
+   and a single uniform datapath section is generated.
+   This generally generates less instructions.
+   Because now we don't get an arrival token in each thread, we cannot use ``wait(token)`` with all threads.
+   Instead, we just wait until the end of the barrier's current phase using ``wait_parity(0)``
+   (0 is the parity of the current phase).
 
-.. code:: cuda
+   Before CCCL 3.2, ``bar.wait_parity(0);`` contained additional logic which may have lead to unnecessary instructions.
+   If you are using CCCL below 3.2, you may replace this line with:
 
-   while (!cuda::ptx::mbarrier_try_wait_parity(cuda::device::barrier_native_handle(bar), 0))
-     ;
+   .. code:: cpp
 
-.. rubric:: Example: 1D TMA load and store using `cuda::device::memcpy_async_tx` (sm90+)
+      while (!cuda::ptx::mbarrier_try_wait_parity(cuda::device::barrier_native_handle(bar), 0))
+        ;
 
-This example can be found in :ref:`libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx-example`.
+   .. rubric:: Example: 1D TMA load and store using `cuda::device::memcpy_async_tx` (sm90+)
+
+   This example can be found in :ref:`libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx-example`.
 
 
-.. rubric:: Example: 1D TMA load and store using `cuda::memcpy_async` (sm90+)
+   .. rubric:: Example: 1D TMA load and store using `cuda::memcpy_async` (sm90+)
 
-This example can be found in the
-`CUDA programming guide <https://docs.nvidia.com/cuda/cuda-c-programming-guide/#using-tma-to-transfer-one-dimensional-arrays>`__.
+   This example can be found in the
+   `CUDA programming guide <https://docs.nvidia.com/cuda/cuda-c-programming-guide/#using-tma-to-transfer-one-dimensional-arrays>`__.

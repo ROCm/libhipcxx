@@ -22,16 +22,15 @@
     SOFTWARE.
 
 .. meta::
-  :description: Overview of the libhipcxx functional extended API, including maximum, minimum, proclaim_return_type, proclaim_copyable_arguments, and get_device_address utilities.
-  :keywords: libhipcxx, ROCm, HIP, C++, functional, maximum, minimum, proclaim_return_type, get_device_address
-
+  :description: Overview of the libhipcxx functional extended API for HIP, including always_true, always_false, maximum, minimum, proclaim_return_type, proclaim_copyable_arguments, get_device_address, and operator property traits.
+  :keywords: libhipcxx, ROCm, HIP, C++, functional, maximum, minimum, proclaim_return_type, get_device_address, operator properties
 
 .. _libcudacxx-extended-api-functional:
 
 Functional
 ----------
 
-This page covers the functional extended API, including utilities for maximum and minimum computation, return-type proclamation, and obtaining device addresses.
+This page covers the functional extended API, including function objects that always return ``true`` or ``false``, utilities for maximum and minimum computation, return-type proclamation, obtaining device addresses, and operator property traits.
 
 .. toctree::
    :hidden:
@@ -43,21 +42,20 @@ This page covers the functional extended API, including utilities for maximum an
    functional/operator_properties
 
 .. list-table::
-   :widths: 25 45 30 30
+   :widths: 25 45 30
    :header-rows: 1
 
    * - **Header**
      - **Content**
-     - **CCCL Availability**
-     - **CUDA Toolkit Availability**
+     - **Since**
 
    * - :ref:`cuda::always_true <libcudacxx-extended-api-functional-always-true-false>`
      - Function object that always returns ``true``
-     - CCCL 3.4.0
+     - libhipcxx 3.4
 
    * - :ref:`cuda::always_false <libcudacxx-extended-api-functional-always-true-false>`
      - Function object that always returns ``false``
-     - CCCL 3.4.0
+     - libhipcxx 3.4
 
    * - :ref:`cuda::maximum <libcudacxx-extended-api-functional-maximum-minimum>`
      - Returns the maximum of two values
@@ -77,10 +75,8 @@ This page covers the functional extended API, including utilities for maximum an
 
    * - :ref:`cuda::get_device_address <libcudacxx-extended-api-memory-get-device-address>`
      - Returns a valid address to a device object
-     - CCCL 2.8.0
-     - CUDA 12.9
+     - libhipcxx 3.0
 
    * - :ref:`cuda::is_associative_v <libcudacxx-extended-api-functional-operator-properties>`, :ref:`cuda::is_commutative_v <libcudacxx-extended-api-functional-operator-properties>`, :ref:`cuda::identity_element() <libcudacxx-extended-api-functional-operator-properties>`, :ref:`cuda::absorbing_element() <libcudacxx-extended-api-functional-operator-properties>`
      - Determines if an operator is associative for a type
-     - CCCL 3.3.0
-     - CUDA 13.3
+     - libhipcxx 3.4

@@ -28,7 +28,7 @@
 .. _libcudacxx-standard-api-container-span:
 
 ``<cuda/std/span>``
-==================
+===================
 
 This page documents ``cuda::std::span`` in libhipcxx, a non-owning view over a contiguous sequence of objects with full constexpr support from C++14 onwards.
 

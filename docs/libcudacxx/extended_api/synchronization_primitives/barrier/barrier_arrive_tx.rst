@@ -35,7 +35,7 @@ This page documents ``cuda::device::barrier_arrive_tx``, which arrives at a shar
 
 Defined in header ``<cuda/barrier>``:
 
-.. code:: cuda
+.. code:: cpp
 
    __device__
    cuda::barrier<cuda::thread_scope_block>::arrival_token
@@ -67,7 +67,10 @@ Effects
 Notes
 -----
 
-This function can only be used under CUDA Compute Capability 9.0 (Hopper) or higher.
+..
+   NVIDIA-specific (compute capability), not applicable to AMD GPUs.
+
+   This function can only be used under CUDA Compute Capability 9.0 (Hopper) or higher.
 
 To check if ``cuda::device::barrier_arrive_tx`` is available, use the ``__cccl_lib_local_barrier_arrive_tx``
 feature flag, as shown in the example code below.
@@ -83,7 +86,7 @@ Example
 The example below shows only ``cuda::device::barrier_arrive_tx``. A more extensive example can be found in the
 :ref:`cuda::device::memcpy_async_tx <libcudacxx-extended-api-asynchronous-operations-memcpy-async-tx>` documentation.
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
    #include <cuda/std/utility> // cuda::std::move
