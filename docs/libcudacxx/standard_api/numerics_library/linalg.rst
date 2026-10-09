@@ -28,7 +28,7 @@
 .. _libcudacxx-standard-api-numerics-linalg:
 
 ``<cuda/std/linalg>``
-====================
+=====================
 
 This page documents ``cuda::std::linalg`` in libhipcxx, providing linear algebra utilities including scaled, conjugated, and transposed accessors and views.
 

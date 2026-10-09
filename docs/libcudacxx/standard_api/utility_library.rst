@@ -58,13 +58,13 @@ the information about the individual features for details.
      - Availability
    * - :ref:`libcudacxx-standard-api-utility-bitset`
      - Fixed-size sequence of bits
-     - libhipcxx 2.7
+     - libhipcxx 3.0
    * - :ref:`libcudacxx-standard-api-utility-expected`
      - Optional value with error channel
      - libhipcxx 2.7
    * - :ref:`libcudacxx-standard-api-utility-functional`
      - Function objects and function wrappers
-     - libhipcxx 2.7
+     - libhipcxx 3.0
    * - :ref:`libcudacxx-standard-api-utility-memory`
      - Low-level memory management utilities
      - libhipcxx 2.7

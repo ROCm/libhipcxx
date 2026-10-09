@@ -49,16 +49,19 @@ Concurrency Restrictions
 An object of type ``cuda::latch`` or `cuda::std::latch <https://en.cppreference.com/w/cpp/thread/latch>`_ shall not
 be accessed concurrently by CPU and GPU threads unless:
 
-- it is in unified memory and the `concurrentManagedAccess property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_116f9619ccc85e93bc456b8c69c80e78b>`_
+- it is in unified memory and the `concurrentManagedAccess property <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`_
   is 1, or
-- it is in CPU memory and the `hostNativeAtomicSupported property <https://docs.nvidia.com/cuda/cuda-runtime-api/structcudaDeviceProp.html#structcudaDeviceProp_1ef82fd7d1d0413c7d6f33287e5b6306f>`_
+- it is in CPU memory and the `hostNativeAtomicSupported property <https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___global_defs.html#structhip_device_prop__t>`_
   is 1.
 
 Note: for objects of scopes other than ``cuda::thread_scope_system``, this is a data race, and is therefore also prohibited
 regardless of memory characteristics.
 
-Under CUDA Compute Capability 6 (Pascal) or prior, an object of type ``cuda::latch`` or
-`cuda::std::latch <https://en.cppreference.com/w/cpp/thread/latch>`_ may not be used.
+..
+   NVIDIA-specific (compute capability), not applicable to AMD GPUs.
+
+   Under CUDA Compute Capability 6 (Pascal) or prior, an object of type ``cuda::latch`` or
+   `cuda::std::latch <https://en.cppreference.com/w/cpp/thread/latch>`_ may not be used.
 
 Implementation-Defined Behavior
 -------------------------------
@@ -78,7 +81,7 @@ For each :ref:`cuda::thread_scope <libcudacxx-extended-api-memory-model-thread-s
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/latch>
 

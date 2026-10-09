@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documents cuda::std::numeric in libhipcxx, providing constexpr numeric algorithms available from C++11 onwards, with notes on omitted parallel algorithms and saturation arithmetic.
-  :keywords: libhipcxx, ROCm, HIP, C++, numeric algorithms, constexpr, nodiscard, saturation
+  :description: Documents cuda::std::numeric in libhipcxx, providing constexpr numeric algorithms available from C++11 onwards, with notes on omitted parallel algorithms.
+  :keywords: libhipcxx, ROCm, HIP, C++, numeric algorithms, constexpr, nodiscard, parallel algorithms
 
 .. _libcudacxx-standard-api-numerics-numeric:
 
@@ -45,26 +45,27 @@ Extensions
 - Algorithms that return a value and not an iterator have been marked ``[[nodiscard]]``.
 
 
-Parallel standard algorithms
-----------------------------
+..
+   Parallel algorithms are not yet supported in libhipcxx.
 
-CCCL provides an implementation for the standard `parallel algorithms library <http://www.eel.is/c++draft/algorithms.parallel>`_
+   Parallel standard algorithms
+   ----------------------------
 
-Currently the CUDA backend is the only supported backend. It can be selected by passing the `cuda::execution::gpu`
-execution policy to one of the supported algorithms. The CUDA backend requires the passed in sequences to reside in
-device accessible memory and the iterators into those sequences to be at least random access iterators. The CUDA backend
-is enabled if the program is compiled with a CUDA compiler in CUDA mode.
+   CCCL provides an implementation for the standard `parallel algorithms library <http://www.eel.is/c++draft/algorithms.parallel>`_
 
-The use of any other execution policy is currently not supported and results in a compile time error.
+   Currently the CUDA backend is the only supported backend. It can be selected by passing the `cuda::execution::gpu`
+   execution policy to one of the supported algorithms. The CUDA backend requires the passed in sequences to reside in
+   device accessible memory and the iterators into those sequences to be at least random access iterators. The CUDA backend
+   is enabled if the program is compiled with a CUDA compiler in CUDA mode.
 
-The following algorithms are supported:
+   The use of any other execution policy is currently not supported and results in a compile time error.
 
-  * ``adjacent_difference``
-  * ``exclusive_scan``
-  * ``inclusive_scan``
-  * ``transform_exclusive_scan``
-  * ``transform_inclusive_scan``
-  * ``reduce``
-  * ``transform_reduce``
+   The following algorithms are supported:
 
-The current implementation status is tracked in this `Github Issue <https://github.com/NVIDIA/cccl/issues/5592>`_
+     * ``adjacent_difference``
+     * ``exclusive_scan``
+     * ``inclusive_scan``
+     * ``transform_exclusive_scan``
+     * ``transform_inclusive_scan``
+     * ``reduce``
+     * ``transform_reduce``

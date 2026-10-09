@@ -28,7 +28,7 @@
 .. _libcudacxx-standard-api-container-mdspan:
 
 ``<cuda/std/mdspan>``
-====================
+=====================
 
 This page documents ``cuda::std::mdspan`` in libhipcxx, a multidimensional span for non-owning views of contiguous data with C++17 availability and C++26 backports.
 

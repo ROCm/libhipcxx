@@ -55,7 +55,7 @@ This page covers the math extended API, providing integer arithmetic utilities i
 
    * - **Header**
      - **Content**
-     - **libhipcxx Availability**
+     - **Since**
 
    * - :ref:`ceil_div <libcudacxx-extended-api-math-ceil-div>`
      - Ceiling division
@@ -63,13 +63,11 @@ This page covers the math extended API, providing integer arithmetic utilities i
 
    * - :ref:`round_up <libcudacxx-extended-api-math-round-up>`
      - Round up to the next multiple
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
 
    * - :ref:`round_down <libcudacxx-extended-api-math-round-down>`
      - Round down to the previous multiple
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
 
    * - :ref:`ilog2 <libcudacxx-extended-api-math-ilog>`
      - Integer logarithm to the base 2
@@ -77,55 +75,44 @@ This page covers the math extended API, providing integer arithmetic utilities i
 
    * - :ref:`ilog10 <libcudacxx-extended-api-math-ilog>`
      - Integer logarithm to the base 10
-     - CCCL 3.0.0
-     - CUDA 13.0
+     - libhipcxx 3.0
 
    * - :ref:`ipow <libcudacxx-extended-api-math-ipow>`
      - Integer power
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`is_power_of_two <libcudacxx-extended-api-math-pow2>`
      - If the value is a power of two
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`isqrt <libcudacxx-extended-api-math-isqrt>`
      - Integer square root
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`neg <libcudacxx-extended-api-math-neg>`
      - Integer negation
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`next_power_of_two <libcudacxx-extended-api-math-pow2>`
      - Next power of two
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`prev_power_of_two <libcudacxx-extended-api-math-pow2>`
      - Previous power of two
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`uabs <libcudacxx-extended-api-math-uabs>`
      - Unsigned absolute value
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`fast_mod_div <libcudacxx-extended-api-math-fast-mod-div>`
      - Fast Modulo/Division
-     - CCCL 3.1.0
-     - CUDA 13.1
+     - libhipcxx 3.4
 
    * - :ref:`mul_hi <libcudacxx-extended-api-math-mul-hi>`
      - Most significant half of the product
-     - CCCL 3.2.0
-     - CUDA 13.2
+     - libhipcxx 3.4
 
    * - :ref:`sincos <libcudacxx-extended-api-math-sincos>`
      - Computes sine and cosine of a value at the same time.
-     - CCCL 3.3.0
-     - CUDA 13.3
+     - libhipcxx 3.4

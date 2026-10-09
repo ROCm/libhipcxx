@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::bitfield_extract, which extracts a bitfield from an unsigned integer value and returns it in the lower bits in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, bitfield_extract, bit manipulation, unsigned integer, BFE
+  :keywords: libhipcxx, ROCm, HIP, C++, bitfield_extract, bit manipulation, unsigned integer, bit field
 
 .. _libcudacxx-extended-api-bit-bitfield_extract:
 
@@ -34,7 +34,7 @@ This page documents ``cuda::bitfield_extract``, which extracts a bitfield of a s
 
 Defined in the ``<cuda/bit>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -72,8 +72,8 @@ The function extracts a bitfield from a value and returns it in the lower bits.
 ..
    The function performs the following operations in CUDA for ``uint8_t``, ``uint16_t``, ``uint32_t``:
 
-- ``SM < 70``: ``BFE``.
-- ``SM >= 70``: ``BMSK``, bitwise operation x2.
+   - ``SM < 70``: ``BFE``.
+   - ``SM >= 70``: ``BMSK``, bitwise operation x2.
 
 .. note::
 
@@ -82,12 +82,12 @@ The function extracts a bitfield from a value and returns it in the lower bits.
 ..
    .. note::
 
-   GCC <= 8 uses a slow path with more instructions even in CUDA.
+      GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/bit>
     #include <cuda/std/cassert>
@@ -99,8 +99,9 @@ Example
 
     int main() {
         bitfield_extract_kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/ofGnbsxW5>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/ofGnbsxW5>`__

@@ -90,8 +90,9 @@ The following APIs from libcudacxx are **not** supported in libhipcxx:
       ``cuda::discard_memory`` has no effect on AMD GPUs.
   * - Extended Warp Library
     - ``<cuda/warp>``
-    - Warp shuffle functions. The header is available, but ``cuda::device::warp_shuffle_*`` are
-      only compiled for NVIDIA PTX targets.
+    - Warp shuffle, match and lane-mask functions. The header is available, but
+      ``cuda::device::warp_shuffle_*``, ``cuda::device::warp_match_all`` and ``cuda::device::lane_mask``
+      are only compiled for NVIDIA PTX targets.
   * - Extended Work Stealing Library
     - ``<cuda/work_stealing>``
     - ``cuda::for_each_canceled_block`` for cancelling and stealing thread blocks. On AMD GPUs it
@@ -101,6 +102,13 @@ The following APIs from libcudacxx are **not** supported in libhipcxx:
     - Hardware-specific device functions including warp shuffles, barrier operations with
       transaction counts, and async memory operations. These require NVIDIA PTX instructions
       and SM-specific hardware features not available on AMD GPUs.
+  * - Extended TMA Library
+    - ``<cuda/tma>``
+    - ``cuda::make_tma_descriptor`` creates descriptors for the NVIDIA Tensor Memory Accelerator.
+  * - Parallel Algorithms
+    - ``<cuda/std/algorithm>``, ``<cuda/std/numeric>``
+    - Overloads of the standard algorithms that take an execution policy such as
+      ``cuda::execution::gpu``.
   * - PTX API
     - ``<cuda/ptx>``
     - The ``cuda::ptx`` namespace contains functions that map to NVIDIA PTX instructions.

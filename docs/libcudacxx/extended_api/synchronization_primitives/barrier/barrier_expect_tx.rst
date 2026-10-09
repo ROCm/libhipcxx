@@ -34,7 +34,7 @@ This page documents ``cuda::device::barrier_expect_tx``, which increments the ex
 
 Defined in header ``<cuda/barrier>``:
 
-.. code:: cuda
+.. code:: cpp
 
    __device__
    void cuda::device::barrier_expect_tx(
@@ -55,15 +55,18 @@ Effects
 -  This function increments the expected transaction count by ``transaction_count_update``.
 -  This function executes atomically.
 
-Notes
------
+..
+   NVIDIA-specific (compute capability), not applicable to AMD GPUs.
 
-This function can only be used under CUDA Compute Capability 9.0 (Hopper) or higher.
+   Notes
+   -----
+
+   This function can only be used under CUDA Compute Capability 9.0 (Hopper) or higher.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
    #include <cuda/std/utility> // cuda::std::move

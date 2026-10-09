@@ -147,7 +147,7 @@ The implementation may assume that any device thread will eventually do one of t
     The following examples refer to the itemized sub-clauses of the implementation assumptions for host and device threads above
     using "host.threads.<id>" and "device.threads.<id>", respectively.
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.Device.0
@@ -160,7 +160,7 @@ The implementation may assume that any device thread will eventually do one of t
             }
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.Device.1
@@ -169,7 +169,7 @@ The implementation may assume that any device thread will eventually do one of t
             while(true) cuda::std::this_thread::yield();
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.Device.2
@@ -180,7 +180,7 @@ The implementation may assume that any device thread will eventually do one of t
             while(True);
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.Device.3
@@ -191,7 +191,7 @@ The implementation may assume that any device thread will eventually do one of t
             while(True.load());
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.Device.4
@@ -230,13 +230,13 @@ return ``hipErrorNotReady`` without a device thread making progress.
    .. dropdown:: Examples of CUDA API forward progress guarantees.
 .. dropdown:: Examples of HIP API forward progress guarantees.
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.API.1
         // Outcome: if no other device threads (e.g., from other processes) are making progress,
         // this program terminates and returns hipSuccess.
-        // Rationale: CUDA guarantees that if the device is empty:
+        // Rationale: HIP guarantees that if the device is empty:
         // - `hipDeviceSynchronize` eventually ensures that at least one device-thread makes progress, which implies that eventually `hello_world` grid and one of its device-threads start.
         // - All thread-block threads eventually start (due to "if a device thread makes progress, all other threads in its thread-block cluster eventually make progress").
         // - Once all threads in thread-block arrive at `__syncthreads` barrier, all waiting threads are unblocked.
@@ -248,13 +248,13 @@ return ``hipErrorNotReady`` without a device thread making progress.
             return (int)hipDeviceSynchronize();
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.API.2
         // Allowed outcome: eventually, no thread makes progress.
         // Rationale: the `hipDeviceSynchronize` API below is only called if a device thread eventually makes progress and sets the flag.
-        // However, CUDA only guarantees that `producer` device thread eventually starts if the synchronization API is called.
+        // However, HIP only guarantees that `producer` device thread eventually starts if the synchronization API is called.
         // Therefore, the host thread may never be unblocked from the flag spin-loop.
         cuda::atomic<int, cuda::thread_scope_system> flag = 0;
         __global__ void producer() { flag.store(1); }
@@ -265,7 +265,7 @@ return ``hipErrorNotReady`` without a device thread making progress.
             return hipDeviceSynchronize();
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.API.3
@@ -282,7 +282,7 @@ return ``hipErrorNotReady`` without a device thread making progress.
             return hipDeviceSynchronize();
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.API.4
@@ -317,12 +317,12 @@ A device thread shall not start until all its dependencies have completed.
    .. dropdown:: Examples of CUDA API forward progress guarantees due to dependencies
 .. dropdown:: Examples of HIP API forward progress guarantees due to dependencies
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.Stream.0
         // Allowed outcome: eventually, no thread makes progress.
-        // Rationale: while CUDA guarantees that one device thread makes progress, since there
+        // Rationale: while HIP guarantees that one device thread makes progress, since there
         // is no dependency between `first` and `second`, it does not guarantee which thread,
         // and therefore it could always pick the device thread from `second`, which then never
         // unblocks from the spin-loop.
@@ -340,13 +340,13 @@ A device thread shall not start until all its dependencies have completed.
             return hipDeviceSynchronize();
         }
 
-    .. code-block:: cuda
+    .. code-block:: cpp
         :linenos:
 
         // Example: Execution.Model.Stream.1
         // Outcome: terminates.
         // Rationale: same as Execution.Model.Stream.0, but this example has a stream dependency
-        // between first and second, which requires CUDA to run the grids in order.
+        // between first and second, which requires HIP to run the grids in order.
         cuda::atomic<int, cuda::thread_scope_system> flag = 0;
         __global__ void first() { flag.store(1, cuda::memory_order_relaxed); }
         __global__ void second() { while(flag.load(cuda::memory_order_relaxed) == 0) {} }

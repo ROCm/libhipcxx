@@ -47,7 +47,7 @@ This page covers the bit-manipulation extended API, providing utilities for bitm
 
    * - **Header**
      - **Content**
-     - **libhipcxx Availability**
+     - **Since**
 
    * - :ref:`bitmask <libcudacxx-extended-api-bit-bitmask>`
      - Generate a bitmask

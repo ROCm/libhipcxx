@@ -34,7 +34,7 @@ This page documents ``cuda::pipeline_role``, an enumeration that specifies wheth
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    enum class pipeline_role : /* unspecified */ {
      producer,

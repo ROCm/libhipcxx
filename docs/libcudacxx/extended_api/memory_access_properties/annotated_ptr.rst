@@ -36,7 +36,7 @@ Defined in header ``<cuda/annotated_ptr>``.
 
 ``cuda::annotated_ptr`` is a pointer annotated with an access property that *may* be applied to its memory operations.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -162,7 +162,7 @@ Constructors and Assignment
 Default constructor
 ~~~~~~~~~~~~~~~~~~~
 
-.. code:: cuda
+.. code:: cpp
 
    annotated_ptr() noexcept = default;
 
@@ -171,7 +171,7 @@ Default constructor
 Constructor from pointer
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: cuda
+.. code:: cpp
 
    constexpr explicit annotated_ptr(pointer ptr);
 
@@ -189,7 +189,7 @@ Constructs an ``annotated_ptr`` requesting association of ``ptr`` with ``Propert
 Constructor from pointer and access property
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename RuntimeProperty>
    annotated_ptr(pointer ptr, RuntimeProperty prop);
@@ -211,7 +211,7 @@ Constructs an ``annotated_ptr`` requesting the association of ``ptr`` with the p
 Copy Constructor from a different ``annotated_ptr``
 ----------------------------------------------------
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename T, typename P>
    constexpr annotated_ptr(const annotated_ptr<T, P>& a);
@@ -231,7 +231,7 @@ Constructs an ``annotated_ptr`` for the same pointer as the input ``annotated_pt
 Explicit conversion operator to ``bool``
 ----------------------------------------
 
-.. code:: cuda
+.. code:: cpp
 
    constexpr operator bool() const noexcept;
 
@@ -240,7 +240,7 @@ Explicit conversion operator to ``bool``
 Raw pointer access
 ------------------
 
-.. code:: cuda
+.. code:: cpp
 
    pointer get() const noexcept;
 
@@ -252,7 +252,7 @@ Operators
 Dereference
 ~~~~~~~~~~~
 
-.. code:: cuda
+.. code:: cpp
 
    reference operator*() const noexcept;
 
@@ -265,7 +265,7 @@ The underlying pointer is not null.
 Pointer-to-member
 ~~~~~~~~~~~~~~~~~
 
-.. code:: cuda
+.. code:: cpp
 
    pointer operator->() const noexcept;
 
@@ -278,7 +278,7 @@ Pointer-to-member
 Subscript
 ~~~~~~~~~
 
-.. code:: cuda
+.. code:: cpp
 
    reference operator[](ptrdiff_t i) const noexcept;
 
@@ -291,7 +291,7 @@ Subscript
 Pointer distance
 ~~~~~~~~~~~~~~~~
 
-.. code:: cuda
+.. code:: cpp
 
    constexpr difference_type operator-(annotated_ptr p) const;
 
@@ -308,7 +308,7 @@ Example
 
 Given three input and output vectors ``x``, ``y``, and ``z``, and two arrays of coefficients ``a`` and ``b``, all of length ``N``:
 
-.. code:: cuda
+.. code:: cpp
 
     size_t N;
     int* x, *y, *z;
@@ -316,7 +316,7 @@ Given three input and output vectors ``x``, ``y``, and ``z``, and two arrays of 
 
 the grid-strided kernel:
 
-.. code:: cuda
+.. code:: cpp
 
     __global__ void update(const int* x, const int* a, const int* b, size_t N) {
         auto g = cooperative_groups::this_grid();
@@ -327,7 +327,7 @@ the grid-strided kernel:
 
 updates ``x``, ``y``, and ``z`` as follows:
 
-.. code:: cuda
+.. code:: cpp
 
    update<<<grid, block>>>(x, a, b, N);
    update<<<grid, block>>>(y, a, b, N);
@@ -337,7 +337,7 @@ The elements of ``a`` and ``b`` are used in all kernels. If ``N`` is large enoug
 
 We can make the ``update`` kernel generic to allow the caller to pass ``cuda::annotated_ptr`` objects that hint at how memory will be accessed:
 
-.. code:: cuda
+.. code:: cpp
 
     template <typename PointerX, typename PointerA, typename PointerB>
     __global__ void update_template(PointerX x, PointerA a, PointerB b, size_t N) {
@@ -349,7 +349,7 @@ We can make the ``update`` kernel generic to allow the caller to pass ``cuda::an
 
 With ``cuda::annotated_ptr``, the caller can then specify the temporal locality of the memory accesses:
 
-.. code:: cuda
+.. code:: cpp
 
    // Frequent accesses to "a" and "b"; infrequent accesses to "x" and "y":
    cuda::annotated_ptr<const int, cuda::access_property::persisting> a_persistent{a}, b_persistent{b};

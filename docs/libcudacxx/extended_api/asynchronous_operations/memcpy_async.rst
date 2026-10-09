@@ -35,7 +35,7 @@ This page documents ``cuda::memcpy_async``, which asynchronously copies a memory
 
 Defined in header ``<cuda/barrier>``:
 
-.. code:: cuda
+.. code:: cpp
 
    // (1)
    template <typename Shape, cuda::thread_scope Scope, typename CompletionFunction>
@@ -53,7 +53,7 @@ Defined in header ``<cuda/barrier>``:
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    // (3)
    template <typename Shape, cuda::thread_scope Scope>
@@ -70,7 +70,7 @@ Defined in header ``<cuda/pipeline>``:
 
 Defined in header ``<cuda/annotated_ptr>``:
 
-.. code:: cuda
+.. code:: cpp
 
    // (5)
    template <typename Dst, typename Src, typename SrcProperty, typename Shape, typename Sync>
@@ -124,11 +124,11 @@ namely:
 
 Additionally:
 
-- If *Shape* is :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-aligned-size>`, ``source``
+- If *Shape* is ``cuda::aligned_size_t``, ``source``
   and ``destination`` are both required to be aligned on ``cuda::aligned_size_t::align``, else the behavior is
   undefined.
 - If ``cuda::pipeline`` is in a *quitted state*
-  (see :ref:`cuda::pipeline::quit <libcudacxx-extended-api-synchronization-pipeline-pipeline-quit>`),
+  (see ``cuda::pipeline::quit``),
   the behavior is undefined.
 - For cooperative overloads (with a group parameter),
   if the parameters are not the same across all threads in ``group``,
@@ -152,7 +152,7 @@ Template Parameters
      - A type satisfying the [*Group*] concept.
    * - ``Shape``
      - Either `cuda::std::size_t <https://en.cppreference.com/w/c/types/size_t>`_
-       or :ref:`cuda::aligned_size_t <libcudacxx-extended-api-memory-aligned-size>`.
+       or ``cuda::aligned_size_t``.
 
 Parameters
 ----------
@@ -177,41 +177,42 @@ Parameters
 Related traits
 --------------
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename Group>
    constexpr inline bool is_thread_block_group_v;
 
-This trait is ``true`` if ``Group`` represents the full CUDA thread block.
+This trait is ``true`` if ``Group`` represents the full thread block.
 For example, ``cooperative_groups::thread_block`` satisfies this trait.
 Users are encouraged to specialize this trait for their own groups.
 
-.. code:: cuda
+.. code:: cpp
 
    template <typename Group>
    constexpr inline bool is_warp_group_v = false;
 
-This trait is ``true`` if ``Group`` represents a full CUDA warp.
+This trait is ``true`` if ``Group`` represents a full warp.
 For example, ``cooperative_groups::thread_block_tile<32, ...>`` satisfies this trait.
 Users are encouraged to specialize this trait for their own groups.
 
-Implementation notes
---------------------
+..
+   Implementation notes
+   --------------------
 
-On Hopper+ GPUs, the overloads taking a barrier may use the Tensor Memory Accelerator (TMA)
-via the ``cp.async.bulk`` instruction to perform the copy if:
-- the barrier resides in shared memory,
-- the data is aligned to 16 bytes,
-- the source is global memory,
-- the destination is shared memory.
-Additionally, the cooperative overload (taking a group) can generate more efficient code
-if the group satisfies the trait ``cuda::is_thread_block_group_v`` or ``cuda::is_warp_group_v``.
-In those cases, a uniform data path is generated for the bulk copy and thread peeling is avoided.
+   On Hopper+ GPUs, the overloads taking a barrier may use the Tensor Memory Accelerator (TMA)
+   via the ``cp.async.bulk`` instruction to perform the copy if:
+   - the barrier resides in shared memory,
+   - the data is aligned to 16 bytes,
+   - the source is global memory,
+   - the destination is shared memory.
+   Additionally, the cooperative overload (taking a group) can generate more efficient code
+   if the group satisfies the trait ``cuda::is_thread_block_group_v`` or ``cuda::is_warp_group_v``.
+   In those cases, a uniform data path is generated for the bulk copy and thread peeling is avoided.
 
-On Ampere+ GPUs, the ``cp.async`` instruction may be used to perform the copy if:
-- the data is aligned to at least 4 bytes,
-- the source is global memory,
-- the destination is shared memory.
+   On Ampere+ GPUs, the ``cp.async`` instruction may be used to perform the copy if:
+   - the data is aligned to at least 4 bytes,
+   - the source is global memory,
+   - the destination is shared memory.
 
 
 Examples
@@ -219,7 +220,7 @@ Examples
 
 .. rubric:: Example: Using a system-wide barrier to copy within global memory
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
 
@@ -235,11 +236,12 @@ Examples
      bar.arrive_and_wait();
    }
 
-`See it on Godbolt <https://godbolt.org/z/od6q9s8fq>`_
+..
+   `See it on Godbolt <https://godbolt.org/z/od6q9s8fq>`_
 
 .. rubric:: Example: 1D load of two buffers from global to shared memory with a barrier
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/barrier>
 
@@ -271,7 +273,7 @@ Examples
 There are multiple possibilities to initialize the ``group`` variable.
 One option is to use the cooperative groups API:
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cooperative_groups.h>
     auto group = cooperative_groups::this_thread_block();
@@ -279,7 +281,7 @@ One option is to use the cooperative groups API:
 Another option, especially if the dimensionality of the thread block is known, e.g. 1D,
 a custom group can be defined like:
 
-.. code:: cuda
+.. code:: cpp
 
    struct this_thread_block_1D {
      static constexpr cuda::thread_scope thread_scope = cuda::thread_scope_block;
@@ -302,7 +304,10 @@ a custom group can be defined like:
 
 Such a group will emit the least amount of code when used with ``cuda::memcpy_async``,
 since the ``thread_rank()`` is easily computed (because the block is 1D)
-and we declared the group as representing the whole thread block,
-which allows emit a uniform data path on Hopper+ GPUs in certain conditions.
+and we declared the group as representing the whole thread block.
 
-`See it on Godbolt <https://godbolt.org/z/aM9cbabcW>`__
+..
+   On NVIDIA GPUs, this also allows emitting a uniform data path on Hopper+ GPUs in certain conditions.
+
+..
+   `See it on Godbolt <https://godbolt.org/z/aM9cbabcW>`__

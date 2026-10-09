@@ -34,7 +34,7 @@ This page documents the ``cuda::pipeline`` destructor, which calls quit if not a
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope>
    __host__ __device__

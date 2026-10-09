@@ -22,15 +22,15 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documents the numerics library headers available in libhipcxx, including bit manipulation, complex numbers, linear algebra, numeric constants, and numeric algorithms.
-  :keywords: libhipcxx, ROCm, HIP, C++, numerics, bit, complex, linalg, numbers, numeric
+  :description: Documents the numerics library headers available in libhipcxx, including bit manipulation, complex numbers, linear algebra, numeric constants, numeric algorithms, and random number generation.
+  :keywords: libhipcxx, ROCm, HIP, C++, numerics, bit, complex, linalg, numbers, numeric, random
 
 .. _libcudacxx-standard-api-numerics:
 
 Numerics Library
 ================
 
-This page covers the numerics library headers available in libhipcxx, including bit manipulation, complex numbers, linear algebra, numeric constants, and numeric algorithms.
+This page covers the numerics library headers available in libhipcxx, including bit manipulation, complex numbers, linear algebra, numeric constants, numeric algorithms, and random number generation.
 
 .. toctree::
    :hidden:
@@ -86,6 +86,5 @@ Any Standard C++ header not listed below is omitted.
 
    * - :ref:`\<cuda/std/random\> <libcudacxx-standard-api-numerics-random>`
      - Random number generation
-     - CCCL 3.3.0
-     - CUDA 13.3
+     - libhipcxx 3.4
      - `\<random\> <https://en.cppreference.com/w/cpp/header/random>`_

@@ -23,7 +23,7 @@
 
 .. meta::
   :description: API reference for cuda::bitfield_insert, which inserts a bitfield from one unsigned integer value into another at a specified position in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, bitfield_insert, bit manipulation, unsigned integer, BFI
+  :keywords: libhipcxx, ROCm, HIP, C++, bitfield_insert, bit manipulation, unsigned integer, bit field
 
 .. _libcudacxx-extended-api-bit-bitfield_insert:
 
@@ -34,7 +34,7 @@ This page documents ``cuda::bitfield_insert``, which inserts the lower bits of a
 
 Defined in the ``<cuda/bit>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -72,8 +72,8 @@ The function extracts the lower bitfield of size ``width`` from ``source`` and i
 ..
    The function performs the following operations in CUDA for ``uint8_t``, ``uint16_t``, ``uint32_t``:
 
-- ``SM < 70``: ``BFI``.
-- ``SM >= 70``: ``BMSK``, bitwise operation x5.
+   - ``SM < 70``: ``BFI``.
+   - ``SM >= 70``: ``BMSK``, bitwise operation x5.
 
 .. note::
 
@@ -82,12 +82,12 @@ The function extracts the lower bitfield of size ``width`` from ``source`` and i
 ..
    .. note::
 
-   GCC <= 8 uses a slow path with more instructions even in CUDA.
+      GCC <= 8 uses a slow path with more instructions even in CUDA.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/bit>
     #include <cuda/std/cassert>
@@ -104,4 +104,5 @@ Example
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/4Thzz516M>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/4Thzz516M>`__

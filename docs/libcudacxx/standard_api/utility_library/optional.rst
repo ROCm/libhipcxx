@@ -22,7 +22,7 @@
     SOFTWARE.
 
 .. meta::
-  :description: Documents cuda::std::optional in libhipcxx, an optional value type available from C++14 with constexpr support and an optional reference extension via CCCL_ENABLE_OPTIONAL_REF.
+  :description: Documents cuda::std::optional in libhipcxx, an optional value type available from C++14, with constexpr support and support for optional references.
   :keywords: libhipcxx, ROCm, HIP, C++, optional, constexpr, value type, optional reference
 
 .. _libcudacxx-standard-api-utility-optional:

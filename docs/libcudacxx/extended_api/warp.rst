@@ -32,45 +32,50 @@ Warp
 
 This page covers the warp extended API, providing generalized warp shuffle operations for exchanging data of arbitrary size between threads within a warp.
 
-.. toctree::
-   :hidden:
-   :maxdepth: 1
+The warp extended API is not supported in libhipcxx. See :ref:`libhipcxx-limitations`.
 
-   warp/warp_shuffle
-   warp/warp_match_all
-   warp/lane_mask
+..
+   Not supported in libhipcxx, see reference/libhipcxx-limitations.rst. The pages are
+   also listed in exclude_patterns in docs/conf.py. The warp shuffle functions,
+   cuda::device::warp_match_all and cuda::device::lane_mask in <cuda/warp> are only
+   compiled for NVIDIA PTX targets.
 
-.. list-table::
-   :widths: 25 45 30
-   :header-rows: 1
+   .. toctree::
+      :hidden:
+      :maxdepth: 1
 
-   * - **Header**
-     - **Content**
-     - **libhipcxx Availability**
+      warp/warp_shuffle
+      warp/warp_match_all
+      warp/lane_mask
 
-   * - :ref:`warp_shuffle_idx <libcudacxx-extended-api-warp-warp-shuffle>`
-     - Warp shuffle from a specific lane
-     - libhipcxx 3.0
+   .. list-table::
+      :widths: 25 45 30
+      :header-rows: 1
 
-   * - :ref:`warp_shuffle_up <libcudacxx-extended-api-warp-warp-shuffle>`
-     - Warp shuffle from original lane index - delta
-     - libhipcxx 3.0
+      * - **Header**
+        - **Content**
+        - **libhipcxx Availability**
 
-   * - :ref:`warp_shuffle_down <libcudacxx-extended-api-warp-warp-shuffle>`
-     - Warp shuffle from original lane index + delta
-     - libhipcxx 3.0
+      * - :ref:`warp_shuffle_idx <libcudacxx-extended-api-warp-warp-shuffle>`
+        - Warp shuffle from a specific lane
+        - libhipcxx 3.0
 
-   * - :ref:`warp_shuffle_xor <libcudacxx-extended-api-warp-warp-shuffle>`
-     - Warp shuffle from original lane index xor mask
-     - CCCL 3.0.0
-     - CUDA 13.0
+      * - :ref:`warp_shuffle_up <libcudacxx-extended-api-warp-warp-shuffle>`
+        - Warp shuffle from original lane index - delta
+        - libhipcxx 3.0
 
-   * - :ref:`warp_match_all <libcudacxx-extended-api-warp-warp-match-all>`
-     - Check if all lanes have the same value
-     - CCCL 3.1.0
-     - CUDA 13.1
+      * - :ref:`warp_shuffle_down <libcudacxx-extended-api-warp-warp-shuffle>`
+        - Warp shuffle from original lane index + delta
+        - libhipcxx 3.0
 
-   * - :ref:`lane_mask <libcudacxx-extended-api-warp-lane-mask>`
-     - Class to represent a mask of lanes in a warp
-     - CCCL 3.1.0
-     - CUDA 13.1
+      * - :ref:`warp_shuffle_xor <libcudacxx-extended-api-warp-warp-shuffle>`
+        - Warp shuffle from original lane index xor mask
+        - libhipcxx 3.0
+
+      * - :ref:`warp_match_all <libcudacxx-extended-api-warp-warp-match-all>`
+        - Check if all lanes have the same value
+        - libhipcxx 3.4
+
+      * - :ref:`lane_mask <libcudacxx-extended-api-warp-lane-mask>`
+        - Class to represent a mask of lanes in a warp
+        - libhipcxx 3.4

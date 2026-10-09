@@ -50,7 +50,7 @@ This page documents ``cuda::pipeline``, a coordination mechanism that sequences 
 
 Defined in header ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::thread_scope Scope>
    class cuda::pipeline {
@@ -144,7 +144,7 @@ producers and consumers. In a *partitioned pipeline*, each participating thread 
 
 .. rubric:: Example
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/pipeline>
    #include <cooperative_groups.h>
