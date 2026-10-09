@@ -22,8 +22,8 @@
     SOFTWARE.
 
 .. meta::
-  :description: API reference for cuda::get_device_address, which returns a valid device pointer to a device object, replacing uses of cudaGetSymbolAddress in libhipcxx.
-  :keywords: libhipcxx, ROCm, HIP, C++, get_device_address, device pointer, cudaGetSymbolAddress, functional
+  :description: API reference for cuda::get_device_address, which returns a valid device pointer to a device object, replacing uses of hipGetSymbolAddress in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, get_device_address, device pointer, hipGetSymbolAddress, memory
 
 .. _libcudacxx-extended-api-memory-get-device-address:
 
@@ -32,10 +32,9 @@
 
 This page documents ``cuda::get_device_address``, which returns a valid device pointer to a device object.
 
-
 Defined in the headers ``<cuda/memory>`` and ``<cuda/functional>``.
 
-.. code:: cuda
+.. code:: cpp
 
   namespace cuda {
 
@@ -49,7 +48,7 @@ Defined in the headers ``<cuda/memory>`` and ``<cuda/functional>``.
 
   } // namespace cuda
 
-``cuda::get_device_address`` returns a valid pointer to a device object for the current (1) or ``device`` (2) device. It replaces uses of ``cudaGetSymbolAddress``, which requires an inout parameter.
+``cuda::get_device_address`` returns a valid pointer to a device object for the current (1) or ``device`` (2) device. It replaces uses of ``hipGetSymbolAddress``, which requires an inout parameter.
 
 **Parameters**
 
@@ -63,7 +62,7 @@ Defined in the headers ``<cuda/memory>`` and ``<cuda/functional>``.
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
   #include <cuda/devices>
   #include <cuda/memory>
@@ -79,9 +78,9 @@ Example
     {
       T* host_address = cuda::std::addressof(device_object);
 
-      cudaPointerAttributes attributes;
-      cudaError_t status = cudaPointerGetAttributes(&attributes, host_address);
-      assert(status == cudaSuccess);
+      hipPointerAttribute_t attributes;
+      hipError_t status = hipPointerGetAttributes(&attributes, host_address);
+      assert(status == hipSuccess);
       assert(attributes.devicePointer == nullptr);
 
       // Calling a kernel with host_address would segfault
@@ -91,9 +90,9 @@ Example
     {
       T* device_address = cuda::get_device_address(device_object, device);
 
-      cudaPointerAttributes attributes;
-      cudaError_t status = cudaPointerGetAttributes(&attributes, device_address);
-      assert(status == cudaSuccess);
+      hipPointerAttribute_t attributes;
+      hipError_t status = hipPointerGetAttributes(&attributes, device_address);
+      assert(status == hipSuccess);
       assert(attributes.devicePointer == device_address);
 
       // Safe to call a kernel

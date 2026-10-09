@@ -1,11 +1,40 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::fast_mod_div, which precomputes a divisor for fast integer division and modulo in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, fast_mod_div, integer division, modulo, div, math
+
 .. _libcudacxx-extended-api-math-fast-mod-div:
 
 ``cuda::fast_mod_div``
 ======================
 
+This page documents ``cuda::fast_mod_div``, which precomputes a divisor to speed up subsequent integer division and modulo operations.
+
 Defined in the ``<cuda/cmath>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda {
 
@@ -31,7 +60,7 @@ Defined in the ``<cuda/cmath>`` header.
 
     } // namespace cuda
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda {
 
@@ -63,15 +92,18 @@ The class ``fast_mod_div`` is used to pre-compute the modulo and division of an 
 **Performance considerations**
 
 - ``fast_mod_div`` needs to be initialized on the host and executed on the device for optimal performance.
-- ``T`` signed type ensures the best performance. ``T == int`` translates to ``SEL``, ``IMAD``, and x2 ``SHF`` instructions.
+- ``T`` signed type ensures the best performance.
 - Larger types (> 32-bits) are slower than smaller types.
 - ``DivisorIsNeverOne == true`` can be used to skip one comparison.
 - ``__builtin_assume(dividend != cuda::std::numeric_limits<U>::max())`` can be used to skip one comparison with unsigned values.
 
+..
+   ``T == int`` translates to ``SEL``, ``IMAD``, and x2 ``SHF`` instructions.
+
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/cmath>
     #include <cuda/std/cassert>
@@ -85,8 +117,9 @@ Example
     int main() {
         cuda::fast_mod_div<int> divisor(20);
         div_kernel<<<1, 1>>>(divisor);
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/fM7E9v9aP>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/fM7E9v9aP>`__

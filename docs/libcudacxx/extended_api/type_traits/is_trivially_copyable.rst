@@ -1,11 +1,40 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::is_trivially_copyable, which tells whether a type, including extended floating-point vector types, can be copied bytewise in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, is_trivially_copyable, type traits, trivially copyable, extended floating-point
+
 .. _libcudacxx-extended-api-type_traits-is_trivially_copyable:
 
 ``cuda::is_trivially_copyable``
 =======================================
 
+This page documents ``cuda::is_trivially_copyable``, which tells whether a type can be copied by copying its underlying bytes.
+
 Defined in the ``<cuda/type_traits>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -18,7 +47,7 @@ Defined in the ``<cuda/type_traits>`` header.
    } // namespace cuda
 
 ``cuda::is_trivially_copyable_v`` trait evaluates if a type can be copied by copying its underlying bytes.
-It extends ``cuda::std::is_trivially_copyable`` to also recognize CUDA extended floating-point vector types as trivially copyable.
+It extends ``cuda::std::is_trivially_copyable`` to also recognize extended floating-point vector types as trivially copyable.
 
 The trait is true when ``T`` is any of the following:
 
@@ -42,7 +71,7 @@ The trait also propagates through composite types:
 Examples
 --------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/type_traits>
    #include <cuda/std/array>
@@ -70,4 +99,5 @@ Examples
    static_assert(cuda::is_trivially_copyable_v<cuda::std::pair<__half2, int>>);
 
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/PqccjfEv6>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/PqccjfEv6>`__

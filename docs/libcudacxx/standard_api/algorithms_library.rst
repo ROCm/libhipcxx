@@ -1,7 +1,38 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+
+.. meta::
+  :description: Documents the algorithms library header <cuda/std/algorithm> in libhipcxx, including its extensions and restrictions, for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, algorithms, constexpr, find, copy, transform
+
 .. _libcudacxx-standard-api-algorithms:
 
 Algorithms Library
-===================
+==================
+
+This page documents ``<cuda/std/algorithm>``, which provides the C++ Standard Library algorithms for host and
+device code.
 
 .. list-table::
    :widths: 25 45 30
@@ -12,7 +43,11 @@ Algorithms Library
      - Availability
    * - `\<cuda/std/algorithm\> <https://en.cppreference.com/w/cpp/header/algorithm>`_
      - Fundamental library algorithms
-     - CCCL 3.2.0 / CUDA 13.2
+     - libhipcxx 3.4
+
+..
+   Parallel algorithms are not yet supported in libhipcxx.
+
    * - `\<cuda/std/execution\> <https://en.cppreference.com/w/cpp/header/execution>`_
      - Standard parallel algorithms
      - CCCL 3.4.0 / CUDA 13.4
@@ -37,62 +72,63 @@ Restrictions
     * ``stable_partition``
     * ``stable_sort``
 
-Parallel standard algorithms
-----------------------------
+..
+   Parallel algorithms are not yet supported in libhipcxx.
 
-CCCL provides an implementation for the standard `parallel algorithms library <http://www.eel.is/c++draft/algorithms.parallel>`_
+   Parallel standard algorithms
+   ----------------------------
 
-Currently the CUDA backend is the only supported backend. It can be selected by passing the `cuda::execution::gpu`
-execution policy to one of the supported algorithms. The CUDA backend requires the passed in sequences to reside in
-device accessible memory and the iterators into those sequences to be at least random access iterators. The CUDA backend
-is enabled if the program is compiled with a CUDA compiler in CUDA mode.
+   CCCL provides an implementation for the standard `parallel algorithms library <http://www.eel.is/c++draft/algorithms.parallel>`_
 
-The use of any other execution policy is currently not supported and results in a compile time error.
+   Currently the CUDA backend is the only supported backend. It can be selected by passing the `cuda::execution::gpu`
+   execution policy to one of the supported algorithms. The CUDA backend requires the passed in sequences to reside in
+   device accessible memory and the iterators into those sequences to be at least random access iterators. The CUDA backend
+   is enabled if the program is compiled with a CUDA compiler in CUDA mode.
 
-The following algorithms are supported:
+   The use of any other execution policy is currently not supported and results in a compile time error.
 
-  * ``adjacent_find``
-  * ``all_of``
-  * ``any_of``
-  * ``copy``
-  * ``copy_if``
-  * ``copy_n``
-  * ``count``
-  * ``count_if``
-  * ``equal``
-  * ``fill``
-  * ``fill_n``
-  * ``find``
-  * ``find_if``
-  * ``find_if_not``
-  * ``for_each``
-  * ``for_each_n``
-  * ``generate``
-  * ``generate_n``
-  * ``is_partitioned``
-  * ``is_sorted``
-  * ``is_sorted_until``
-  * ``merge``
-  * ``mismatch``
-  * ``none_of``
-  * ``remove``
-  * ``remove_copy``
-  * ``remove_copy_if``
-  * ``remove_if``
-  * ``replace``
-  * ``replace_copy``
-  * ``replace_copy_if``
-  * ``replace_if``
-  * ``reverse``
-  * ``reverse_copy``
-  * ``rotate``
-  * ``rotate_copy``
-  * ``shift_left``
-  * ``shift_right``
-  * ``stable_partition``
-  * ``swap_ranges``
-  * ``transform``
-  * ``unique``
-  * ``unique_copy``
+   The following algorithms are supported:
 
-The current implementation status is tracked in this `Github Issue <https://github.com/NVIDIA/cccl/issues/5592>`_
+     * ``adjacent_find``
+     * ``all_of``
+     * ``any_of``
+     * ``copy``
+     * ``copy_if``
+     * ``copy_n``
+     * ``count``
+     * ``count_if``
+     * ``equal``
+     * ``fill``
+     * ``fill_n``
+     * ``find``
+     * ``find_if``
+     * ``find_if_not``
+     * ``for_each``
+     * ``for_each_n``
+     * ``generate``
+     * ``generate_n``
+     * ``is_partitioned``
+     * ``is_sorted``
+     * ``is_sorted_until``
+     * ``merge``
+     * ``mismatch``
+     * ``none_of``
+     * ``remove``
+     * ``remove_copy``
+     * ``remove_copy_if``
+     * ``remove_if``
+     * ``replace``
+     * ``replace_copy``
+     * ``replace_copy_if``
+     * ``replace_if``
+     * ``reverse``
+     * ``reverse_copy``
+     * ``rotate``
+     * ``rotate_copy``
+     * ``shift_left``
+     * ``shift_right``
+     * ``stable_partition``
+     * ``swap_ranges``
+     * ``transform``
+     * ``unique``
+     * ``unique_copy``

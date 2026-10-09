@@ -1,13 +1,42 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::make_tma_descriptor, which constructs a tensor map descriptor from a DLPack tensor in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, make_tma_descriptor, TMA, DLPack, DLTensor, tensor map
+
 .. _libcudacxx-extended-api-tma-make_tma_descriptor:
 
 ``cuda::make_tma_descriptor``
 =============================
 
+This page documents ``cuda::make_tma_descriptor``, which constructs a tensor map descriptor from a DLPack tensor.
+
 Defined in the ``<cuda/tma>`` header.
 
 **Function signatures**
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda {
 
@@ -34,7 +63,7 @@ Defined in the ``<cuda/tma>`` header.
 
 **Enumerators**
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda {
 
@@ -56,7 +85,7 @@ Defined in the ``<cuda/tma>`` header.
 
     } // namespace cuda
 
-The functions construct a `CUDA Tensor Memory Accelerator (TMA) descriptor <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#using-tma-to-transfer-multi-dimensional-arrays>`__ from a ``DLTensor``. The resulting ``CUtensorMap`` can be bound to TMA-based copy instructions to efficiently stage multi-dimensional tiles in shared memory on Compute Capability 9.0 and newer GPUs.
+The functions construct a Tensor Memory Accelerator (TMA) descriptor from a ``DLTensor``. The resulting ``CUtensorMap`` can be bound to TMA-based copy instructions to efficiently stage multi-dimensional tiles in shared memory on Compute Capability 9.0 and newer GPUs.
 
 
 .. note::
@@ -190,13 +219,15 @@ References
 ----------
 
 - `DLPack C API <https://dmlc.github.io/dlpack/latest/c_api.html>`__ documentation.
-- `CUDA Tensor Memory Accelerator (TMA) <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#using-tma-to-transfer-multi-dimensional-arrays>`__ documentation.
-- ``cuTensorMapEncodeTiled()`` `CUDA driver API <https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TENSOR__MEMORY.html#group__CUDA__TENSOR__MEMORY_1ga7c7d2aaac9e49294304e755e6f341d7>`__ documentation.
+
+..
+   - `CUDA Tensor Memory Accelerator (TMA) <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#using-tma-to-transfer-multi-dimensional-arrays>`__ documentation.
+   - ``cuTensorMapEncodeTiled()`` `CUDA driver API <https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TENSOR__MEMORY.html#group__CUDA__TENSOR__MEMORY_1ga7c7d2aaac9e49294304e755e6f341d7>`__ documentation.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/tma>
     #include <cuda/std/cstdint>

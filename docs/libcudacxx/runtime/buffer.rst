@@ -1,10 +1,39 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::buffer, a typed stream-ordered container allocated from memory resources, which is not yet available in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, buffer, make_buffer, stream-ordered allocation, memory resource
+
 .. _cccl-runtime-buffer:
 
 .. |cuda_make_buffer| replace:: ``cuda::make_buffer``
-.. _cuda_make_buffer: ../api/namespacecuda_1a8d909070d4cf758e776659b91e473a6f.html
 
 Buffer
 ======
+
+This page documents ``cuda::buffer``, which is a typed container for stream-ordered memory. ``cuda::buffer`` requires a
+hipCUB port and is not yet available in libhipcxx.
 
 The buffer API provides a typed container allocated from memory resources. It handles stream-ordered allocation, initialization, and deallocation of memory.
 
@@ -26,7 +55,7 @@ constraints are checked at compile time.
 
 While the buffer operates in stream order, it can also be constructed with a :ref:`synchronous_resource <libcudacxx-extended-api-memory-resources-synchronous-resource>`, in which case it will automatically use the :ref:`synchronous_resource_adapter <libcudacxx-extended-api-memory-resources-synchronous-adapter>` to wrap the provided resource.
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+Availability: libhipcxx 3.4
 
 Example:
 
@@ -159,11 +188,11 @@ Example:
     // Alternative would be to call buf.destroy(stream2)
    }
 
-|cuda_make_buffer|_
+|cuda_make_buffer|
 ------------------------------------------------------------------------------------------------
 .. _cccl-runtime-buffer-make-buffer:
 
-|cuda_make_buffer|_ is a factory function that
+|cuda_make_buffer| is a factory function that
 creates buffers with automatic property deduction from the memory resource. It supports the same construction patterns
 as the buffer constructors, in addition to an overload that sets all elements of the buffer to the same value.
 

@@ -1,11 +1,40 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::device::warp_match_all, which checks whether all lanes in a warp hold the same value in libhipcxx.
+  :keywords: libhipcxx, ROCm, HIP, C++, warp, warp_match_all, lane_mask, warp intrinsics
+
 .. _libcudacxx-extended-api-warp-warp-match-all:
 
 ``cuda::device::warp_match_all``
 ================================
 
+This page documents ``cuda::device::warp_match_all``, which checks whether all lanes of a warp have the same value.
+
 Defined in ``<cuda/warp>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
     namespace cuda::device {
 
@@ -15,7 +44,7 @@ Defined in ``<cuda/warp>`` header.
 
     } // namespace cuda::device
 
-The functionality provides a generalized and safe alternative to CUDA warp match all intrinsic ``__match_all_sync``.
+The functionality provides a generalized and safe alternative to the warp match all intrinsic ``__match_all_sync``.
 The function allows bitwise comparison of any data size, including raw arrays, pointers, and structs.
 
 **Parameters**
@@ -29,9 +58,11 @@ The function allows bitwise comparison of any data size, including raw arrays, p
 
 **Preconditions**
 
-- The functionality is only supported on ``SM >= 70``.
 - ``lane_mask`` must be non-zero.
 - ``T`` shall have no padding bits, that is, ``T``'s value representation shall be identical to its object representation.
+
+..
+   - The functionality is only supported on ``SM >= 70``.
 
 **Undefined Behavior**
 
@@ -39,19 +70,22 @@ The function allows bitwise comparison of any data size, including raw arrays, p
 
 **Performance considerations**
 
-- The function calls the PTX instruction ``match.sync`` :math:`ceil\left(\frac{sizeof(data)}{4}\right)` times.
 - The function is slightly faster when called with a mask of all active lanes (overload function) even if all lanes participates in the call.
 - The function is slower when called with a non-fully active warp.
 
-**References**
+..
+   - The function calls the PTX instruction ``match.sync`` :math:`ceil\left(\frac{sizeof(data)}{4}\right)` times.
 
-- `CUDA match_all Intrinsics <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-match-functions>`_
-- `PTX match.sync instruction <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-match-sync>`_
+..
+   **References**
+
+   - `CUDA match_all Intrinsics <https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#warp-match-functions>`_
+   - `PTX match.sync instruction <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#parallel-synchronization-and-communication-instructions-match-sync>`_
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/std/array>
     #include <cuda/std/cassert>
@@ -71,8 +105,9 @@ Example
 
     int main() {
         warp_match_kernel<<<1, 32>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/Eq81fTb8z>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/Eq81fTb8z>`_

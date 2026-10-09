@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::overflow_cast, which casts an integer value to another integer type with overflow checking in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, overflow_cast, cast, overflow, integer conversion, numeric
+
 .. _libcudacxx-extended-api-numeric-overflow_cast:
 
 ``cuda::overflow_cast``
 ==========================
+
+This page documents ``cuda::overflow_cast``, which casts an integer value to another integer type with overflow checking.
 
 .. code:: cpp
 
@@ -29,7 +58,7 @@ The function ``cuda::overflow_cast`` casts a value of type ``From`` to type ``To
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/numeric>
     #include <cuda/std/cassert>
@@ -62,7 +91,8 @@ Example
     int main()
     {
         kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/vK3WMMs1n>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/vK3WMMs1n>`_

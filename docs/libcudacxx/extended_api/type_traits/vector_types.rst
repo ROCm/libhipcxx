@@ -1,14 +1,43 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for the vector type traits cuda::is_vector_type, cuda::is_extended_fp_vector_type, cuda::vector_type, and cuda::scalar_type in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, vector types, is_vector_type, vector_type, scalar_type, type traits
+
 .. _libcudacxx-extended-api-type_traits-vector_types:
 
 Vector Type Traits
 ==================
+
+This page documents the vector type traits ``cuda::is_vector_type``, ``cuda::is_extended_fp_vector_type``, ``cuda::vector_type``, and ``cuda::scalar_type``.
 
 Defined in the ``<cuda/type_traits>`` header.
 
 ``cuda::is_vector_type_v``
 --------------------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -20,7 +49,7 @@ Defined in the ``<cuda/type_traits>`` header.
 
    } // namespace cuda
 
-``cuda::is_vector_type_v<T>`` is ``true`` if ``T`` is a cv-qualified CUDA vector type, such as ``int2``, ``float4``, or ``dim3``.
+``cuda::is_vector_type_v<T>`` is ``true`` if ``T`` is a cv-qualified HIP vector type, such as ``int2``, ``float4``, or ``dim3``.
 
 **Supported vector types**
 
@@ -30,18 +59,18 @@ Defined in the ``<cuda/type_traits>`` header.
 - ``ushort1``, ``ushort2``, ``ushort3``, ``ushort4``.
 - ``int1``, ``int2``, ``int3``, ``int4``.
 - ``uint1``, ``uint2``, ``uint3``, ``uint4``.
-- ``long1``, ``long2``, ``long3``, ``long4``, and alignment variants in CUDA Toolkit 13.0+.
-- ``ulong1``, ``ulong2``, ``ulong3``, ``ulong4``, and alignment variants in CUDA Toolkit 13.0+.
-- ``longlong1``, ``longlong2``, ``longlong3``, ``longlong4``, and alignment variants in CUDA Toolkit 13.0+.
-- ``ulonglong1``, ``ulonglong2``, ``ulonglong3``, ``ulonglong4``, and alignment variants in CUDA Toolkit 13.0+.
+- ``long1``, ``long2``, ``long3``, ``long4``.
+- ``ulong1``, ``ulong2``, ``ulong3``, ``ulong4``.
+- ``longlong1``, ``longlong2``, ``longlong3``, ``longlong4``.
+- ``ulonglong1``, ``ulonglong2``, ``ulonglong3``, ``ulonglong4``.
 - ``float1``, ``float2``, ``float3``, ``float4``.
-- ``double1``, ``double2``, ``double3``, ``double4``, and alignment variants in CUDA Toolkit 13.0+.
+- ``double1``, ``double2``, ``double3``, ``double4``.
 - ``dim3``.
 
 ``cuda::is_extended_fp_vector_type_v``
 --------------------------------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -64,10 +93,14 @@ Defined in the ``<cuda/type_traits>`` header.
 - ``__nv_fp6x2_e2m3``, ``__nv_fp6x2_e3m2``, ``__nv_fp6x4_e2m3``, ``__nv_fp6x4_e3m2``.
 - ``__nv_fp4x2_e2m1``, ``__nv_fp4x4_e2m1``.
 
+.. note::
+
+   With HIP, the ``e8m0`` FP8 types and the FP6 and FP4 vector types are not available.
+
 ``cuda::vector_type``
 -----------------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -82,12 +115,12 @@ Defined in the ``<cuda/type_traits>`` header.
 
    } // namespace cuda
 
-``cuda::vector_type<T, Size>::type`` is a type alias that maps a scalar type ``T`` and a vector size ``Size`` to the corresponding CUDA vector type. If no valid vector type exists for the given combination, the type is ``void``. It supports both integral and floating-point vector types.
+``cuda::vector_type<T, Size>::type`` is a type alias that maps a scalar type ``T`` and a vector size ``Size`` to the corresponding HIP vector type. If no valid vector type exists for the given combination, the type is ``void``. It supports both integral and floating-point vector types.
 
 ``cuda::scalar_type``
 -----------------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -102,12 +135,12 @@ Defined in the ``<cuda/type_traits>`` header.
 
    } // namespace cuda
 
-``cuda::scalar_type<T>::type`` extracts the scalar element type from a cv-qualified CUDA vector type. For example, ``cuda::scalar_type<int2>::type`` is ``int`` and ``cuda::scalar_type<float4>::type`` is ``float``. It supports both integral and floating-point vector types. If ``T`` is not a vector type, the ``type`` type alias is not defined.
+``cuda::scalar_type<T>::type`` extracts the scalar element type from a cv-qualified HIP vector type. For example, ``cuda::scalar_type<int2>::type`` is ``int`` and ``cuda::scalar_type<float4>::type`` is ``float``. It supports both integral and floating-point vector types. If ``T`` is not a vector type, the ``type`` type alias is not defined.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/type_traits>
 
@@ -132,4 +165,4 @@ Example
 See Also
 --------
 
-- :ref:`Tuple Protocol for Vector Types <libcudacxx-extended-api-vector-tuple-protocol>` - Tuple protocol support for CUDA vector types.
+- :ref:`Tuple Protocol for Vector Types <libcudacxx-extended-api-vector-tuple-protocol>` - Tuple protocol support for HIP vector types.
