@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::add_overflow, which performs addition with overflow checking in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, add_overflow, overflow, integer arithmetic, numeric, overflow_result
+
 .. _libcudacxx-extended-api-numeric-add_overflow:
 
 ``cuda::add_overflow``
 ======================
+
+This page documents ``cuda::add_overflow``, which performs addition with overflow checking.
 
 Defined in ``<cuda/numeric>`` header.
 
@@ -44,12 +73,14 @@ The function ``cuda::add_overflow`` performs addition of two values ``lhs`` and 
 - No overflow checking is required if ``Lhs +  Rhs`` is always representable with the ``Result`` type.
 - Computation is generally faster when ``Lhs``, ``Rhs``, and ``Result`` have the same signedness.
 - Unsigned computations are generally faster than signed computations.
-- The function uses PTX ``asm`` on device and compiler intrinsics on host whenever possible.
+
+..
+   - The function uses PTX ``asm`` on device and compiler intrinsics on host whenever possible.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/numeric>
     #include <cuda/std/cassert>
@@ -83,7 +114,8 @@ Example
     int main()
     {
         kernel<<<1, 1>>>();
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/PPT17ozx6>`_
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/PPT17ozx6>`_

@@ -1,11 +1,40 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::ptr_in_range, which checks whether a pointer lies inside a half-open range of pointers in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, ptr_in_range, pointer range, bounds check, memory
+
 .. _libcudacxx-extended-api-memory-ptr_in_range:
 
 ``cuda::ptr_in_range``
 ======================
 
+This page documents ``cuda::ptr_in_range``, which checks whether a pointer lies inside a range.
+
 Defined in the header ``<cuda/memory>``.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -38,7 +67,7 @@ Checks whether ``ptr`` lies inside the half-open interval ``[start, end)``.
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/memory>
 
@@ -55,13 +84,14 @@ Example
     int main() {
         size_t N          = 32;
         float* device_ptr = nullptr;
-        cudaMalloc(&device_ptr, N * sizeof(float));
+        hipMalloc(&device_ptr, N * sizeof(float));
 
         kernel<<<1, N>>>(device_ptr, N);
-        cudaDeviceSynchronize();
+        hipDeviceSynchronize();
 
-        cudaFree(device_ptr);
+        hipFree(device_ptr);
         return 0;
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/sMz76hGEc>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/sMz76hGEc>`__

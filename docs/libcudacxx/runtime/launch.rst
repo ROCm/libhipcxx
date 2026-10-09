@@ -1,32 +1,53 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::launch, cuda::make_config, the kernel launch options and cuda::host_launch in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, kernel launch, launch configuration, cooperative launch, dynamic shared memory, host_launch
+
 .. _cccl-runtime-launch:
 
 .. |cuda_launch| replace:: ``cuda::launch``
-.. _cuda_launch: ../api/namespacecuda_1afd43c8d92fdb84879aed04f3e2ea25d2.html
 .. |cuda_kernel_config| replace:: ``cuda::kernel_config``
-.. _cuda_kernel_config: ../api/structcuda_1_1kernel__config.html
 .. |cuda_make_config| replace:: ``cuda::make_config``
-.. _cuda_make_config: ../api/namespacecuda_1aa7b277627ddc60563f1818ae8e05ba2d.html
 .. |cuda_cooperative_launch| replace:: ``cuda::cooperative_launch``
-.. _cuda_cooperative_launch: ../api/structcuda_1_1cooperative__launch.html
 .. |cuda_dynamic_shared_memory| replace:: ``cuda::dynamic_shared_memory``
-.. _cuda_dynamic_shared_memory: ../api/namespacecuda_1a737c80f87e6e727a865cd05b82ec2405.html
 .. |cuda_launch_priority| replace:: ``cuda::launch_priority``
-.. _cuda_launch_priority: ../api/structcuda_1_1launch__priority.html
 .. |cuda_host_launch| replace:: ``cuda::host_launch``
-.. _cuda_host_launch: ../api/namespacecuda_1a5af4f59c915edb056f346b904197ff3d.html
 
 Launch
 ======
 
-The launch API provides abstractions for launching CUDA kernels with a given configuration. It supports kernel functions and device callable objects, cooperative launches, dynamic shared memory, and other launch options.
+The launch API provides abstractions for launching HIP kernels with a given configuration. It supports kernel functions and device callable objects, cooperative launches, dynamic shared memory, and other launch options.
+In libhipcxx, kernels are launched with ``hipModuleLaunchKernel``, or ``hipModuleLaunchCooperativeKernel`` for cooperative launches.
 
-|cuda_launch|_
+|cuda_launch|
 --------------------------------------------------------------------------------------------
 .. _cccl-runtime-launch-launch:
 
-|cuda_launch|_ launches a kernel function or a device callable object on the specified stream with a given
+|cuda_launch| launches a kernel function or a device callable object on the specified stream with a given
 configuration. The kernel can accept the configuration as its first argument to enable some device-side functionality,
-but it is not required. If the kernel does accept the configuration as its first argument, |cuda_launch|_
+but it is not required. If the kernel does accept the configuration as its first argument, |cuda_launch|
 will automatically pass it into the kernel without the need to pass the configuration as an argument twice.
 
 *Note:* Configuration won't be passed automatically into the kernel if it is an extended device lambda, it needs to be passed as the second launch function argument and as the first kernel argument.
@@ -35,7 +56,7 @@ The benefit of using a callable object with a device call operator (later called
 template arguments deduced from the arguments, while a kernel function needs to be explicitly instantiated. It also
 allows attaching a default configuration that is later combined with the configuration passed to the launch.
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+Availability: libhipcxx 3.4
 
 Example with kernel function:
 
@@ -97,14 +118,14 @@ Example with extended device lambda:
      cuda::launch(stream, config, lambda, config, 42);
    }
 
-|cuda_kernel_config|_
+|cuda_kernel_config|
 -------------------------------------------------------------------------------
 .. _cccl-runtime-launch-kernel-config:
 
-|cuda_kernel_config|_ represents a kernel launch configuration combining hierarchy dimensions and launch
-options. It should be created using |cuda_make_config|_ rather than being constructed directly.
+|cuda_kernel_config| represents a kernel launch configuration combining hierarchy dimensions and launch
+options. It should be created using |cuda_make_config| rather than being constructed directly.
 
-A |cuda_kernel_config|_ provides:
+A |cuda_kernel_config| provides:
 
 - ``hierarchy()`` - Access to the hierarchy dimensions
 - ``options()`` - Access to launch options
@@ -112,13 +133,13 @@ A |cuda_kernel_config|_ provides:
 - ``combine_with_default(kernel)`` - Combine with default options from a kernel of a kernel functor accessed via
   ``kernel.default_config()``, equivalent to ``combine(kernel.default_config())``
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+Availability: libhipcxx 3.4
 
-|cuda_make_config|_
+|cuda_make_config|
 -------------------------------------------------------------------------------------------------
 .. _cccl-runtime-launch-make-config:
 
-|cuda_make_config|_ creates a kernel configuration from `hierarchy dimensions <cccl-runtime-hierarchy>` and
+|cuda_make_config| creates a kernel configuration from `hierarchy dimensions <cccl-runtime-hierarchy>` and
 optional launch options. It can be called with:
 
 - A hierarchy and options: ``make_config(hierarchy, option1, option2, ...)``
@@ -126,14 +147,14 @@ optional launch options. It can be called with:
 
 In the last case, the dimensions arguments must come first, followed by options.
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+Availability: libhipcxx 3.4
 
 Example:
 
 .. code:: cpp
 
    #include <cuda/launch>
-   #include <cooperative_groups.h>
+   #include <hip/hip_cooperative_groups.h>
 
    // Create config with cooperative launch
    auto config1 = cuda::make_config(cuda::grid_dims(256), cuda::cooperative_launch{});
@@ -173,18 +194,19 @@ Launch Options
 
 The launch API provides several launch options:
 
-|cuda_cooperative_launch|_
+|cuda_cooperative_launch|
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Enables cooperative launch, restricting the grid to a number of blocks that can simultaneously execute on the device. This enables usage of ``cooperative_groups::grid_group::sync()`` in the kernel. This is a struct that can be default-constructed.
+See `Cooperative groups <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/cooperative_groups.html>`__.
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+Availability: libhipcxx 3.4
 
 Example:
 
 .. code:: cpp
 
    #include <cuda/launch>
-   #include <cooperative_groups.h>
+   #include <hip/hip_cooperative_groups.h>
 
    template <typename Configuration>
    __global__ void kernel(Configuration conf) {
@@ -197,17 +219,18 @@ Example:
      cuda::launch(stream, config, kernel<decltype(config)>);
    }
 
-|cuda_dynamic_shared_memory|_
+|cuda_dynamic_shared_memory|
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Specifies dynamic shared memory configuration. It provides a type-safe way to specify shared memory content and later access it through the configuration object passed to the kernel.
 
-- For non-array ``T`` (e.g., a struct), call |cuda_dynamic_shared_memory|_ with no size argument.
-- For bounded array ``T[n]`` (e.g., ``int[10]``), call |cuda_dynamic_shared_memory|_ with no size argument.
-- For unbounded array ``T[]`` (e.g., ``float[]``), pass the element count to |cuda_dynamic_shared_memory|_.
+- For non-array ``T`` (e.g., a struct), call |cuda_dynamic_shared_memory| with no size argument.
+- For bounded array ``T[n]`` (e.g., ``int[10]``), call |cuda_dynamic_shared_memory| with no size argument.
+- For unbounded array ``T[]`` (e.g., ``float[]``), pass the element count to |cuda_dynamic_shared_memory|.
 - To opt in to non-portable dynamic shared memory sizes (greater than 48 KiB per block), pass
-  :cpp:any:`cuda::non_portable` to |cuda_dynamic_shared_memory|_.
+  :cpp:any:`cuda::non_portable` to |cuda_dynamic_shared_memory|. The maximum amount of shared memory per block depends
+  on the AMD GPU and can be queried with ``cuda::device_attributes::max_shared_memory_per_block``.
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+Availability: libhipcxx 3.4
 
 Example:
 
@@ -234,16 +257,23 @@ Example:
      auto config = cuda::make_config(
      cuda::block_dims<128>(),
      cuda::grid_dims(4),
-     cuda::dynamic_shared_memory<float[]>(32768, cuda::non_portable)
+     cuda::dynamic_shared_memory<float[]>(14336, cuda::non_portable) // 56 KiB
      );
      cuda::launch(stream, config, kernel<decltype(config)>);
    }
 
-|cuda_launch_priority|_
+|cuda_launch_priority|
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Specifies the priority launch option used when scheduling the kernel launch. Overrides the priority specified in the stream.
+Specifies the priority launch option used when scheduling the kernel launch.
+In libhipcxx this option is accepted for source compatibility but ignored, because HIP kernel launches have no
+per-launch priority attribute. Use a stream created with the desired priority instead.
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+..
+   Not supported in libhipcxx: the launch priority attribute is ignored on HIP.
+
+   Overrides the priority specified in the stream.
+
+Availability: libhipcxx 3.4
 
 Example:
 
@@ -257,15 +287,15 @@ Example:
      cuda::launch_priority{0}
    );
 
-|cuda_host_launch|_
+|cuda_host_launch|
 -------------------------------------------------------------------------------------------------
 .. _cccl-runtime-launch-host-launch:
 
-|cuda_host_launch|_ launches a host callable for a stream-ordered execution. The callable can be a lambda
+|cuda_host_launch| launches a host callable for a stream-ordered execution. The callable can be a lambda
 function, a function pointer, or a callable object.
 The callable and arguments are taken by value and stored for later execution. This requires a dynamic allocation to store the callable and arguments. If the callable is a function pointer or cuda::std::reference_wrapper and there are no arguments, the dynamic allocation is avoided.
 
-Availability: CCCL 3.2.0 / CUDA 13.2
+Availability: libhipcxx 3.4
 
 Example:
 

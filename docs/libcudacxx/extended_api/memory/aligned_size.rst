@@ -34,7 +34,7 @@ This page documents ``cuda::aligned_size_t``, a shape type representing a byte e
 
 Defined in headers ``<cuda/memory>``, ``<cuda/barrier>`` and ``<cuda/pipeline>``:
 
-.. code:: cuda
+.. code:: cpp
 
    template <cuda::std::size_t Alignment>
    struct cuda::aligned_size_t {
@@ -99,7 +99,7 @@ the behavior is undefined.
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/memory>
 

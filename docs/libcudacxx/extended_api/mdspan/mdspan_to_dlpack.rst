@@ -1,3 +1,30 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::to_dlpack_tensor, which converts a host, device, or managed mdspan to a DLPack DLTensor view in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, mdspan, DLPack, DLTensor, to_dlpack_tensor, conversion
+
 .. _libcudacxx-extended-api-mdspan-mdspan-to-dlpack:
 
 ``mdspan`` to DLPack
@@ -10,7 +37,7 @@ Defined in the ``<cuda/mdspan>`` header.
 Conversion functions
 --------------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -33,7 +60,7 @@ Types
 
 ``/*dlpack_tensor*/`` is a internal helper class that stores a ``DLTensor`` and owns the backing storage for its ``shape`` and ``strides`` pointers. The class does not use any heap allocation.
 
-.. code:: cuda
+.. code:: cpp
 
   namespace cuda {
 
@@ -80,7 +107,7 @@ Element types are mapped to ``DLDataType`` according to the DLPack conventions, 
 - Signed and unsigned integers.
 - IEEE-754 Floating-point and extended precision floating-point, including ``__half``, ``__nv_bfloat16``, ``__float128``, FP8, FP6, FP4 when available.
 - Complex: ``cuda::std::complex<__half>``, ``cuda::std::complex<float>``, and ``cuda::std::complex<double>``.
-- `CUDA built-in vector types <https://docs.nvidia.com/cuda/cuda-programming-guide/05-appendices/cpp-language-extensions.html#built-in-types>`__, such as ``int2``, ``float4``, etc.
+- `HIP built-in vector types <https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_cpp_language_extensions.html>`__, such as ``int2``, ``float4``, etc.
 - Vector types for extended floating-point, such as ``__half2``, ``__nv_fp8x4_e4m3``, etc.
 
 Constraints
@@ -107,7 +134,7 @@ References
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
   #include <dlpack/dlpack.h>
   #include <cuda/mdspan>
@@ -133,7 +160,7 @@ Example
 
 Examples of invalid usage:
 
-.. code:: cuda
+.. code:: cpp
 
   #include <dlpack/dlpack.h>
   #include <cuda/mdspan>
@@ -149,7 +176,7 @@ Examples of invalid usage:
     // const DLTensor& dltensor = cuda::to_dlpack_tensor(md).get(); // compile error
   }
 
-.. code:: cuda
+.. code:: cpp
 
   #include <dlpack/dlpack.h>
   #include <cuda/mdspan>

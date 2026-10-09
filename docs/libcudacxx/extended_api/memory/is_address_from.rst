@@ -1,11 +1,40 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::device::is_address_from and cuda::device::is_object_from, which check whether a pointer or object belongs to a given device address space in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, is_address_from, is_object_from, address_space, shared memory, global memory
+
 .. _libcudacxx-extended-api-memory-is_address_from:
 
 ``cuda::device::is_address_from`` and ``cuda::device::is_object_from``
 ======================================================================
 
+This page documents ``cuda::device::is_address_from`` and ``cuda::device::is_object_from``, which check whether a pointer or object belongs to a specific device address space.
+
 Defined in the ``<cuda/memory>`` header.
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda::device {
 
@@ -21,11 +50,14 @@ Defined in the ``<cuda/memory>`` header.
 
    } // namespace cuda::device
 
-Enumeration of device address spaces used with the ``is_address_from()`` and ``is_object_from()`` functions. See the `PTX ISA documentation for state spaces <https://docs.nvidia.com/cuda/parallel-thread-execution/#state-spaces>`_ for more details.
+Enumeration of device address spaces used with the ``is_address_from()`` and ``is_object_from()`` functions.
+
+..
+   See the `PTX ISA documentation for state spaces <https://docs.nvidia.com/cuda/parallel-thread-execution/#state-spaces>`_ for more details.
 
 ----
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda::device {
 
@@ -38,7 +70,7 @@ Checks whether a generic-address pointer ``ptr`` is from the specified address s
 
 ----
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda::device {
 
@@ -52,7 +84,10 @@ Checks whether an object ``obj`` with a generic address is from the specified ad
 
 ----
 
-Unlike the corresponding CUDA intrinsic functions ``__isGlobal()``, ``__isShared()``, ``__isConstant()``, ``__isLocal()``, ``__isGridConstant()``, and ``__isClusterShared()``, ``is_address_from()`` and ``is_object_from()`` are portable across all compute capabilities and, in debug mode, also checks that the pointer is not null.
+..
+   Unlike the corresponding CUDA intrinsic functions ``__isGlobal()``, ``__isShared()``, ``__isConstant()``, ``__isLocal()``, ``__isGridConstant()``, and ``__isClusterShared()``, ``is_address_from()`` and ``is_object_from()`` are portable across all compute capabilities and, in debug mode, also checks that the pointer is not null.
+
+In debug mode, ``is_address_from()`` and ``is_object_from()`` also check that the pointer is not null.
 
 **Parameters**
 
@@ -68,6 +103,10 @@ Unlike the corresponding CUDA intrinsic functions ``__isGlobal()``, ``__isShared
 
   If the GPU architecture does not support the requested address space, the function always returns ``false``.
 
+  On AMD GPUs, ``address_space::grid_constant`` queries always return ``false``, and ``address_space::cluster_shared``
+  queries are equivalent to ``address_space::shared`` queries. ``address_space::constant`` queries are not supported:
+  ``__constant__`` variables cannot be distinguished from global memory, and the query traps at run time.
+
 **Preconditions**
 
 - ``ptr`` must not be null. (1)
@@ -76,19 +115,21 @@ Unlike the corresponding CUDA intrinsic functions ``__isGlobal()``, ``__isShared
 
 - When available, the built-in functions (``__isGlobal()``, ``__isShared()``, ``__isConstant()``, ``__isLocal()``, ``__isGridConstant()``, or ``__isClusterShared()``) are used to determine the address space.
 - If the memory space of the input pointer matches the requested address space,
-  the function marks the pointer as belonging to that address space. For example, a subsequent store to a generic address that maps to shared memory emits an ``STS`` SASS instruction rather than the generic ``ST`` instruction.
+  the function marks the pointer as belonging to that address space.
+
+..
+   For example, a subsequent store to a generic address that maps to shared memory emits an ``STS`` SASS instruction rather than the generic ``ST`` instruction.
 
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
     #include <cuda/memory>
 
     __device__   int global_var;
-    __constant__ int constant_var;
 
-    __global__ void kernel(const __grid_constant__ int grid_constant_var)
+    __global__ void kernel()
     {
         using cuda::device::address_space;
         __shared__ int shared_var;
@@ -96,21 +137,18 @@ Example
 
         assert(cuda::device::is_address_from(&global_var, address_space::global));
         assert(cuda::device::is_address_from(&shared_var, address_space::shared));
-        assert(cuda::device::is_address_from(&constant_var, address_space::constant));
         assert(cuda::device::is_address_from(&local_var, address_space::local));
-        assert(cuda::device::is_address_from(&grid_constant_var, address_space::grid_constant));
 
         assert(cuda::device::is_object_from(global_var, address_space::global));
         assert(cuda::device::is_object_from(shared_var, address_space::shared));
-        assert(cuda::device::is_object_from(constant_var, address_space::constant));
         assert(cuda::device::is_object_from(local_var, address_space::local));
-        assert(cuda::device::is_object_from(grid_constant_var, address_space::grid_constant));
     }
 
     int main(int, char**)
     {
-        kernel<<<1, 1>>>(42);
-        cudaDeviceSynchronize();
+        kernel<<<1, 1>>>();
+        hipDeviceSynchronize();
     }
 
-`See it on Godbolt 🔗 <https://godbolt.org/z/5ajhe37df>`__
+..
+   `See it on Godbolt 🔗 <https://godbolt.org/z/5ajhe37df>`__

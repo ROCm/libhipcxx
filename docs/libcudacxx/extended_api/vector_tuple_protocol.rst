@@ -1,3 +1,30 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: Description of the tuple protocol support for HIP vector types in libhipcxx, enabling structured bindings and cuda::std::get access.
+  :keywords: libhipcxx, ROCm, HIP, C++, tuple protocol, vector types, structured bindings, tuple_size, get
+
 .. _libcudacxx-extended-api-vector-tuple-protocol:
 
 Vector Tuple Protocol
@@ -5,12 +32,12 @@ Vector Tuple Protocol
 
 Defined in the ``<cuda/std/tuple>`` header.
 
-``libcu++`` provides tuple protocol support for CUDA vector types, enabling structured bindings and tuple-like access to vector type elements.
+``libhipcxx`` provides tuple protocol support for HIP vector types, enabling structured bindings and tuple-like access to vector type elements.
 
 Please refer to the documentation of the C++ standard header `\<tuple\> <https://en.cppreference.com/w/cpp/header/tuple>`_ for more information.
 
-- ``cuda::std::tuple_size<VectorType>`` provides the number of elements in a CUDA vector type as a compile-time constant.
-- ``cuda::std::tuple_element<I, VectorType>`` provides the scalar element type of a CUDA vector type at index ``I``.
+- ``cuda::std::tuple_size<VectorType>`` provides the number of elements in a HIP vector type as a compile-time constant.
+- ``cuda::std::tuple_element<I, VectorType>`` provides the scalar element type of a HIP vector type at index ``I``.
 - ``cuda::std::get<I>(v)`` returns a reference to the element at index ``I`` of the vector type ``v``.
 
   - For ``I == 0``: reference to ``v.x``
@@ -21,9 +48,9 @@ Please refer to the documentation of the C++ standard header `\<tuple\> <https:/
 Structured Bindings
 -------------------
 
-CUDA vector types support C++17 structured bindings through the tuple protocol.
+HIP vector types support C++17 structured bindings through the tuple protocol.
 
-.. code:: cuda
+.. code:: cpp
 
    int2 vec{1, 2};
    auto [x, y] = vec;  // x == 1, y == 2
@@ -34,7 +61,7 @@ CUDA vector types support C++17 structured bindings through the tuple protocol.
 Supported Vector Types
 ----------------------
 
-The tuple protocol is supported for all CUDA vector types:
+The tuple protocol is supported for all HIP vector types:
 
 **Integral vector types**
 
@@ -44,15 +71,15 @@ The tuple protocol is supported for all CUDA vector types:
 - ``ushort1``, ``ushort2``, ``ushort3``, ``ushort4``.
 - ``int1``, ``int2``, ``int3``, ``int4``.
 - ``uint1``, ``uint2``, ``uint3``, ``uint4``.
-- ``long1``, ``long2``, ``long3``, ``long4``, and alignment variants in CUDA Toolkit 13.0+.
-- ``ulong1``, ``ulong2``, ``ulong3``, ``ulong4``, and alignment variants in CUDA Toolkit 13.0+.
-- ``longlong1``, ``longlong2``, ``longlong3``, ``longlong4``, and alignment variants in CUDA Toolkit 13.0+.
-- ``ulonglong1``, ``ulonglong2``, ``ulonglong3``, ``ulonglong4``, and alignment variants in CUDA Toolkit 13.0+.
+- ``long1``, ``long2``, ``long3``, ``long4``.
+- ``ulong1``, ``ulong2``, ``ulong3``, ``ulong4``.
+- ``longlong1``, ``longlong2``, ``longlong3``, ``longlong4``.
+- ``ulonglong1``, ``ulonglong2``, ``ulonglong3``, ``ulonglong4``.
 
 **Floating-point vector types**
 
 - ``float1``, ``float2``, ``float3``, ``float4``.
-- ``double1``, ``double2``, ``double3``, ``double4``, and alignment variants in CUDA Toolkit 13.0+.
+- ``double1``, ``double2``, ``double3``, ``double4``.
 
 **Special types**
 
@@ -69,10 +96,14 @@ The tuple protocol is supported for all CUDA vector types:
 
 **\*** Single-component vector types.
 
+.. note::
+
+   With HIP, the ``e8m0`` FP8 types and the FP6 and FP4 vector types are not available.
+
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/std/tuple>
 
@@ -108,4 +139,4 @@ Example
 See Also
 --------
 
-- :ref:`Type Traits for CUDA Vector Types <libcudacxx-extended-api-type_traits-vector_types>` - Extract scalar type from vector types.
+- :ref:`Type Traits for HIP Vector Types <libcudacxx-extended-api-type_traits-vector_types>` - Extract scalar type from vector types.

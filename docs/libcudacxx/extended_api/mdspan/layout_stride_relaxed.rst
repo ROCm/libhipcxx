@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for cuda::layout_stride_relaxed, an mdspan layout mapping policy that supports negative strides, zero strides, and a base offset in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, mdspan, layout_stride_relaxed, layout mapping, strides, broadcasting
+
 .. _libcudacxx-extended-api-mdspan-layout-stride-relaxed:
 
 ``layout_stride_relaxed``
 =========================
+
+This page documents ``cuda::layout_stride_relaxed``, which is an ``mdspan`` layout mapping with user-defined strides that can be negative or zero.
 
 Defined in the ``<cuda/mdspan>`` header.
 

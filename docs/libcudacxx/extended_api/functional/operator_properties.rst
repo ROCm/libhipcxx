@@ -1,7 +1,36 @@
+..
+    MIT License
+
+    Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+.. meta::
+  :description: API reference for the operator property traits cuda::is_associative_v, cuda::is_commutative_v, cuda::identity_element, and cuda::absorbing_element in libhipcxx for HIP.
+  :keywords: libhipcxx, ROCm, HIP, C++, operator properties, associative, commutative, identity element, absorbing element, functional
+
 .. _libcudacxx-extended-api-functional-operator-properties:
 
 Operator Properties
 ===================
+
+This page documents ``cuda::is_associative_v``, ``cuda::is_commutative_v``, ``cuda::identity_element()``, and ``cuda::absorbing_element()``, which describe algebraic properties of binary operators.
 
 Defined in the header ``<cuda/functional>``.
 
@@ -12,7 +41,7 @@ such as parallel reductions that can reorder operations for associative operator
 Associativity
 -------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -77,7 +106,7 @@ for all values ``a``, ``b``, ``c`` of type ``T``. This allows the implementation
 Commutativity
 -------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -138,7 +167,7 @@ for all values ``a``, ``b`` of type ``T``.
 Identity Element
 ----------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -208,7 +237,7 @@ exists for the given operator and type combination, it returns an internal senti
 Absorbing Element
 -----------------
 
-.. code:: cuda
+.. code:: cpp
 
    namespace cuda {
 
@@ -281,7 +310,7 @@ The functionality supports all integer and floating-point types, including exten
 Example
 -------
 
-.. code:: cuda
+.. code:: cpp
 
    #include <cuda/functional>
    #include <cuda/std/cstdio>
@@ -319,7 +348,7 @@ Customization
 Users can extend the operator properties traits to support custom operators or custom types by specializing
 the internal variable templates. The following specializations are available:
 
-.. code:: cuda
+.. code:: cpp
 
    template <>
    inline constexpr bool cuda::is_associative_v<MyOperator, MyType> = true;
