@@ -35,13 +35,24 @@ This page documents ``cuda::std::linalg`` in libhipcxx, providing linear algebra
 Provided functionalities
 ------------------------
 
-- ``scaled()`` `std::linalg::scaled <https://en.cppreference.com/w/cpp/numeric/linalg/scaled>`_
-- ``scaled_accessor`` `std::linalg::scaled_accessor <https://en.cppreference.com/w/cpp/numeric/linalg/scaled_accessor>`_
-- ``conjugated()`` `std::linalg::conjugated <https://en.cppreference.com/w/cpp/numeric/linalg/conjugated>`_
-- ``conjugated_accessor`` `std::linalg::conjugated_accessor <https://en.cppreference.com/w/cpp/numeric/linalg/conjugated_accessor>`_
-- ``transposed()`` `std::linalg::transposed <https://en.cppreference.com/w/cpp/numeric/linalg/transposed>`_
-- ``layout_transpose`` `std::linalg::layout_transpose <https://en.cppreference.com/w/cpp/numeric/linalg/layout_transpose>`_
-- ``conjugate_transposed()`` `std::linalg::conjugate_transposed <https://en.cppreference.com/w/cpp/numeric/linalg/conjugate_transposed>`_
+- ``scaled()`` ``std::linalg::scaled``
+- ``scaled_accessor`` ``std::linalg::scaled_accessor``
+- ``conjugated()`` ``std::linalg::conjugated``
+- ``conjugated_accessor`` ``std::linalg::conjugated_accessor``
+- ``transposed()`` ``std::linalg::transposed``
+- ``layout_transpose`` ``std::linalg::layout_transpose``
+- ``conjugate_transposed()`` ``std::linalg::conjugate_transposed``
+
+.. cppreference pages for these C++26 facilities are still empty:
+.. - `std::linalg::scaled <https://en.cppreference.com/w/cpp/numeric/linalg/scaled>`_
+.. - `std::linalg::scaled_accessor <https://en.cppreference.com/w/cpp/numeric/linalg/scaled_accessor>`_
+.. - `std::linalg::conjugated <https://en.cppreference.com/w/cpp/numeric/linalg/conjugated>`_
+.. - `std::linalg::conjugated_accessor <https://en.cppreference.com/w/cpp/numeric/linalg/conjugated_accessor>`_
+.. - `std::linalg::transposed <https://en.cppreference.com/w/cpp/numeric/linalg/transposed>`_
+.. - `std::linalg::layout_transpose <https://en.cppreference.com/w/cpp/numeric/linalg/layout_transpose>`_
+.. - `std::linalg::conjugate_transposed <https://en.cppreference.com/w/cpp/numeric/linalg/conjugate_transposed>`_
+
+These facilities are specified in the `C++ draft standard <https://eel.is/c++draft/linalg>`_.
 
 Extensions
 ----------
