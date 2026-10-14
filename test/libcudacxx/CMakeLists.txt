@@ -25,6 +25,11 @@ option(
   "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
   OFF
 )
+option(
+  LIBHIPCXX_TEST_WITH_HIPRTC
+  "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
+  OFF
+)
 ###############################################################################
 ### C2H tests:
 # NOTE(HIP/AMD): on HIP we also pull in the c2h subdirectory so the
@@ -64,7 +69,9 @@ if (LIBCUDACXX_ENABLE_HIP)
   find_package(rocthrust QUIET CONFIG)
 endif()
 
-if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT CCCL_ENABLE_TILE AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP))
+# NOTE(HIP/AMD): hipRTC matches the NVRTC exclusion above. Those per-test
+# executables are offline amdclang++ builds, not runtime-compiled by hiprtcc.
+if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT LIBHIPCXX_TEST_WITH_HIPRTC AND NOT CCCL_ENABLE_TILE AND (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP))
   file(
     GLOB_RECURSE test_srcs
     RELATIVE "${CMAKE_CURRENT_LIST_DIR}"
@@ -215,17 +222,25 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT CCCL_
     libcudacxx_add_test(test_target "${test_src}")
   endforeach()
 elseif (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
-  # NOTE(HIP/AMD): when c2h tests are disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF,
-  # used in air-gapped CI to avoid the cccl_get_catch2() git fetch), still
-  # define an *empty* 'libcudacxx.test.c2h_all' target. The
-  # 'libcudacxx-base' build preset in CMakePresets.json lists this target
-  # by name; without this stub a 'cmake --build --preset libcudacxx-cppNN'
-  # invocation would fail with 'ninja: error: unknown target
-  # libcudacxx.test.c2h_all'. Building the empty target is a near-zero-cost
-  # no-op.
+  # NOTE(HIP/AMD): when the per-test executables above are not created
+  # (c2h disabled, or NVRTC/hipRTC runtime compilation), still define an
+  # *empty* 'libcudacxx.test.c2h_all' target. The 'libcudacxx-base' build
+  # preset in CMakePresets.json lists this target by name; without this
+  # stub a 'cmake --build --preset libcudacxx-cppNN' invocation would fail
+  # with 'ninja: error: unknown target libcudacxx.test.c2h_all'. Building
+  # the empty target is a near-zero-cost no-op.
   add_custom_target(libcudacxx.test.c2h_all)
+  if (NOT LIBCUDACXX_ENABLE_C2H_TESTS)
+    set(_c2h_skip_reason "LIBCUDACXX_ENABLE_C2H_TESTS=OFF")
+  elseif (LIBCUDACXX_TEST_WITH_NVRTC)
+    set(_c2h_skip_reason "LIBCUDACXX_TEST_WITH_NVRTC=ON")
+  elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
+    set(_c2h_skip_reason "LIBHIPCXX_TEST_WITH_HIPRTC=ON")
+  elseif (CCCL_ENABLE_TILE)
+    set(_c2h_skip_reason "CCCL_ENABLE_TILE=ON")
+  endif()
   message(STATUS
-    "c2h tests disabled (LIBCUDACXX_ENABLE_C2H_TESTS=OFF). "
+    "c2h tests disabled (${_c2h_skip_reason}). "
     "libcudacxx.test.c2h_all defined as an empty stub.")
 endif()
 
@@ -288,10 +303,6 @@ elseif(LIBCUDACXX_ENABLE_HIP)
   endforeach ()
 
   message(STATUS "Enabled HIP architectures:${_compute_message}")
-
-  option(LIBHIPCXX_TEST_WITH_HIPRTC
-  "Test libcu++ with runtime compilation instead of offline compilation. Only runs device side tests."
-  OFF)
 endif()
 
 if (LIBCUDACXX_TEST_WITH_NVRTC)
@@ -634,7 +645,7 @@ set(
 )
 message(STATUS "libcudacxx_LIT_FLAGS: ${libcudacxx_LIT_FLAGS}")
 
-if (NOT LIBCUDACXX_TEST_WITH_NVRTC)
+if (NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT LIBHIPCXX_TEST_WITH_HIPRTC)
   # Build but don't run the tests. Used by CI to pre-seed sccache for the test machines.
   # Only executed if explicitly requested.
   add_custom_target(
