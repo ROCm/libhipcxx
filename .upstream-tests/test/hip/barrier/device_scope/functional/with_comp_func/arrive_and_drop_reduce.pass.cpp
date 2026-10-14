@@ -25,7 +25,7 @@
 
 // TODO(HIP/AMD): hiprtc is unsupported because the test scaffolding is much simpler for hiprtc (single thread, etc). See internal issue #383.
 // TODO(HIP/AMD): cooperative_groups is not supported on Windows
-// UNSUPPORTED: nvcc, nvhpc, nvc++, hiprtc, msvc
+// UNSUPPORTED: nvcc, nvhpc, nvc++, hiprtc, windows_amd
 // ADDITIONAL_COMPILE_FLAGS: -DUSE_COOPERATIVE_LAUNCH
 
 // <cuda/barrier>
