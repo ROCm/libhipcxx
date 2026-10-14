@@ -52,6 +52,16 @@ function(libcudacxx_build_compiler_targets)
     "CCCL_IGNORE_DEPRECATED_STREAM_REF_HEADER"
   )
 
+  # NOTE(HIP/AMD): windows.h / minwindef.h define min and max as function-like
+  # macros unless NOMINMAX is set. Lit already passes -DNOMINMAX for every
+  # Windows compiler. cccl_build_compiler_targets() only adds it when
+  # CMAKE_CXX_COMPILER_ID is MSVC, so HIP c2h tests built with clang still see
+  # the macros. They break numeric_limits::max/min in c2h/custom_type.h and
+  # rocPRIM's max/min.
+  if (WIN32)
+    list(APPEND cxx_compile_definitions "NOMINMAX")
+  endif()
+
   if (CCCL_ENABLE_TILE)
     list(APPEND cuda_compile_options "--enable-tile")
   endif()
