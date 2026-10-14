@@ -157,19 +157,27 @@ extern "C" _CCCL_DEVICE void __assertfail();
       ? (void) 0 : __assertfail()
 #  endif
 #elif defined(__HIP_PLATFORM_AMD__) && defined(_WIN32)
-// NOTE(HIP/AMD): hip_assert.h declares _wassert as a __device__ function.
-// The device pass still type-checks __host__ functions, and _CCCL_ASSERT
-// resolves to the device implementation for that whole pass, so a direct
-// _wassert() call from a host function is ill-formed ("call to __device__
-// function from __host__ function"). Overload on execution space, same as
-// the hipRTC path above: device callers trap, host callers are a no-op.
-// Host-pass asserts go through _CCCL_ASSERT_IMPL_HOST instead.
+// NOTE(HIP/AMD): hip_assert.h declares _wassert as a __device__ function, and
+// only while compiling the device pass. That pass still type-checks __host__
+// functions, and _CCCL_ASSERT resolves to the device implementation for the
+// whole pass, so a direct _wassert() call from a host function is ill-formed
+// ("call to __device__ function from __host__ function"). Overload on
+// execution space, same as the hipRTC path above: device callers trap, host
+// callers are a no-op.
+// The host pass of the same -x hip TU leaves __device__ empty and does not
+// include hip_assert.h, so naming _wassert here is an undeclared identifier
+// ("use of undeclared identifier '_wassert'" when compiling for host). Keep
+// the call in the device-pass overload only.
+#  if _CCCL_DEVICE_COMPILATION()
 [[maybe_unused]] _CCCL_DEVICE inline void
 __cccl_hip_wassert(const wchar_t* __msg, const wchar_t* __file, unsigned __line) noexcept
 {
   _wassert(__msg, __file, __line);
 }
 [[maybe_unused]] _CCCL_HOST inline void __cccl_hip_wassert(const wchar_t*, const wchar_t*, unsigned) noexcept {}
+#  else // ^^^ _CCCL_DEVICE_COMPILATION() ^^^ / vvv !_CCCL_DEVICE_COMPILATION() vvv
+[[maybe_unused]] inline void __cccl_hip_wassert(const wchar_t*, const wchar_t*, unsigned) noexcept {}
+#  endif // !_CCCL_DEVICE_COMPILATION()
 #  define _CCCL_ASSERT_IMPL_DEVICE(expression, message)      \
     _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1)   \
     ? (void) 0 : ::__cccl_hip_wassert(_CRT_WIDE(#message), __FILEW__, __LINE__)
