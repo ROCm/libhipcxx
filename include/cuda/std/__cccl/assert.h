@@ -156,8 +156,25 @@ extern "C" _CCCL_DEVICE void __assertfail();
       _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
       ? (void) 0 : __assertfail()
 #  endif
-#elif _CCCL_CUDA_COMPILER(NVCC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32)) //! Use __assert_fail to implement device side asserts
-#  if _CCCL_COMPILER(MSVC) || (defined(__HIP_PLATFORM_AMD__) && defined(_WIN32))
+#elif defined(__HIP_PLATFORM_AMD__) && defined(_WIN32)
+// NOTE(HIP/AMD): hip_assert.h declares _wassert as a __device__ function.
+// The device pass still type-checks __host__ functions, and _CCCL_ASSERT
+// resolves to the device implementation for that whole pass, so a direct
+// _wassert() call from a host function is ill-formed ("call to __device__
+// function from __host__ function"). Overload on execution space, same as
+// the hipRTC path above: device callers trap, host callers are a no-op.
+// Host-pass asserts go through _CCCL_ASSERT_IMPL_HOST instead.
+[[maybe_unused]] _CCCL_DEVICE inline void
+__cccl_hip_wassert(const wchar_t* __msg, const wchar_t* __file, unsigned __line) noexcept
+{
+  _wassert(__msg, __file, __line);
+}
+[[maybe_unused]] _CCCL_HOST inline void __cccl_hip_wassert(const wchar_t*, const wchar_t*, unsigned) noexcept {}
+#  define _CCCL_ASSERT_IMPL_DEVICE(expression, message)      \
+    _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1)   \
+    ? (void) 0 : ::__cccl_hip_wassert(_CRT_WIDE(#message), __FILEW__, __LINE__)
+#elif _CCCL_CUDA_COMPILER(NVCC) //! Use __assert_fail to implement device side asserts
+#  if _CCCL_COMPILER(MSVC)
 #    define _CCCL_ASSERT_IMPL_DEVICE(expression, message)    \
       _CCCL_BUILTIN_EXPECT(static_cast<bool>(expression), 1) \
       ? (void) 0 : _wassert(_CRT_WIDE(#message), __FILEW__, __LINE__)
