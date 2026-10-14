@@ -32,6 +32,7 @@
 // Verify a two-wave producer-consumer workflow with double buffering.
 
 #include <cassert>
+#include <vector>
 
 #include "test_macros.h"
 #include "hip_wavefront_size.h"
@@ -126,9 +127,12 @@ int main(int argc, char** argv)
   HIP_CALL(err, hipDeviceSynchronize());
   HIP_CALL(err, hipGetLastError());
 
+  std::vector<float> hOut(NUM_ELEMS);
+  HIP_CALL(err, hipMemcpy(hOut.data(), dOut, NUM_ELEMS * sizeof(float), hipMemcpyDeviceToHost));
+
   for (int i = 0; i < NUM_ELEMS; ++i)
   {
-    assert(dOut[i] == i);
+    assert(hOut[i] == i);
   }
 
   HIP_CALL(err, hipFree(dOut));
