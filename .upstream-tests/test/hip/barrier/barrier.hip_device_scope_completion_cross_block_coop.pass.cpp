@@ -24,7 +24,7 @@
 // THE SOFTWARE.
 
 // TODO(HIP/AMD): cooperative_groups is not supported on Windows
-// UNSUPPORTED: true, msvc
+// UNSUPPORTED: true, windows_amd
 // ADDITIONAL_COMPILE_FLAGS: -DUSE_COOPERATIVE_LAUNCH
 
 // <cuda/barrier>
