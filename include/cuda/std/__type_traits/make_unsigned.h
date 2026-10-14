@@ -54,13 +54,16 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
-// NOTE(HIP/AMD): excluded for hipRTC. gcc-8's libstdc++ <type_traits>, pulled in
-// transitively there, declares `namespace std { struct __make_unsigned; }`, which makes
-// clang revert its own builtin to a plain identifier for the rest of the TU. The
-// reversion is invisible to _CCCL_CHECK_BUILTIN, so exclude hipRTC outright.
-#if _CCCL_CHECK_BUILTIN(make_unsigned) && !defined(_CCCL_COMPILER_HIPRTC)
+// NOTE(HIP/AMD): excluded for HIP and hipRTC. <hip/hip_runtime.h> (included from
+// __config on every HIP TU) and hipRTC's host <new> both pull libstdc++
+// <type_traits>, which declares `namespace std { struct __make_unsigned; }`.
+// That makes clang revert its __make_unsigned builtin to a plain identifier for
+// the rest of the TU. The reversion is invisible to _CCCL_CHECK_BUILTIN
+// (__has_builtin stays 1), so the builtin alias never defines make_unsigned_t.
+// Use the manual fallback instead.
+#if _CCCL_CHECK_BUILTIN(make_unsigned) && !_CCCL_HIP_COMPILATION() && !defined(_CCCL_COMPILER_HIPRTC)
 #  define _CCCL_BUILTIN_MAKE_UNSIGNED(...) __make_unsigned(__VA_ARGS__)
-#endif // _CCCL_CHECK_BUILTIN(make_unsigned) && !_CCCL_COMPILER_HIPRTC
+#endif // _CCCL_CHECK_BUILTIN(make_unsigned) && !_CCCL_HIP_COMPILATION() && !_CCCL_COMPILER_HIPRTC
 
 // __make_unsigned doesn't work with clang < 20 or clang + nvcc
 #if _CCCL_COMPILER(CLANG, <, 20) || (_CCCL_COMPILER(CLANG) && _CCCL_CUDA_COMPILER(NVCC))
