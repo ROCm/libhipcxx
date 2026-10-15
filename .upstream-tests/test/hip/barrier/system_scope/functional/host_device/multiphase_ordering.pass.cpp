@@ -24,7 +24,8 @@
 // THE SOFTWARE.
 
 // TODO(HIP/AMD): hiprtc is unsupported because the test scaffolding is much simpler for hiprtc (single thread, etc). See internal issue #383.
-// UNSUPPORTED: nvcc, nvhpc, nvc++, hiprtc
+// TODO(HIP/AMD): __managed__ memory is not supported on Windows with discrete GPUs (WDDM), so the system-scope barrier cannot synchronize host+device.
+// UNSUPPORTED: nvcc, nvhpc, nvc++, hiprtc, windows_amd
 
 // <hip/barrier>
 //
