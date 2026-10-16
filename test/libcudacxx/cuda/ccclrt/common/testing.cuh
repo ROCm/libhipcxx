@@ -152,6 +152,15 @@ inline int cuda_driver_version()
   return ::cuda::__driver::__getVersion();
 }
 
+// NOTE(HIP/AMD): not every device supports cooperative launches (e.g. gfx1151
+// on Windows reports 0 and fails such launches with hipErrorLaunchFailure).
+inline bool supports_cooperative_launch()
+{
+  int value = 0;
+  CUDART(cudaDeviceGetAttribute(&value, cudaDevAttrCooperativeLaunch, 0));
+  return value != 0;
+}
+
 // Needs to be a template because we use template catch2 macro
 template <typename Dummy = void>
 struct ccclrt_test_fixture

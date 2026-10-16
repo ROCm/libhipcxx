@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // XFAIL: enable-tile
 // nvbug6077402: error: "call to non-tile function not supported!"
 
@@ -35,6 +57,21 @@ template <class T, class U = T>
 TEST_FUNC void test()
 {
   test(cuda::std::complex<T>(2, 3), cuda::std::complex<U>(2, 0), cuda::std::complex<T>(-5, 12));
+}
+
+// Device code defaults to -ffp-contract=fast, so pow() and exp(y * log(x)) fuse FMAs
+// differently; exp() amplifies the rounding gap to ~4e-12 relative for double.
+template <class T>
+TEST_FUNC void is_about_pow(T x, T y)
+{
+  if constexpr (cuda::std::is_same_v<T, double>)
+  {
+    assert(cuda::std::abs((x - y) / (x + y)) < 1.e-11);
+  }
+  else
+  {
+    is_about(x, y);
+  }
 }
 
 template <class T>
@@ -75,7 +112,7 @@ TEST_FUNC void test_edges()
       {
         if (real(r) != real(z))
         {
-          is_about(real(r), real(z));
+          is_about_pow(real(r), real(z));
         }
         assert(cuda::std::signbit(real(r)) == cuda::std::signbit(real(z)));
       }
@@ -87,7 +124,7 @@ TEST_FUNC void test_edges()
       {
         if (imag(r) != imag(z))
         {
-          is_about(imag(r), imag(z));
+          is_about_pow(imag(r), imag(z));
         }
         assert(cuda::std::signbit(imag(r)) == cuda::std::signbit(imag(z)));
       }
