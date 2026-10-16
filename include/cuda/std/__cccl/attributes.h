@@ -188,7 +188,9 @@
 
 // _CCCL_NO_UNIQUE_ADDRESS
 
-#if _CCCL_COMPILER(MSVC) || _CCCL_HAS_CPP_ATTRIBUTE(no_unique_address) < 201803L
+// On Windows clang's host pass ignores [[no_unique_address]] but the AMDGPU device pass honors it, so key off
+// _MSC_VER (defined in both passes) to keep host and device layouts identical.
+#if _CCCL_COMPILER(MSVC) || defined(_MSC_VER) || _CCCL_HAS_CPP_ATTRIBUTE(no_unique_address) < 201803L
 // MSVC implementation has lead to multiple issues with silent runtime corruption when passing data into kernels
 #  define _CCCL_HAS_ATTRIBUTE_NO_UNIQUE_ADDRESS() 0
 #  define _CCCL_NO_UNIQUE_ADDRESS

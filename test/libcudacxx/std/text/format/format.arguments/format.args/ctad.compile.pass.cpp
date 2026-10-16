@@ -16,12 +16,16 @@
 #include <cuda/std/type_traits>
 #include <cuda/std/utility>
 
+// A global using-directive makes HIP's ::__any ambiguous with cuda::std::__any on Windows.
+namespace test_ns
+{
 using namespace cuda::std;
 
 static_assert(is_same_v<format_args, decltype(basic_format_args{make_format_args(declval<int&>())})>);
 #if _CCCL_HAS_WCHAR_T()
 static_assert(is_same_v<wformat_args, decltype(basic_format_args{make_wformat_args(declval<int&>())})>);
 #endif // _CCCL_HAS_WCHAR_T()
+} // namespace test_ns
 
 int main(int, char**)
 {

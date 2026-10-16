@@ -1291,6 +1291,7 @@ TEST_FUNC constexpr bool test_base()
 {
   constexpr auto items = get_test_items<Base>();
 
+  _CCCL_PRAGMA_NOUNROLL()
   for (const auto& item : items)
   {
     test_from_chars<cuda::std::int64_t>(item, Base);

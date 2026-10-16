@@ -58,8 +58,9 @@ static bool replacementCalled = false;
 
 void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, void* args[])
 {
-  replacementCalled = true;
-  bool has_cluster  = false;
+  replacementCalled   = true;
+  bool has_cluster    = false;
+  bool is_cooperative = false;
 
   CCCLRT_CHECK(expectedConfig.gridDimX == config.gridDimX);
   CCCLRT_CHECK(expectedConfig.gridDimY == config.gridDimY);
@@ -90,6 +91,7 @@ void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, v
             break;
           case CU_LAUNCH_ATTRIBUTE_COOPERATIVE:
             CCCLRT_CHECK(expectedAttr.value.cooperative == actualAttr.value.cooperative);
+            is_cooperative = actualAttr.value.cooperative != 0;
             break;
           case CU_LAUNCH_ATTRIBUTE_PRIORITY:
             CCCLRT_CHECK(expectedAttr.value.priority == actualAttr.value.priority);
@@ -105,6 +107,10 @@ void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, v
     CCCLRT_CHECK(j != expectedConfig.numAttrs);
   }
 
+  if (is_cooperative && !test::supports_cooperative_launch())
+  {
+    return;
+  }
   if (!has_cluster || !skip_device_exec(arch_filter<std::less<int>, 90>))
   {
     return ::cuda::__driver::__launchKernel(config, kernel, args);

@@ -24,6 +24,8 @@ find_package(libhipcxx REQUIRED)
 
 add_executable(version_check version_check.cxx)
 target_compile_options(version_check PRIVATE -x hip)
+# clang targeting MSVC defaults to C++14, but libhipcxx requires C++17.
+target_compile_features(version_check PRIVATE cxx_std_17)
 target_link_libraries(version_check PRIVATE libhipcxx::libhipcxx hip::host)
 enable_testing()
 add_test(NAME version_check COMMAND "$<TARGET_FILE:version_check>")

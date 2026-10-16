@@ -569,7 +569,18 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool accessors", "[memory_resource]", TEST_T
 
     // Should be a noop
     auto noop_backing_size = pool.attribute(cuda::memory_pool_attributes::reserved_mem_current);
+#if defined(__HIP_PLATFORM_AMD__)
+    // NOTE(HIP/AMD): on Windows the pool backs each allocation separately
+    // instead of sharing one larger chunk, so this trim may release the freed
+    // ptr1 block. It must still hold the live ptr2 allocation.
+    CHECK(noop_backing_size <= backing_size);
+    CHECK(noop_backing_size >= 2048 * sizeof(int));
+    backing_size = noop_backing_size;
+    const auto min_backing_size = 2048 * sizeof(int);
+#else
     CHECK(backing_size == noop_backing_size);
+    const auto min_backing_size = 4096 * sizeof(int);
+#endif
 
     // Trim to larger than ever allocated
     pool.trim_to(backing_size * 24);
@@ -584,7 +595,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool accessors", "[memory_resource]", TEST_T
     // Check the backing size again
     auto new_backing_size = pool.attribute(cuda::memory_pool_attributes::reserved_mem_current);
     CHECK(new_backing_size <= backing_size);
-    CHECK(new_backing_size >= 4096 * sizeof(int));
+    CHECK(new_backing_size >= min_backing_size);
 
     // Free the last allocation
     resource.deallocate(stream, ptr2, 2048 * sizeof(int));

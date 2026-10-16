@@ -279,7 +279,10 @@ void launch_smoke_test(cudaStream_t dst)
     };
 
     test(config);
-    test(config.add(cuda::cooperative_launch(), cuda::launch_priority(0)));
+    if (::test::supports_cooperative_launch())
+    {
+      test(config.add(cuda::cooperative_launch(), cuda::launch_priority(0)));
+    }
   }
 }
 
@@ -342,6 +345,10 @@ struct verify_callable
 
 C2H_CCCLRT_TEST("Launch with default config", "")
 {
+  if (!test::supports_cooperative_launch())
+  {
+    return;
+  }
   cuda::stream stream{cuda::device_ref{0}};
   auto grid  = cuda::grid_dims(4);
   auto block = cuda::block_dims<256>;

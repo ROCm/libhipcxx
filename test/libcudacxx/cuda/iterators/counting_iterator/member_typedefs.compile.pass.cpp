@@ -113,6 +113,8 @@ TEST_FUNC void test()
 #else // ^^^ _CCCL_HAS_INT128() ^^^ / vvv !_CCCL_HAS_INT128() vvv
   using widest_integer = long long;
 #endif // !_CCCL_HAS_INT128()
+  // long is 32-bit on Windows, so its next wider signed type is long long.
+  using wider_than_long = cuda::std::conditional_t<(sizeof(long) < sizeof(long long)), long long, widest_integer>;
   {
     using Iter = cuda::counting_iterator<char>;
     static_assert(cuda::std::same_as<Iter::iterator_concept, cuda::std::random_access_iterator_tag>);
@@ -202,7 +204,7 @@ TEST_FUNC void test()
     // Same as below, if there is no type larger than long, we can just use that.
     static_assert(sizeof(Iter::difference_type) >= sizeof(long));
     static_assert(cuda::std::is_signed_v<Iter::difference_type>);
-    static_assert(cuda::std::same_as<Iter::difference_type, widest_integer>);
+    static_assert(cuda::std::same_as<Iter::difference_type, wider_than_long>);
     static_assert(cuda::std::random_access_iterator<Iter>);
     static_assert(cuda::std::is_trivially_copyable_v<Iter>);
   }
