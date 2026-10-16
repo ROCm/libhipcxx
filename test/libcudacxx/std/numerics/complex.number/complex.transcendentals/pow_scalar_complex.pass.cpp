@@ -59,6 +59,21 @@ TEST_FUNC void test()
   test(U(2), cuda::std::complex<T>(2), cuda::std::complex<T>(4));
 }
 
+// Device code defaults to -ffp-contract=fast, so pow() and exp(y * log(x)) fuse FMAs
+// differently; exp() amplifies the rounding gap to ~4e-12 relative for double.
+template <class T>
+TEST_FUNC bool is_pow_equal(T x, T y)
+{
+  if constexpr (cuda::std::is_same_v<T, double>)
+  {
+    return x == y || cuda::std::abs((x - y) / (x + y)) < 1.e-11;
+  }
+  else
+  {
+    return x == y;
+  }
+}
+
 template <class T>
 TEST_FUNC void test_edges()
 {
@@ -94,7 +109,7 @@ TEST_FUNC void test_edges()
       }
       else
       {
-        assert(real(r) == real(z));
+        assert(is_pow_equal(real(r), real(z)));
       }
       if (cuda::std::isnan(imag(r)))
       {
@@ -102,7 +117,7 @@ TEST_FUNC void test_edges()
       }
       else
       {
-        assert(imag(r) == imag(z));
+        assert(is_pow_equal(imag(r), imag(z)));
       }
     }
   }
