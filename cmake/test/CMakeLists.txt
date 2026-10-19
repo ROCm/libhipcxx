@@ -27,6 +27,12 @@ set(cmake_opts
   -D "CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}"
 )
 
+# Clang on Windows (GNU-like frontend) makes project() enable RC, so the nested
+# configure fails unless the resource compiler is passed through.
+if (CMAKE_RC_COMPILER)
+  list(APPEND cmake_opts -D "CMAKE_RC_COMPILER=${CMAKE_RC_COMPILER}")
+endif()
+
 # NOTE(HIP/AMD): version_check.cxx includes <cuda/std/atomic>, whose HIP device
 # intrinsics are only declared when the TU compiles as HIP -- so it needs hipcc,
 # not the host compiler (amdclang++ on a plain .cxx fails just like g++).
