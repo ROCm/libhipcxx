@@ -39,7 +39,9 @@
 #include <cuda/std/__barrier/empty_completion.h>
 #include <cuda/std/cstdint>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA
 
 // AMD HIP specialization for thread_scope_thread barriers.
 //
@@ -49,15 +51,15 @@ _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 // inherit from barrier<thread_scope_block>.
 
 template <>
-class barrier<thread_scope_thread, _CUDA_VSTD::__empty_completion>
-  : private barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
+class barrier<thread_scope_thread, ::cuda::std::__empty_completion>
+  : private barrier<thread_scope_block, ::cuda::std::__empty_completion>
 {
-  using __base = barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>;
+  using __base = barrier<thread_scope_block, ::cuda::std::__empty_completion>;
 
 public:
   using __base::__base;
 
-  _LIBCUDACXX_HIDE_FROM_ABI friend void init(barrier* __b, _CUDA_VSTD::ptrdiff_t __expected)
+  _CCCL_HOST_DEVICE_API friend void init(barrier* __b, ::cuda::std::ptrdiff_t __expected)
   {
     init(static_cast<__base*>(__b), __expected);
   }
@@ -70,6 +72,8 @@ public:
   using __base::wait;
 };
 
-_LIBCUDACXX_END_NAMESPACE_CUDA
+_CCCL_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___BARRIER_BARRIER_HIP_THREAD_SCOPE_H

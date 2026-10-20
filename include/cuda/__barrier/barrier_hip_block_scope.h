@@ -44,7 +44,6 @@
 
 #include <cuda/__barrier/barrier_hip_config.h>
 #include <cuda/__fwd/barrier.h>
-#include <cuda/__fwd/barrier_native_handle.h>
 #include <cuda/__barrier/lds_barrier.h>
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/__barrier/barrier.h>
@@ -52,8 +51,20 @@
 #include <cuda/std/__barrier/barrier_atomic_wrappers.h>
 #include <cuda/std/__new_>
 #include <cuda/std/cstdint>
+#include <cuda/__barrier/barrier.h>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA_DEVICE
+[[nodiscard]] _CCCL_DEVICE_API ::cuda::std::uint64_t*
+barrier_native_handle(::cuda::barrier<::cuda::thread_scope_block>& __b);
+_CCCL_END_NAMESPACE_CUDA_DEVICE
+
+#include <cuda/std/__cccl/epilogue.h>
+
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA
 
 /// @brief Dispatch tag carried by every HIP-native barrier specialisation.
 ///
@@ -64,7 +75,7 @@ struct __hip_native_tag
 
 // Forward declarations for friend functions
 template <class _Barrier>
-_CCCL_DEVICE void __add_tx_expectation(_Barrier&, _CUDA_VSTD::uint64_t);
+_CCCL_DEVICE void __add_tx_expectation(_Barrier&, ::cuda::std::uint64_t);
 
 struct __memcpy_completion_impl;
 
@@ -80,18 +91,18 @@ struct __memcpy_completion_impl;
 ///       storage followed by `init()` is the canonical GPU shared-memory
 ///       pattern and `__shared__` does not support non-trivial constructors.
 template <>
-class barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
+class barrier<thread_scope_block, ::cuda::std::__empty_completion>
 {
-  using __barrier_base = _CUDA_VSTD::__barrier_base<_CUDA_VSTD::__empty_completion, thread_scope_block>;
+  using __barrier_base = ::cuda::std::__barrier_base<::cuda::std::__empty_completion, thread_scope_block>;
   __barrier_base __barrier_;
 
-  static constexpr _CUDA_VSTD::uint64_t __phase_bit = 1ull << 63;
-  static constexpr _CUDA_VSTD::ptrdiff_t __max_expected_arrivals = 1024;
+  static constexpr ::cuda::std::uint64_t __phase_bit = 1ull << 63;
+  static constexpr ::cuda::std::ptrdiff_t __max_expected_arrivals = 1024;
 
   friend struct __memcpy_completion_impl;
 
-  _CCCL_DEVICE friend inline _CUDA_VSTD::uint64_t*
-  device::_LIBCUDACXX_ABI_NAMESPACE::barrier_native_handle(barrier<thread_scope_block>& __b);
+  _CCCL_DEVICE_API friend ::cuda::std::uint64_t*
+  ::cuda::device::_LIBCUDACXX_ABI_NAMESPACE::barrier_native_handle(barrier<thread_scope_block>& __b);
 
   // LDS phase state for supported shared-memory barriers.
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
@@ -108,35 +119,35 @@ class barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
 #  endif
   }
 
-  _CCCL_DEVICE static _CUDA_VSTD::uint64_t __token_from_lds_value(_CUDA_VSTD::uint64_t __value)
+  _CCCL_DEVICE static ::cuda::std::uint64_t __token_from_lds_value(::cuda::std::uint64_t __value)
   {
-    _CUDA_VSTD::uint64_t __phase = __lds_barrier_t::__phase_from_value(__value);
+    ::cuda::std::uint64_t __phase = __lds_barrier_t::__phase_from_value(__value);
     return (__phase & 1) ? __phase_bit : 0;
   }
 
-  _CCCL_DEVICE void __init_lds_phase(_CUDA_VSTD::ptrdiff_t __expected)
+  _CCCL_DEVICE void __init_lds_phase(::cuda::std::ptrdiff_t __expected)
   {
     __tx_barrier.__init_phase(__expected);
   }
 
-  _CCCL_DEVICE _CUDA_VSTD::uint32_t __lds_pending_count() const
+  _CCCL_DEVICE ::cuda::std::uint32_t __lds_pending_count() const
   {
     return __tx_barrier.__pending_count();
   }
 
-  _CCCL_DEVICE _CUDA_VSTD::uint64_t __lds_arrive(_CUDA_VSTD::ptrdiff_t __update)
+  _CCCL_DEVICE ::cuda::std::uint64_t __lds_arrive(::cuda::std::ptrdiff_t __update)
   {
     _CCCL_ASSERT(__update >= 0, "Arrival count update must be non-negative.");
     __builtin_amdgcn_fence(__ATOMIC_RELEASE, "workgroup");
 
-    _CUDA_VSTD::uint64_t __old = __tx_barrier.__arrive_rtn(static_cast<_CUDA_VSTD::uint32_t>(__update));
+    ::cuda::std::uint64_t __old = __tx_barrier.__arrive_rtn(static_cast<::cuda::std::uint32_t>(__update));
 
     return __token_from_lds_value(__old);
   }
 
-  _CCCL_DEVICE bool __try_wait_lds(_CUDA_VSTD::uint64_t __token) const
+  _CCCL_DEVICE bool __try_wait_lds(::cuda::std::uint64_t __token) const
   {
-    _CUDA_VSTD::uint64_t __value = __tx_barrier.__query();
+    ::cuda::std::uint64_t __value = __tx_barrier.__query();
 
     bool const __complete = __token_from_lds_value(__value) != (__token & __phase_bit);
     if (__complete) {
@@ -145,14 +156,14 @@ class barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
     return __complete;
   }
 
-  _CCCL_DEVICE void __wait_lds(_CUDA_VSTD::uint64_t __token) const
+  _CCCL_DEVICE void __wait_lds(::cuda::std::uint64_t __token) const
   {
     while (!__try_wait_lds(__token)) {
       __builtin_amdgcn_s_sleep(1);
     }
   }
 
-  _CCCL_DEVICE static _CUDA_VSTD::uint64_t __lds_token_from_parity(bool __parity)
+  _CCCL_DEVICE static ::cuda::std::uint64_t __lds_token_from_parity(bool __parity)
   {
     return __parity ? __phase_bit : 0;
   }
@@ -168,7 +179,7 @@ class barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
   }
 #endif
 
-  _CCCL_DEVICE void __add_tx_pending_count(_CUDA_VSTD::uint64_t __tx_count)
+  _CCCL_DEVICE void __add_tx_pending_count(::cuda::std::uint64_t __tx_count)
   {
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
     if (__tx_count == 0) {
@@ -208,16 +219,16 @@ class barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
   class __barrier_poll_tester_phase_tx
   {
     barrier const* __barrier_ptr;
-    _CUDA_VSTD::uint64_t __phase;
+    ::cuda::std::uint64_t __phase;
 
   public:
-    _LIBCUDACXX_HIDE_FROM_ABI
-    __barrier_poll_tester_phase_tx(barrier const* __barrier_ptr_, _CUDA_VSTD::uint64_t&& __phase_)
+    _CCCL_HOST_DEVICE_API
+    __barrier_poll_tester_phase_tx(barrier const* __barrier_ptr_, ::cuda::std::uint64_t&& __phase_)
         : __barrier_ptr(__barrier_ptr_)
-        , __phase(_CUDA_VSTD::move(__phase_))
+        , __phase(::cuda::std::move(__phase_))
     {}
 
-    _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool operator()() const
+    [[nodiscard]] _CCCL_HOST_DEVICE_API bool operator()() const
     {
       return __barrier_ptr->__try_wait_phase_tx(__phase);
     }
@@ -229,29 +240,29 @@ class barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
     bool __parity;
 
   public:
-    _LIBCUDACXX_HIDE_FROM_ABI __barrier_poll_tester_parity_tx(barrier const* __barrier_ptr_, bool __parity_)
+    _CCCL_HOST_DEVICE_API __barrier_poll_tester_parity_tx(barrier const* __barrier_ptr_, bool __parity_)
         : __barrier_ptr(__barrier_ptr_)
         , __parity(__parity_)
     {}
 
-    _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool operator()() const
+    [[nodiscard]] _CCCL_HOST_DEVICE_API bool operator()() const
     {
       return __barrier_ptr->__try_wait_parity_tx(__parity);
     }
   };
 
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __tx_complete() const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool __tx_complete() const
   {
     return true;
   }
 
-  _LIBCUDACXX_HIDE_FROM_ABI void __wait_tx_complete() const
+  _CCCL_HOST_DEVICE_API void __wait_tx_complete() const
   {
     while (!__tx_complete()) {}
     __builtin_amdgcn_fence(__ATOMIC_ACQUIRE, "workgroup");
   }
 
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait_tx_complete() const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait_tx_complete() const
   {
     if (!__tx_complete()) {
       return false;
@@ -260,17 +271,17 @@ class barrier<thread_scope_block, _CUDA_VSTD::__empty_completion>
     return true;
   }
 
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait_phase_tx(_CUDA_VSTD::uint64_t __phase) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait_phase_tx(::cuda::std::uint64_t __phase) const
   {
-    if (!_CUDA_VSTD::__call_try_wait(__barrier_, _CUDA_VSTD::move(__phase))) {
+    if (!::cuda::std::__call_try_wait(__barrier_, ::cuda::std::move(__phase))) {
       return false;
     }
     return __try_wait_tx_complete();
   }
 
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool __try_wait_parity_tx(bool __parity) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool __try_wait_parity_tx(bool __parity) const
   {
-    if (!_CUDA_VSTD::__call_try_wait_parity(__barrier_, __parity)) {
+    if (!::cuda::std::__call_try_wait_parity(__barrier_, __parity)) {
       return false;
     }
     return __try_wait_tx_complete();
@@ -286,7 +297,7 @@ public:
   /// Phase 0 (initial): `arrival_token == 0`.
   /// Phase 1: `arrival_token == (1ull << 63)`.
   /// The phase alternates on each barrier completion.
-  using arrival_token = _CUDA_VSTD::uint64_t;
+  using arrival_token = ::cuda::std::uint64_t;
 
   /// @brief Default constructor.
   ///
@@ -302,8 +313,8 @@ public:
   /// @param __expected  Number of arrivals required to complete one phase.
   ///                    Must satisfy `0 <= __expected <= max()`.
   /// @param             Completion functor (unused; present for API conformance).
-  _LIBCUDACXX_HIDE_FROM_ABI explicit barrier(_CUDA_VSTD::ptrdiff_t __expected,
-                                             _CUDA_VSTD::__empty_completion = {})
+  _CCCL_HOST_DEVICE_API explicit barrier(::cuda::std::ptrdiff_t __expected,
+                                             ::cuda::std::__empty_completion = {})
   {
     init(this, __expected);
   }
@@ -316,7 +327,7 @@ public:
   /// @param __b         Pointer to the barrier to initialise.
   /// @param __expected  Number of arrivals required to complete one phase.
   ///                    Must satisfy `0 <= __expected <= max()`.
-  _LIBCUDACXX_HIDE_FROM_ABI friend void init(barrier* __b, _CUDA_VSTD::ptrdiff_t __expected)
+  _CCCL_HOST_DEVICE_API friend void init(barrier* __b, ::cuda::std::ptrdiff_t __expected)
   {
     _CCCL_ASSERT(__expected >= 0, "Cannot initialize barrier with negative arrival count");
     _CCCL_ASSERT(__expected <= max(), "Cannot initialize barrier with arrival count greater than max()");
@@ -337,8 +348,8 @@ public:
   /// @param __update  Number of arrivals to contribute.  Defaults to 1.
   /// @return          A token representing the phase at the time of arrival,
   ///                  to be passed to `wait()`.
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI
-  arrival_token arrive(_CUDA_VSTD::ptrdiff_t __update = 1)
+  [[nodiscard]] _CCCL_HOST_DEVICE_API
+  arrival_token arrive(::cuda::std::ptrdiff_t __update = 1)
   {
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
     if (__is_lds_barrier()) {
@@ -356,7 +367,7 @@ public:
   /// @param __token  Token returned by a prior call to `arrive()`.
   ///                 Ownership is transferred; the token must not be used
   ///                 after this call.
-  _LIBCUDACXX_HIDE_FROM_ABI
+  _CCCL_HOST_DEVICE_API
   void wait(arrival_token&& __token) const
   {
 
@@ -367,7 +378,7 @@ public:
     }
 #endif
 
-    __barrier_.wait(_CUDA_VSTD::move(__token));
+    __barrier_.wait(::cuda::std::move(__token));
     __wait_tx_complete();
   }
 
@@ -380,7 +391,7 @@ public:
   ///
   /// @param __parity  The phase parity to wait for.  `false` waits for
   ///                  phase 0 (even), `true` waits for phase 1 (odd).
-  _LIBCUDACXX_HIDE_FROM_ABI
+  _CCCL_HOST_DEVICE_API
   void wait_parity(bool __parity) const
   {
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
@@ -402,10 +413,10 @@ public:
   /// @param __dur    Maximum duration to wait.
   /// @return true if phase completed, false on timeout.
   template <class _Rep, class _Period>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool
-  try_wait_for(arrival_token&& __token, const _CUDA_VSTD::chrono::duration<_Rep, _Period>& __dur) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
+  try_wait_for(arrival_token&& __token, const ::cuda::std::chrono::duration<_Rep, _Period>& __dur) const
   {
-    auto __nanosec = _CUDA_VSTD::chrono::duration_cast<_CUDA_VSTD::chrono::nanoseconds>(__dur);
+    auto __nanosec = ::cuda::std::chrono::duration_cast<::cuda::std::chrono::nanoseconds>(__dur);
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
     if (__is_lds_barrier()) {
       arrival_token __token_value = __token;
@@ -413,22 +424,22 @@ public:
         return __try_wait_lds(__token_value);
       }
 
-      _CUDA_VSTD::chrono::high_resolution_clock::time_point const __start =
-        _CUDA_VSTD::chrono::high_resolution_clock::now();
+      ::cuda::std::chrono::high_resolution_clock::time_point const __start =
+        ::cuda::std::chrono::high_resolution_clock::now();
       do {
         if (__try_wait_lds(__token_value)) {
           return true;
         }
-      } while (__nanosec > (_CUDA_VSTD::chrono::high_resolution_clock::now() - __start));
+      } while (__nanosec > (::cuda::std::chrono::high_resolution_clock::now() - __start));
       return false;
     }
 #endif
     if (__nanosec.count() < 1)
     {
-      return __try_wait_phase_tx(_CUDA_VSTD::move(__token));
+      return __try_wait_phase_tx(::cuda::std::move(__token));
     }
-    return _CUDA_VSTD::__cccl_thread_poll_with_backoff(
-      __barrier_poll_tester_phase_tx(this, _CUDA_VSTD::move(__token)),
+    return ::cuda::std::__cccl_thread_poll_with_backoff(
+      __barrier_poll_tester_phase_tx(this, ::cuda::std::move(__token)),
       __nanosec);
   }
 
@@ -440,10 +451,10 @@ public:
   /// @param __time   Time point deadline.
   /// @return true if phase completed, false on timeout.
   template <class _Clock, class _Duration>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool
-  try_wait_until(arrival_token&& __token, const _CUDA_VSTD::chrono::time_point<_Clock, _Duration>& __time) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
+  try_wait_until(arrival_token&& __token, const ::cuda::std::chrono::time_point<_Clock, _Duration>& __time) const
   {
-    return try_wait_for(_CUDA_VSTD::move(__token), (__time - _Clock::now()));
+    return try_wait_for(::cuda::std::move(__token), (__time - _Clock::now()));
   }
 
   /// @brief Attempts to wait for a parity phase completion with a timeout.
@@ -454,24 +465,24 @@ public:
   /// @param __dur     Maximum duration to wait.
   /// @return true if phase completed, false on timeout.
   template <class _Rep, class _Period>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool
-  try_wait_parity_for(bool __parity, const _CUDA_VSTD::chrono::duration<_Rep, _Period>& __dur) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
+  try_wait_parity_for(bool __parity, const ::cuda::std::chrono::duration<_Rep, _Period>& __dur) const
   {
-    auto __nanosec = _CUDA_VSTD::chrono::duration_cast<_CUDA_VSTD::chrono::nanoseconds>(__dur);
+    auto __nanosec = ::cuda::std::chrono::duration_cast<::cuda::std::chrono::nanoseconds>(__dur);
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
     if (__is_lds_barrier()) {
-      _CUDA_VSTD::uint64_t const __token = __lds_token_from_parity(__parity);
+      ::cuda::std::uint64_t const __token = __lds_token_from_parity(__parity);
       if (__nanosec.count() < 1) {
         return __try_wait_lds(__token);
       }
 
-      _CUDA_VSTD::chrono::high_resolution_clock::time_point const __start =
-        _CUDA_VSTD::chrono::high_resolution_clock::now();
+      ::cuda::std::chrono::high_resolution_clock::time_point const __start =
+        ::cuda::std::chrono::high_resolution_clock::now();
       do {
         if (__try_wait_lds(__token)) {
           return true;
         }
-      } while (__nanosec > (_CUDA_VSTD::chrono::high_resolution_clock::now() - __start));
+      } while (__nanosec > (::cuda::std::chrono::high_resolution_clock::now() - __start));
       return false;
     }
 #endif
@@ -479,7 +490,7 @@ public:
     {
       return __try_wait_parity_tx(__parity);
     }
-    return _CUDA_VSTD::__cccl_thread_poll_with_backoff(
+    return ::cuda::std::__cccl_thread_poll_with_backoff(
       __barrier_poll_tester_parity_tx(this, __parity),
       __nanosec);
   }
@@ -492,8 +503,8 @@ public:
   /// @param __time    Time point deadline.
   /// @return true if phase completed, false on timeout.
   template <class _Clock, class _Duration>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI bool
-  try_wait_parity_until(bool __parity, const _CUDA_VSTD::chrono::time_point<_Clock, _Duration>& __time) const
+  [[nodiscard]] _CCCL_HOST_DEVICE_API bool
+  try_wait_parity_until(bool __parity, const ::cuda::std::chrono::time_point<_Clock, _Duration>& __time) const
   {
     return try_wait_parity_for(__parity, (__time - _Clock::now()));
   }
@@ -501,7 +512,7 @@ public:
   /// @brief Arrives at the barrier and waits for the current phase to complete.
   ///
   /// Equivalent to `wait(arrive())`.
-  _LIBCUDACXX_HIDE_FROM_ABI
+  _CCCL_HOST_DEVICE_API
   void arrive_and_wait()
   {
     wait(arrive());
@@ -516,7 +527,7 @@ public:
   ///
   /// @note The expected count used to complete the *current* phase is
   ///       unaffected; only future phases see the decremented threshold.
-  _LIBCUDACXX_HIDE_FROM_ABI
+  _CCCL_HOST_DEVICE_API
   void arrive_and_drop()
   {
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
@@ -535,7 +546,7 @@ public:
   /// ordinary-copy events; init_count remains the public-arrival reload value.
   ///
   /// @note Declared `static constexpr` so it is callable without an instance.
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI static constexpr _CUDA_VSTD::ptrdiff_t max() noexcept
+  [[nodiscard]] _CCCL_HOST_DEVICE_API static constexpr ::cuda::std::ptrdiff_t max() noexcept
   {
     return __lds_barrier_t::init_count_max;
   }
@@ -545,13 +556,15 @@ public:
   /// Used by ordinary barrier-backed async-copy internals to add pending work
   /// to the active phase before its producer completion arrives.
   template <class _Barrier>
-  friend _CCCL_DEVICE void __add_tx_expectation(_Barrier& __b, _CUDA_VSTD::uint64_t __tx_count)
+  friend _CCCL_DEVICE void __add_tx_expectation(_Barrier& __b, ::cuda::std::uint64_t __tx_count)
   {
     __b.__add_tx_pending_count(__tx_count);
   }
 
 };
 
-_LIBCUDACXX_END_NAMESPACE_CUDA
+_CCCL_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___BARRIER_BARRIER_HIP_BLOCK_SCOPE_H

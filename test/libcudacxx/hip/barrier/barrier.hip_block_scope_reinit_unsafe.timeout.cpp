@@ -54,7 +54,7 @@ __device__ void test_unsafe_reinit_between_arrive_and_wait()
     init(&b, k_thread_count);
 
   // Wait with tokens from the overwritten object.
-  b.wait(_CUDA_VSTD::move(token));
+  b.wait(::cuda::std::move(token));
   __syncthreads();
 }
 

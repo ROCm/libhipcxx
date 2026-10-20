@@ -50,7 +50,9 @@
 
 #include <nv/target>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA
 
 /***********************************************************************
  * cuda::memcpy_async dispatch
@@ -64,7 +66,7 @@ _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
  *
  ***********************************************************************/
 
-_CCCL_NODISCARD _CCCL_DEVICE inline bool __hip_memcpy_async_is_shared(char const* __ptr)
+[[nodiscard]] _CCCL_DEVICE inline bool __hip_memcpy_async_is_shared(char const* __ptr)
 {
 #if defined(__HIP_DEVICE_COMPILE__)
   return __builtin_amdgcn_is_shared((const __attribute__((address_space(0))) void*) __ptr);
@@ -74,7 +76,7 @@ _CCCL_NODISCARD _CCCL_DEVICE inline bool __hip_memcpy_async_is_shared(char const
 #endif // __HIP_DEVICE_COMPILE__
 }
 
-_CCCL_NODISCARD _CCCL_DEVICE inline bool
+[[nodiscard]] _CCCL_DEVICE inline bool
 __hip_memcpy_async_has_accelerated_direction(char* __dest_char, char const* __src_char)
 {
 #if defined(__HIP_DEVICE_COMPILE__) && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
@@ -88,14 +90,14 @@ __hip_memcpy_async_has_accelerated_direction(char* __dest_char, char const* __sr
 #endif
 }
 
-template <_CUDA_VSTD::size_t _Align, typename _Group>
-_CCCL_NODISCARD _CCCL_DEVICE inline __completion_mechanism __dispatch_memcpy_async_any_to_any(
+template <::cuda::std::size_t _Align, typename _Group>
+[[nodiscard]] _CCCL_DEVICE inline __completion_mechanism __dispatch_memcpy_async_any_to_any(
   _Group const& __group,
   char* __dest_char,
   char const* __src_char,
-  _CUDA_VSTD::size_t __size,
-  _CUDA_VSTD::uint32_t __allowed_completions,
-  _CUDA_VSTD::uint64_t* __bar_handle)
+  ::cuda::std::size_t __size,
+  ::cuda::std::uint32_t __allowed_completions,
+  ::cuda::std::uint64_t* __bar_handle)
 {
   const bool __can_use_complete_tx = __allowed_completions & uint32_t(__completion_mechanism::__mbarrier_complete_tx);
   const bool __can_use_async_group = __allowed_completions & uint32_t(__completion_mechanism::__async_group);
@@ -146,7 +148,7 @@ _CCCL_NODISCARD _CCCL_DEVICE inline __completion_mechanism __dispatch_memcpy_asy
 #if defined(__HIP_DEVICE_COMPILE__) && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
   if(__bar_handle != nullptr && (__can_use_complete_tx))
   {
-    __attribute__((address_space(3))) _CUDA_VSTD::int64_t* __tmpHandle = (__attribute__((address_space(3))) _CUDA_VSTD::int64_t*)(__bar_handle);
+    __attribute__((address_space(3))) ::cuda::std::int64_t* __tmpHandle = (__attribute__((address_space(3))) ::cuda::std::int64_t*)(__bar_handle);
 
     __builtin_amdgcn_fence(__ATOMIC_RELEASE, "workgroup");
     __builtin_amdgcn_ds_atomic_async_barrier_arrive_b64(reinterpret_cast<long*>(__tmpHandle));
@@ -166,17 +168,17 @@ _CCCL_NODISCARD _CCCL_DEVICE inline __completion_mechanism __dispatch_memcpy_asy
 }
 
 // __dispatch_memcpy_async is the internal entry point for dispatching to the correct memcpy_async implementation.
-template <_CUDA_VSTD::size_t _Align, typename _Group>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __completion_mechanism __dispatch_memcpy_async(
+template <::cuda::std::size_t _Align, typename _Group>
+[[nodiscard]] _CCCL_HOST_DEVICE_API __completion_mechanism __dispatch_memcpy_async(
   _Group const& __group,
   char* __dest_char,
   char const* __src_char,
-  _CUDA_VSTD::size_t __size,
-  _CUDA_VSTD::uint32_t __allowed_completions,
-  _CUDA_VSTD::uint64_t* __bar_handle)
+  ::cuda::std::size_t __size,
+  ::cuda::std::uint32_t __allowed_completions,
+  ::cuda::std::uint64_t* __bar_handle)
 {
   NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE_LIBHIPCXX,
+    NV_IS_DEVICE,
     (
         return __dispatch_memcpy_async_any_to_any<_Align>(
           __group, __dest_char, __src_char, __size, __allowed_completions, __bar_handle);
@@ -184,23 +186,25 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __completion_mechanism __dispatch_memc
     (
       // Host code path:
       if (__group.thread_rank() == 0) {
-        _CUDA_VSTD::memcpy(__dest_char, __src_char, __size);
+        ::cuda::std::memcpy(__dest_char, __src_char, __size);
       } return __completion_mechanism::__sync;));
 }
 
-template <_CUDA_VSTD::size_t _Align, typename _Group>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI __completion_mechanism __dispatch_memcpy_async(
+template <::cuda::std::size_t _Align, typename _Group>
+[[nodiscard]] _CCCL_HOST_DEVICE_API __completion_mechanism __dispatch_memcpy_async(
   _Group const& __group,
   char* __dest_char,
   char const* __src_char,
-  _CUDA_VSTD::size_t __size,
-  _CUDA_VSTD::uint32_t __allowed_completions)
+  ::cuda::std::size_t __size,
+  ::cuda::std::uint32_t __allowed_completions)
 {
   _CCCL_ASSERT(!(__allowed_completions & uint32_t(__completion_mechanism::__mbarrier_complete_tx)),
                "Cannot allow mbarrier_complete_tx completion mechanism when not passing a barrier. ");
   return __dispatch_memcpy_async<_Align>(__group, __dest_char, __src_char, __size, __allowed_completions, nullptr);
 }
 
-_LIBCUDACXX_END_NAMESPACE_CUDA
+_CCCL_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA__MEMCPY_ASYNC_DISPATCH_HIP_MEMCPY_ASYNC_H_

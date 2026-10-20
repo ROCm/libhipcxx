@@ -78,7 +78,8 @@ __host__ __device__ constexpr bool test()
   return true;
 }
 
-static_assert(hip::aligned_size_t<42>{1337}.value == 1337, "");
+// CCCL 3.4 requires a power-of-two alignment and a size that is a multiple of it.
+static_assert(hip::aligned_size_t<32>{1344}.value == 1344, "");
 
 int main(int, char**)
 {

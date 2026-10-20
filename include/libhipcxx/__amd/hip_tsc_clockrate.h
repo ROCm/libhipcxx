@@ -89,10 +89,10 @@
 #    ifndef _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE
 #      define _LIBCUDACXX_HIP_TSC_NANOSECONDS_PER_CYCLE 10
 #    endif
-// gfx1250: from the CDNA5 ISA: 100 MHz TSC for wall_clock64.
+// gfx1250: CDNA5 ISA, 100 MHz TSC for wall_clock64.
 #  elif defined(__gfx1250__)
 #    ifndef NDEBUG
-#      warning Assuming 100 MHz realtime clock rate (TSC) for gfx1100/gfx1101 (according to the RDNA3 ISA). Timing-related APIs (e.g., chrono) or sleep instructions may behave incorrectly!
+#      warning Assuming 100 MHz realtime clock rate (TSC) for gfx1250 (from the CDNA5 ISA). Timing-related APIs (e.g., chrono) or sleep instructions may behave incorrectly!
 #    endif
 #    ifndef _LIBCUDACXX_HIP_TSC_CLOCKRATE
 #      define _LIBCUDACXX_HIP_TSC_CLOCKRATE             100000000

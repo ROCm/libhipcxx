@@ -36,7 +36,9 @@
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/atomic>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_STD
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 // Thin wrappers over the atomic operations used in __barrier_base.
 //
@@ -53,7 +55,7 @@ namespace __barrier_atomics
 
 // Replaces fetch_add(acq_rel).  Used in __barrier_base<__empty_completion>::arrive().
 template <typename _Tp, thread_scope _Sco>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI _Tp fetch_add_acq_rel(__atomic_impl<_Tp, _Sco>& __atom, _Tp __inc)
+[[nodiscard]] _CCCL_HOST_DEVICE_API _Tp fetch_add_acq_rel(__atomic_impl<_Tp, _Sco>& __atom, _Tp __inc)
 {
 #if defined(__HIP_PLATFORM_AMD__) && defined(__HIP_DEVICE_COMPILE__)
   __atomic_thread_fence_cuda(static_cast<__memory_order_underlying_t>(memory_order_release), __scope_to_tag<_Sco>{});
@@ -79,7 +81,7 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI _Tp fetch_add_acq_rel(__atomic_impl<_T
 
 // Replaces fetch_sub(acq_rel).  Used in __barrier_base<_CompletionF>::arrive().
 template <typename _Tp, thread_scope _Sco>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI _Tp
+[[nodiscard]] _CCCL_HOST_DEVICE_API _Tp
 fetch_sub_acq_rel(__atomic_impl<_Tp, _Sco>& __atom, _Tp __dec)
 {
 #if defined(__HIP_PLATFORM_AMD__) && defined(__HIP_DEVICE_COMPILE__)
@@ -99,7 +101,7 @@ fetch_sub_acq_rel(__atomic_impl<_Tp, _Sco>& __atom, _Tp __dec)
 // __completion() may issue stores between the two that must be visible before the phase bit
 // is published to waiting threads.
 template <typename _Tp, thread_scope _Sco>
-_LIBCUDACXX_HIDE_FROM_ABI void store_release(__atomic_impl<_Tp, _Sco>& __atom, _Tp __val)
+_CCCL_HOST_DEVICE_API void store_release(__atomic_impl<_Tp, _Sco>& __atom, _Tp __val)
 {
 #if defined(__HIP_PLATFORM_AMD__) && defined(__HIP_DEVICE_COMPILE__)
   __atomic_thread_fence_cuda(
@@ -112,7 +114,7 @@ _LIBCUDACXX_HIDE_FROM_ABI void store_release(__atomic_impl<_Tp, _Sco>& __atom, _
 
 // Replaces load(acquire).  Used in __try_wait / __try_wait_phase.
 template <typename _Tp, thread_scope _Sco>
-_CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI _Tp load_acquire(const __atomic_impl<_Tp, _Sco>& __atom)
+[[nodiscard]] _CCCL_HOST_DEVICE_API _Tp load_acquire(const __atomic_impl<_Tp, _Sco>& __atom)
 {
 #if defined(__HIP_PLATFORM_AMD__) && defined(__HIP_DEVICE_COMPILE__)
   // Use DS_READ for LDS barriers, FLAT_LOAD for global barriers
@@ -137,6 +139,8 @@ _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI _Tp load_acquire(const __atomic_impl<_
 
 } // namespace __barrier_atomics
 
-_LIBCUDACXX_END_NAMESPACE_STD
+_CCCL_END_NAMESPACE_CUDA_STD
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // __LIBCUDACXX___BARRIER_BARRIER_ATOMIC_WRAPPERS_H

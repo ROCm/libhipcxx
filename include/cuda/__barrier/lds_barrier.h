@@ -45,7 +45,9 @@
 #include <cuda/std/cstddef>
 #include <cuda/std/cstdint>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA
 
 /// @brief AMD LDS barrier helper with bitfield layout
 ///
@@ -59,90 +61,90 @@ struct alignas(8) __lds_barrier_t
   static constexpr int WIDTH = 29;
   static constexpr int pending_count_width = WIDTH;
   static constexpr int init_count_width    = 16;
-  static constexpr _CUDA_VSTD::uint32_t pending_count_max = (_CUDA_VSTD::uint32_t{1} << pending_count_width) - 1;
-  static constexpr _CUDA_VSTD::uint64_t combined_count_max = _CUDA_VSTD::uint64_t{1} << pending_count_width;
-  static constexpr _CUDA_VSTD::uint32_t init_count_max = (_CUDA_VSTD::uint32_t{1} << init_count_width) - 1;
+  static constexpr ::cuda::std::uint32_t pending_count_max = (::cuda::std::uint32_t{1} << pending_count_width) - 1;
+  static constexpr ::cuda::std::uint64_t combined_count_max = ::cuda::std::uint64_t{1} << pending_count_width;
+  static constexpr ::cuda::std::uint32_t init_count_max = (::cuda::std::uint32_t{1} << init_count_width) - 1;
 
   union {
-    _CUDA_VSTD::uint64_t value;
+    ::cuda::std::uint64_t value;
     struct {
-      _CUDA_VSTD::uint64_t pending_count : WIDTH;         // [28:0] arrive(N)
-      _CUDA_VSTD::uint64_t phase         : (32 - WIDTH);  // [31:29] phase modified if last to arrive
-      _CUDA_VSTD::uint64_t init_count    : init_count_width; // [47:32] next-phase public arrival count
-      _CUDA_VSTD::uint64_t zeros         : 16;            // [63:48] 
+      ::cuda::std::uint64_t pending_count : WIDTH;         // [28:0] arrive(N)
+      ::cuda::std::uint64_t phase         : (32 - WIDTH);  // [31:29] phase modified if last to arrive
+      ::cuda::std::uint64_t init_count    : init_count_width; // [47:32] next-phase public arrival count
+      ::cuda::std::uint64_t zeros         : 16;            // [63:48] 
     };
   };
 
   /// @brief Set the init_count bitfield
   /// @param __count Value to write to init_count (16-bit)
-  _CCCL_HOST_DEVICE void set_init_count(_CUDA_VSTD::uint16_t __count)
+  _CCCL_HOST_DEVICE void set_init_count(::cuda::std::uint16_t __count)
   {
     init_count = __count;
   }
 
   /// @brief Set the pending_count bitfield
   /// @param __count Value to write to pending_count (29-bit)
-  _CCCL_HOST_DEVICE void set_pending_count(_CUDA_VSTD::uint32_t __count)
+  _CCCL_HOST_DEVICE void set_pending_count(::cuda::std::uint32_t __count)
   {
     pending_count = __count;
   }
 
 #if _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
-  _CCCL_FORCEINLINE _CCCL_DEVICE __attribute__((address_space(3))) _CUDA_VSTD::uint64_t* __lds_word_ptr()
+  _CCCL_FORCEINLINE _CCCL_DEVICE __attribute__((address_space(3))) ::cuda::std::uint64_t* __lds_word_ptr()
   {
-    return (__attribute__((address_space(3))) _CUDA_VSTD::uint64_t*)(&value);
+    return (__attribute__((address_space(3))) ::cuda::std::uint64_t*)(&value);
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE __attribute__((address_space(3))) const _CUDA_VSTD::uint64_t* __lds_word_ptr() const
+  _CCCL_FORCEINLINE _CCCL_DEVICE __attribute__((address_space(3))) const ::cuda::std::uint64_t* __lds_word_ptr() const
   {
-    return (__attribute__((address_space(3))) const _CUDA_VSTD::uint64_t*)(&value);
+    return (__attribute__((address_space(3))) const ::cuda::std::uint64_t*)(&value);
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE static _CUDA_VSTD::uint64_t __phase_from_value(_CUDA_VSTD::uint64_t __value)
+  _CCCL_FORCEINLINE _CCCL_DEVICE static ::cuda::std::uint64_t __phase_from_value(::cuda::std::uint64_t __value)
   {
     __lds_barrier_t __barrier = {};
     __barrier.value = __value;
     return __barrier.phase;
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE static _CUDA_VSTD::uint32_t __pending_count_from_value(_CUDA_VSTD::uint64_t __value)
+  _CCCL_FORCEINLINE _CCCL_DEVICE static ::cuda::std::uint32_t __pending_count_from_value(::cuda::std::uint64_t __value)
   {
     __lds_barrier_t __barrier = {};
     __barrier.value = __value;
-    return static_cast<_CUDA_VSTD::uint32_t>(__barrier.pending_count);
+    return static_cast<::cuda::std::uint32_t>(__barrier.pending_count);
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE void __init_phase(_CUDA_VSTD::ptrdiff_t __expected)
+  _CCCL_FORCEINLINE _CCCL_DEVICE void __init_phase(::cuda::std::ptrdiff_t __expected)
   {
     value = 0;
 
     if (__expected > 0) {
-      _CUDA_VSTD::uint64_t __init_val = static_cast<_CUDA_VSTD::uint64_t>(__expected - 1);
-      set_pending_count(static_cast<_CUDA_VSTD::uint32_t>(__init_val));
-      set_init_count(static_cast<_CUDA_VSTD::uint16_t>(__init_val));
+      ::cuda::std::uint64_t __init_val = static_cast<::cuda::std::uint64_t>(__expected - 1);
+      set_pending_count(static_cast<::cuda::std::uint32_t>(__init_val));
+      set_init_count(static_cast<::cuda::std::uint16_t>(__init_val));
     }
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE _CUDA_VSTD::uint64_t __arrive_rtn(_CUDA_VSTD::uint32_t __update)
+  _CCCL_FORCEINLINE _CCCL_DEVICE ::cuda::std::uint64_t __arrive_rtn(::cuda::std::uint32_t __update)
   {
-    _CUDA_VSTD::uint64_t __old = __builtin_amdgcn_ds_atomic_barrier_arrive_rtn_b64(
+    ::cuda::std::uint64_t __old = __builtin_amdgcn_ds_atomic_barrier_arrive_rtn_b64(
       reinterpret_cast<__attribute__((address_space(3))) long*>(__lds_word_ptr()), __update);
     return __old;
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE _CUDA_VSTD::uint64_t __query() const
+  _CCCL_FORCEINLINE _CCCL_DEVICE ::cuda::std::uint64_t __query() const
   {
-    _CUDA_VSTD::uint64_t& __state_value = const_cast<_CUDA_VSTD::uint64_t&>(value);
-    hip::atomic_ref<_CUDA_VSTD::uint64_t, hip::thread_scope_block> __state(__state_value);
-    return __state.load(hip::std::memory_order_relaxed);
+    ::cuda::std::uint64_t& __state_value = const_cast<::cuda::std::uint64_t&>(value);
+    ::cuda::atomic_ref<::cuda::std::uint64_t, ::cuda::thread_scope_block> __state(__state_value);
+    return __state.load(::cuda::std::memory_order_relaxed);
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE _CUDA_VSTD::uint32_t __pending_count() const
+  _CCCL_FORCEINLINE _CCCL_DEVICE ::cuda::std::uint32_t __pending_count() const
   {
     return __pending_count_from_value(__query());
   }
 
-  _CCCL_FORCEINLINE _CCCL_DEVICE void __add_pending_count(_CUDA_VSTD::uint64_t __count)
+  _CCCL_FORCEINLINE _CCCL_DEVICE void __add_pending_count(::cuda::std::uint64_t __count)
   {
     __lds_barrier_t __increment = {};
     __increment.pending_count = __count;
@@ -151,7 +153,7 @@ struct alignas(8) __lds_barrier_t
 
   _CCCL_FORCEINLINE _CCCL_DEVICE void __decrement_init_count()
   {
-    constexpr _CUDA_VSTD::uint64_t __drop_expected_update = ~((_CUDA_VSTD::uint64_t{1} << 32) - 1);
+    constexpr ::cuda::std::uint64_t __drop_expected_update = ~((::cuda::std::uint64_t{1} << 32) - 1);
     __scoped_atomic_fetch_add(__lds_word_ptr(), __drop_expected_update, __ATOMIC_RELAXED, __MEMORY_SCOPE_WRKGRP);
   }
 
@@ -165,6 +167,8 @@ struct alignas(8) __lds_barrier_t
 #endif // _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
 };
 
-_LIBCUDACXX_END_NAMESPACE_CUDA
+_CCCL_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___BARRIER_LDS_BARRIER_H

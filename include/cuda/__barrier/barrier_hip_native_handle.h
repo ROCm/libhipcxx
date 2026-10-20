@@ -38,24 +38,28 @@
 #include <cuda/std/__atomic/scopes.h>
 #include <cuda/std/cstdint>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA_DEVICE
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA_DEVICE
 
 /// @brief Returns a raw pointer to the barrier's active native state.
 ///
 /// For the HIP block-scope empty-completion specialization on gfx1250,
 /// shared-memory barriers use the LDS phase object. Non-shared barriers retain
 /// the software state as their active phase object.
-_CCCL_DEVICE inline _CUDA_VSTD::uint64_t*
+_CCCL_DEVICE inline ::cuda::std::uint64_t*
 barrier_native_handle(barrier<thread_scope_block>& __b)
 {
 #if defined(__HIP_DEVICE_COMPILE__) && _CUDA___BARRIER_HIP_HAS_LDS_PHASE_OBJECT
   if (__builtin_amdgcn_is_shared(reinterpret_cast<const void*>(&__b))) {
-    return reinterpret_cast<_CUDA_VSTD::uint64_t*>(&__b.__tx_barrier.value);
+    return reinterpret_cast<::cuda::std::uint64_t*>(&__b.__tx_barrier.value);
   }
 #endif
-  return reinterpret_cast<_CUDA_VSTD::uint64_t*>(&__b);
+  return reinterpret_cast<::cuda::std::uint64_t*>(&__b);
 }
 
-_LIBCUDACXX_END_NAMESPACE_CUDA_DEVICE
+_CCCL_END_NAMESPACE_CUDA_DEVICE
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___BARRIER_BARRIER_NATIVE_HANDLE_HIP_H

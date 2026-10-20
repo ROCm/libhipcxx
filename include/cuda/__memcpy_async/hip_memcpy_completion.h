@@ -46,7 +46,9 @@
 
 #include <nv/target>
 
-_LIBCUDACXX_BEGIN_NAMESPACE_CUDA
+#include <cuda/std/__cccl/prologue.h>
+
+_CCCL_BEGIN_NAMESPACE_CUDA
 
 // This struct contains functions to defer the completion of a barrier phase
 // or pipeline stage until a specific memcpy_async operation *initiated by
@@ -58,10 +60,10 @@ _LIBCUDACXX_BEGIN_NAMESPACE_CUDA
 struct __memcpy_completion_impl
 {
   template <typename _Group>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI static async_contract_fulfillment
+  [[nodiscard]] _CCCL_HOST_DEVICE_API static async_contract_fulfillment
   __defer(__completion_mechanism __cm,
           _Group const& __group,
-          _CUDA_VSTD::size_t __size,
+          ::cuda::std::size_t __size,
           barrier<::cuda::thread_scope_block>& __barrier)
   {
     // In principle, this is the overload for shared memory barriers. However, a
@@ -100,15 +102,15 @@ struct __memcpy_completion_impl
   }
 
   template <typename _Group, thread_scope _Sco, typename _CompF>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI static async_contract_fulfillment __defer(
-    __completion_mechanism __cm, _Group const& __group, _CUDA_VSTD::size_t __size, barrier<_Sco, _CompF>& __barrier)
+  [[nodiscard]] _CCCL_HOST_DEVICE_API static async_contract_fulfillment __defer(
+    __completion_mechanism __cm, _Group const& __group, ::cuda::std::size_t __size, barrier<_Sco, _CompF>& __barrier)
   {
     return __defer_non_smem_barrier(__cm, __group, __size, __barrier);
   }
 
   template <typename _Group, thread_scope _Sco, typename _CompF>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI static async_contract_fulfillment __defer_non_smem_barrier(
-    __completion_mechanism __cm, _Group const& __group, _CUDA_VSTD::size_t __size, barrier<_Sco, _CompF>& __barrier)
+  [[nodiscard]] _CCCL_HOST_DEVICE_API static async_contract_fulfillment __defer_non_smem_barrier(
+    __completion_mechanism __cm, _Group const& __group, ::cuda::std::size_t __size, barrier<_Sco, _CompF>& __barrier)
   {
     // Overload for non-smem barriers.
     switch (__cm)
@@ -148,8 +150,8 @@ struct __memcpy_completion_impl
   }
 
   template <typename _Group, thread_scope _Sco>
-  _CCCL_NODISCARD _LIBCUDACXX_HIDE_FROM_ABI static async_contract_fulfillment
-  __defer(__completion_mechanism __cm, _Group const&, _CUDA_VSTD::size_t, pipeline<_Sco>&)
+  [[nodiscard]] _CCCL_HOST_DEVICE_API static async_contract_fulfillment
+  __defer(__completion_mechanism __cm, _Group const&, ::cuda::std::size_t, pipeline<_Sco>&)
   {
     switch (__cm)
     {
@@ -168,6 +170,8 @@ struct __memcpy_completion_impl
   }
 };
 
-_LIBCUDACXX_END_NAMESPACE_CUDA
+_CCCL_END_NAMESPACE_CUDA
+
+#include <cuda/std/__cccl/epilogue.h>
 
 #endif // _CUDA___MEMCPY_ASYNC_HIP_MEMCPY_COMPLETION_H
