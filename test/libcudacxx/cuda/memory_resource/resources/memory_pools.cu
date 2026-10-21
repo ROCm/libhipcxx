@@ -569,10 +569,11 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool accessors", "[memory_resource]", TEST_T
 
     // Should be a noop
     auto noop_backing_size = pool.attribute(cuda::memory_pool_attributes::reserved_mem_current);
-#if defined(__HIP_PLATFORM_AMD__)
+#if defined(__HIP_PLATFORM_AMD__) && _CCCL_OS(WINDOWS)
     // NOTE(HIP/AMD): on Windows the pool backs each allocation separately
     // instead of sharing one larger chunk, so this trim may release the freed
-    // ptr1 block. It must still hold the live ptr2 allocation.
+    // ptr1 block. It must still hold the live ptr2 allocation. Linux keeps the
+    // shared chunk, so the strict CUDA check below still applies there.
     CHECK(noop_backing_size <= backing_size);
     CHECK(noop_backing_size >= 2048 * sizeof(int));
     backing_size = noop_backing_size;
