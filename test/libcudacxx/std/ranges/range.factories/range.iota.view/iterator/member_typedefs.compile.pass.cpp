@@ -134,8 +134,9 @@ TEST_FUNC void test()
 #else // ^^^ _CCCL_HAS_INT128() ^^^ / vvv !_CCCL_HAS_INT128() vvv
   using widest_integer = long long;
 #endif // !_CCCL_HAS_INT128()
-  // Windows uses LLP64, so long is 32-bit and its next wider signed type is long long.
-  // This differs from widest_integer with amdclang, which supports __int128_t unlike MSVC.
+  // NOTE(HIP/AMD): Windows is LLP64, so long is 32-bit and the next wider signed
+  // type is long long. amdclang provides __int128_t, unlike MSVC, so widest_integer
+  // is not the difference type here.
   using wider_than_long = cuda::std::conditional_t<(sizeof(long) < sizeof(long long)), long long, widest_integer>;
 
   {
