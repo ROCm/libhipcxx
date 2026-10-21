@@ -263,28 +263,25 @@ def killProcessAndChildren(pid):
     TODO: Reimplement this without using psutil so we can
           remove our dependency on it.
     """
-    if platform.system() == "AIX":
-        subprocess.call("kill -kill $(ps -o pid= -L{})".format(pid), shell=True)
-    else:
-        import psutil
+    import psutil
 
+    try:
+        psutilProc = psutil.Process(pid)
+        # Handle the different psutil API versions
         try:
-            psutilProc = psutil.Process(pid)
-            # Handle the different psutil API versions
+            # psutil >= 2.x
+            children_iterator = psutilProc.children(recursive=True)
+        except AttributeError:
+            # psutil 1.x
+            children_iterator = psutilProc.get_children(recursive=True)
+        for child in children_iterator:
             try:
-                # psutil >= 2.x
-                children_iterator = psutilProc.children(recursive=True)
-            except AttributeError:
-                # psutil 1.x
-                children_iterator = psutilProc.get_children(recursive=True)
-            for child in children_iterator:
-                try:
-                    child.kill()
-                except psutil.NoSuchProcess:
-                    pass
-            psutilProc.kill()
-        except psutil.NoSuchProcess:
-            pass
+                child.kill()
+            except psutil.NoSuchProcess:
+                pass
+        psutilProc.kill()
+    except psutil.NoSuchProcess:
+        pass
 
 
 def executeCommandVerbose(cmd, *args, **kwargs):
