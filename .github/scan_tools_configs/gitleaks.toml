@@ -1,0 +1,90 @@
+# MIT License
+#
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# gitleaks.toml
+# Reference: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
+# Local scan: gitleaks detect --source . --config .github/scan_tools_configs/gitleaks.toml
+#
+# Gitleaks configuration for this repository's security scans.
+#
+# This file defines the repository's complete Gitleaks policy. Recurring
+# exclusions belong in this file.
+#
+# The `[extend]` section inherits Gitleaks' built-in rules, and the
+# `[[allowlists]]` below apply to every rule.
+#
+# Use `.gitleaksignore` for one-off finding fingerprints. Add recurring path
+# or regex exclusions to `[[allowlists]]` in this file.
+
+title = "gitleaks config"
+
+[extend]
+# Inherit gitleaks' built-in ruleset (rotations, AWS, GCP, Slack, ...).
+# Setting this to false would mean rolling our own detections, which
+# is almost never what you want.
+useDefault = true
+
+
+
+# Allowlist field-vs-target reference:
+#   stopwords         -> always matched against the SECRET value.
+#   regexes           -> matched against `regexTarget` (default: "secret").
+#   regexTarget       -> "secret" | "match" | "line".
+# Use "match" or "line" when the "tell" is the variable name or
+# surrounding syntax, not the value itself.
+
+[[allowlists]]
+# Allowlist by location only where a real first-party secret structurally
+# can't live. Dependency lock files qualify: their contents are generated
+# from a manifest, and the high-entropy strings they carry are artifact
+# digests rather than credentials. Add vendored third-party trees here as
+# callers bring them in, one explicit path per entry.
+description = "Generated dependency lock files"
+paths = [
+  '''.*\.lock$''',
+]
+
+[[allowlists]]
+description = "Test fixtures using well-known dummy variable names"
+# The "tell" here is the variable name on the same line, not the value
+# (the value is a random-looking string by design). Match against the
+# full rule match (variable + value) so we anchor on the identifier.
+regexTarget = "match"
+regexes = [
+  '''(?i)\bINVALID_TOKEN\s*=''',
+  '''(?i)\bwrong_secret\s*=''',
+  # Explicit test-only secret identifiers
+  '''(?i)\btest_secret\s*=''',
+  '''(?i)\bdummy_secret\s*=''',
+  '''(?i)\bfake_secret\s*=''',
+  '''(?i)\bexample_secret\s*='''
+]
+
+[[allowlists]]
+description = "Public artifact digests (variable names ending in SHA256/512/MD5)"
+# SHA-256/512/MD5 hashes of public artifacts are not secrets.
+regexTarget = "line"
+regexes = [
+  '''[A-Z][A-Z0-9_]*SHA256\s*[=:]''',
+  '''[A-Z][A-Z0-9_]*SHA512\s*[=:]''',
+  '''[A-Z][A-Z0-9_]*MD5\s*[=:]''',
+]
