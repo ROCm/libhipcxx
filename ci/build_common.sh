@@ -250,17 +250,26 @@ function build_preset() {
     status=$?
     popd > /dev/null
 
-    sccache --show-adv-stats --stats-format=json > "${sccache_json}"
+    # sccache_stats.sh returns without recording counters when sccache is
+    # absent. Do not invoke the binary in that case: the build result stands
+    # on its own.
+    if command -v sccache >/dev/null 2>&1; then
+        sccache --show-adv-stats --stats-format=json > "${sccache_json}"
 
-    minimal_sccache_stats=$(source "./sccache_stats.sh" "end")
+        minimal_sccache_stats=$(source "./sccache_stats.sh" "end")
 
-    # Only print detailed stats in actions workflow
+        # Only print detailed stats in actions workflow
+        if [ -n "${GITHUB_ACTIONS:-}" ]; then
+            begin_group "💲 sccache stats"
+            echo "${minimal_sccache_stats}"
+            sccache -s
+            end_group
+        else
+          echo $minimal_sccache_stats
+        fi
+    fi
+
     if [ -n "${GITHUB_ACTIONS:-}" ]; then
-        begin_group "💲 sccache stats"
-        echo "${minimal_sccache_stats}"
-        sccache -s
-        end_group
-
         begin_group "🥷 ninja build times"
         echo "The "weighted" time is the elapsed time of each build step divided by the number
               of tasks that were running in parallel. This makes it an excellent approximation
@@ -270,8 +279,6 @@ function build_preset() {
               that is tiny."
         ./ninja_summary.py -C ${BUILD_DIR}/${PRESET} || echo "Warning: ninja_summary.py failed to execute properly."
         end_group
-    else
-      echo $minimal_sccache_stats
     fi
 
     return $status
