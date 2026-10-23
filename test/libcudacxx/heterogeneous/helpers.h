@@ -40,17 +40,18 @@
 #include "test_macros.h"
 
 // NOTE(HIP/AMD): libamdhip64's DSO destructor busy-spins for minutes when many of
-// these processes exit at once; static destructors run before _dl_fini, so ending
-// the process here skips it. Safe because the tests keep no state needing
-// destruction and every failure path aborts, which bypasses this.
-// See LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR in force_include_hip.h.
+// these processes exit at once (ROCm 7.14 and ROCm 10); static destructors run
+// before _dl_fini, so ending the process here skips it. The status is the code
+// recorded by the test wrapper, so a non-zero return stays a failure. abort()
+// does not run this destructor. See LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR in
+// force_include_hip.h.
 #if LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR
 struct skip_hip_teardown_t
 {
   ~skip_hip_teardown_t()
   {
     std::fflush(nullptr);
-    std::_Exit(0);
+    std::_Exit(libhipcxx_teardown_exit_code());
   }
 };
 static skip_hip_teardown_t skip_hip_teardown_instance;
