@@ -1097,8 +1097,7 @@ struct CUlaunchConfig
 // '::__nv_fp8_e4m3' forward-declared instead of '::__hip_fp8_e4m3', and
 // later macro expansion finds an undeclared name. fp4 / fp6 are
 // intentionally NOT pulled in here -- their <hip/hip_fp{4,6}.h> headers
-// have an internal-helper symbol clash, see
-// /home/moberste/Coding/Reproducer/claude/hip_fp4_fp6_internal_helpers_redefinition.cpp.
+// have an internal-helper symbol clash when included together.
 #include <hip/hip_fp8.h>
 // NOTE(HIP/AMD): mark 'inline' to avoid ODR violations when multiple
 // TUs that include <libhipcxx/__amd/cuda_runtime.h> are linked together (the

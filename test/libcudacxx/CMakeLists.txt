@@ -262,8 +262,7 @@ endmacro()
 # '// UNSUPPORTED: hipcc, hiprtc' and 'pre-sm-90'. On HIP-only builds the
 # dlpack include is therefore dead code -- and 'cccl_get_dlpack()' would
 # otherwise call CPM/'git clone gh:dmlc/dlpack#v1.2', which fails in
-# air-gapped CI containers (observed on the ROCm-DS Jenkins job
-# 'libhipcxx/155': 'Failed to clone repository ...dlpack...'). Gate the
+# air-gapped CI containers ('Failed to clone repository ...dlpack...'). Gate the
 # fetch on 'LIBCUDACXX_ENABLE_CUDA' so HIP-only builds skip it entirely.
 # NOTE(HIP/AMD): 3.3 adds general mdspan<->dlpack conversion tests
 # (cuda/containers/views/mdspan/{mdspan_to_dlpack,dlpack_to_mdspan}) that need
