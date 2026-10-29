@@ -34,13 +34,12 @@
 // UNSUPPORTED: windows && pre-sm-70
 
 // NOTE(HIP/AMD): the test body in main() below is already wrapped in
-// '#if !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE)', so on the
-// HIPRTC build (where <cuda/std/__internal/atomic.h> force-defines
-// _CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE -- see the matching note
-// there) main() reduces to 'return 0;' and the test trivially
-// passes. No UNSUPPORTED marker is therefore required for HIPRTC,
-// and HIPCC keeps the SAFE-path coverage of the actual
-// stack-allocated cuda::atomic<T> exercised by tests<...>().
+// '#if !defined(_CCCL_ATOMIC_UNSAFE_AUTOMATIC_STORAGE)', so on HIPRTC
+// builds where <cuda/std/__internal/atomic.h> still defines that macro
+// main() reduces to 'return 0;'. ROCm >= 7.13 does not define it, so
+// this test really does run the stack-allocated atomics under HIPRTC.
+// tests() is noinline there until LCOMPILER-3082 is fixed; see below.
+// HIPCC offline is unchanged and keeps the SAFE-path coverage.
 
 #include <cuda/atomic>
 #include <cuda/std/cassert>
@@ -138,7 +137,13 @@ TEST_DEVICE_FUNC T fetch_max(T in)
 }
 
 template <typename T>
+// FIXME(HIP/AMD): noinline until LCOMPILER-3082 is fixed. HIPRTC miscompiles
+// this on gfx942 once every tests<T>() is inlined into main.
+#if defined(__HIPCC_RTC__)
+TEST_DEVICE_FUNC __attribute__((noinline)) inline void tests()
+#else
 TEST_DEVICE_FUNC inline void tests()
+#endif
 {
   const T tid = threadIdx.x;
   assert(tid + T(1) == store(tid));
