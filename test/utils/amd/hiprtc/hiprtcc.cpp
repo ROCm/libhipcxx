@@ -66,10 +66,13 @@ using ArgHandlerMap = std::vector<ArgPair>;
 
 int g_argc;
 char** g_argv;
+bool offloadArchExplicit = false;
 
+// gfx1250-strict must be listed before the shorter gfx12xx pattern. regex_match
+// requires the whole string, so gfx1250-strict would otherwise fall back to gfx90a.
 // Ignore PTX arch, only capture output version since PTX only compilation *must* be the same
-std::regex real_capture(R"((?:--offload-arch=)?(gfx(90.|94.|95.|10..|11..|12..)))");
-std::regex virtual_capture(R"((?:--offload-arch=)?(gfx(90.|94.|95.|10..|11..|12..)))"); // NOTE(HIP): HIP does not support virtual archs
+std::regex real_capture(R"((?:--offload-arch=)?(gfx1250-strict|gfx(90.|94.|95.|10..|11..|12..)))");
+std::regex virtual_capture(R"((?:--offload-arch=)?(gfx1250-strict|gfx(90.|94.|95.|10..|11..|12..)))"); // NOTE(HIP): HIP does not support virtual archs
 
 // Arch list is a set of unique pairs of strings and bools
 // e.x. { compute_arch, real_or_virtual }
@@ -91,6 +94,59 @@ static ArchConfig translate_gpu_arch(const std::string& arch)
                                     : ArchConfig{"gfx90a", true};
 
   return config;
+}
+
+// Offload id of the current device, e.g. "gfx942" or "gfx1250-strict".
+static std::string current_device_arch()
+{
+  hipDevice_t device;
+  cudaDeviceProp device_prop;
+
+  (void)cudaGetDevice(&device);
+  (void)cudaGetDeviceProperties(&device_prop, device);
+
+  // Keep an optional -strict suffix. Feature suffixes after ':' are not part of the offload id.
+  const std::regex gfx_arch_pattern("(gfx[0-9a-fA-F]+(?:-strict)?)(:[-+:\\w]+)?");
+
+  std::smatch match;
+  std::string full_arch_name(device_prop.gcnArchName);
+  if (!std::regex_search(full_arch_name, match, gfx_arch_pattern))
+  {
+    std::cerr << "HIP fatal error: Cannot determine target architecture name of current device!" << std::endl;
+    std::terminate();
+  }
+  return match[1].str();
+}
+
+static bool ends_with(const std::string& s, const std::string& suffix)
+{
+  return s.size() >= suffix.size() && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+// Builds are named "<template>.<arch>.gpu", one per --offload-arch. Run the one built for the
+// current device. gfx1250 (B0) and gfx1250-strict (A0) are different targets, so the match is exact.
+static std::string select_build_for_device(const std::vector<std::string>& builds)
+{
+  if (builds.size() == 1)
+  {
+    return builds[0];
+  }
+
+  const std::string arch = current_device_arch();
+  for (const auto& build : builds)
+  {
+    if (ends_with(build, "." + arch + ".gpu"))
+    {
+      return build;
+    }
+  }
+
+  std::cerr << "HIP fatal error: no build for current device " << arch << " among:" << std::endl;
+  for (const auto& build : builds)
+  {
+    std::cerr << "  " << build << std::endl;
+  }
+  std::terminate();
 }
 
 // Greedy handlers inform the argument processor to expect more arguments
@@ -165,7 +221,8 @@ ArgPair argHandlers[] = {
   {// Matches '--offload-arch=' or '--offload-arch ...'
    std::regex("^--offload-arch[= ]?(.+)$"),
     [](const std::smatch& match) {
-    // buildList.emplace(translate_gpu_arch(match[1].str().data()));
+     buildList.emplace(translate_gpu_arch(match[1].str()));
+     offloadArchExplicit = true;
      return NORMAL;
    }},
   {// Matches the many various versions of dialect switch and normalizes it
@@ -255,26 +312,12 @@ int main(int argc, char** argv)
     }
   }
 
-  hipDevice_t device;
-  cudaDeviceProp device_prop;
-
-  (void)cudaGetDevice(&device);
-  (void)cudaGetDeviceProperties(&device_prop, device);
-
-  const std::regex gfx_arch_pattern("(gfx[0-9a-fA-F]+)(:[-+:\\w]+)?");
-
-  std::smatch match;
-  std::string full_arch_name(device_prop.gcnArchName);
-  std::string short_arch_name;
-
-  if (std::regex_search(full_arch_name, match, gfx_arch_pattern)) {
-    short_arch_name = match[1].str(); // Extract the first capture group
+  // An explicit --offload-arch (including gfx1250-strict) is the compile target.
+  // Otherwise hiprtcc compiles for the current device.
+  if (!offloadArchExplicit)
+  {
+    buildList.emplace(translate_gpu_arch(current_device_arch()));
   }
-  else{
-    std::cerr << "HIP fatal error: Cannot determine target architecture name of current device!" << std::endl;
-    std::terminate();
-  }
-  buildList.emplace(translate_gpu_arch(short_arch_name));
 
   fprintf(stderr, "NVRTCC Configuration:\r\n");
   fprintf(stderr, "  Output dir: %s\r\n", outputDir.c_str());
@@ -287,9 +330,9 @@ int main(int argc, char** argv)
   // Load the input file and execute
   if (execute)
   {
-    fprintf(
-      stderr, "Executing %s with %i threads\r\n", executionConfig.builds[0].c_str(), executionConfig.rc.threadCount);
-    load_and_run_gpu_code(executionConfig.builds[0], executionConfig.rc);
+    const std::string build = select_build_for_device(executionConfig.builds);
+    fprintf(stderr, "Executing %s with %i threads\r\n", build.c_str(), executionConfig.rc.threadCount);
+    load_and_run_gpu_code(build, executionConfig.rc);
     fprintf(stderr, "Execution Passed\r\n");
     return 0;
   }
