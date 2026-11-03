@@ -160,7 +160,7 @@ print_environment_details() {
   git log -1 || echo "Not a repository"
 
   if command -v amd-smi &> /dev/null; then
-    amd-smi
+    amd-smi || echo "amd-smi failed (no GPU driver loaded on this node?)"
   else
     echo "amd-smi not found"
   fi
