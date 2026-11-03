@@ -176,13 +176,8 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT LIBHI
     # other tests don't reference any thrust symbol and the link is a
     # no-op for them. Cheaper to do this unconditionally than to
     # maintain a per-test "needs rocthrust" allow-list.
-    # rocThrust still uses the libhipcxx <= 3.1 API. The tests define
-    # _CCCL_NO_SYSTEM_HEADER, so the legacy compat deprecation warnings
-    # it triggers are not suppressed as system header warnings and
-    # fail the build under -Werror.
     if (LIBCUDACXX_ENABLE_HIP AND TARGET roc::rocthrust)
       target_link_libraries(${target_name} PRIVATE roc::rocthrust)
-      target_compile_definitions(${target_name} PRIVATE LIBHIPCXX_IGNORE_DEPRECATED_LEGACY_COMPAT)
     endif()
 
     # NOTE(HIP/AMD): the c2h test sources are upstream NVIDIA cccl test
