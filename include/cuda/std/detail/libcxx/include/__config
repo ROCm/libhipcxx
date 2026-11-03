@@ -1,0 +1,51 @@
+// MIT License
+//
+// Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// NOTE(HIP/AMD): forwarding header for consumers of libhipcxx <= 3.1, which
+// include this removed internal path directly. See
+// <libhipcxx/__amd/legacy_compat.h>.
+
+#ifndef _LIBCUDACXX_LEGACY_DETAIL_LIBCXX_INCLUDE_CONFIG
+#define _LIBCUDACXX_LEGACY_DETAIL_LIBCXX_INCLUDE_CONFIG
+
+#include <cuda/std/detail/__config>
+
+#if defined(_CCCL_IMPLICIT_SYSTEM_HEADER_GCC)
+#  pragma GCC system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_CLANG)
+#  pragma clang system_header
+#elif defined(_CCCL_IMPLICIT_SYSTEM_HEADER_MSVC)
+#  pragma system_header
+#endif // no system header
+
+#ifdef LIBHIPCXX_NO_LEGACY_COMPAT
+#  error "<cuda/std/detail/libcxx/include/__config> is a legacy header, use <cuda/std/detail/__config>."
+#endif // LIBHIPCXX_NO_LEGACY_COMPAT
+
+#include <cuda/std/__utility/ctad_support.h>
+
+#define _LIBCUDACXX_CTAD_SUPPORTED_FOR_TYPE(_ClassName) _CCCL_CTAD_SUPPORTED_FOR_TYPE(_ClassName)
+#if _LIBHIPCXX_LEGACY_DEPRECATE_MACROS()
+#  pragma clang deprecated(_LIBCUDACXX_CTAD_SUPPORTED_FOR_TYPE, _LIBHIPCXX_LEGACY_COMPAT_MSG)
+#endif // _LIBHIPCXX_LEGACY_DEPRECATE_MACROS()
+
+#endif // _LIBCUDACXX_LEGACY_DETAIL_LIBCXX_INCLUDE_CONFIG

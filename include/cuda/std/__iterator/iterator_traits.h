@@ -558,6 +558,17 @@ inline constexpr bool __has_random_access_traversal =
   __has_iterator_category_convertible_to<_Iter, random_access_iterator_tag>
   || __has_iterator_concept_convertible_to<_Iter, random_access_iterator_tag>;
 
+#ifndef LIBHIPCXX_NO_LEGACY_COMPAT
+// NOTE(HIP/AMD): legacy names used by consumers of libhipcxx <= 3.1, see legacy_compat.h.
+// They only look at iterator_category, like the 3.0 versions.
+template <class _Iter>
+using __is_cpp17_input_iterator _LIBHIPCXX_LEGACY_DEPRECATED =
+  bool_constant<__has_iterator_category_convertible_to<_Iter, input_iterator_tag>>;
+template <class _Iter>
+using __is_cpp17_random_access_iterator _LIBHIPCXX_LEGACY_DEPRECATED =
+  bool_constant<__has_iterator_category_convertible_to<_Iter, random_access_iterator_tag>>;
+#endif // !LIBHIPCXX_NO_LEGACY_COMPAT
+
 // __has_contiguous_traversal determines if an iterator is known by
 // libc++ to be contiguous, either because it advertises itself as such
 // (in C++20) or because it is a pointer type or a known trivial wrapper
