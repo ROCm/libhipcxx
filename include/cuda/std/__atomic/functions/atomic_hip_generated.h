@@ -58,6 +58,16 @@
 
 #include <cuda/std/__cccl/prologue.h>
 
+// NOTE(HIP/AMD): newer amd-llvm deprecates the __hip_atomic_* builtins used
+// below (-Whip-deprecated-builtins), which fails builds that see this header
+// as a non-system header under -Werror.
+_CCCL_DIAG_PUSH
+#if defined(__has_warning)
+#  if __has_warning("-Whip-deprecated-builtins")
+_CCCL_DIAG_SUPPRESS_CLANG("-Whip-deprecated-builtins")
+#  endif
+#endif
+
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 static inline _CCCL_DEVICE void __atomic_thread_fence_cuda([[maybe_unused]] int __memorder, __thread_scope_block_tag) {
@@ -493,5 +503,7 @@ template<class _Type>
 }
 
 _CCCL_END_NAMESPACE_CUDA_STD
+
+_CCCL_DIAG_POP
 
 #include <cuda/std/__cccl/epilogue.h>

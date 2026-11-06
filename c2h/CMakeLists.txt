@@ -152,11 +152,6 @@ if (LIBCUDACXX_ENABLE_HIP)
   # weak-stub rationale that requires '-pthread' on every HIP test
   # executable that constructs a 'cuda::device_ref' / 'cuda::stream'.
   cccl_c2h_attach_hip_deps(cccl.c2h SCOPE INTERFACE)
-  # c2h's headers include rocThrust, which still uses the libhipcxx <= 3.1
-  # API. The tests define _CCCL_NO_SYSTEM_HEADER, so the legacy compat
-  # deprecation warnings it triggers are not suppressed as system header
-  # warnings and fail the build under -Werror.
-  target_compile_definitions(cccl.c2h INTERFACE LIBHIPCXX_IGNORE_DEPRECATED_LEGACY_COMPAT)
 else()
   add_library(
     cccl.c2h

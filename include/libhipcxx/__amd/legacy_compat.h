@@ -41,10 +41,13 @@
 //
 // Define LIBHIPCXX_NO_LEGACY_COMPAT to disable all of it.
 //
-// The compat mode is deprecated: every legacy name warns where a consumer uses
-// it. Define LIBHIPCXX_IGNORE_DEPRECATED_LEGACY_COMPAT (or
-// CCCL_IGNORE_DEPRECATED_API) to silence the warnings. Macros can only be
-// marked deprecated with clang.
+// The compat mode is deprecated, but its deprecation warnings are off by
+// default: consumers like rocThrust still use the legacy names in their own
+// headers, so every downstream build with -Werror would break. Define
+// LIBHIPCXX_WARN_DEPRECATED_LEGACY_COMPAT to get a warning wherever a legacy
+// name is used. LIBHIPCXX_IGNORE_DEPRECATED_LEGACY_COMPAT and
+// CCCL_IGNORE_DEPRECATED_API still keep them off. Macros can only be marked
+// deprecated with clang.
 
 #ifndef _AMD_LEGACY_COMPAT_H
 #define _AMD_LEGACY_COMPAT_H
@@ -57,16 +60,16 @@
 
 #  define _LIBHIPCXX_LEGACY_COMPAT_MSG                                                                 \
     "libhipcxx legacy compat mode (libhipcxx <= 3.1 API) is deprecated and will be removed soon. Migrate " \
-    "to the libhipcxx >= 3.2 API, or define LIBHIPCXX_IGNORE_DEPRECATED_LEGACY_COMPAT to silence this "    \
-    "warning."
+    "to the libhipcxx >= 3.2 API."
 
-#  if defined(LIBHIPCXX_IGNORE_DEPRECATED_LEGACY_COMPAT) || defined(CCCL_IGNORE_DEPRECATED_API)
-#    define _LIBHIPCXX_LEGACY_DEPRECATED
-#    define _LIBHIPCXX_LEGACY_DEPRECATE_MACROS() 0
-#  else // ^^^ silenced ^^^ / vvv warn vvv
+#  if defined(LIBHIPCXX_WARN_DEPRECATED_LEGACY_COMPAT) && !defined(LIBHIPCXX_IGNORE_DEPRECATED_LEGACY_COMPAT) \
+    && !defined(CCCL_IGNORE_DEPRECATED_API)
 #    define _LIBHIPCXX_LEGACY_DEPRECATED         CCCL_DEPRECATED_BECAUSE(_LIBHIPCXX_LEGACY_COMPAT_MSG)
 #    define _LIBHIPCXX_LEGACY_DEPRECATE_MACROS() _CCCL_COMPILER(CLANG)
-#  endif // ^^^ warn ^^^
+#  else // ^^^ warn ^^^ / vvv silenced (default) vvv
+#    define _LIBHIPCXX_LEGACY_DEPRECATED
+#    define _LIBHIPCXX_LEGACY_DEPRECATE_MACROS() 0
+#  endif // ^^^ silenced (default) ^^^
 
 // Namespaces, removed in CCCL #5538 / #6548. The definitions are the 3.0 ones
 // and deliberately skip _CCCL_PROLOGUE_INCLUDE_CHECK(), as they are expanded
