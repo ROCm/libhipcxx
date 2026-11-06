@@ -94,7 +94,7 @@ public:
   //! @return timed_event The constructed `timed_event` object
   //!
   //! @note The constructed `timed_event` object takes ownership of the native handle.
-  [[nodiscard]] static _CCCL_HOST_API timed_event from_native_handle(::cudaEvent_t __evnt) noexcept
+  [[nodiscard]] static _CCCL_HOST_API timed_event from_native_handle(::hipEvent_t __evnt) noexcept
   {
     return timed_event(__evnt);
   }
@@ -125,7 +125,7 @@ public:
 private:
   // Use `timed_event::from_native_handle(e)` to construct an owning `timed_event`
   // object from a `cudaEvent_t` handle.
-  _CCCL_HOST_API explicit constexpr timed_event(::cudaEvent_t __evnt) noexcept
+  _CCCL_HOST_API explicit constexpr timed_event(::hipEvent_t __evnt) noexcept
       : event(__evnt)
   {}
 };

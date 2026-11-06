@@ -63,9 +63,9 @@ TEST_FUNC __noinline__ void test_memcpy_async()
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE,
     (arr0 = (int*) malloc(ARR_SZ * sizeof(int)); arr1 = (int*) malloc(ARR_SZ * sizeof(int));),
-    (assert_rt(cudaMallocManaged((void**) &arr0, ARR_SZ * sizeof(int)));
-     assert_rt(cudaMallocManaged((void**) &arr1, ARR_SZ * sizeof(int)));
-     assert_rt(cudaDeviceSynchronize());))
+    (assert_rt(hipMallocManaged((void**) &arr0, ARR_SZ * sizeof(int)));
+     assert_rt(hipMallocManaged((void**) &arr1, ARR_SZ * sizeof(int)));
+     assert_rt(hipDeviceSynchronize());))
 
   cuda::annotated_ptr<int, cuda::access_property> ann0{arr0, ap};
   cuda::annotated_ptr<int, cuda::access_property> ann1{arr1, ap};
@@ -140,7 +140,7 @@ TEST_FUNC __noinline__ void test_memcpy_async()
         arr1[i] = 0;
       }))
 
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (free(arr0); free(arr1);), (assert_rt(cudaFree(arr0)); assert_rt(cudaFree(arr1));))
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (free(arr0); free(arr1);), (assert_rt(hipFree(arr0)); assert_rt(hipFree(arr1));))
 }
 
 int main(int argc, char** argv)

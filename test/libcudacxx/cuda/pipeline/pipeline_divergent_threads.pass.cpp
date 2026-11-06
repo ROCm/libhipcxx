@@ -147,8 +147,8 @@ int main(int argc, char** argv)
     (
       constexpr int batch_size = 10; constexpr size_t size = batch_size * nthreads; int* in, *out;
 
-      if (cudaMallocManaged((void**) &in, sizeof(int) * size) != cudaSuccess
-          || cudaMallocManaged((void**) &out, sizeof(int) * size) != cudaSuccess) {
+      if (hipMallocManaged((void**) &in, sizeof(int) * size) != hipSuccess
+          || hipMallocManaged((void**) &out, sizeof(int) * size) != hipSuccess) {
         printf("Setup failed\n");
         return -1;
       }
@@ -157,18 +157,18 @@ int main(int argc, char** argv)
 
       with_staging<<<1, nthreads>>>(out, in, size, batch_size);
       {
-        auto result = cudaGetLastError();
-        if (result != cudaSuccess)
+        auto result = hipGetLastError();
+        if (result != hipSuccess)
         {
           printf("Kernel launch failed\n");
-          printf("Error: %s\n", cudaGetErrorString(result));
+          printf("Error: %s\n", hipGetErrorString(result));
           return -1;
         }
       }
 
-      if (cudaDeviceSynchronize() != cudaSuccess) {
+      if (hipDeviceSynchronize() != hipSuccess) {
         printf("Kernel failed while running\n");
-        printf("Error: %s\n", cudaGetErrorString(cudaGetLastError()));
+        printf("Error: %s\n", hipGetErrorString(hipGetLastError()));
         return -1;
       }
 

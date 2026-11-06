@@ -74,27 +74,27 @@ public:
   struct persisting
   {
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-    [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::cudaAccessProperty() const noexcept
+    [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::hipAccessProperty() const noexcept
     {
-      return ::cudaAccessProperty::cudaAccessPropertyPersisting;
+      return ::hipAccessProperty::hipAccessPropertyPersisting;
     }
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   };
   struct streaming
   {
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-    [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::cudaAccessProperty() const noexcept
+    [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::hipAccessProperty() const noexcept
     {
-      return ::cudaAccessProperty::cudaAccessPropertyStreaming;
+      return ::hipAccessProperty::hipAccessPropertyStreaming;
     }
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   };
   struct normal
   {
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-    [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::cudaAccessProperty() const noexcept
+    [[nodiscard]] _CCCL_HOST_DEVICE_API constexpr operator ::hipAccessProperty() const noexcept
     {
-      return ::cudaAccessProperty::cudaAccessPropertyNormal;
+      return ::hipAccessProperty::hipAccessPropertyNormal;
     }
 #endif // _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
   };

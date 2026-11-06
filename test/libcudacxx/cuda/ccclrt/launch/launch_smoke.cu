@@ -52,9 +52,9 @@
 
 __managed__ bool kernel_run_proof = false;
 
-void check_kernel_run(cudaStream_t stream)
+void check_kernel_run(hipStream_t stream)
 {
-  CUDART(cudaStreamSynchronize(stream));
+  CUDART(hipStreamSynchronize(stream));
   CCCLRT_CHECK(kernel_run_proof);
   kernel_run_proof = false;
 }
@@ -143,10 +143,10 @@ struct launch_transform_to_int_convertible
 
   struct int_convertible
   {
-    cudaStream_t stream_;
+    hipStream_t stream_;
     int value_;
 
-    int_convertible(cudaStream_t stream, int value) noexcept
+    int_convertible(hipStream_t stream, int value) noexcept
         : stream_(stream)
         , value_(value)
     {
@@ -182,14 +182,14 @@ struct launch_transform_to_int_convertible
 };
 
 // Needs a separate function for Windows extended lambda
-void launch_smoke_test(cudaStream_t dst)
+void launch_smoke_test(hipStream_t dst)
 {
   cuda::__ensure_current_context guard(cuda::device_ref{0});
   // Use raw stream to make sure it can be implicitly converted on call to
   // launch
-  cudaStream_t stream;
+  hipStream_t stream;
 
-  CUDART(cudaStreamCreate(&stream));
+  CUDART(hipStreamCreate(&stream));
   // Spell out all overloads to make sure they compile, include a check for
   // implicit conversions
   {
@@ -290,19 +290,19 @@ C2H_CCCLRT_TEST("Launch smoke stream", "[launch]")
 {
   // Use raw stream to make sure it can be implicitly converted on call to
   // launch
-  cudaStream_t stream;
+  hipStream_t stream;
 
   {
     ::cuda::__ensure_current_context guard(cuda::device_ref{0});
-    CUDART(cudaStreamCreate(&stream));
+    CUDART(hipStreamCreate(&stream));
   }
 
   launch_smoke_test(stream);
 
   {
     ::cuda::__ensure_current_context guard(cuda::device_ref{0});
-    CUDART(cudaStreamSynchronize(stream));
-    CUDART(cudaStreamDestroy(stream));
+    CUDART(hipStreamSynchronize(stream));
+    CUDART(hipStreamDestroy(stream));
   }
 }
 

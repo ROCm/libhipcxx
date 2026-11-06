@@ -105,21 +105,21 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-[[nodiscard]] _CCCL_API constexpr bool isnormal(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isnormal(__hip_bfloat16 __x) noexcept
 {
   return ::cuda::std::fpclassify(__x) == FP_NORMAL;
 }
 #endif // _CCCL_HAS_NVBF16()
 
 #if _CCCL_HAS_NVFP8_E4M3()
-[[nodiscard]] _CCCL_API constexpr bool isnormal(__nv_fp8_e4m3 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isnormal(__hip_fp8_e4m3 __x) noexcept
 {
   return ::cuda::std::fpclassify(__x) == FP_NORMAL;
 }
 #endif // _CCCL_HAS_NVFP8_E4M3()
 
 #if _CCCL_HAS_NVFP8_E5M2()
-[[nodiscard]] _CCCL_API constexpr bool isnormal(__nv_fp8_e5m2 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isnormal(__hip_fp8_e5m2 __x) noexcept
 {
   return ::cuda::std::fpclassify(__x) == FP_NORMAL;
 }
@@ -133,21 +133,21 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #endif // _CCCL_HAS_NVFP8_E8M0()
 
 #if _CCCL_HAS_NVFP6_E2M3()
-[[nodiscard]] _CCCL_API constexpr bool isnormal(__nv_fp6_e2m3 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isnormal(__hip_fp6_e2m3 __x) noexcept
 {
   return ::cuda::std::fpclassify(__x) == FP_NORMAL;
 }
 #endif // _CCCL_HAS_NVFP6_E2M3()
 
 #if _CCCL_HAS_NVFP6_E3M2()
-[[nodiscard]] _CCCL_API constexpr bool isnormal(__nv_fp6_e3m2 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isnormal(__hip_fp6_e3m2 __x) noexcept
 {
   return ::cuda::std::fpclassify(__x) == FP_NORMAL;
 }
 #endif // _CCCL_HAS_NVFP6_E3M2()
 
 #if _CCCL_HAS_NVFP4_E2M1()
-[[nodiscard]] _CCCL_API constexpr bool isnormal(__nv_fp4_e2m1 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isnormal(__hip_fp4_e2m1 __x) noexcept
 {
   return ::cuda::std::fpclassify(__x) == FP_NORMAL;
 }

@@ -1,6 +1,28 @@
 // SPDX-FileCopyrightText: Copyright (c) 2025, NVIDIA CORPORATION. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
 #include <cub/detail/type_traits.cuh>
@@ -18,7 +40,7 @@ void verify_results(const c2h::host_vector<T>& expected_data, const c2h::host_ve
 {
   using namespace cub::detail;
   int device_id = 0;
-  CubDebugExit(cudaGetDevice(&device_id));
+  CubDebugExit(hipGetDevice(&device_id));
   int ptx_version = 0;
   CubDebugExit(CUB_NS_QUALIFIER::PtxVersion(ptx_version, device_id));
   if (ptx_version < 80 && is_any_bfloat16_v<T>)
@@ -33,7 +55,7 @@ void verify_results(const c2h::host_vector<T>& expected_data, const c2h::host_ve
   {
     REQUIRE_APPROX_EQ(expected_data, test_results);
   }
-  else if constexpr (cuda::std::is_same_v<T, __nv_bfloat16> || cuda::std::is_same_v<T, __half>)
+  else if constexpr (cuda::std::is_same_v<T, __hip_bfloat16> || cuda::std::is_same_v<T, __half>)
   {
     constexpr auto rel_err = cuda::std::is_same_v<T, __half> ? 0.08f : 0.2f;
     REQUIRE_APPROX_EQ_EPSILON(expected_data, test_results, rel_err);
@@ -46,7 +68,7 @@ void verify_results(const c2h::host_vector<T>& expected_data, const c2h::host_ve
       REQUIRE_THAT(expected_data[i].y, Catch::Matchers::WithinRel(test_results[i].y, 0.01f));
     }
   }
-  else if constexpr (cuda::std::is_same_v<T, __nv_bfloat162> || cuda::std::is_same_v<T, __half2>)
+  else if constexpr (cuda::std::is_same_v<T, __hip_bfloat162> || cuda::std::is_same_v<T, __half2>)
   {
     constexpr auto rel_err = cuda::std::is_same_v<T, __half2> ? 0.08f : 0.2f;
     for (size_t i = 0; i < test_results.size(); ++i)
@@ -55,7 +77,7 @@ void verify_results(const c2h::host_vector<T>& expected_data, const c2h::host_ve
       REQUIRE_THAT(expected_data[i].y, Catch::Matchers::WithinRel(test_results[i].y, rel_err));
     }
   }
-  else if constexpr (cuda::std::is_same_v<T, cuda::std::complex<__nv_bfloat16>>
+  else if constexpr (cuda::std::is_same_v<T, cuda::std::complex<__hip_bfloat16>>
                      || cuda::std::is_same_v<T, cuda::std::complex<__half>>)
   {
     constexpr auto rel_err = cuda::std::is_same_v<T, cuda::std::complex<__half>> ? 0.08f : 0.2f;
@@ -105,9 +127,9 @@ void verify_results_exact(const c2h::host_vector<T>& expected_data, const c2h::h
   int device_id                = 0;
   int compute_capability_major = 0;
   int compute_capability_minor = 0;
-  CubDebugExit(cudaGetDevice(&device_id));
-  CubDebugExit(cudaDeviceGetAttribute(&compute_capability_major, cudaDevAttrComputeCapabilityMajor, device_id));
-  CubDebugExit(cudaDeviceGetAttribute(&compute_capability_minor, cudaDevAttrComputeCapabilityMinor, device_id));
+  CubDebugExit(hipGetDevice(&device_id));
+  CubDebugExit(hipDeviceGetAttribute(&compute_capability_major, hipDeviceAttributeComputeCapabilityMajor, device_id));
+  CubDebugExit(hipDeviceGetAttribute(&compute_capability_minor, hipDeviceAttributeComputeCapabilityMinor, device_id));
   int compute_capability = 10 * compute_capability_major + compute_capability_minor;
   if (compute_capability < 80 && is_any_bfloat16_v<T>)
   {

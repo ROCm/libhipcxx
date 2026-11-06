@@ -91,7 +91,7 @@ class device_memory_pool_ref
 public:
   //! @brief  Constructs the device_memory_pool_ref from a \c cudaMemPool_t.
   //! @param __pool The \c cudaMemPool_t used to allocate memory.
-  _CCCL_HOST_API explicit device_memory_pool_ref(::cudaMemPool_t __pool) noexcept
+  _CCCL_HOST_API explicit device_memory_pool_ref(::hipMemPool_t __pool) noexcept
       : __memory_pool_base(__pool)
   {}
 
@@ -114,7 +114,7 @@ public:
 [[nodiscard]] inline device_memory_pool_ref& device_default_memory_pool(::cuda::device_ref __device)
 {
   static device_memory_pool_ref __pool{::cuda::__get_default_memory_pool(
-    ::CUmemLocation{::CU_MEM_LOCATION_TYPE_DEVICE, __device.get()}, ::CU_MEM_ALLOCATION_TYPE_PINNED)};
+    ::hipMemLocation{::hipMemLocationTypeDevice, __device.get()}, ::hipMemAllocationTypePinned)};
   return __pool;
 }
 
@@ -138,7 +138,7 @@ struct device_memory_pool : device_memory_pool_ref
 
   //! @brief Constructs an empty \c device_memory_pool without an underlying pool.
   _CCCL_HOST_API explicit device_memory_pool(no_init_t) noexcept
-      : device_memory_pool_ref(::cudaMemPool_t{})
+      : device_memory_pool_ref(::hipMemPool_t{})
   {}
 
   //! @brief Constructs a \c device_memory_pool with the optionally specified
@@ -154,8 +154,8 @@ struct device_memory_pool : device_memory_pool_ref
   _CCCL_HOST_API device_memory_pool(::cuda::device_ref __device_id, memory_pool_properties __properties = {})
       : device_memory_pool_ref(__create_cuda_mempool(
           __properties,
-          ::CUmemLocation{::CU_MEM_LOCATION_TYPE_DEVICE, __device_id.get()},
-          ::CU_MEM_ALLOCATION_TYPE_PINNED))
+          ::hipMemLocation{::hipMemLocationTypeDevice, __device_id.get()},
+          ::hipMemAllocationTypePinned))
   {}
 
   ~device_memory_pool() noexcept
@@ -166,7 +166,7 @@ struct device_memory_pool : device_memory_pool_ref
     }
   }
 
-  _CCCL_HOST_API static device_memory_pool from_native_handle(::cudaMemPool_t __pool) noexcept
+  _CCCL_HOST_API static device_memory_pool from_native_handle(::hipMemPool_t __pool) noexcept
   {
     return device_memory_pool(__pool);
   }
@@ -176,7 +176,7 @@ struct device_memory_pool : device_memory_pool_ref
   //! @return cudaMemPool_t The native handle being held by this object.
   //!
   //! @post The memory pool object is in a moved-from state.
-  _CCCL_HOST_API constexpr ::cudaMemPool_t release() noexcept
+  _CCCL_HOST_API constexpr ::hipMemPool_t release() noexcept
   {
     return ::cuda::std::exchange(__pool_, nullptr);
   }
@@ -192,7 +192,7 @@ struct device_memory_pool : device_memory_pool_ref
   device_memory_pool& operator=(const device_memory_pool&) = delete;
 
 private:
-  device_memory_pool(::cudaMemPool_t __pool) noexcept
+  device_memory_pool(::hipMemPool_t __pool) noexcept
       : device_memory_pool_ref(__pool)
   {}
 };

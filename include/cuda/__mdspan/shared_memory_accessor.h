@@ -205,7 +205,7 @@ public:
 #if !defined(_CCCL_DISABLE_MDSPAN_ACCESSOR_DETECT_INVALIDITY)
     NV_IF_TARGET(
       NV_IS_DEVICE,
-      (bool __is_shared_mem = ::__isShared(__p); //
+      (bool __is_shared_mem = ::__libhipcxx::__isShared(__p); //
        _CCCL_ASSERT(__is_shared_mem, "__p is not a shared memory pointer");
        _CCCL_ASSERT(__i <= ::cuda::__max_smem_allocation_bytes() / sizeof(__element_type),
                     "__i exceeds the maximum shared memory allocation size");
@@ -220,7 +220,7 @@ public:
 #if !defined(_CCCL_DISABLE_MDSPAN_ACCESSOR_DETECT_INVALIDITY)
     NV_IF_TARGET(
       NV_IS_DEVICE,
-      (bool __is_shared_mem = ::__isShared(__p); //
+      (bool __is_shared_mem = ::__libhipcxx::__isShared(__p); //
        _CCCL_ASSERT(__is_shared_mem, "__p is not a shared memory pointer");
        _CCCL_ASSERT(__i <= ::cuda::__max_smem_allocation_bytes() / sizeof(__element_type),
                     "__i exceeds the maximum shared memory allocation size");

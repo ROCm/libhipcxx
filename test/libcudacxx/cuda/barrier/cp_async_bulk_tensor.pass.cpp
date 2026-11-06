@@ -170,7 +170,7 @@ PFN_cuTensorMapEncodeTiled get_cuTensorMapEncodeTiled()
   void* driver_ptr = nullptr;
   cudaDriverEntryPointQueryResult driver_status;
   auto code = cudaGetDriverEntryPoint("cuTensorMapEncodeTiled", &driver_ptr, cudaEnableDefault, &driver_status);
-  assert(code == cudaSuccess && "Could not get driver API");
+  assert(code == hipSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled>(driver_ptr);
 }
 #  else // ^^^ _CCCL_CTK_BELOW(12, 5) ^^^ / vvv _CCCL_CTK_AT_LEAST(12, 5) vvv
@@ -180,7 +180,7 @@ PFN_cuTensorMapEncodeTiled_v12000 get_cuTensorMapEncodeTiled()
   cudaDriverEntryPointQueryResult driver_status;
   auto code =
     cudaGetDriverEntryPointByVersion("cuTensorMapEncodeTiled", &driver_ptr, 12000, cudaEnableDefault, &driver_status);
-  assert(code == cudaSuccess && "Could not get driver API");
+  assert(code == hipSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled_v12000>(driver_ptr);
 }
 #  endif // _CCCL_CTK_AT_LEAST(12, 5)
@@ -195,8 +195,8 @@ int main(int, char**)
       cuda_thread_count = 512;
 
       int* tensor_ptr = nullptr;
-      auto code       = cudaGetSymbolAddress((void**) &tensor_ptr, gmem_tensor);
-      assert(code == cudaSuccess && "getsymboladdress failed.");
+      auto code       = hipGetSymbolAddress((void**) &tensor_ptr, gmem_tensor);
+      assert(code == hipSuccess && "getsymboladdress failed.");
 
       // https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__TENSOR__MEMORY.html
       CUtensorMap local_tensor_map{};
@@ -217,7 +217,7 @@ int main(int, char**)
       auto cuTensorMapEncodeTiled = get_cuTensorMapEncodeTiled();
 
       // Create the tensor descriptor.
-      CUresult res = cuTensorMapEncodeTiled(
+      hipError_t res = cuTensorMapEncodeTiled(
         &local_tensor_map, // CUtensorMap *tensorMap,
         CUtensorMapDataType::CU_TENSOR_MAP_DATA_TYPE_INT32,
         rank, // cuuint32_t tensorRank,
@@ -231,9 +231,9 @@ int main(int, char**)
         CUtensorMapL2promotion::CU_TENSOR_MAP_L2_PROMOTION_NONE,
         CUtensorMapFloatOOBfill::CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
 
-      assert(res == CUDA_SUCCESS && "tensormap creation failed.");
-      code = cudaMemcpyToSymbol(global_fake_tensor_map, &local_tensor_map, sizeof(CUtensorMap));
-      assert(code == cudaSuccess && "memcpytosymbol failed.");));
+      assert(res == hipSuccess && "tensormap creation failed.");
+      code = hipMemcpyToSymbol(global_fake_tensor_map, &local_tensor_map, sizeof(CUtensorMap));
+      assert(code == hipSuccess && "memcpytosymbol failed.");));
 
   NV_DISPATCH_TARGET(NV_IS_DEVICE, (test(0, 0); test(4, 0); test(4, 4);));
   return 0;

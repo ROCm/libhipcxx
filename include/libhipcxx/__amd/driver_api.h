@@ -141,10 +141,8 @@ _CCCL_HOST_API inline void __deviceGetName(char* __name_out, int __len, int __or
 // Routed through `hipPointerGetAttributes` (plural runtime API) so that
 // unregistered host pointers (stack/heap arrays) are reported gracefully
 // instead of returning `hipErrorInvalidValue` like the singular driver-API
-// `hipPointerGetAttribute` would. The translation below maps the HIP
-// runtime types onto the CUmemorytype values the upstream callers expect
-// (the AMD shim aliases `CUmemorytype` to `hipMemoryType`, so the values
-// coincide modulo the `Unregistered` case which we collapse to `Host`).
+// `hipPointerGetAttribute` would. The `Unregistered` memory type is
+// collapsed to `Host` below.
 
 template <::hipPointer_attribute _Attr>
 [[nodiscard]] _CCCL_API _CCCL_CONSTEVAL auto __pointer_attribute_value_type_t_impl() noexcept
@@ -194,23 +192,23 @@ using __pointer_attribute_value_type_t = decltype(::cuda::__driver::__pointer_at
 // unregistered host memory (stack/heap/static), so callers must accept
 // that as a non-fatal "unknown pointer" outcome -- matching what they
 // already do for `cudaErrorInvalidValue` on CUDA.
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t
 __pointerGetAttributesNoThrow(::hipPointerAttribute_t& __result, const void* __ptr) noexcept
 {
   // Zero-initialise so an early-out (hipErrorInvalidValue) leaves the
   // type field as hipMemoryTypeUnregistered (= 0) for callers that
   // choose to inspect __result regardless of the returned status.
   __result = {};
-  return static_cast<::cudaError_t>(::hipPointerGetAttributes(&__result, __ptr));
+  return static_cast<::hipError_t>(::hipPointerGetAttributes(&__result, __ptr));
 }
 
 template <::hipPointer_attribute _Attr>
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t
 __pointerGetAttributeNoThrow(__pointer_attribute_value_type_t<_Attr>& __result, const void* __ptr)
 {
   ::hipPointerAttribute_t __ptr_attrib{};
   const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__ptr_attrib, __ptr);
-  if (__status != ::cudaSuccess)
+  if (__status != ::hipSuccess)
   {
     return __status;
   }
@@ -258,12 +256,12 @@ __pointerGetAttributeNoThrow(__pointer_attribute_value_type_t<_Attr>& __result, 
 // NV-gated; HIP path uses the full-struct overload); kept for surface
 // completeness so future HIP code can call the variadic form.
 template <::cuda::std::size_t _Np>
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __pointerGetAttributesNoThrow(
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __pointerGetAttributesNoThrow(
   ::hipPointer_attribute (&__attrs)[_Np], void* (&__results)[_Np], const void* __ptr) noexcept
 {
   ::hipPointerAttribute_t __ptr_attrib{};
   const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__ptr_attrib, __ptr);
-  if (__status != ::cudaSuccess)
+  if (__status != ::hipSuccess)
   {
     return __status;
   }
@@ -308,7 +306,7 @@ template <::cuda::std::size_t _Np>
         break;
     }
   }
-  return ::cudaSuccess;
+  return ::hipSuccess;
 }
 
 // Stream management
@@ -320,14 +318,14 @@ template <::cuda::std::size_t _Np>
   return __stream;
 }
 
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __streamDestroyNoThrow(::hipStream_t __stream)
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __streamDestroyNoThrow(::hipStream_t __stream)
 {
-  return static_cast<::cudaError_t>(::hipStreamDestroy(__stream));
+  return static_cast<::hipError_t>(::hipStreamDestroy(__stream));
 }
 
-_CCCL_HOST_API inline ::cudaError_t __streamSynchronizeNoThrow(::hipStream_t __stream)
+_CCCL_HOST_API inline ::hipError_t __streamSynchronizeNoThrow(::hipStream_t __stream)
 {
-  return static_cast<::cudaError_t>(::hipStreamSynchronize(__stream));
+  return static_cast<::hipError_t>(::hipStreamSynchronize(__stream));
 }
 
 _CCCL_HOST_API inline void __streamSynchronize(::hipStream_t __stream)
@@ -347,9 +345,9 @@ _CCCL_HOST_API inline void __streamWaitEvent(::hipStream_t __stream, ::hipEvent_
   _CCCL_TRY_CUDA_API(::hipStreamWaitEvent, "Failed to make a stream wait for an event", __stream, __evnt, 0u);
 }
 
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __streamQueryNoThrow(::hipStream_t __stream)
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __streamQueryNoThrow(::hipStream_t __stream)
 {
-  return static_cast<::cudaError_t>(::hipStreamQuery(__stream));
+  return static_cast<::hipError_t>(::hipStreamQuery(__stream));
 }
 
 [[nodiscard]] _CCCL_HOST_API inline int __streamGetPriority(::hipStream_t __stream)
@@ -409,14 +407,14 @@ _CCCL_HOST_API inline void __eventSynchronize(::hipEvent_t __evnt)
   _CCCL_TRY_CUDA_API(::hipEventSynchronize, "Failed to synchronize CUDA event", __evnt);
 }
 
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __eventQueryNoThrow(::hipEvent_t __evnt)
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __eventQueryNoThrow(::hipEvent_t __evnt)
 {
-  return static_cast<::cudaError_t>(::hipEventQuery(__evnt));
+  return static_cast<::hipError_t>(::hipEventQuery(__evnt));
 }
 
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __eventDestroyNoThrow(::hipEvent_t __evnt)
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __eventDestroyNoThrow(::hipEvent_t __evnt)
 {
-  return static_cast<::cudaError_t>(::hipEventDestroy(__evnt));
+  return static_cast<::hipError_t>(::hipEventDestroy(__evnt));
 }
 
 [[nodiscard]] _CCCL_HOST_API inline ::hipEvent_t __eventCreate(unsigned __flags)
@@ -451,9 +449,7 @@ _CCCL_HOST_API inline void __launchHostFunc(::hipStream_t __stream, ::hipHostFn_
 }
 
 // NOTE(HIP/AMD): memory-pool attribute getter/setter used by
-// <cuda/__memory_resource/memory_resource_base.h>. The CUDA form
-// takes ::CUmemPool_attribute which we alias to ::hipMemPoolAttr in
-// <libhipcxx/__amd/cuda_runtime.h>.
+// <cuda/__memory_resource/memory_resource_base.h>.
 [[nodiscard]] _CCCL_HOST_API inline size_t
 __mempoolGetAttribute(::hipMemPool_t __pool, ::hipMemPoolAttr __attr)
 {
@@ -471,16 +467,13 @@ __mempoolSetAttribute(::hipMemPool_t __pool, ::hipMemPoolAttr __attr, void* __va
 }
 
 // NOTE(HIP/AMD): memory-pool create / access wrappers used by
-// <cuda/__memory_resource/memory_resource_base.h>. The CUDA driver API
-// uses CUmemoryPool/CUmemPoolProps/CUmemAccessDesc/CUmemAccess_flags
-// which we alias to hipMemPool_t/hipMemPoolProps/hipMemAccessDesc/
-// hipMemAccessFlags in <libhipcxx/__amd/cuda_runtime.h>. The HIP runtime API
+// <cuda/__memory_resource/memory_resource_base.h>. The HIP runtime API
 // signature matches the upstream cuda::__driver shape exactly for
 // these four entry points.
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t
 __mempoolCreateNoThrow(::hipMemPool_t* __pool, ::hipMemPoolProps* __props)
 {
-  return static_cast<::cudaError_t>(::hipMemPoolCreate(__pool, __props));
+  return static_cast<::hipError_t>(::hipMemPoolCreate(__pool, __props));
 }
 
 // NOTE(HIP/AMD): the default device memory pool. On HIP _CCCL_HAS_CTK() is
@@ -526,17 +519,17 @@ __mallocFromPoolAsync(::size_t __bytes, ::hipMemPool_t __pool, ::hipStream_t __s
   return static_cast<::hipDeviceptr_t>(__result);
 }
 
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t
 __freeAsyncNoThrow(::hipDeviceptr_t __dptr, ::hipStream_t __stream)
 {
-  return static_cast<::cudaError_t>(::hipFreeAsync(__dptr, __stream));
+  return static_cast<::hipError_t>(::hipFreeAsync(__dptr, __stream));
 }
 
 // NOTE(HIP/AMD): mirrors upstream cuda::__driver::__mempoolDestroyNoThrow.
 // Used by device_memory_pool.h destructor via _CCCL_ASSERT_CUDA_API.
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __mempoolDestroyNoThrow(::hipMemPool_t __pool) noexcept
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __mempoolDestroyNoThrow(::hipMemPool_t __pool) noexcept
 {
-  return static_cast<::cudaError_t>(::hipMemPoolDestroy(__pool));
+  return static_cast<::hipError_t>(::hipMemPoolDestroy(__pool));
 }
 
 _CCCL_HOST_API inline void __mempoolDestroy(::hipMemPool_t __pool)
@@ -561,9 +554,9 @@ _CCCL_HOST_API inline void __mempoolTrimTo(::hipMemPool_t __pool, ::size_t __min
   return static_cast<::hipDeviceptr_t>(__result);
 }
 
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __freeNoThrow(::hipDeviceptr_t __dptr)
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __freeNoThrow(::hipDeviceptr_t __dptr)
 {
-  return static_cast<::cudaError_t>(::hipFree(__dptr));
+  return static_cast<::hipError_t>(::hipFree(__dptr));
 }
 
 [[nodiscard]] _CCCL_HOST_API inline void* __mallocHost(::size_t __bytes)
@@ -576,17 +569,17 @@ _CCCL_HOST_API inline void __mempoolTrimTo(::hipMemPool_t __pool, ::size_t __min
   return __result;
 }
 
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t __freeHostNoThrow(void* __dptr)
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t __freeHostNoThrow(void* __dptr)
 {
-  return static_cast<::cudaError_t>(::hipHostFree(__dptr));
+  return static_cast<::hipError_t>(::hipHostFree(__dptr));
 }
 
 // NOTE(HIP/AMD): execution-control wrappers used by <cuda/__launch/*>.
 // CUfunction_attribute -> hipFunction_attribute (see cuda_runtime.h).
-[[nodiscard]] _CCCL_HOST_API inline ::cudaError_t
+[[nodiscard]] _CCCL_HOST_API inline ::hipError_t
 __functionGetAttributeNoThrow(int& __value, ::hipFunction_attribute __attr, ::hipFunction_t __kernel)
 {
-  return static_cast<::cudaError_t>(::hipFuncGetAttribute(&__value, __attr, __kernel));
+  return static_cast<::hipError_t>(::hipFuncGetAttribute(&__value, __attr, __kernel));
 }
 
 // NOTE(HIP/AMD): convert the CUDA-shaped CUlaunchConfig (filled by
@@ -594,12 +587,12 @@ __functionGetAttributeNoThrow(int& __value, ::hipFunction_attribute __attr, ::hi
 // layout-compatible, so we read the fields explicitly. The PRIORITY (hint)
 // and CLUSTER_DIMENSION (Hopper-only) launch attributes have no AMDGCN
 // equivalent and are ignored; COOPERATIVE selects the cooperative launch.
-_CCCL_HOST_API inline void __launchKernel(::CUlaunchConfig& __config, ::hipFunction_t __kernel, void** __args)
+_CCCL_HOST_API inline void __launchKernel(::__libhipcxx::__launch_config& __config, ::hipFunction_t __kernel, void** __args)
 {
   bool __cooperative = false;
   for (unsigned int __i = 0; __i < __config.numAttrs; ++__i)
   {
-    if (__config.attrs[__i].id == ::CU_LAUNCH_ATTRIBUTE_COOPERATIVE)
+    if (__config.attrs[__i].id == ::__libhipcxx::__launch_attribute_cooperative)
     {
       __cooperative = __config.attrs[__i].value.cooperative != 0;
     }

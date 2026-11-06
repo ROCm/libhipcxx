@@ -281,7 +281,7 @@ PFN_cuTensorMapEncodeTiled get_cuTensorMapEncodeTiled()
   void* driver_ptr = nullptr;
   cudaDriverEntryPointQueryResult driver_status;
   auto code = cudaGetDriverEntryPoint("cuTensorMapEncodeTiled", &driver_ptr, cudaEnableDefault, &driver_status);
-  assert(code == cudaSuccess && "Could not get driver API");
+  assert(code == hipSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled>(driver_ptr);
 }
 #  else // ^^^ _CCCL_CTK_BELOW(12, 5) ^^^ / vvv _CCCL_CTK_AT_LEAST(12, 5) vvv
@@ -291,7 +291,7 @@ PFN_cuTensorMapEncodeTiled_v12000 get_cuTensorMapEncodeTiled()
   cudaDriverEntryPointQueryResult driver_status;
   auto code =
     cudaGetDriverEntryPointByVersion("cuTensorMapEncodeTiled", &driver_ptr, 12000, cudaEnableDefault, &driver_status);
-  assert(code == cudaSuccess && "Could not get driver API");
+  assert(code == hipSuccess && "Could not get driver API");
   return reinterpret_cast<PFN_cuTensorMapEncodeTiled_v12000>(driver_ptr);
 }
 #  endif // _CCCL_CTK_AT_LEAST(12, 5)
@@ -330,7 +330,7 @@ CUtensorMap map_encode(T* tensor_ptr,
   auto cuTensorMapEncodeTiled = get_cuTensorMapEncodeTiled();
 
   // Create the tensor descriptor.
-  CUresult res = cuTensorMapEncodeTiled(
+  hipError_t res = cuTensorMapEncodeTiled(
     &tensor_map, // CUtensorMap *tensorMap,
     CUtensorMapDataType::CU_TENSOR_MAP_DATA_TYPE_INT32,
     num_dims, // cuuint32_t tensorRank,
@@ -344,7 +344,7 @@ CUtensorMap map_encode(T* tensor_ptr,
     CUtensorMapL2promotion::CU_TENSOR_MAP_L2_PROMOTION_NONE,
     CUtensorMapFloatOOBfill::CU_TENSOR_MAP_FLOAT_OOB_FILL_NONE);
 
-  assert(res == CUDA_SUCCESS && "tensormap creation failed.");
+  assert(res == hipSuccess && "tensormap creation failed.");
 
   return tensor_map;
 }
@@ -356,15 +356,15 @@ void init_tensor_map(const T& gmem_tensor_symbol,
 {
   // Get pointer to gmem_tensor to create tensor map.
   int* tensor_ptr = nullptr;
-  auto code       = cudaGetSymbolAddress((void**) &tensor_ptr, gmem_tensor_symbol);
-  assert(code == cudaSuccess && "Could not get symbol address.");
+  auto code       = hipGetSymbolAddress((void**) &tensor_ptr, gmem_tensor_symbol);
+  assert(code == hipSuccess && "Could not get symbol address.");
 
   // Create tensor map
   CUtensorMap local_tensor_map = map_encode(tensor_ptr, gmem_dims, smem_dims);
 
   // Copy it to device
-  code = cudaMemcpyToSymbol(global_fake_tensor_map, &local_tensor_map, sizeof(CUtensorMap));
-  assert(code == cudaSuccess && "Could not copy symbol to device.");
+  code = hipMemcpyToSymbol(global_fake_tensor_map, &local_tensor_map, sizeof(CUtensorMap));
+  assert(code == hipSuccess && "Could not copy symbol to device.");
 }
 #endif // ! TEST_COMPILER(NVRTC)
 

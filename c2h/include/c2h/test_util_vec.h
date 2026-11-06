@@ -1,6 +1,28 @@
 // SPDX-FileCopyrightText: Copyright (c) 2011-2022, NVIDIA CORPORATION. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #pragma once
 
 #include <thrust/detail/config/device_system.h>
@@ -389,7 +411,7 @@ inline constexpr bool is_vector2_type_v = cuda::std::__is_one_of_v<
 #  endif // TEST_HALF_T()
 #  if TEST_BF_T()
   ,
-  __nv_bfloat162
+  __hip_bfloat162
 #  endif // TEST_BF_T()
   >;
 
@@ -409,7 +431,7 @@ inline constexpr bool is_vector2_fp_type_v<__half2> = true;
 #  if TEST_BF_T()
 
 template <>
-inline constexpr bool is_vector2_fp_type_v<__nv_bfloat162> = true;
+inline constexpr bool is_vector2_fp_type_v<__hip_bfloat162> = true;
 
 #  endif // TEST_BF_T()
 

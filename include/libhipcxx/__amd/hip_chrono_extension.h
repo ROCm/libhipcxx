@@ -78,7 +78,7 @@
 #define LIBCUDACXX_HIP_CHECK(command)         \
   {                                           \
     __hip_error = command;                    \
-    assert(__hip_error == cudaSuccess);       \
+    assert(__hip_error == hipSuccess);       \
   }
 
 namespace cuda
@@ -105,46 +105,46 @@ __global__ inline void get_sysclock_offset_kernel(long long* __d_dev_sysclock_of
   *__d_dev_sysclock_offset = wall_clock64();
 }
 
-inline cudaError_t initialize_amdgpu_sysclock_on_current_device() noexcept
+inline hipError_t initialize_amdgpu_sysclock_on_current_device() noexcept
 {
-  cudaError_t __hip_error;
+  hipError_t __hip_error;
 
   long long* __d_dev_sysclock_offset;
-  LIBCUDACXX_HIP_CHECK(cudaMalloc(&__d_dev_sysclock_offset, sizeof(long long)));
+  LIBCUDACXX_HIP_CHECK(hipMalloc(&__d_dev_sysclock_offset, sizeof(long long)));
 
   // Get device sysclock offset and host UNIX timestamp at approximately the
   // same point in wall time.
   get_sysclock_offset_kernel<<<1, 1>>>(__d_dev_sysclock_offset);
 
-  LIBCUDACXX_HIP_CHECK(cudaGetLastError());
+  LIBCUDACXX_HIP_CHECK(hipGetLastError());
 
   long long __h_host_unix_sysclock_ticks_elapsed =
     ::std::chrono::system_clock::now().time_since_epoch().count();
 
   long long __h_dev_sysclock_offset = -1;
   LIBCUDACXX_HIP_CHECK(
-    cudaMemcpy(&__h_dev_sysclock_offset, __d_dev_sysclock_offset, sizeof(long long), cudaMemcpyDeviceToHost));
+    hipMemcpy(&__h_dev_sysclock_offset, __d_dev_sysclock_offset, sizeof(long long), hipMemcpyDeviceToHost));
 
-  LIBCUDACXX_HIP_CHECK(cudaMemcpyToSymbol(
+  LIBCUDACXX_HIP_CHECK(hipMemcpyToSymbol(
     HIP_SYMBOL(__unix_sysclock0_host_ticks), &__h_host_unix_sysclock_ticks_elapsed, sizeof(long long)));
   LIBCUDACXX_HIP_CHECK(
-    cudaMemcpyToSymbol(HIP_SYMBOL(__offset_devclock0), &__h_dev_sysclock_offset, sizeof(long long)));
+    hipMemcpyToSymbol(HIP_SYMBOL(__offset_devclock0), &__h_dev_sysclock_offset, sizeof(long long)));
 
-  LIBCUDACXX_HIP_CHECK(cudaFree(__d_dev_sysclock_offset));
+  LIBCUDACXX_HIP_CHECK(hipFree(__d_dev_sysclock_offset));
   return __hip_error;
 }
 
-inline cudaError_t initialize_amdgpu_sysclock_on_device(int __device_id) noexcept
+inline hipError_t initialize_amdgpu_sysclock_on_device(int __device_id) noexcept
 {
-  cudaError_t __hip_error;
+  hipError_t __hip_error;
   int __current_device_id;
-  LIBCUDACXX_HIP_CHECK(cudaGetDevice(&__current_device_id));
-  LIBCUDACXX_HIP_CHECK(cudaSetDevice(__device_id));
+  LIBCUDACXX_HIP_CHECK(hipGetDevice(&__current_device_id));
+  LIBCUDACXX_HIP_CHECK(hipSetDevice(__device_id));
 
   LIBCUDACXX_HIP_CHECK(initialize_amdgpu_sysclock_on_current_device());
 
-  LIBCUDACXX_HIP_CHECK(cudaDeviceSynchronize());
-  LIBCUDACXX_HIP_CHECK(cudaSetDevice(__current_device_id));
+  LIBCUDACXX_HIP_CHECK(hipDeviceSynchronize());
+  LIBCUDACXX_HIP_CHECK(hipSetDevice(__current_device_id));
   return __hip_error;
 }
 

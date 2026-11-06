@@ -165,7 +165,7 @@ template <class _Tp>
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-[[nodiscard]] _CCCL_API constexpr bool isinf(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isinf(__hip_bfloat16 __x) noexcept
 {
 #  if _LIBCUDACXX_HAS_NVBF16()
   _CCCL_IF_NOT_CONSTEVAL_DEFAULT
@@ -178,22 +178,22 @@ template <class _Tp>
 #    endif // ^^^ C++17 or nvcc 12.3+ ^^^
   }
 #  endif // _LIBCUDACXX_HAS_NVBF16()
-  return (::cuda::std::__fp_get_storage(__x) & __fp_exp_mant_mask_of_v<__nv_bfloat16>)
-      == __fp_exp_mask_of_v<__nv_bfloat16>;
+  return (::cuda::std::__fp_get_storage(__x) & __fp_exp_mant_mask_of_v<__hip_bfloat16>)
+      == __fp_exp_mask_of_v<__hip_bfloat16>;
 }
 #endif // _CCCL_HAS_NVBF16()
 
 #if _CCCL_HAS_NVFP8_E4M3()
-[[nodiscard]] _CCCL_API constexpr bool isinf(__nv_fp8_e4m3) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isinf(__hip_fp8_e4m3) noexcept
 {
   return false;
 }
 #endif // _CCCL_HAS_NVFP8_E4M3()
 
 #if _CCCL_HAS_NVFP8_E5M2()
-[[nodiscard]] _CCCL_API constexpr bool isinf(__nv_fp8_e5m2 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isinf(__hip_fp8_e5m2 __x) noexcept
 {
-  return (__x.__x & __fp_exp_mant_mask_of_v<__nv_fp8_e5m2>) == __fp_exp_mask_of_v<__nv_fp8_e5m2>;
+  return (__x.__x & __fp_exp_mant_mask_of_v<__hip_fp8_e5m2>) == __fp_exp_mask_of_v<__hip_fp8_e5m2>;
 }
 #endif // _CCCL_HAS_NVFP8_E5M2()
 
@@ -205,21 +205,21 @@ template <class _Tp>
 #endif // _CCCL_HAS_NVFP8_E8M0()
 
 #if _CCCL_HAS_NVFP6_E2M3()
-[[nodiscard]] _CCCL_API constexpr bool isinf(__nv_fp6_e2m3) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isinf(__hip_fp6_e2m3) noexcept
 {
   return false;
 }
 #endif // _CCCL_HAS_NVFP6_E2M3()
 
 #if _CCCL_HAS_NVFP6_E3M2()
-[[nodiscard]] _CCCL_API constexpr bool isinf(__nv_fp6_e3m2) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isinf(__hip_fp6_e3m2) noexcept
 {
   return false;
 }
 #endif // _CCCL_HAS_NVFP6_E3M2()
 
 #if _CCCL_HAS_NVFP4_E2M1()
-[[nodiscard]] _CCCL_API constexpr bool isinf(__nv_fp4_e2m1) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isinf(__hip_fp4_e2m1) noexcept
 {
   return false;
 }

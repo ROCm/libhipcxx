@@ -70,7 +70,7 @@ struct stream : stream_ref
       : stream_ref(::cuda::__invalid_stream())
   {
     [[maybe_unused]] __ensure_current_context __ctx_setter(__dev);
-    __stream = ::cuda::__driver::__streamCreateWithPriority(cudaStreamNonBlocking, __priority);
+    __stream = ::cuda::__driver::__streamCreateWithPriority(hipStreamNonBlocking, __priority);
   }
 
   //! @brief Construct a new `stream` object into the moved-from state.
@@ -126,7 +126,7 @@ struct stream : stream_ref
   //! @return stream The constructed `stream` object
   //!
   //! @note The constructed `stream` object takes ownership of the native handle.
-  [[nodiscard]] static _CCCL_HOST_API stream from_native_handle(::cudaStream_t __handle)
+  [[nodiscard]] static _CCCL_HOST_API stream from_native_handle(::hipStream_t __handle)
   {
     return stream(__handle);
   }
@@ -145,7 +145,7 @@ struct stream : stream_ref
   //! @return cudaStream_t The native handle being held by the `stream` object.
   //!
   //! @post The stream object is in a moved-from state.
-  [[nodiscard]] _CCCL_HOST_API ::cudaStream_t release()
+  [[nodiscard]] _CCCL_HOST_API ::hipStream_t release()
   {
     return ::cuda::std::exchange(__stream, ::cuda::__invalid_stream());
   }
@@ -153,7 +153,7 @@ struct stream : stream_ref
 private:
   // Use `stream::from_native_handle(s)` to construct an owning `stream`
   // object from a `cudaStream_t` handle.
-  _CCCL_HOST_API explicit stream(::cudaStream_t __handle)
+  _CCCL_HOST_API explicit stream(::hipStream_t __handle)
       : stream_ref(__handle)
   {}
 };

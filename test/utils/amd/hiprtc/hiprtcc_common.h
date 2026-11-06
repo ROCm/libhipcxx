@@ -26,7 +26,9 @@
 // THE SOFTWARE.
 
 #pragma once
-#include "nvrtc_runtime_api.h"
+#include <hip/hip_runtime.h>
+#include <hip/hiprtc.h>
+
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -34,39 +36,26 @@
 #include <string>
 #include <vector>
 
-#define NVRTC_SAFE_CALL(x)                                                                 \
-  do                                                                                       \
-  {                                                                                        \
-    nvrtcResult result = x;                                                                \
-    if (result != NVRTC_SUCCESS)                                                           \
-    {                                                                                      \
-      printf("\nNVRTC ERROR: %s failed with error %s\n", #x, nvrtcGetErrorString(result)); \
-      exit(1);                                                                             \
-    }                                                                                      \
+#define HIPRTC_SAFE_CALL(x)                                                                  \
+  do                                                                                         \
+  {                                                                                          \
+    hiprtcResult result = x;                                                                 \
+    if (result != HIPRTC_SUCCESS)                                                            \
+    {                                                                                        \
+      printf("\nHIPRTC ERROR: %s failed with error %s\n", #x, hiprtcGetErrorString(result)); \
+      exit(1);                                                                               \
+    }                                                                                        \
   } while (0)
 
-#define CUDA_SAFE_CALL(x)                                         \
-  do                                                              \
-  {                                                               \
-    CUresult result = x;                                          \
-    if (result != CUDA_SUCCESS)                                   \
-    {                                                             \
-      const char* msg;                                            \
-      (void)cuGetErrorName(result, &msg);                         \
-      printf("\nCUDA ERROR: %s failed with error %s\n", #x, msg); \
-      exit(1);                                                    \
-    }                                                             \
-  } while (0)
-
-#define CUDA_API_CALL(x)                                                                \
-  do                                                                                    \
-  {                                                                                     \
-    cudaError_t err = x;                                                                \
-    if (err != cudaSuccess)                                                             \
-    {                                                                                   \
-      printf("\nCUDA ERROR: %s: %s\n", cudaGetErrorName(err), cudaGetErrorString(err)); \
-      exit(1);                                                                          \
-    }                                                                                   \
+#define HIP_SAFE_CALL(x)                                                                                     \
+  do                                                                                                         \
+  {                                                                                                          \
+    hipError_t err = x;                                                                                      \
+    if (err != hipSuccess)                                                                                   \
+    {                                                                                                        \
+      printf("\nHIP ERROR: %s failed with error %s: %s\n", #x, hipGetErrorName(err), hipGetErrorString(err)); \
+      exit(1);                                                                                               \
+    }                                                                                                        \
   } while (0)
 
 static void write_output_file(const char* data, size_t datasz, const std::string& file)
@@ -157,17 +146,16 @@ typedef struct {
 
 // NOTE(HIP/AMD): HIPRTC does not include hip/hip_runtime.h, so types and
 // constants from the HIP runtime API are not available. Provide minimal stub
-// definitions needed by libhipcxx headers (referenced via cuda_*->hip_* macro
-// mappings in include/libhipcxx/__amd/cuda_runtime.h).
+// definitions needed by libhipcxx headers.
 //
 // hipSuccess MUST be a plain enumerator (NOT a '#define' to a parenthesized
 // cast like '((hipError_t)0)'). The cast spelling causes a hard parse error
-// wherever libhipcxx headers reference '::cudaSuccess' on a HIPRTC-reachable
+// wherever libhipcxx headers reference '::hipSuccess' on a HIPRTC-reachable
 // code path, because '::' requires an unqualified-id on the right and the
 // expansion '::((hipError_t)0)' is unparseable. Mirroring the real HIP
 // runtime's '<hip/hip_runtime_api.h>:enum hipError_t { hipSuccess = 0, ... }'
-// shape via an enum typedef makes 'hipSuccess' an identifier and lets the
-// upstream '::cudaSuccess' spelling parse unchanged.
+// shape via an enum typedef makes 'hipSuccess' an identifier, so the
+// '::hipSuccess' spelling parses.
 typedef enum hipError_t {
   hipSuccess = 0,
 } hipError_t;
@@ -195,21 +183,6 @@ hipError_t hipGetLastError(void);
 #ifndef __managed__
 #  define __managed__
 #endif
-
-// Define all macros required for reverse hipification here
-#ifndef __nv_bfloat16
-#  define __nv_bfloat16 __hip_bfloat16
-#endif
-#ifndef __nv_bfloat16_raw
-#  define __nv_bfloat16_raw __hip_bfloat16_raw
-#endif
-#ifndef __nv_bfloat162
-#  define __nv_bfloat162 __hip_bfloat162
-#endif
-
-__host__ __device__ void __trap(){
-    __hip_assert(false);
-}
 
 // NOTE(HIP/AMD): HIPRTC doesn't provide <cassert>, so define assert as a polyfill
 // using __builtin_trap which is available in HIPRTC device code. Using a function

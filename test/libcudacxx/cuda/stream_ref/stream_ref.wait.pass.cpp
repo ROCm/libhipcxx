@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -38,7 +38,7 @@
 
 _CCCL_SUPPRESS_DEPRECATED_PUSH
 
-void CUDART_CB callback(cudaStream_t, cudaError_t, void* flag)
+void HIPRT_CB callback(hipStream_t, hipError_t, void* flag)
 {
   std::chrono::milliseconds sleep_duration{1000};
   std::this_thread::sleep_for(sleep_duration);
@@ -63,14 +63,14 @@ void test_wait(cuda::stream_ref& ref)
 
 bool test()
 {
-  cudaStream_t stream;
-  assert(cudaStreamCreate(&stream) == cudaSuccess);
+  hipStream_t stream;
+  assert(hipStreamCreate(&stream) == hipSuccess);
   std::atomic_flag flag = ATOMIC_FLAG_INIT;
-  assert(cudaStreamAddCallback(stream, callback, &flag, 0) == cudaSuccess);
+  assert(hipStreamAddCallback(stream, callback, &flag, 0) == hipSuccess);
   cuda::stream_ref ref{stream};
   test_wait(ref);
   assert(flag.test_and_set());
-  assert(cudaStreamDestroy(stream) == cudaSuccess);
+  assert(hipStreamDestroy(stream) == hipSuccess);
 
   return true;
 }

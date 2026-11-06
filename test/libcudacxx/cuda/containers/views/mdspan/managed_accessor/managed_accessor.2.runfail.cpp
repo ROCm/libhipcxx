@@ -38,7 +38,7 @@
 bool managed_accessor_test()
 {
   int* device_ptr;
-  assert(cudaMalloc(&device_ptr, 4) == cudaSuccess);
+  assert(hipMalloc(&device_ptr, 4) == hipSuccess);
   using ext_t = cuda::std::extents<int, 4>;
   cuda::managed_mdspan<int, ext_t> d_md{device_ptr, ext_t{}};
   unused(d_md);

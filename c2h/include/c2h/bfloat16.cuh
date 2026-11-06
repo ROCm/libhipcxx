@@ -67,7 +67,7 @@ struct bfloat16_t
   uint16_t __x;
 
   /// Constructor from __nv_bfloat16
-  __host__ __device__ __forceinline__ explicit bfloat16_t(const __nv_bfloat16& other)
+  __host__ __device__ __forceinline__ explicit bfloat16_t(const __hip_bfloat16& other)
   {
     __x = reinterpret_cast<const uint16_t&>(other);
   }
@@ -129,9 +129,9 @@ struct bfloat16_t
   }
 
   /// Cast to __nv_bfloat16
-  __host__ __device__ __forceinline__ operator __nv_bfloat16() const
+  __host__ __device__ __forceinline__ operator __hip_bfloat16() const
   {
-    return reinterpret_cast<const __nv_bfloat16&>(__x);
+    return reinterpret_cast<const __hip_bfloat16&>(__x);
   }
 
   /// Cast to float
@@ -237,7 +237,7 @@ inline std::ostream& operator<<(std::ostream& out, const bfloat16_t& x)
 }
 
 /// Insert formatted \p __nv_bfloat16 into the output stream
-inline std::ostream& operator<<(std::ostream& out, const __nv_bfloat16& x)
+inline std::ostream& operator<<(std::ostream& out, const __hip_bfloat16& x)
 {
   return out << bfloat16_t(x);
 }
@@ -260,17 +260,17 @@ public:
 
   static _CCCL_HOST_DEVICE _CCCL_FORCEINLINE bfloat16_t max()
   {
-    return bfloat16_t(numeric_limits<__nv_bfloat16>::max());
+    return bfloat16_t(numeric_limits<__hip_bfloat16>::max());
   }
 
   static _CCCL_HOST_DEVICE _CCCL_FORCEINLINE bfloat16_t min()
   {
-    return bfloat16_t(numeric_limits<__nv_bfloat16>::min());
+    return bfloat16_t(numeric_limits<__hip_bfloat16>::min());
   }
 
   static _CCCL_HOST_DEVICE _CCCL_FORCEINLINE bfloat16_t lowest()
   {
-    return bfloat16_t(numeric_limits<__nv_bfloat16>::lowest());
+    return bfloat16_t(numeric_limits<__hip_bfloat16>::lowest());
   }
 };
 

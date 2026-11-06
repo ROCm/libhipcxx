@@ -168,14 +168,14 @@ int main(int, char**)
   test<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test<__nv_bfloat16>();
+  test<__hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
   test_edges<double>();
 #if _LIBCUDACXX_HAS_NVFP16()
   test_edges<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test_edges<__nv_bfloat16>();
+  test_edges<__hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
   return 0;

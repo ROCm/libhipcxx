@@ -133,7 +133,7 @@ public:
 
 #if _CCCL_HAS_NVBF16()
 template <class _Tp>
-class __numeric_limits_impl<__nv_bfloat16, __numeric_limits_type::__floating_point, _Tp>
+class __numeric_limits_impl<__hip_bfloat16, __numeric_limits_type::__floating_point, _Tp>
 {
 public:
   using type = _Tp;
@@ -210,7 +210,7 @@ public:
 
 #if _CCCL_HAS_NVFP8_E4M3()
 template <class _Tp>
-class __numeric_limits_impl<__nv_fp8_e4m3, __numeric_limits_type::__floating_point, _Tp>
+class __numeric_limits_impl<__hip_fp8_e4m3, __numeric_limits_type::__floating_point, _Tp>
 {
 public:
   using type = _Tp;
@@ -287,7 +287,7 @@ public:
 
 #if _CCCL_HAS_NVFP8_E5M2()
 template <class _Tp>
-class __numeric_limits_impl<__nv_fp8_e5m2, __numeric_limits_type::__floating_point, _Tp>
+class __numeric_limits_impl<__hip_fp8_e5m2, __numeric_limits_type::__floating_point, _Tp>
 {
 public:
   using type = _Tp;
@@ -441,7 +441,7 @@ public:
 
 #if _CCCL_HAS_NVFP6_E2M3()
 template <class _Tp>
-class __numeric_limits_impl<__nv_fp6_e2m3, __numeric_limits_type::__floating_point, _Tp>
+class __numeric_limits_impl<__hip_fp6_e2m3, __numeric_limits_type::__floating_point, _Tp>
 {
 public:
   using type = _Tp;
@@ -518,7 +518,7 @@ public:
 
 #if _CCCL_HAS_NVFP6_E3M2()
 template <class _Tp>
-class __numeric_limits_impl<__nv_fp6_e3m2, __numeric_limits_type::__floating_point, _Tp>
+class __numeric_limits_impl<__hip_fp6_e3m2, __numeric_limits_type::__floating_point, _Tp>
 {
 public:
   using type = _Tp;
@@ -595,7 +595,7 @@ public:
 
 #if _CCCL_HAS_NVFP4_E2M1()
 template <class _Tp>
-class __numeric_limits_impl<__nv_fp4_e2m1, __numeric_limits_type::__floating_point, _Tp>
+class __numeric_limits_impl<__hip_fp4_e2m1, __numeric_limits_type::__floating_point, _Tp>
 {
 public:
   using type = _Tp;

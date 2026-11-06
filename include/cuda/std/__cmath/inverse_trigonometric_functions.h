@@ -125,7 +125,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 acos(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 acos(__hip_bfloat16 __x) noexcept
 {
   return __float2bfloat16(::cuda::std::acosf(__bfloat162float(__x)));
 }
@@ -206,7 +206,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 asin(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 asin(__hip_bfloat16 __x) noexcept
 {
   return __float2bfloat16(::cuda::std::asinf(__bfloat162float(__x)));
 }
@@ -287,7 +287,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 atan(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 atan(__hip_bfloat16 __x) noexcept
 {
   return __float2bfloat16(::cuda::std::atanf(__bfloat162float(__x)));
 }
@@ -368,7 +368,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 atan2(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 atan2(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
 {
   return __float2bfloat16(::cuda::std::atan2f(__bfloat162float(__x), __bfloat162float(__y)));
 }

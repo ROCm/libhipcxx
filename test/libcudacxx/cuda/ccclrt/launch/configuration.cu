@@ -31,17 +31,17 @@
 // SOFTWARE.
 
 // NOTE(HIP/AMD): <cuda.h> (the CUDA driver header) does not exist on HIP. The
-// CUlaunchConfig / CUfunction aggregates this test uses are provided directly by
-// the libhipcxx HIP shim. Important: do NOT pull in <cuda/launch> here -- it
+// ::__libhipcxx::__launch_config aggregates this test uses are provided by
+// <libhipcxx/__amd/hip_runtime.h>. Important: do NOT pull in <cuda/launch> here -- it
 // must be included only *after* _CCCLRT_LAUNCH_CONFIG_TEST is defined below, so
 // that the launch hook (test_launch_kernel_replacement) is actually compiled in.
 #if defined(__HIP_PLATFORM_AMD__)
-#  include <libhipcxx/__amd/cuda_runtime.h>
+#  include <libhipcxx/__amd/hip_runtime.h>
 #else
 #  include <cuda.h>
 #endif
 
-void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, void* args[]);
+void test_launch_kernel_replacement(::__libhipcxx::__launch_config& config, hipFunction_t kernel, void* args[]);
 
 // This is a replacement for the launch kernel function that is used to test
 // the configuration of the launch kernel. It checks if the configuration
@@ -53,10 +53,10 @@ void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, v
 
 #include <host_device.cuh>
 
-static CUlaunchConfig expectedConfig;
+static ::__libhipcxx::__launch_config expectedConfig;
 static bool replacementCalled = false;
 
-void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, void* args[])
+void test_launch_kernel_replacement(::__libhipcxx::__launch_config& config, hipFunction_t kernel, void* args[])
 {
   replacementCalled   = true;
   bool has_cluster    = false;
@@ -83,17 +83,17 @@ void test_launch_kernel_replacement(CUlaunchConfig& config, CUfunction kernel, v
       {
         switch (expectedAttr.id)
         {
-          case CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION:
+          case ::__libhipcxx::__launch_attribute_cluster_dimension:
             CCCLRT_CHECK(expectedAttr.value.clusterDim.x == actualAttr.value.clusterDim.x);
             CCCLRT_CHECK(expectedAttr.value.clusterDim.y == actualAttr.value.clusterDim.y);
             CCCLRT_CHECK(expectedAttr.value.clusterDim.z == actualAttr.value.clusterDim.z);
             has_cluster = true;
             break;
-          case CU_LAUNCH_ATTRIBUTE_COOPERATIVE:
+          case ::__libhipcxx::__launch_attribute_cooperative:
             CCCLRT_CHECK(expectedAttr.value.cooperative == actualAttr.value.cooperative);
             is_cooperative = actualAttr.value.cooperative != 0;
             break;
-          case CU_LAUNCH_ATTRIBUTE_PRIORITY:
+          case ::__libhipcxx::__launch_attribute_priority:
             CCCLRT_CHECK(expectedAttr.value.priority == actualAttr.value.priority);
             break;
           default:
@@ -133,9 +133,9 @@ auto make_test_dims(const dim3& grid_dims, const dim3& block_dims, const dim3& c
   }
 }
 
-auto add_cluster(const dim3& cluster_dims, CUlaunchAttribute& attr)
+auto add_cluster(const dim3& cluster_dims, ::__libhipcxx::__launch_attribute& attr)
 {
-  attr.id               = CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION;
+  attr.id               = ::__libhipcxx::__launch_attribute_cluster_dimension;
   attr.value.clusterDim = {cluster_dims.x, cluster_dims.y, cluster_dims.z};
 }
 
@@ -164,11 +164,11 @@ auto configuration_test(
 
   SECTION("Simple cooperative launch")
   {
-    CUlaunchAttribute attrs[2];
+    ::__libhipcxx::__launch_attribute attrs[2];
     auto config                               = cuda::make_config(dims, cuda::cooperative_launch());
     expectedConfig.numAttrs                   = 1 + HasCluster;
     expectedConfig.attrs                      = &attrs[0];
-    expectedConfig.attrs[0].id                = CU_LAUNCH_ATTRIBUTE_COOPERATIVE;
+    expectedConfig.attrs[0].id                = ::__libhipcxx::__launch_attribute_cooperative;
     expectedConfig.attrs[0].value.cooperative = 1;
     if constexpr (HasCluster)
     {
@@ -179,7 +179,7 @@ auto configuration_test(
 
   SECTION("Priority and dynamic smem")
   {
-    CUlaunchAttribute attrs[2];
+    ::__libhipcxx::__launch_attribute attrs[2];
     constexpr int priority = 42;
     constexpr int num_ints = 128;
     auto config =
@@ -187,7 +187,7 @@ auto configuration_test(
     expectedConfig.sharedMemBytes          = num_ints * sizeof(int);
     expectedConfig.numAttrs                = 1 + HasCluster;
     expectedConfig.attrs                   = &attrs[0];
-    expectedConfig.attrs[0].id             = CU_LAUNCH_ATTRIBUTE_PRIORITY;
+    expectedConfig.attrs[0].id             = ::__libhipcxx::__launch_attribute_priority;
     expectedConfig.attrs[0].value.priority = priority;
     if constexpr (HasCluster)
     {
@@ -204,7 +204,7 @@ auto configuration_test(
     {
       int arr[13 * 1024];
     };
-    CUlaunchAttribute attrs[1];
+    ::__libhipcxx::__launch_attribute attrs[1];
     auto config                   = cuda::make_config(dims, cuda::dynamic_shared_memory<S>(cuda::non_portable));
     expectedConfig.sharedMemBytes = sizeof(S);
     expectedConfig.numAttrs       = HasCluster;
@@ -220,8 +220,8 @@ auto configuration_test(
 
 C2H_TEST("Launch configuration", "[launch]")
 {
-  cudaStream_t stream;
-  CUDART(cudaStreamCreate(&stream));
+  hipStream_t stream;
+  CUDART(hipStreamCreate(&stream));
   SECTION("No cluster")
   {
     configuration_test<false>(stream, 8, 64);
@@ -231,7 +231,7 @@ C2H_TEST("Launch configuration", "[launch]")
     configuration_test<true>(stream, 8, 32, 2);
   }
 
-  CUDART(cudaStreamDestroy(stream));
+  CUDART(hipStreamDestroy(stream));
   CCCLRT_CHECK(replacementCalled);
 }
 
@@ -337,7 +337,7 @@ C2H_TEST("Queries on config", "[launch]")
   auto config = cuda::make_config(cuda::grid_dims(4), cuda::block_dims<256>(), cuda::cooperative_launch());
   test_queries_on_config(config);
   test_kernel<<<4, 256>>>(config);
-  CUDART(cudaGetLastError());
-  CUDART(cudaDeviceSynchronize());
+  CUDART(hipGetLastError());
+  CUDART(hipDeviceSynchronize());
 }
 #endif // !_CCCL_CUDA_COMPILER(CLANG) && !_CCCL_HIP_COMPILATION()

@@ -39,7 +39,7 @@
 // 'amdclang++/hipcc -c foo.hip' gets the macro here, before __cccl/compiler.h
 // and every other __HIP_PLATFORM_AMD__ check sees it.
 #if defined(__HIPCC__) || defined(__HIP_PLATFORM_AMD__)
-#include <libhipcxx/__amd/cuda_runtime.h>
+#include <libhipcxx/__amd/hip_runtime.h>
 // NOTE(HIP/AMD): per-architecture HIP TSC clock-rate macros used by
 // the libhipcxx wall_clock64-based time / chrono / sleep code
 // (<cuda/std/ctime>, <cuda/std/__thread/threading_support_cuda.h>).

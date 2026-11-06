@@ -53,7 +53,7 @@
 struct __half;
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-struct __nv_bfloat16;
+struct __hip_bfloat16;
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 #include <cuda/std/__cccl/prologue.h>

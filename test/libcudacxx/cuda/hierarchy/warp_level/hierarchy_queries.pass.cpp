@@ -261,13 +261,13 @@ void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_e
   cuda::std::dims<3, unsigned> cluster_exts_dyn{cluster_exts.extent(0), cluster_exts.extent(1), cluster_exts.extent(2)};
   cuda::std::dims<3, unsigned> block_exts_dyn{block_exts.extent(0), block_exts.extent(1), block_exts.extent(2)};
 
-  cudaLaunchAttribute attribute[1]{};
+  hipLaunchAttribute attribute[1]{};
   attribute[0].id               = cudaLaunchAttributeClusterDimension;
   attribute[0].val.clusterDim.x = cluster_dims.x;
   attribute[0].val.clusterDim.y = cluster_dims.y;
   attribute[0].val.clusterDim.z = cluster_dims.z;
 
-  cudaLaunchConfig_t config{};
+  hipLaunchConfig_t config{};
   config.gridDim  = dim3{grid_dims.x * cluster_dims.x, grid_dims.y * cluster_dims.y, grid_dims.z * cluster_dims.z};
   config.blockDim = block_dims;
   config.attrs    = attribute;
@@ -280,7 +280,7 @@ void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_e
       cuda::cluster_dims<ClusterExts::static_extent(0), ClusterExts::static_extent(1), ClusterExts::static_extent(2)>(),
       cuda::block_dims<BlockExts::static_extent(0), BlockExts::static_extent(1), BlockExts::static_extent(2)>());
     auto kernel = test_kernel<decltype(hier), GridExts, ClusterExts, BlockExts>;
-    assert(cudaLaunchKernelEx(&config, kernel, hier, grid_exts, cluster_exts, block_exts) == cudaSuccess);
+    assert(hipLaunchKernelEx(&config, kernel, hier, grid_exts, cluster_exts, block_exts) == hipSuccess);
   }
 
   // 2. Launch hierarchy with all dynamic extents.
@@ -289,7 +289,7 @@ void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_e
       cuda::make_hierarchy(cuda::grid_dims(grid_dims), cuda::cluster_dims(cluster_dims), cuda::block_dims(block_dims));
     auto kernel =
       test_kernel<decltype(hier), decltype(grid_exts_dyn), decltype(cluster_exts_dyn), decltype(block_exts_dyn)>;
-    assert(cudaLaunchKernelEx(&config, kernel, hier, grid_exts_dyn, cluster_exts_dyn, block_exts_dyn) == cudaSuccess);
+    assert(hipLaunchKernelEx(&config, kernel, hier, grid_exts_dyn, cluster_exts_dyn, block_exts_dyn) == hipSuccess);
   }
 }
 #endif // !defined(__HIP_PLATFORM_AMD__)
@@ -297,7 +297,7 @@ void test_launch(GridExts grid_exts, ClusterExts cluster_exts, BlockExts block_e
 void test()
 {
   int cc_major{};
-  assert(cudaDeviceGetAttribute(&cc_major, cudaDevAttrComputeCapabilityMajor, 0) == cudaSuccess);
+  assert(hipDeviceGetAttribute(&cc_major, hipDeviceAttributeComputeCapabilityMajor, 0) == hipSuccess);
 
   // thread block clusters require compute capability at least 9.0
   const bool enable_clusters = cc_major >= 9;
@@ -316,7 +316,7 @@ void test()
   }
 #endif // !defined(__HIP_PLATFORM_AMD__)
 
-  assert(cudaDeviceSynchronize() == cudaSuccess);
+  assert(hipDeviceSynchronize() == hipSuccess);
 }
 #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 

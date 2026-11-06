@@ -86,19 +86,19 @@ int main(int, char**)
 #endif
 
 #if _CCCL_HAS_NVFP4_E2M1()
-  test_nv_fp<__nv_fp4_e2m1>();
+  test_nv_fp<__hip_fp4_e2m1>();
 #endif
 #if _CCCL_HAS_NVFP6_E3M2()
-  test_nv_fp<__nv_fp6_e3m2>();
+  test_nv_fp<__hip_fp6_e3m2>();
 #endif
 #if _CCCL_HAS_NVFP6_E2M3()
-  test_nv_fp<__nv_fp6_e2m3>();
+  test_nv_fp<__hip_fp6_e2m3>();
 #endif
 #if _CCCL_HAS_NVFP8_E4M3()
-  test_nv_fp<__nv_fp8_e4m3>();
+  test_nv_fp<__hip_fp8_e4m3>();
 #endif
 #if _CCCL_HAS_NVFP8_E5M2()
-  test_nv_fp<__nv_fp8_e5m2>();
+  test_nv_fp<__hip_fp8_e5m2>();
 #endif
 #if _CCCL_HAS_NVFP8_E8M0()
   test_nv_fp<__nv_fp8_e8m0>();
@@ -107,7 +107,7 @@ int main(int, char**)
   test_nv_fp<__half>();
 #endif
 #if _CCCL_HAS_NVBF16()
-  test_nv_fp<__nv_bfloat16>();
+  test_nv_fp<__hip_bfloat16>();
 #endif
 
 #if _CCCL_HAS_FLOAT128()

@@ -29,7 +29,6 @@
 
 // NOTE(HIP/AMD): rocThrust reports THRUST_DEVICE_SYSTEM_HIP, but every
 // THRUST_DEVICE_SYSTEM_CUDA-guarded path in this header is correct on HIP too:
-// the cuda* runtime calls are hip-shimmed (<libhipcxx/__amd/cuda_runtime.h>),
 // thrust::cuda::par is provided by rocThrust, and cuda::mr/stream come from
 // libhipcxx. Rather than widening the ~11 individual guards (a large cherry-pick
 // conflict surface against upstream), present THRUST_DEVICE_SYSTEM as CUDA for the
@@ -86,8 +85,8 @@ NVBENCH_DECLARE_TYPE_STRINGS(__half, "F16", "half");
 NVBENCH_DECLARE_TYPE_STRINGS(cuda::std::complex<__half>, "C16", "complex_half");
 #endif
 #if _CCCL_HAS_NVBF16()
-NVBENCH_DECLARE_TYPE_STRINGS(__nv_bfloat16, "BF16", "bfloat16");
-NVBENCH_DECLARE_TYPE_STRINGS(cuda::std::complex<__nv_bfloat16>, "CB16", "complex_bfloat16");
+NVBENCH_DECLARE_TYPE_STRINGS(__hip_bfloat16, "BF16", "bfloat16");
+NVBENCH_DECLARE_TYPE_STRINGS(cuda::std::complex<__hip_bfloat16>, "CB16", "complex_bfloat16");
 #endif
 NVBENCH_DECLARE_TYPE_STRINGS(complex32, "C32", "complex32");
 NVBENCH_DECLARE_TYPE_STRINGS(complex64, "C64", "complex64");
@@ -674,10 +673,10 @@ struct caching_allocator_t
     }
     else
     {
-      const cudaError_t status = cudaMallocAsync(&result, num_bytes, __stream.get());
-      if (cudaSuccess != status)
+      const hipError_t status = hipMallocAsync(&result, num_bytes, __stream.get());
+      if (hipSuccess != status)
       {
-        throw std::runtime_error(std::string("Failed to allocate device memory: ") + cudaGetErrorString(status));
+        throw std::runtime_error(std::string("Failed to allocate device memory: ") + hipGetErrorString(status));
       }
       // NOTE: We can avoid a `__stream.sync()` here because `allocate` is only ever called asynchronously with a stream
       // So it is fine that the memory is only valid in stream order
@@ -728,10 +727,10 @@ private:
   {
     value_type* result{};
 #if THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
-    const cudaError_t status = cudaMalloc(&result, num_bytes);
-    if (cudaSuccess != status)
+    const hipError_t status = hipMalloc(&result, num_bytes);
+    if (hipSuccess != status)
     {
-      throw std::runtime_error(std::string("Failed to allocate device memory: ") + cudaGetErrorString(status));
+      throw std::runtime_error(std::string("Failed to allocate device memory: ") + hipGetErrorString(status));
     }
 #else
     result = new value_type[num_bytes];
@@ -742,7 +741,7 @@ private:
   void do_deallocate(value_type* ptr)
   {
 #if THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA
-    cudaFree(ptr);
+    hipFree(ptr);
 #else
     delete[] ptr;
 #endif

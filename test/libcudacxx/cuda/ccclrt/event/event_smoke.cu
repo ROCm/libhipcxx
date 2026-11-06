@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/stream>
 
 #include <testing.cuh>
@@ -28,39 +50,39 @@ static_assert(!::cuda::std::is_default_constructible_v<cuda::event_ref>);
 static_assert(!::cuda::std::is_default_constructible_v<cuda::event>);
 static_assert(!::cuda::std::is_default_constructible_v<cuda::timed_event>);
 
-C2H_CCCLRT_TEST("can construct an event_ref from a cudaEvent_t", "[event]")
+C2H_CCCLRT_TEST("can construct an event_ref from a hipEvent_t", "[event]")
 {
   cuda::__ensure_current_context guard(cuda::device_ref{0});
-  ::cudaEvent_t ev;
-  CCCLRT_REQUIRE(::cudaEventCreate(&ev) == ::cudaSuccess);
+  ::hipEvent_t ev;
+  CCCLRT_REQUIRE(::hipEventCreate(&ev) == ::hipSuccess);
   cuda::event_ref ref(ev);
   CCCLRT_REQUIRE(ref.get() == ev);
   CCCLRT_REQUIRE(!!ref);
   // test implicit conversion from cudaEvent_t:
   cuda::event_ref ref2 = ::test::fn_takes_event_ref(ev);
   CCCLRT_REQUIRE(ref2.get() == ev);
-  CCCLRT_REQUIRE(::cudaEventDestroy(ev) == ::cudaSuccess);
+  CCCLRT_REQUIRE(::hipEventDestroy(ev) == ::hipSuccess);
   // test an empty event_ref:
-  cuda::event_ref ref3(::cudaEvent_t{});
-  CCCLRT_REQUIRE(ref3.get() == ::cudaEvent_t{});
+  cuda::event_ref ref3(::hipEvent_t{});
+  CCCLRT_REQUIRE(ref3.get() == ::hipEvent_t{});
   CCCLRT_REQUIRE(!ref3);
 }
 
 C2H_CCCLRT_TEST("can copy construct an event_ref and compare for equality", "[event]")
 {
   cuda::__ensure_current_context guard(cuda::device_ref{0});
-  ::cudaEvent_t ev;
-  CCCLRT_REQUIRE(::cudaEventCreate(&ev) == ::cudaSuccess);
+  ::hipEvent_t ev;
+  CCCLRT_REQUIRE(::hipEventCreate(&ev) == ::hipSuccess);
   const cuda::event_ref ref(ev);
   const cuda::event_ref ref2 = ref;
   CCCLRT_REQUIRE(ref2 == ref);
   CCCLRT_REQUIRE(!(ref != ref2));
   CCCLRT_REQUIRE((ref ? true : false)); // test contextual convertibility to bool
   CCCLRT_REQUIRE(!!ref);
-  CCCLRT_REQUIRE(::cudaEvent_t{} != ref);
-  CCCLRT_REQUIRE(::cudaEventDestroy(ev) == ::cudaSuccess);
+  CCCLRT_REQUIRE(::hipEvent_t{} != ref);
+  CCCLRT_REQUIRE(::hipEventDestroy(ev) == ::hipSuccess);
   // copy from empty event_ref:
-  const cuda::event_ref ref3(::cudaEvent_t{});
+  const cuda::event_ref ref3(::hipEvent_t{});
   const cuda::event_ref ref4 = ref3;
   CCCLRT_REQUIRE(ref4 == ref3);
   CCCLRT_REQUIRE(!(ref3 != ref4));
@@ -70,8 +92,8 @@ C2H_CCCLRT_TEST("can copy construct an event_ref and compare for equality", "[ev
 C2H_CCCLRT_TEST("can use event_ref to record and wait on an event", "[event]")
 {
   cuda::__ensure_current_context guard(cuda::device_ref{0});
-  ::cudaEvent_t ev;
-  CCCLRT_REQUIRE(::cudaEventCreate(&ev) == ::cudaSuccess);
+  ::hipEvent_t ev;
+  CCCLRT_REQUIRE(::hipEventCreate(&ev) == ::hipSuccess);
   const cuda::event_ref ref(ev);
 
   test::pinned<int> i(0);
@@ -83,21 +105,21 @@ C2H_CCCLRT_TEST("can use event_ref to record and wait on an event", "[event]")
   CCCLRT_REQUIRE(*i == 42);
 
   stream.sync();
-  CCCLRT_REQUIRE(::cudaEventDestroy(ev) == ::cudaSuccess);
+  CCCLRT_REQUIRE(::hipEventDestroy(ev) == ::hipSuccess);
 }
 
 C2H_CCCLRT_TEST("can construct an event with a stream_ref", "[event]")
 {
   cuda::stream stream{cuda::device_ref{0}};
   cuda::event ev(static_cast<cuda::stream_ref>(stream));
-  CCCLRT_REQUIRE(ev.get() != ::cudaEvent_t{});
+  CCCLRT_REQUIRE(ev.get() != ::hipEvent_t{});
 }
 
 C2H_CCCLRT_TEST("can construct an event with a device_ref", "[event]")
 {
   cuda::device_ref device{0};
   cuda::event ev(device);
-  CCCLRT_REQUIRE(ev.get() != ::cudaEvent_t{});
+  CCCLRT_REQUIRE(ev.get() != ::hipEvent_t{});
   cuda::stream stream{device};
   ev.record(stream);
   ev.sync();

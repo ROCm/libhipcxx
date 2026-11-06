@@ -165,12 +165,12 @@ void test_async_resource_ref()
   cuda::mr::resource_ref<cuda::mr::host_accessible, Properties...> ref_second{second};
 
   // Ensure that we properly pass on the allocate function
-  assert(ref_first.allocate(::cudaStream_t{}, 0, 0) == first.allocate(::cudaStream_t{}, 0, 0));
-  assert(ref_second.allocate(::cudaStream_t{}, 0, 0) == second.allocate(::cudaStream_t{}, 0, 0));
+  assert(ref_first.allocate(::hipStream_t{}, 0, 0) == first.allocate(::hipStream_t{}, 0, 0));
+  assert(ref_second.allocate(::hipStream_t{}, 0, 0) == second.allocate(::hipStream_t{}, 0, 0));
 
   // Ensure that assignment still works
   ref_second = ref_first;
-  assert(ref_second.allocate(::cudaStream_t{}, 0, 0) == first.allocate(::cudaStream_t{}, 0, 0));
+  assert(ref_second.allocate(::hipStream_t{}, 0, 0) == first.allocate(::hipStream_t{}, 0, 0));
 }
 
 // clang complains about pure virtual functions being called, so ensure that we properly crash if so

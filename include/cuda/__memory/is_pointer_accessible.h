@@ -71,7 +71,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 #if _CCCL_HAS_CTK() && !_CCCL_COMPILER(NVRTC)
 
 #  define _CCCL_THROW_OR_RETURN(_STATUS, _MSG)                                               \
-    if ((_STATUS) != ::cudaSuccess)                                                          \
+    if ((_STATUS) != ::hipSuccess)                                                          \
     {                                                                                        \
       if constexpr (_IsNothrow)                                                              \
       {                                                                                      \
@@ -93,12 +93,12 @@ _CCCL_HOST_API inline bool __is_managed(const void* __p, ::cuda::std::bool_const
   }
   bool __is_managed{};
   const auto __status =
-    ::cuda::__driver::__pointerGetAttributeNoThrow<::CU_POINTER_ATTRIBUTE_IS_MANAGED>(__is_managed, __p);
+    ::cuda::__driver::__pointerGetAttributeNoThrow<::HIP_POINTER_ATTRIBUTE_IS_MANAGED>(__is_managed, __p);
   switch (__status)
   {
-    case ::cudaSuccess:
+    case ::hipSuccess:
       return __is_managed;
-    case ::cudaErrorInvalidValue:
+    case ::hipErrorInvalidValue:
       return false;
     default:
       _CCCL_THROW_OR_RETURN(__status, "is_managed() failed");
@@ -133,17 +133,17 @@ __is_host_accessible(const void* __p, ::cuda::std::bool_constant<_IsNothrow>) no
   {
     return false;
   }
-  ::CUpointer_attribute __attrs[3] = {
-    ::CU_POINTER_ATTRIBUTE_MEMORY_TYPE, ::CU_POINTER_ATTRIBUTE_IS_MANAGED, ::CU_POINTER_ATTRIBUTE_MEMPOOL_HANDLE};
-  auto __memory_type       = static_cast<::CUmemorytype>(0);
+  ::hipPointer_attribute __attrs[3] = {
+    ::HIP_POINTER_ATTRIBUTE_MEMORY_TYPE, ::HIP_POINTER_ATTRIBUTE_IS_MANAGED, ::CU_POINTER_ATTRIBUTE_MEMPOOL_HANDLE};
+  auto __memory_type       = static_cast<::hipMemoryType>(0);
   int __is_managed         = 0;
-  ::CUmemoryPool __mempool = nullptr;
+  ::hipMemPool_t __mempool = nullptr;
   void* __results[3]       = {&__memory_type, &__is_managed, &__mempool};
   const auto __status      = ::cuda::__driver::__pointerGetAttributesNoThrow(__attrs, __results, __p);
   _CCCL_THROW_OR_RETURN(__status, "Failed to get attributes of a pointer");
   // (1) check if the pointer is unregistered
-  if (__memory_type == static_cast<::CUmemorytype>(0)
-      || (__mempool == nullptr && (__is_managed || __memory_type == ::CU_MEMORYTYPE_HOST)))
+  if (__memory_type == static_cast<::hipMemoryType>(0)
+      || (__mempool == nullptr && (__is_managed || __memory_type == ::hipMemoryTypeHost)))
   {
     return true;
   }
@@ -151,11 +151,11 @@ __is_host_accessible(const void* __p, ::cuda::std::bool_constant<_IsNothrow>) no
 #  if _CCCL_CTK_AT_LEAST(12, 2)
   if (__mempool != nullptr)
   {
-    ::CUmemLocation __prop{::CU_MEM_LOCATION_TYPE_HOST, 0};
-    ::CUmemAccess_flags __pool_flags;
+    ::hipMemLocation __prop{::hipMemLocationTypeHost, 0};
+    ::hipMemAccessFlags __pool_flags;
     const auto __status2 = ::cuda::__driver::__mempoolGetAccessNoThrow(__pool_flags, __mempool, &__prop);
     _CCCL_THROW_OR_RETURN(__status2, "Failed to get access of a memory pool");
-    return __pool_flags & unsigned{::CU_MEM_ACCESS_FLAGS_PROT_READ};
+    return __pool_flags & unsigned{::hipMemAccessFlagsProtRead};
   }
 #  endif // _CCCL_CTK_AT_LEAST(12, 2)
   return false;
@@ -196,36 +196,36 @@ _CCCL_HOST_API inline bool __is_device_or_managed_memory(const void* __p) noexce
   {
     return false;
   }
-  ::CUpointer_attribute __attrs[4] = {
-    ::CU_POINTER_ATTRIBUTE_MEMORY_TYPE,
-    ::CU_POINTER_ATTRIBUTE_IS_MANAGED,
-    ::CU_POINTER_ATTRIBUTE_DEVICE_ORDINAL,
+  ::hipPointer_attribute __attrs[4] = {
+    ::HIP_POINTER_ATTRIBUTE_MEMORY_TYPE,
+    ::HIP_POINTER_ATTRIBUTE_IS_MANAGED,
+    ::HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL,
     ::CU_POINTER_ATTRIBUTE_MEMPOOL_HANDLE};
-  auto __memory_type       = static_cast<::CUmemorytype>(0);
+  auto __memory_type       = static_cast<::hipMemoryType>(0);
   int __is_managed         = 0;
   int __ptr_dev_id         = 0;
-  ::CUmemoryPool __mempool = nullptr;
+  ::hipMemPool_t __mempool = nullptr;
   void* __results[4]       = {&__memory_type, &__is_managed, &__ptr_dev_id, &__mempool};
   const auto __status      = ::cuda::__driver::__pointerGetAttributesNoThrow(__attrs, __results, __p);
-  if (__status != ::cudaSuccess)
+  if (__status != ::hipSuccess)
   {
     return false;
   }
   // (1) check if the pointer is unregistered
-  if (__memory_type == static_cast<::CUmemorytype>(0))
+  if (__memory_type == static_cast<::hipMemoryType>(0))
   {
     return false;
   }
   // (2) check if a memory pool is associated with the pointer
   if (__mempool != nullptr)
   {
-    ::CUmemLocation __prop{::CU_MEM_LOCATION_TYPE_DEVICE, __ptr_dev_id};
-    ::CUmemAccess_flags __pool_flags;
+    ::hipMemLocation __prop{::hipMemLocationTypeDevice, __ptr_dev_id};
+    ::hipMemAccessFlags __pool_flags;
     const auto __status2 = ::cuda::__driver::__mempoolGetAccessNoThrow(__pool_flags, __mempool, &__prop);
-    return (__status2 == ::cudaSuccess) && (static_cast<bool>(__pool_flags));
+    return (__status2 == ::hipSuccess) && (static_cast<bool>(__pool_flags));
   }
   // (3) check if the pointer is a device accessible pointer or managed memory
-  return __is_managed || __memory_type == ::CU_MEMORYTYPE_DEVICE;
+  return __is_managed || __memory_type == ::hipMemoryTypeDevice;
 }
 
 template <bool _IsNothrow>
@@ -237,36 +237,36 @@ _CCCL_HOST_API inline bool __is_device_accessible(
   {
     return false;
   }
-  ::CUpointer_attribute __attrs[4] = {
-    ::CU_POINTER_ATTRIBUTE_MEMORY_TYPE,
-    ::CU_POINTER_ATTRIBUTE_IS_MANAGED,
-    ::CU_POINTER_ATTRIBUTE_DEVICE_ORDINAL,
+  ::hipPointer_attribute __attrs[4] = {
+    ::HIP_POINTER_ATTRIBUTE_MEMORY_TYPE,
+    ::HIP_POINTER_ATTRIBUTE_IS_MANAGED,
+    ::HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL,
     ::CU_POINTER_ATTRIBUTE_MEMPOOL_HANDLE};
-  auto __memory_type       = static_cast<::CUmemorytype>(0);
+  auto __memory_type       = static_cast<::hipMemoryType>(0);
   int __is_managed         = 0;
   int __ptr_dev_id         = 0;
-  ::CUmemoryPool __mempool = nullptr;
+  ::hipMemPool_t __mempool = nullptr;
   void* __results[4]       = {&__memory_type, &__is_managed, &__ptr_dev_id, &__mempool};
   const auto __status      = ::cuda::__driver::__pointerGetAttributesNoThrow(__attrs, __results, __p);
   _CCCL_THROW_OR_RETURN(__status, "Failed to get attributes of a pointer");
   // (1) check if the pointer is unregistered
-  if (__memory_type == static_cast<::CUmemorytype>(0))
+  if (__memory_type == static_cast<::hipMemoryType>(0))
   {
     return false;
   }
   // (2) check if the pointer is a device accessible pointer or managed memory
-  if (!__is_managed && __memory_type != ::CU_MEMORYTYPE_DEVICE)
+  if (!__is_managed && __memory_type != ::hipMemoryTypeDevice)
   {
     return false;
   }
   // (3) check if a memory pool is associated with the pointer
   if (__mempool != nullptr)
   {
-    ::CUmemLocation __prop{::CU_MEM_LOCATION_TYPE_DEVICE, __device.get()};
-    ::CUmemAccess_flags __pool_flags;
+    ::hipMemLocation __prop{::hipMemLocationTypeDevice, __device.get()};
+    ::hipMemAccessFlags __pool_flags;
     const auto __status2 = ::cuda::__driver::__mempoolGetAccessNoThrow(__pool_flags, __mempool, &__prop);
     _CCCL_THROW_OR_RETURN(__status2, "Failed to get access of a memory pool");
-    return __pool_flags & unsigned{::CU_MEM_ACCESS_FLAGS_PROT_READ};
+    return __pool_flags & unsigned{::hipMemAccessFlagsProtRead};
   }
   // (4) check if the pointer is allocated on the specified device
   if (__ptr_dev_id == __device.get())
@@ -332,12 +332,12 @@ __hip_query_pointer(const void* __p, ::hipPointerAttribute_t& __attr, const char
     return false;
   }
   const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
-  if (__status == ::cudaErrorInvalidValue)
+  if (__status == ::hipErrorInvalidValue)
   {
     __attr.type = ::hipMemoryTypeUnregistered;
     return true;
   }
-  if (__status != ::cudaSuccess)
+  if (__status != ::hipSuccess)
   {
     ::cuda::__throw_cuda_error(__status, "is_pointer_accessible query failed", __fn);
   }
@@ -452,12 +452,12 @@ __hip_query_pointer_nothrow(const void* __p, ::hipPointerAttribute_t& __attr) no
     return false;
   }
   const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attr, __p);
-  if (__status == ::cudaErrorInvalidValue)
+  if (__status == ::hipErrorInvalidValue)
   {
     __attr.type = ::hipMemoryTypeUnregistered;
     return true;
   }
-  return __status == ::cudaSuccess;
+  return __status == ::hipSuccess;
 }
 
 [[nodiscard]] _CCCL_HOST_API inline bool __is_managed_nothrow(const void* __p) noexcept

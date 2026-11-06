@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -71,20 +71,20 @@ static void load_and_run_gpu_code(const std::string inputFile, const RunConfig& 
   std::vector<char> code(std::istreambuf_iterator<char>{istr}, std::istreambuf_iterator<char>{});
   istr.close();
 
-  CUdevice cuDevice;
-  CUcontext context;
-  CUmodule module;
-  CUfunction kernel;
+  hipDevice_t device;
+  hipCtx_t context;
+  hipModule_t module;
+  hipFunction_t kernel;
 
-  CUDA_SAFE_CALL(cuInit(0));
-  CUDA_SAFE_CALL(cuDeviceGet(&cuDevice, 0));
-  // CUDA_SAFE_CALL(cuCtxCreate(&context, 0, cuDevice)); // NOTE(HIPRTC): This API is deprecated on the AMD platform.
-  CUDA_SAFE_CALL(cuModuleLoadDataEx(&module, code.data(), 0, 0, 0));
-  CUDA_SAFE_CALL(cuModuleGetFunction(&kernel, module, "main_kernel"));
-  CUDA_SAFE_CALL(cuLaunchKernel(kernel, 1, 1, 1, rc.threadCount, 1, 1, rc.shmemSize, nullptr, nullptr, 0));
+  HIP_SAFE_CALL(hipInit(0));
+  HIP_SAFE_CALL(hipDeviceGet(&device, 0));
+  // HIP_SAFE_CALL(hipCtxCreate(&context, 0, device)); // NOTE(HIPRTC): This API is deprecated on the AMD platform.
+  HIP_SAFE_CALL(hipModuleLoadDataEx(&module, code.data(), 0, 0, 0));
+  HIP_SAFE_CALL(hipModuleGetFunction(&kernel, module, "main_kernel"));
+  HIP_SAFE_CALL(hipModuleLaunchKernel(kernel, 1, 1, 1, rc.threadCount, 1, 1, rc.shmemSize, nullptr, nullptr, 0));
 
-  CUDA_API_CALL(cudaGetLastError());
-  CUDA_API_CALL(cudaDeviceSynchronize());
+  HIP_SAFE_CALL(hipGetLastError());
+  HIP_SAFE_CALL(hipDeviceSynchronize());
 
   return;
 }

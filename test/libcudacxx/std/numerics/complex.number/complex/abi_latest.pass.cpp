@@ -66,7 +66,7 @@ int main(int, char**)
   test<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test<__nv_bfloat16>();
+  test<__hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
   return 0;

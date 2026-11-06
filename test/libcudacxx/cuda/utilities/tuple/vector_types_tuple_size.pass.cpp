@@ -83,7 +83,7 @@ TEST_FUNC constexpr bool test()
   test<__half2, 2>();
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  test<__nv_bfloat162, 2>();
+  test<__hip_bfloat162, 2>();
 #endif // _CCCL_HAS_NVBF16()
 
   test<dim3, 3>();

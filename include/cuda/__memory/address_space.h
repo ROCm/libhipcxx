@@ -108,7 +108,7 @@ enum class address_space
       return static_cast<bool>(__ret);
 #  else // ^^^ _CCCL_CUDA_COMPILER(NVCC, <, 12, 3) || _CCCL_CUDA_COMPILER(NVRTC, <, 12, 3) ^^^ /
         // vvv !_CCCL_CUDA_COMPILER(NVCC, <, 12, 3) && !_CCCL_CUDA_COMPILER(NVRTC, <, 12, 3) vvv
-      bool __p = static_cast<bool>(::__isGlobal(__ptr));
+      bool __p = static_cast<bool>(::__libhipcxx::__isGlobal(__ptr));
       if (__p)
       {
         _CCCL_ASSUME(__p);
@@ -130,7 +130,7 @@ enum class address_space
       return static_cast<bool>(__ret);
 #  else // ^^^ _CCCL_CUDA_COMPILER(NVCC, <, 12, 3) || _CCCL_CUDA_COMPILER(NVRTC, <, 12, 3) ^^^ /
         // vvv !_CCCL_CUDA_COMPILER(NVCC, <, 12, 3) && !_CCCL_CUDA_COMPILER(NVRTC, <, 12, 3) vvv
-      bool __p = static_cast<bool>(::__isConstant(__ptr));
+      bool __p = static_cast<bool>(::__libhipcxx::__isConstant(__ptr));
       if (__p)
       {
         _CCCL_ASSUME(__p);
@@ -153,7 +153,7 @@ enum class address_space
       return static_cast<bool>(__ret);
 #  else // ^^^ _CCCL_CUDA_COMPILER(NVCC, <, 13, 1) || _CCCL_CUDA_COMPILER(NVRTC, <, 13, 1) ^^^ /
         // vvv !_CCCL_CUDA_COMPILER(NVCC) && !_CCCL_CUDA_COMPILER(NVRTC) vvv
-      bool __p = static_cast<bool>(::__isLocal(__ptr));
+      bool __p = static_cast<bool>(::__libhipcxx::__isLocal(__ptr));
       if (__p)
       {
         _CCCL_ASSUME(__p);
@@ -165,7 +165,7 @@ enum class address_space
 #  if _CCCL_CUDA_COMPILER(NVCC, >=, 12, 3) || _CCCL_CUDA_COMPILER(NVRTC, >=, 12, 3)
       NV_IF_ELSE_TARGET(
         NV_PROVIDES_SM_70,
-        (bool __p = static_cast<bool>(::__isGridConstant(__ptr)); //
+        (bool __p = static_cast<bool>(::__libhipcxx::__isGridConstant(__ptr)); //
          if (__p) //
          { //
            _CCCL_ASSUME(__p); //
@@ -201,7 +201,7 @@ enum class address_space
         // vvv !_CCCL_CUDA_COMPILER(NVCC, <, 12, 3) && !_CCCL_CUDA_COMPILER(NVRTC, <, 12, 3) vvv
       NV_IF_ELSE_TARGET(
         NV_PROVIDES_SM_90,
-        (bool __p = static_cast<bool>(::__isClusterShared(__ptr)); //
+        (bool __p = static_cast<bool>(::__libhipcxx::__isClusterShared(__ptr)); //
          if (__p) //
          { //
            _CCCL_ASSUME(__p); //
@@ -225,7 +225,7 @@ enum class address_space
       return static_cast<bool>(__ret);
 #  else // ^^^ _CCCL_CUDA_COMPILER(NVCC, <, 12, 3) || _CCCL_CUDA_COMPILER(NVRTC, <, 12, 3) ^^^ /
         // vvv !_CCCL_CUDA_COMPILER(NVCC, <, 12, 3) && !_CCCL_CUDA_COMPILER(NVRTC, <, 12, 3) vvv
-      bool __p = static_cast<bool>(::__isShared(__ptr));
+      bool __p = static_cast<bool>(::__libhipcxx::__isShared(__ptr));
       if (__p)
       {
         _CCCL_ASSUME(__p);

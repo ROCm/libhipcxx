@@ -50,11 +50,9 @@
 // means <thrust/detail/config/device_system.h> may or may not be
 // available at parse time on HIP, so we can't rely on
 // THRUST_DEVICE_SYSTEM being defined here. Keep the dedicated
-// __HIP_PLATFORM_AMD__ arm: HIP always has a (cuda*-aliased-to-hip*)
-// runtime regardless of whether rocThrust is wired up, so
-// `_C2H_HAS_DEVICE_RUNTIME` is unconditionally true on HIP. The runner
-// helper itself routes through cuda* runtime API symbols that are
-// shimmed to hip* by <libhipcxx/__amd/cuda_runtime.h>; it does not consume thrust.
+// __HIP_PLATFORM_AMD__ arm: HIP always has a device runtime regardless
+// of whether rocThrust is wired up, so `_C2H_HAS_DEVICE_RUNTIME` is
+// unconditionally true on HIP. The runner helper does not consume thrust.
 #ifdef __HIP_PLATFORM_AMD__
 #  define _C2H_HAS_DEVICE_RUNTIME 1
 #elif THRUST_DEVICE_SYSTEM == THRUST_DEVICE_SYSTEM_CUDA

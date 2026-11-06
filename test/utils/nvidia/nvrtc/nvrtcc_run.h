@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <nvrtc.h>
@@ -58,10 +80,10 @@ static void load_and_run_gpu_code(const std::string inputFile, const RunConfig& 
   std::vector<char> code(std::istreambuf_iterator<char>{istr}, std::istreambuf_iterator<char>{});
   istr.close();
 
-  CUdevice cuDevice;
-  CUcontext context;
+  hipDevice_t cuDevice;
+  hipCtx_t context;
   CUmodule module;
-  CUfunction kernel;
+  hipFunction_t kernel;
 
   CUDA_SAFE_CALL(cuInit(0));
   CUDA_SAFE_CALL(cuDeviceGet(&cuDevice, 0));
@@ -71,8 +93,8 @@ static void load_and_run_gpu_code(const std::string inputFile, const RunConfig& 
   CUDA_SAFE_CALL(cuModuleGetFunction(&kernel, module, "main_kernel"));
   CUDA_SAFE_CALL(cuLaunchKernel(kernel, 1, 1, 1, rc.threadCount, 1, 1, rc.shmemSize, nullptr, nullptr, 0));
 
-  CUDA_API_CALL(cudaGetLastError());
-  CUDA_API_CALL(cudaDeviceSynchronize());
+  CUDA_API_CALL(hipGetLastError());
+  CUDA_API_CALL(hipDeviceSynchronize());
 
   CUDA_SAFE_CALL(cuModuleUnload(module));
 }

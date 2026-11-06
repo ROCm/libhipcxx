@@ -79,7 +79,7 @@ _CCCL_CONCEPT __has_query_get_stream = _CCCL_REQUIRES_EXPR((_Env), const _Env& _
 //! @brief `get_stream` is a customization point object that queries a type `T` for an associated stream
 struct get_stream_t
 {
-  [[nodiscard]] _CCCL_API constexpr ::cuda::stream_ref operator()(::cudaStream_t __stream) const noexcept
+  [[nodiscard]] _CCCL_API constexpr ::cuda::stream_ref operator()(::hipStream_t __stream) const noexcept
   {
     return ::cuda::stream_ref{__stream};
   }

@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef TEST_LIBCUDACXX_CCCLRT_ALGORITHM_COMMON_CUH
 #define TEST_LIBCUDACXX_CCCLRT_ALGORITHM_COMMON_CUH
 
@@ -65,15 +87,15 @@ struct test_buffer
     cuda::__ensure_current_context ctx_setter{cuda::device_ref{0}};
     if (type == test_buffer_type::pinned)
     {
-      _CCCL_TRY_CUDA_API(cudaMallocHost, "Failed to allocate pinned memory", &data_ptr, size * sizeof(T));
+      _CCCL_TRY_CUDA_API(hipHostMalloc, "Failed to allocate pinned memory", &data_ptr, size * sizeof(T));
     }
     else if (type == test_buffer_type::device)
     {
-      _CCCL_TRY_CUDA_API(cudaMalloc, "Failed to allocate device memory", &data_ptr, size * sizeof(T));
+      _CCCL_TRY_CUDA_API(hipMalloc, "Failed to allocate device memory", &data_ptr, size * sizeof(T));
     }
     else if (type == test_buffer_type::managed)
     {
-      _CCCL_TRY_CUDA_API(cudaMallocManaged, "Failed to allocate managed memory", &data_ptr, size * sizeof(T));
+      _CCCL_TRY_CUDA_API(hipMallocManaged, "Failed to allocate managed memory", &data_ptr, size * sizeof(T));
     }
   }
 
@@ -84,15 +106,15 @@ struct test_buffer
       cuda::__ensure_current_context ctx_setter{cuda::device_ref{0}};
       if (type == test_buffer_type::pinned)
       {
-        _CCCL_LOG_CUDA_API(cudaFreeHost, "Failed to free pinned memory", data_ptr);
+        _CCCL_LOG_CUDA_API(hipHostFree, "Failed to free pinned memory", data_ptr);
       }
       else if (type == test_buffer_type::device)
       {
-        _CCCL_LOG_CUDA_API(cudaFree, "Failed to free device memory", data_ptr);
+        _CCCL_LOG_CUDA_API(hipFree, "Failed to free device memory", data_ptr);
       }
       else if (type == test_buffer_type::managed)
       {
-        _CCCL_LOG_CUDA_API(cudaFree, "Failed to free managed memory", data_ptr);
+        _CCCL_LOG_CUDA_API(hipFree, "Failed to free managed memory", data_ptr);
       }
     }
   }

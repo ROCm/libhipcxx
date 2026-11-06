@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -51,12 +51,12 @@ inline TEST_DEVICE_FUNC void mbarrier_complete_tx(Barrier& b, int transaction_co
           :
           : "r"((unsigned int) __cvta_generic_to_shared(cuda::device::barrier_native_handle(b))), "r"(transaction_count)
           : "memory");
-      } else { libhipcxx::__trap(); }),
+      } else { ::__libhipcxx::__trap(); }),
     NV_ANY_TARGET,
     (
       // On architectures pre-SM90 (and on host), we drop the transaction count
       // update. The barriers do not keep track of transaction counts.
-      libhipcxx::__trap();));
+      ::__libhipcxx::__trap();));
 }
 
 template <bool split_arrive_and_expect>

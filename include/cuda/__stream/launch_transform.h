@@ -109,7 +109,7 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT __launch_transform_t
   // transform_launch_argument that are find-able by ADL.
   template <typename _Arg>
   using __transform_result_t = __remove_rvalue_reference_t<decltype(transform_launch_argument(
-    ::cuda::stream_ref{::cudaStream_t{}}, ::cuda::std::declval<_Arg>()))>;
+    ::cuda::stream_ref{::hipStream_t{}}, ::cuda::std::declval<_Arg>()))>;
 
   template <typename _Arg>
   using __transformed_argument_t =

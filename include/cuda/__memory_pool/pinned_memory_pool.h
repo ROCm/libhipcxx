@@ -93,7 +93,7 @@ class pinned_memory_pool_ref
 public:
   //! @brief  Constructs the pinned_memory_pool_ref from a \c cudaMemPool_t.
   //! @param __pool The \c cudaMemPool_t used to allocate memory.
-  _CCCL_HOST_API explicit pinned_memory_pool_ref(::cudaMemPool_t __pool) noexcept
+  _CCCL_HOST_API explicit pinned_memory_pool_ref(::hipMemPool_t __pool) noexcept
       : __memory_pool_base(__pool)
   {}
 
@@ -128,7 +128,7 @@ struct pinned_memory_pool : pinned_memory_pool_ref
 
   //! @brief Constructs an empty \c pinned_memory_pool without an underlying pool.
   _CCCL_HOST_API explicit pinned_memory_pool(no_init_t) noexcept
-      : pinned_memory_pool_ref(::cudaMemPool_t{})
+      : pinned_memory_pool_ref(::hipMemPool_t{})
   {}
 
 #    if _CCCL_CTK_AT_LEAST(13, 0)
@@ -146,7 +146,7 @@ struct pinned_memory_pool : pinned_memory_pool_ref
   //! created.
   _CCCL_HOST_API pinned_memory_pool(memory_pool_properties __properties = {})
       : pinned_memory_pool_ref(__create_cuda_mempool(
-          __properties, ::CUmemLocation{::CU_MEM_LOCATION_TYPE_HOST, 0}, ::CU_MEM_ALLOCATION_TYPE_PINNED))
+          __properties, ::hipMemLocation{::hipMemLocationTypeHost, 0}, ::hipMemAllocationTypePinned))
   {
     enable_access_from(cuda::devices);
   }
@@ -169,7 +169,7 @@ struct pinned_memory_pool : pinned_memory_pool_ref
   //! created.
   _CCCL_HOST_API pinned_memory_pool(int __numa_id, memory_pool_properties __properties = {})
       : pinned_memory_pool_ref(__create_cuda_mempool(
-          __properties, ::CUmemLocation{::CU_MEM_LOCATION_TYPE_HOST_NUMA, __numa_id}, ::CU_MEM_ALLOCATION_TYPE_PINNED))
+          __properties, ::hipMemLocation{::hipMemLocationTypeHostNuma, __numa_id}, ::hipMemAllocationTypePinned))
   {
     enable_access_from(cuda::devices);
   }
@@ -182,7 +182,7 @@ struct pinned_memory_pool : pinned_memory_pool_ref
     }
   }
 
-  _CCCL_HOST_API static pinned_memory_pool from_native_handle(::cudaMemPool_t __pool) noexcept
+  _CCCL_HOST_API static pinned_memory_pool from_native_handle(::hipMemPool_t __pool) noexcept
   {
     return pinned_memory_pool(__pool);
   }
@@ -192,7 +192,7 @@ struct pinned_memory_pool : pinned_memory_pool_ref
   //! @return cudaMemPool_t The native handle being held by this object.
   //!
   //! @post The memory pool object is in a moved-from state.
-  _CCCL_HOST_API constexpr ::cudaMemPool_t release() noexcept
+  _CCCL_HOST_API constexpr ::hipMemPool_t release() noexcept
   {
     return ::cuda::std::exchange(__pool_, nullptr);
   }
@@ -208,7 +208,7 @@ struct pinned_memory_pool : pinned_memory_pool_ref
   pinned_memory_pool& operator=(const pinned_memory_pool&) = delete;
 
 private:
-  pinned_memory_pool(::cudaMemPool_t __pool) noexcept
+  pinned_memory_pool(::hipMemPool_t __pool) noexcept
       : pinned_memory_pool_ref(__pool)
   {}
 };
@@ -226,11 +226,11 @@ static_assert(::cuda::mr::resource_with<pinned_memory_pool, ::cuda::mr::host_acc
 {
 #    if _CCCL_CTK_AT_LEAST(13, 0)
   static pinned_memory_pool_ref __default_pool{[]() {
-    ::cudaMemPool_t __pool = ::cuda::__get_default_memory_pool(
-      ::CUmemLocation{::CU_MEM_LOCATION_TYPE_HOST, 0}, ::CU_MEM_ALLOCATION_TYPE_PINNED);
+    ::hipMemPool_t __pool = ::cuda::__get_default_memory_pool(
+      ::hipMemLocation{::hipMemLocationTypeHost, 0}, ::hipMemAllocationTypePinned);
     // TODO should we be more careful with setting access from all devices?
     // Maybe only if it was not set for any device?
-    ::cuda::__mempool_set_access(__pool, ::cuda::devices, ::CU_MEM_ACCESS_FLAGS_PROT_READWRITE);
+    ::cuda::__mempool_set_access(__pool, ::cuda::devices, ::hipMemAccessFlagsProtReadWrite);
     return __pool;
   }()};
 

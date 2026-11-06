@@ -44,7 +44,7 @@ void __global__ lambda_launcher(const Dims dims, const Lambda lambda)
 }
 
 template <typename Comparator, unsigned int FilterArch>
-bool arch_filter(const cudaDeviceProp& props)
+bool arch_filter(const hipDeviceProp_t& props)
 {
   int act_arch = props.major * 10 + props.minor;
   if (Comparator()(act_arch, FilterArch))
@@ -54,15 +54,15 @@ bool arch_filter(const cudaDeviceProp& props)
   return false;
 }
 
-static bool skip_host_exec(bool (* /* filter */)(const cudaDeviceProp&))
+static bool skip_host_exec(bool (* /* filter */)(const hipDeviceProp_t&))
 {
   return false;
 }
 
-static bool skip_device_exec(bool (*filter)(const cudaDeviceProp&))
+static bool skip_device_exec(bool (*filter)(const hipDeviceProp_t&))
 {
-  cudaDeviceProp props;
-  CUDART(cudaGetDeviceProperties(&props, 0));
+  hipDeviceProp_t props;
+  CUDART(hipGetDeviceProperties(&props, 0));
   return filter(props);
 }
 
@@ -86,9 +86,9 @@ void test_host_dev(const Dims& dims, const Lambda& lambda, const Filters&... fil
       return;
     }
 
-    cudaLaunchConfig_t config = {};
+    hipLaunchConfig_t config = {};
     config.gridDim            = {0};
-    cudaLaunchAttribute attrs[1];
+    hipLaunchAttribute attrs[1];
     config.attrs = &attrs[0];
 
     config.blockDim = dim3{cuda::gpu_thread.dims(cuda::block, dims)};
@@ -118,8 +118,8 @@ void test_host_dev(const Dims& dims, const Lambda& lambda, const Filters&... fil
     }
 
     // device testing
-    CUDART(cudaLaunchKernelEx(&config, lambda_launcher<Dims, Lambda>, dims, lambda));
-    CUDART(cudaDeviceSynchronize());
+    CUDART(hipLaunchKernelEx(&config, lambda_launcher<Dims, Lambda>, dims, lambda));
+    CUDART(hipDeviceSynchronize());
   }
 }
 

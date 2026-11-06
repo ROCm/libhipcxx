@@ -121,7 +121,7 @@ void test_host_device_abi_compatiblity()
   value.__month_name_           = ref.month_name;
 
   test_host_device_abi_compatiblity_kernel<<<1, 1>>>(value);
-  assert(cudaDeviceSynchronize() == cudaSuccess);
+  assert(hipDeviceSynchronize() == hipSuccess);
 }
 #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 

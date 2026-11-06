@@ -48,7 +48,7 @@ void recursive_check_device_setter(int id)
   CCCLRT_REQUIRE(test::count_driver_stack() == cuda::devices.size() - id);
   auto ctx = driver::__ctxGetCurrent();
 #endif // !_CCCL_HIP_COMPILATION()
-  CUDART(cudaGetDevice(&cudart_id));
+  CUDART(hipGetDevice(&cudart_id));
   CCCLRT_REQUIRE(cudart_id == id);
 
   if (id != 0)
@@ -61,7 +61,7 @@ void recursive_check_device_setter(int id)
     // check above still holds and keeps running.
     CCCLRT_REQUIRE(test::count_driver_stack() == cuda::devices.size() - id);
     CCCLRT_REQUIRE(ctx == driver::__ctxGetCurrent());
-    CUDART(cudaGetDevice(&cudart_id));
+    CUDART(hipGetDevice(&cudart_id));
     CCCLRT_REQUIRE(cudart_id == id);
 #else
     (void) cudart_id;

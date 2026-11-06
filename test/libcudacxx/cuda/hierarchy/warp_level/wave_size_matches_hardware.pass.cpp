@@ -91,29 +91,29 @@ __global__ void wave_size_probe_kernel(unsigned* out)
 void test()
 {
   int hw_wave_size = 0;
-  assert(cudaDeviceGetAttribute(&hw_wave_size, cudaDevAttrWarpSize, 0) == cudaSuccess);
+  assert(hipDeviceGetAttribute(&hw_wave_size, hipDeviceAttributeWarpSize, 0) == hipSuccess);
   assert(hw_wave_size == 32 || hw_wave_size == 64);
 
   unsigned* d_out = nullptr;
-  assert(cudaMalloc(&d_out, sizeof(unsigned)) == cudaSuccess);
+  assert(hipMalloc(&d_out, sizeof(unsigned)) == hipSuccess);
 
   // Include a block size that is not a whole multiple of either wave size, so
   // the warp-in-block rounding is exercised on both wave-32 and wave-64.
   const unsigned block_sizes[] = {32u, 64u, 96u, 128u};
   for (const unsigned block_size : block_sizes)
   {
-    assert(cudaMemset(d_out, 0, sizeof(unsigned)) == cudaSuccess);
+    assert(hipMemset(d_out, 0, sizeof(unsigned)) == hipSuccess);
 
     wave_size_probe_kernel<<<2, block_size>>>(d_out);
-    assert(cudaGetLastError() == cudaSuccess);
-    assert(cudaDeviceSynchronize() == cudaSuccess);
+    assert(hipGetLastError() == hipSuccess);
+    assert(hipDeviceSynchronize() == hipSuccess);
 
     unsigned compiled_wave_size = 0;
-    assert(cudaMemcpy(&compiled_wave_size, d_out, sizeof(unsigned), cudaMemcpyDeviceToHost) == cudaSuccess);
+    assert(hipMemcpy(&compiled_wave_size, d_out, sizeof(unsigned), hipMemcpyDeviceToHost) == hipSuccess);
     assert(compiled_wave_size == static_cast<unsigned>(hw_wave_size));
   }
 
-  assert(cudaFree(d_out) == cudaSuccess);
+  assert(hipFree(d_out) == hipSuccess);
 }
 
 int main(int, char**)

@@ -104,7 +104,7 @@ TEST_FUNC constexpr bool test_eq(const T& lhs, const T& rhs)
   else
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-    if constexpr (cuda::std::is_same_v<T, __nv_bfloat16>)
+    if constexpr (cuda::std::is_same_v<T, __hip_bfloat16>)
   {
     return cuda::std::__fp_get_storage(lhs) == cuda::std::__fp_get_storage(rhs);
   }
@@ -232,7 +232,7 @@ TEST_FUNC bool test()
   test<__half2, __half, 2>();
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  test<__nv_bfloat162, __nv_bfloat16, 2>();
+  test<__hip_bfloat162, __hip_bfloat16, 2>();
 #endif // _CCCL_HAS_NVBF16()
 
   return true;

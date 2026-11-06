@@ -162,16 +162,16 @@ struct cooperative_launch : public __detail::launch_option
   static constexpr __detail::launch_option_kind kind = __detail::launch_option_kind::cooperative_launch;
 };
 
-[[nodiscard]] _CCCL_API inline cudaError_t
-__apply_launch_option(const cooperative_launch&, CUlaunchConfig& config, CUfunction) noexcept
+[[nodiscard]] _CCCL_API inline hipError_t
+__apply_launch_option(const cooperative_launch&, ::__libhipcxx::__launch_config& config, hipFunction_t) noexcept
 {
-  CUlaunchAttribute attr;
-  attr.id                = CU_LAUNCH_ATTRIBUTE_COOPERATIVE;
+  ::__libhipcxx::__launch_attribute attr;
+  attr.id                = ::__libhipcxx::__launch_attribute_cooperative;
   attr.value.cooperative = true;
 
   config.attrs[config.numAttrs++] = attr;
 
-  return cudaSuccess;
+  return hipSuccess;
 }
 
 template <class _Tp>
@@ -355,10 +355,10 @@ private:
 };
 
 template <class _Tp>
-[[nodiscard]] ::cudaError_t __apply_launch_option(
-  const dynamic_shared_memory_option<_Tp>& __opt, ::CUlaunchConfig& __config, ::CUfunction __kernel) noexcept
+[[nodiscard]] ::hipError_t __apply_launch_option(
+  const dynamic_shared_memory_option<_Tp>& __opt, ::__libhipcxx::__launch_config& __config, ::hipFunction_t __kernel) noexcept
 {
-  ::cudaError_t __status = ::cudaSuccess;
+  ::hipError_t __status = ::hipSuccess;
 
   // Since CUDA 12.4, querying CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES requires
   // the function to be loaded.
@@ -368,7 +368,7 @@ template <class _Tp>
   if (::cuda::__driver::__version_at_least(12, 4))
   {
     __status = ::cuda::__driver::__functionLoadNoThrow(__kernel);
-    if (__status != ::cudaSuccess)
+    if (__status != ::hipSuccess)
     {
       return __status;
     }
@@ -377,8 +377,8 @@ template <class _Tp>
 
   int __static_smem_size{};
   __status = ::cuda::__driver::__functionGetAttributeNoThrow(
-    __static_smem_size, ::CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES, __kernel);
-  if (__status != ::cudaSuccess)
+    __static_smem_size, ::HIP_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES, __kernel);
+  if (__status != ::hipSuccess)
   {
     return __status;
   }
@@ -389,8 +389,8 @@ template <class _Tp>
 #if !defined(__HIP_PLATFORM_AMD__)
   int __max_dyn_smem_size{};
   __status = ::cuda::__driver::__functionGetAttributeNoThrow(
-    __max_dyn_smem_size, ::CU_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES, __kernel);
-  if (__status != ::cudaSuccess)
+    __max_dyn_smem_size, ::HIP_FUNC_ATTRIBUTE_SHARED_SIZE_BYTES, __kernel);
+  if (__status != ::hipSuccess)
   {
     return __status;
   }
@@ -399,21 +399,21 @@ template <class _Tp>
   const auto __dyn_smem_size = ::cuda::overflow_cast<int>(__opt.size_bytes());
   if (__dyn_smem_size.overflow)
   {
-    return ::cudaErrorInvalidValue;
+    return ::hipErrorInvalidValue;
   }
 
   const int __smem_size = __static_smem_size + __dyn_smem_size.value;
   if (static_cast<::cuda::std::size_t>(__smem_size) > __max_portable_dyn_smem_size && !__opt.__non_portable_)
   {
-    return ::cudaErrorInvalidValue;
+    return ::hipErrorInvalidValue;
   }
 
 #if !defined(__HIP_PLATFORM_AMD__)
   if (__max_dyn_smem_size < __dyn_smem_size.value)
   {
     __status = ::cuda::__driver::__functionSetAttributeNoThrow(
-      __kernel, ::CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES, __dyn_smem_size.value);
-    if (__status != ::cudaSuccess)
+      __kernel, ::HIP_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES, __dyn_smem_size.value);
+    if (__status != ::hipSuccess)
     {
       return __status;
     }
@@ -421,7 +421,7 @@ template <class _Tp>
 #endif // !__HIP_PLATFORM_AMD__
 
   __config.sharedMemBytes = static_cast<unsigned>(__dyn_smem_size.value);
-  return ::cudaSuccess;
+  return ::hipSuccess;
 }
 
 /**
@@ -507,16 +507,16 @@ struct launch_priority : public __detail::launch_option
   {}
 };
 
-[[nodiscard]] _CCCL_HOST_API inline cudaError_t
-__apply_launch_option(const launch_priority& __opt, CUlaunchConfig& config, CUfunction) noexcept
+[[nodiscard]] _CCCL_HOST_API inline hipError_t
+__apply_launch_option(const launch_priority& __opt, ::__libhipcxx::__launch_config& config, hipFunction_t) noexcept
 {
-  CUlaunchAttribute attr;
-  attr.id             = CU_LAUNCH_ATTRIBUTE_PRIORITY;
+  ::__libhipcxx::__launch_attribute attr;
+  attr.id             = ::__libhipcxx::__launch_attribute_priority;
   attr.value.priority = __opt.priority;
 
   config.attrs[config.numAttrs++] = attr;
 
-  return cudaSuccess;
+  return hipSuccess;
 }
 
 template <typename... _OptionsToFilter>
@@ -820,19 +820,19 @@ inline unsigned int constexpr kernel_config_count_attr_space(const kernel_config
 }
 
 template <typename Dimensions, typename... Options>
-[[nodiscard]] cudaError_t apply_kernel_config(
-  const kernel_config<Dimensions, Options...>& config, CUlaunchConfig& cuda_config, CUfunction kernel) noexcept
+[[nodiscard]] hipError_t apply_kernel_config(
+  const kernel_config<Dimensions, Options...>& config, ::__libhipcxx::__launch_config& cuda_config, hipFunction_t kernel) noexcept
 {
   return ::cuda::std::apply(
     [&](auto&... config_options) {
-      cudaError_t __status = cudaSuccess;
+      hipError_t __status = hipSuccess;
 
       // Use short-cutting && to skip the rest on error, is this too
       // convoluted?
       // For some reason gcc 7 complains about __status capture, so we pass it as a reference
-      (void) (... && [](cudaError_t call_status, cudaError_t& __status_out) {
+      (void) (... && [](hipError_t call_status, hipError_t& __status_out) {
         __status_out = call_status;
-        return call_status == cudaSuccess;
+        return call_status == hipSuccess;
       }(::cuda::__apply_launch_option(config_options, cuda_config, kernel), __status));
 
       return __status;

@@ -77,7 +77,7 @@ TEST_FUNC __noinline__ void bench()
   static const size_t THREAD_CNT = 128;
   static const size_t BLOCK_CNT  = ARR_SZ / THREAD_CNT;
   const dim3 threads(THREAD_CNT, 1, 1), blocks(BLOCK_CNT, 1, 1);
-  cudaEvent_t start, stop;
+  hipEvent_t start, stop;
 #else
   static const size_t ARR_SZ = 1 << 10;
 #endif
@@ -89,16 +89,16 @@ TEST_FUNC __noinline__ void bench()
   arr0 = (int*) malloc(ARR_SZ * sizeof(int));
   arr1 = (int*) malloc(ARR_SZ * sizeof(int));
 #else
-  assert_rt(cudaMallocManaged((void**) &arr0, ARR_SZ * sizeof(int)));
-  assert_rt(cudaMallocManaged((void**) &arr1, ARR_SZ * sizeof(int)));
-  assert_rt(cudaDeviceSynchronize());
+  assert_rt(hipMallocManaged((void**) &arr0, ARR_SZ * sizeof(int)));
+  assert_rt(hipMallocManaged((void**) &arr1, ARR_SZ * sizeof(int)));
+  assert_rt(hipDeviceSynchronize());
 #endif
 
 #if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
   ptr_timing_dev(arr0, arr1);
 #else
   ptr_timing<<<blocks, threads>>>(arr0, arr1);
-  assert_rt(cudaDeviceSynchronize());
+  assert_rt(hipDeviceSynchronize());
 #endif
 
   for (size_t i = 0; i < ARR_SZ; ++i)
@@ -110,17 +110,17 @@ TEST_FUNC __noinline__ void bench()
 #if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
   ptr_timing_dev(arr0, arr1);
 #else
-  assert_rt(cudaDeviceSynchronize());
-  assert_rt(cudaEventCreate(&start));
-  assert_rt(cudaEventCreate(&stop));
-  assert_rt(cudaEventRecord(start));
+  assert_rt(hipDeviceSynchronize());
+  assert_rt(hipEventCreate(&start));
+  assert_rt(hipEventCreate(&stop));
+  assert_rt(hipEventRecord(start));
   ptr_timing<<<blocks, threads>>>(arr0, arr1);
-  assert_rt(cudaEventRecord(stop));
-  assert_rt(cudaEventSynchronize(stop));
-  assert_rt(cudaEventElapsedTime(&pointer_time, start, stop));
-  assert_rt(cudaEventDestroy(start));
-  assert_rt(cudaEventDestroy(stop));
-  assert_rt(cudaDeviceSynchronize());
+  assert_rt(hipEventRecord(stop));
+  assert_rt(hipEventSynchronize(stop));
+  assert_rt(hipEventElapsedTime(&pointer_time, start, stop));
+  assert_rt(hipEventDestroy(start));
+  assert_rt(hipEventDestroy(stop));
+  assert_rt(hipDeviceSynchronize());
 
   for (size_t i = 0; i < ARR_SZ; ++i)
   {
@@ -136,8 +136,8 @@ TEST_FUNC __noinline__ void bench()
 
   NV_IF_ELSE_TARGET(NV_IS_DEVICE,
                     (annotated_ptr_timing_dev(arr0, arr1);),
-                    (assert_rt(cudaDeviceSynchronize()); annotated_ptr_timing<<<blocks, threads>>>(arr0, arr1);
-                     assert_rt(cudaDeviceSynchronize());))
+                    (assert_rt(hipDeviceSynchronize()); annotated_ptr_timing<<<blocks, threads>>>(arr0, arr1);
+                     assert_rt(hipDeviceSynchronize());))
 
   for (size_t i = 0; i < ARR_SZ; ++i)
   {
@@ -148,15 +148,15 @@ TEST_FUNC __noinline__ void bench()
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE,
     (annotated_ptr_timing_dev(arr0, arr1);),
-    (assert_rt(cudaDeviceSynchronize()); assert_rt(cudaEventCreate(&start)); assert_rt(cudaEventCreate(&stop));
-     assert_rt(cudaEventRecord(start));
+    (assert_rt(hipDeviceSynchronize()); assert_rt(hipEventCreate(&start)); assert_rt(hipEventCreate(&stop));
+     assert_rt(hipEventRecord(start));
      annotated_ptr_timing<<<blocks, threads>>>(arr0, arr1);
-     assert_rt(cudaEventRecord(stop));
-     assert_rt(cudaEventSynchronize(stop));
-     assert_rt(cudaEventElapsedTime(&annotated_time, start, stop));
-     assert_rt(cudaEventDestroy(start));
-     assert_rt(cudaEventDestroy(stop));
-     assert_rt(cudaDeviceSynchronize());
+     assert_rt(hipEventRecord(stop));
+     assert_rt(hipEventSynchronize(stop));
+     assert_rt(hipEventElapsedTime(&annotated_time, start, stop));
+     assert_rt(hipEventDestroy(start));
+     assert_rt(hipEventDestroy(stop));
+     assert_rt(hipDeviceSynchronize());
 
      for (size_t i = 0; i < ARR_SZ; ++i) {
        if (arr1[i] != (int) i)
@@ -168,7 +168,7 @@ TEST_FUNC __noinline__ void bench()
        arr1[i] = 0;
      }))
 
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (free(arr0); free(arr1);), (assert_rt(cudaFree(arr0)); assert_rt(cudaFree(arr1));))
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (free(arr0); free(arr1);), (assert_rt(hipFree(arr0)); assert_rt(hipFree(arr1));))
 
   printf("array(ms):%f, arrotated_ptr(ms):%f\n", pointer_time, annotated_time);
 }

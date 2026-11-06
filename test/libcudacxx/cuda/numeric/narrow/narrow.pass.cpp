@@ -33,7 +33,7 @@
 // from `(unsigned) long` / `(unsigned) long long`, nor from each other. The
 // `cuda::narrow` implementation in include/cuda/__numeric/narrow.h dispatches
 // to `__double2half`-style explicit converter helpers in
-// include/libhipcxx/__amd/cuda_runtime.h to perform a 2-step conversion via `double`/`float`
+// include/libhipcxx/__amd/hip_runtime.h to perform a 2-step conversion via `double`/`float`
 // in those cases, so this test now builds and passes under hipcc.
 
 #include <cuda/numeric>
@@ -117,7 +117,7 @@ TEST_FUNC void test_type()
 #if _CCCL_HAS_INT128()
 #  if _LIBCUDACXX_HAS_NVFP16()
   // __int128_t and __uint128_t are not convertible to __half or __nv_bfloat16
-  if constexpr (!::cuda::std::is_same_v<To, __half> && !::cuda::std::is_same_v<To, __nv_bfloat16>)
+  if constexpr (!::cuda::std::is_same_v<To, __half> && !::cuda::std::is_same_v<To, __hip_bfloat16>)
 #  endif // _LIBCUDACXX_HAS_NVFP16()
   {
     test_type<To, __int128_t>();
@@ -135,7 +135,7 @@ TEST_FUNC void test_type()
     test_type<To, __half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-    test_type<To, __nv_bfloat16>();
+    test_type<To, __hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
   }
 }
@@ -162,7 +162,7 @@ TEST_FUNC bool test()
   test_type<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test_type<__nv_bfloat16>();
+  test_type<__hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
   return true;

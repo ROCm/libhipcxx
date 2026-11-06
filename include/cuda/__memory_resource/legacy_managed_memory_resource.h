@@ -66,9 +66,9 @@ _CCCL_BEGIN_NAMESPACE_CUDA_MR
 class legacy_managed_memory_resource : public memory_resource_base<legacy_managed_memory_resource>
 {
 private:
-  unsigned int __flags_ = cudaMemAttachGlobal;
+  unsigned int __flags_ = hipMemAttachGlobal;
 
-  static constexpr unsigned int __available_flags = cudaMemAttachGlobal | cudaMemAttachHost;
+  static constexpr unsigned int __available_flags = hipMemAttachGlobal | hipMemAttachHost;
 
 public:
   //! @brief Construct a new legacy_managed_memory_resource.
@@ -77,7 +77,7 @@ public:
   //! for the resource. This association has the effect of initializing that device and the memory being implicitly
   //! freed if the device is reset.
   _CCCL_HOST_API constexpr legacy_managed_memory_resource(
-    const unsigned int __flags = cudaMemAttachGlobal, device_ref __device = {0}) noexcept
+    const unsigned int __flags = hipMemAttachGlobal, device_ref __device = {0}) noexcept
       : __flags_(__flags & __available_flags)
       , __device_(__device)
   {
@@ -100,7 +100,7 @@ public:
     }
 
     ::cuda::__ensure_current_context __guard(__device_);
-    ::CUdeviceptr __ptr = ::cuda::__driver::__mallocManaged(__bytes, __flags_);
+    ::hipDeviceptr_t __ptr = ::cuda::__driver::__mallocManaged(__bytes, __flags_);
     return reinterpret_cast<void*>(__ptr); // NOLINT(performance-no-int-to-ptr)
   }
 
@@ -118,7 +118,7 @@ public:
                  "Invalid alignment passed to legacy_managed_memory_resource::deallocate_sync.");
     _CCCL_ASSERT_CUDA_API(::cuda::__driver::__freeNoThrow,
                           "legacy_managed_memory_resource::deallocate_sync failed",
-                          reinterpret_cast<::CUdeviceptr>(__ptr));
+                          reinterpret_cast<::hipDeviceptr_t>(__ptr));
   }
 
   //! @brief Equality comparison with another \c managed_memory_resource.

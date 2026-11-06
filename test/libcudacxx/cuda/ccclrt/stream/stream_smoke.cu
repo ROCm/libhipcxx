@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/devices>
 #include <cuda/std/type_traits>
 #include <cuda/std/utility>
@@ -27,8 +49,8 @@ C2H_CCCLRT_TEST("Can create a stream and launch work into it", "[stream]")
 C2H_CCCLRT_TEST("From native handle", "[stream]")
 {
   cuda::__ensure_current_context guard(cuda::device_ref{0});
-  cudaStream_t handle;
-  CUDART(cudaStreamCreate(&handle));
+  hipStream_t handle;
+  CUDART(hipStreamCreate(&handle));
   {
     auto stream = cuda::stream::from_native_handle(handle);
 
@@ -38,7 +60,7 @@ C2H_CCCLRT_TEST("From native handle", "[stream]")
     CCCLRT_REQUIRE(*i == 42);
     (void) stream.release();
   }
-  CUDART(cudaStreamDestroy(handle));
+  CUDART(hipStreamDestroy(handle));
 }
 
 template <typename StreamType>
@@ -117,8 +139,8 @@ C2H_CCCLRT_TEST("Stream get device", "[stream]")
   CCCLRT_REQUIRE(dev0_stream.device() == 0);
 
   cuda::__ensure_current_context guard(cuda::device_ref{*std::prev(cuda::devices.end())});
-  cudaStream_t stream_handle;
-  CUDART(cudaStreamCreate(&stream_handle));
+  hipStream_t stream_handle;
+  CUDART(hipStreamCreate(&stream_handle));
   auto stream_cudart = cuda::stream::from_native_handle(stream_handle);
   CCCLRT_REQUIRE(stream_cudart.device() == *std::prev(cuda::devices.end()));
   auto stream_ref_cudart = cuda::stream_ref(stream_handle);
@@ -157,7 +179,7 @@ C2H_CCCLRT_TEST("Stream ID", "[stream]")
     // Test that stream_ref also supports id()
     // NULL stream needs a device to be set
     cuda::__ensure_current_context guard(cuda::device_ref{0});
-    cuda::stream_ref ref1(::cudaStream_t{});
+    cuda::stream_ref ref1(::hipStream_t{});
     cuda::stream_ref ref2(stream1);
 
 #if _CCCL_COMPILER(NVHPC, <, 25, 11)
@@ -180,12 +202,12 @@ C2H_CCCLRT_TEST("Invalid stream", "[stream]")
   STATIC_REQUIRE(!cuda::std::is_convertible_v<cuda::invalid_stream_t, cuda::stream_ref>);
   {
     cuda::stream_ref stream{cuda::invalid_stream};
-    CCCLRT_REQUIRE(stream.get() == (cudaStream_t) (~0ull)); // NOLINT(performance-no-int-to-ptr)
+    CCCLRT_REQUIRE(stream.get() == (hipStream_t) (~0ull)); // NOLINT(performance-no-int-to-ptr)
   }
 
   // 3. Test stream_ref comparisons
   {
-    cuda::stream_ref valid_stream{(cudaStream_t) (123ull)}; // NOLINT(performance-no-int-to-ptr)
+    cuda::stream_ref valid_stream{(hipStream_t) (123ull)}; // NOLINT(performance-no-int-to-ptr)
     cuda::stream_ref invalid_stream{cuda::invalid_stream};
 
     CCCLRT_REQUIRE(!(valid_stream == cuda::invalid_stream));

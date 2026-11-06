@@ -96,7 +96,7 @@ template <typename _ElementType>
   //--------------------------------------------------------------------------------------------------------------------
   // bfloat16 (must come before general floating-point)
 #  if _CCCL_HAS_NVBF16()
-  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__nv_bfloat16>)
+  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__hip_bfloat16>)
   {
     return ::DLDataType{::kDLBfloat, 16, 1};
   }
@@ -104,13 +104,13 @@ template <typename _ElementType>
   //--------------------------------------------------------------------------------------------------------------------
   // Low-precision Floating-point types (must come before general floating-point)
 #  if _CCCL_HAS_NVFP8_E4M3()
-  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__nv_fp8_e4m3>)
+  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__hip_fp8_e4m3>)
   {
     return ::DLDataType{::kDLFloat8_e4m3fn, 8, 1};
   }
 #  endif // _CCCL_HAS_NVFP8_E4M3()
 #  if _CCCL_HAS_NVFP8_E5M2()
-  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__nv_fp8_e5m2>)
+  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__hip_fp8_e5m2>)
   {
     return ::DLDataType{::kDLFloat8_e5m2, 8, 1};
   }
@@ -122,19 +122,19 @@ template <typename _ElementType>
   }
 #  endif // _CCCL_HAS_NVFP8_E8M0()
 #  if _CCCL_HAS_NVFP6_E2M3()
-  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__nv_fp6_e2m3>)
+  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__hip_fp6_e2m3>)
   {
     return ::DLDataType{::kDLFloat6_e2m3fn, 6, 1};
   }
 #  endif // _CCCL_HAS_NVFP6_E2M3()
 #  if _CCCL_HAS_NVFP6_E3M2()
-  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__nv_fp6_e3m2>)
+  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__hip_fp6_e3m2>)
   {
     return ::DLDataType{::kDLFloat6_e3m2fn, 6, 1};
   }
 #  endif // _CCCL_HAS_NVFP6_E3M2()
 #  if _CCCL_HAS_NVFP4_E2M1()
-  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__nv_fp4_e2m1>)
+  else if constexpr (::cuda::std::is_same_v<_ElementType, ::__hip_fp4_e2m1>)
   {
     return ::DLDataType{::kDLFloat4_e2m1fn, 4, 1};
   }
@@ -256,11 +256,11 @@ template <typename _ElementType, typename _Extents, typename _Layout, typename _
 to_dlpack_tensor(const ::cuda::device_mdspan<_ElementType, _Extents, _Layout, _Accessor>& __mdspan)
 {
   using __mdspan_type              = ::cuda::std::mdspan<_ElementType, _Extents, _Layout, _Accessor>;
-  ::CUpointer_attribute __attrs[1] = {::CU_POINTER_ATTRIBUTE_DEVICE_ORDINAL};
+  ::hipPointer_attribute __attrs[1] = {::HIP_POINTER_ATTRIBUTE_DEVICE_ORDINAL};
   int __ptr_dev_id                 = 0;
   void* __results[1]               = {&__ptr_dev_id};
   const auto __status = ::cuda::__driver::__pointerGetAttributesNoThrow(__attrs, __results, __mdspan.data_handle());
-  if (__status != ::cudaSuccess)
+  if (__status != ::hipSuccess)
   {
     _CCCL_THROW(::cuda::cuda_error, __status, "Failed to get device ordinal of a pointer");
   }

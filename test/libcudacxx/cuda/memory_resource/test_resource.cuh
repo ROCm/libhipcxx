@@ -28,9 +28,8 @@
 #include <cstdint>
 
 // NOTE(HIP/AMD): the upstream-named <cuda_runtime_api.h> does not
-// exist on a HIP-only system; libhipcxx's detail/__config pulls
-// <libhipcxx/__amd/cuda_runtime.h> transitively (via <cuda/memory_resource>),
-// so this include is unnecessary on HIP. Gate on
+// exist on a HIP-only system; the test uses the hip* runtime API from the
+// force-included <hip/hip_runtime.h>, so this include is unnecessary on HIP. Gate on
 // __HIP_PLATFORM_AMD__ (clang-hip preprocessor sets it
 // unconditionally) rather than _CCCL_HIP_COMPILATION().
 #if !defined(__HIP_PLATFORM_AMD__)

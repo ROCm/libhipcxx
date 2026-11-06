@@ -125,14 +125,14 @@ __global__ void __launch_bounds__(1024) device_test(char* gmem)
 
 void launch_kernel()
 {
-  cudaError_t err;
+  hipError_t err;
   char* inptr = nullptr;
-  CUDA_CALL(err, cudaGetLastError());
-  CUDA_CALL(err, cudaMalloc(&inptr, 1024));
-  CUDA_CALL(err, cudaMemset(inptr, 1, 1024));
+  CUDA_CALL(err, hipGetLastError());
+  CUDA_CALL(err, hipMalloc(&inptr, 1024));
+  CUDA_CALL(err, hipMemset(inptr, 1, 1024));
   device_test<<<1, 1024>>>(inptr);
-  CUDA_CALL(err, cudaGetLastError());
-  CUDA_CALL(err, cudaDeviceSynchronize());
+  CUDA_CALL(err, hipGetLastError());
+  CUDA_CALL(err, hipDeviceSynchronize());
 }
 
 int main(int arg, char** argv)

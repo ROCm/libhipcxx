@@ -96,7 +96,7 @@ struct __pstl_dispatch<__pstl_algorithm::__max_element, __execution_backend::__c
   {
     size_t __ret       = 0ull;
     const auto __count = static_cast<int64_t>(::cuda::std::distance(__first, __last));
-    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStream_t{}}, __policy);
+    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStream_t{}}, __policy);
 
     // Determine temporary device storage requirements for max_element
     size_t __num_bytes = 0;
@@ -130,12 +130,12 @@ struct __pstl_dispatch<__pstl_algorithm::__max_element, __execution_backend::__c
 
       // Copy the result back from storage
       _CCCL_TRY_CUDA_API(
-        ::cudaMemcpyAsync,
+        ::hipMemcpyAsync,
         "__pstl_cuda_max_element: copy of result from device to host failed",
         ::cuda::std::addressof(__ret),
         __storage.template __get_raw_ptr<0>(),
         sizeof(size_t),
-        ::cudaMemcpyDefault,
+        ::hipMemcpyDefault,
         __stream.get());
     }
 
@@ -155,7 +155,7 @@ struct __pstl_dispatch<__pstl_algorithm::__max_element, __execution_backend::__c
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == cudaErrorMemoryAllocation)
+        if (__err.status() == hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }

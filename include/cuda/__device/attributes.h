@@ -55,12 +55,12 @@
 
 _CCCL_BEGIN_NAMESPACE_CUDA
 
-template <::cudaDeviceAttr _Attr, typename _Type>
+template <::hipDeviceAttribute_t _Attr, typename _Type>
 struct __dev_attr_impl
 {
   using type = _Type;
 
-  [[nodiscard]] _CCCL_HOST_API constexpr operator ::cudaDeviceAttr() const noexcept
+  [[nodiscard]] _CCCL_HOST_API constexpr operator ::hipDeviceAttribute_t() const noexcept
   {
     return _Attr;
   }
@@ -68,233 +68,245 @@ struct __dev_attr_impl
   [[nodiscard]] _CCCL_HOST_API type operator()(device_ref __dev) const
   {
     return static_cast<type>(::cuda::__driver::__deviceGetAttribute(
-      static_cast<::CUdevice_attribute>(_Attr), ::cuda::__driver::__deviceGet(__dev.get())));
+      static_cast<::hipDeviceAttribute_t>(_Attr), ::cuda::__driver::__deviceGet(__dev.get())));
   }
 };
 
-template <::cudaDeviceAttr _Attr>
+template <::hipDeviceAttribute_t _Attr>
 struct __dev_attr : __dev_attr_impl<_Attr, int>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrMaxSharedMemoryPerBlock> //
-    : __dev_attr_impl<::cudaDevAttrMaxSharedMemoryPerBlock, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeMaxSharedMemoryPerBlock> //
+    : __dev_attr_impl<::hipDeviceAttributeMaxSharedMemoryPerBlock, ::cuda::std::size_t>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrTotalConstantMemory> //
-    : __dev_attr_impl<::cudaDevAttrTotalConstantMemory, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeTotalConstantMemory> //
+    : __dev_attr_impl<::hipDeviceAttributeTotalConstantMemory, ::cuda::std::size_t>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrMaxPitch> //
-    : __dev_attr_impl<::cudaDevAttrMaxPitch, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeMaxPitch> //
+    : __dev_attr_impl<::hipDeviceAttributeMaxPitch, ::cuda::std::size_t>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrMaxTexture2DLinearPitch> //
-    : __dev_attr_impl<::cudaDevAttrMaxTexture2DLinearPitch, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeMaxTexture2DLinear> //
+    : __dev_attr_impl<::hipDeviceAttributeMaxTexture2DLinear, ::cuda::std::size_t>
 {};
 // TODO: give this a strong type for kilohertz
 template <>
-struct __dev_attr<::cudaDevAttrClockRate> //
-    : __dev_attr_impl<::cudaDevAttrClockRate, int>
+struct __dev_attr<::hipDeviceAttributeClockRate> //
+    : __dev_attr_impl<::hipDeviceAttributeClockRate, int>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrTextureAlignment> //
-    : __dev_attr_impl<::cudaDevAttrTextureAlignment, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeTextureAlignment> //
+    : __dev_attr_impl<::hipDeviceAttributeTextureAlignment, ::cuda::std::size_t>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrTexturePitchAlignment> //
-    : __dev_attr_impl<::cudaDevAttrTexturePitchAlignment, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeTexturePitchAlignment> //
+    : __dev_attr_impl<::hipDeviceAttributeTexturePitchAlignment, ::cuda::std::size_t>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrGpuOverlap> //
-    : __dev_attr_impl<::cudaDevAttrGpuOverlap, bool>
+struct __dev_attr<::hipDeviceAttributeAsyncEngineCount> //
+    : __dev_attr_impl<::hipDeviceAttributeAsyncEngineCount, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrKernelExecTimeout> //
-    : __dev_attr_impl<::cudaDevAttrKernelExecTimeout, bool>
+struct __dev_attr<::hipDeviceAttributeKernelExecTimeout> //
+    : __dev_attr_impl<::hipDeviceAttributeKernelExecTimeout, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrIntegrated> //
-    : __dev_attr_impl<::cudaDevAttrIntegrated, bool>
+struct __dev_attr<::hipDeviceAttributeIntegrated> //
+    : __dev_attr_impl<::hipDeviceAttributeIntegrated, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrCanMapHostMemory> //
-    : __dev_attr_impl<::cudaDevAttrCanMapHostMemory, bool>
+struct __dev_attr<::hipDeviceAttributeCanMapHostMemory> //
+    : __dev_attr_impl<::hipDeviceAttributeCanMapHostMemory, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrComputeMode> //
-    : __dev_attr_impl<::cudaDevAttrComputeMode, ::cudaComputeMode>
+struct __dev_attr<::hipDeviceAttributeComputeMode> //
+    : __dev_attr_impl<::hipDeviceAttributeComputeMode, ::hipComputeMode>
 {
-  static constexpr type default_mode           = ::cudaComputeModeDefault;
-  static constexpr type prohibited_mode        = ::cudaComputeModeProhibited;
-  static constexpr type exclusive_process_mode = ::cudaComputeModeExclusiveProcess;
+  static constexpr type default_mode           = ::hipComputeModeDefault;
+  static constexpr type prohibited_mode        = ::hipComputeModeProhibited;
+  static constexpr type exclusive_process_mode = ::hipComputeModeExclusiveProcess;
 };
 template <>
-struct __dev_attr<::cudaDevAttrConcurrentKernels> //
-    : __dev_attr_impl<::cudaDevAttrConcurrentKernels, bool>
+struct __dev_attr<::hipDeviceAttributeConcurrentKernels> //
+    : __dev_attr_impl<::hipDeviceAttributeConcurrentKernels, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrEccEnabled> //
-    : __dev_attr_impl<::cudaDevAttrEccEnabled, bool>
+struct __dev_attr<::hipDeviceAttributeEccEnabled> //
+    : __dev_attr_impl<::hipDeviceAttributeEccEnabled, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrTccDriver> //
-    : __dev_attr_impl<::cudaDevAttrTccDriver, bool>
+struct __dev_attr<::hipDeviceAttributeTccDriver> //
+    : __dev_attr_impl<::hipDeviceAttributeTccDriver, bool>
 {};
 // TODO: give this a strong type for kilohertz
 template <>
-struct __dev_attr<::cudaDevAttrMemoryClockRate> //
-    : __dev_attr_impl<::cudaDevAttrMemoryClockRate, int>
+struct __dev_attr<::hipDeviceAttributeMemoryClockRate> //
+    : __dev_attr_impl<::hipDeviceAttributeMemoryClockRate, int>
 {};
 // TODO: give this a strong type for bits
 template <>
-struct __dev_attr<::cudaDevAttrGlobalMemoryBusWidth> //
-    : __dev_attr_impl<::cudaDevAttrGlobalMemoryBusWidth, int>
+struct __dev_attr<::hipDeviceAttributeMemoryBusWidth> //
+    : __dev_attr_impl<::hipDeviceAttributeMemoryBusWidth, int>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrL2CacheSize> //
-    : __dev_attr_impl<::cudaDevAttrL2CacheSize, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeL2CacheSize> //
+    : __dev_attr_impl<::hipDeviceAttributeL2CacheSize, ::cuda::std::size_t>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrUnifiedAddressing> //
-    : __dev_attr_impl<::cudaDevAttrUnifiedAddressing, bool>
+struct __dev_attr<::hipDeviceAttributeUnifiedAddressing> //
+    : __dev_attr_impl<::hipDeviceAttributeUnifiedAddressing, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrStreamPrioritiesSupported> //
-    : __dev_attr_impl<::cudaDevAttrStreamPrioritiesSupported, bool>
+struct __dev_attr<::hipDeviceAttributeStreamPrioritiesSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeStreamPrioritiesSupported, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrGlobalL1CacheSupported> //
-    : __dev_attr_impl<::cudaDevAttrGlobalL1CacheSupported, bool>
+struct __dev_attr<::hipDeviceAttributeGlobalL1CacheSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeGlobalL1CacheSupported, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrLocalL1CacheSupported> //
-    : __dev_attr_impl<::cudaDevAttrLocalL1CacheSupported, bool>
+struct __dev_attr<::hipDeviceAttributeLocalL1CacheSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeLocalL1CacheSupported, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrMaxSharedMemoryPerMultiprocessor> //
-    : __dev_attr_impl<::cudaDevAttrMaxSharedMemoryPerMultiprocessor, ::cuda::std::size_t>
+struct __dev_attr<::hipDeviceAttributeMaxSharedMemoryPerMultiprocessor> //
+    : __dev_attr_impl<::hipDeviceAttributeMaxSharedMemoryPerMultiprocessor, ::cuda::std::size_t>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrManagedMemory> //
-    : __dev_attr_impl<::cudaDevAttrManagedMemory, bool>
+struct __dev_attr<::hipDeviceAttributeManagedMemory> //
+    : __dev_attr_impl<::hipDeviceAttributeManagedMemory, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrIsMultiGpuBoard> //
-    : __dev_attr_impl<::cudaDevAttrIsMultiGpuBoard, bool>
+struct __dev_attr<::hipDeviceAttributeIsMultiGpuBoard> //
+    : __dev_attr_impl<::hipDeviceAttributeIsMultiGpuBoard, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrHostNativeAtomicSupported> //
-    : __dev_attr_impl<::cudaDevAttrHostNativeAtomicSupported, bool>
+struct __dev_attr<::hipDeviceAttributeHostNativeAtomicSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeHostNativeAtomicSupported, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrPageableMemoryAccess> //
-    : __dev_attr_impl<::cudaDevAttrPageableMemoryAccess, bool>
+struct __dev_attr<::hipDeviceAttributePageableMemoryAccess> //
+    : __dev_attr_impl<::hipDeviceAttributePageableMemoryAccess, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrConcurrentManagedAccess> //
-    : __dev_attr_impl<::cudaDevAttrConcurrentManagedAccess, bool>
+struct __dev_attr<::hipDeviceAttributeConcurrentManagedAccess> //
+    : __dev_attr_impl<::hipDeviceAttributeConcurrentManagedAccess, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrComputePreemptionSupported> //
-    : __dev_attr_impl<::cudaDevAttrComputePreemptionSupported, bool>
+struct __dev_attr<::hipDeviceAttributeComputePreemptionSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeComputePreemptionSupported, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrCanUseHostPointerForRegisteredMem> //
-    : __dev_attr_impl<::cudaDevAttrCanUseHostPointerForRegisteredMem, bool>
+struct __dev_attr<::hipDeviceAttributeCanUseHostPointerForRegisteredMem> //
+    : __dev_attr_impl<::hipDeviceAttributeCanUseHostPointerForRegisteredMem, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrCooperativeLaunch> //
-    : __dev_attr_impl<::cudaDevAttrCooperativeLaunch, bool>
+struct __dev_attr<::hipDeviceAttributeCooperativeLaunch> //
+    : __dev_attr_impl<::hipDeviceAttributeCooperativeLaunch, bool>
 {};
 template <>
-struct __dev_attr<::cudaDevAttrCanFlushRemoteWrites> //
-    : __dev_attr_impl<::cudaDevAttrCanFlushRemoteWrites, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrHostRegisterSupported> //
-    : __dev_attr_impl<::cudaDevAttrHostRegisterSupported, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrDirectManagedMemAccessFromHost> //
-    : __dev_attr_impl<::cudaDevAttrDirectManagedMemAccessFromHost, bool>
-{};
-// NOTE(HIP/AMD): HIP collapses cudaDevAttrMaxSharedMemoryPerBlockOptin
-// and cudaDevAttrReservedSharedMemoryPerBlock onto the same enum value
-// as cudaDevAttrMaxSharedMemoryPerBlock, which would cause duplicate
-// template specializations. Skip those two specializations under HIP;
-// the using-aliases below resolve to the existing
-// __dev_attr<cudaDevAttrMaxSharedMemoryPerBlock> specialization.
-#if !_CCCL_HIP_COMPILATION()
-template <>
-struct __dev_attr<::cudaDevAttrMaxSharedMemoryPerBlockOptin> //
-    : __dev_attr_impl<::cudaDevAttrMaxSharedMemoryPerBlockOptin, ::cuda::std::size_t>
-{};
-#endif // !_CCCL_HIP_COMPILATION()
-template <>
-struct __dev_attr<::cudaDevAttrMaxPersistingL2CacheSize> //
-    : __dev_attr_impl<::cudaDevAttrMaxPersistingL2CacheSize, ::cuda::std::size_t>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrMaxAccessPolicyWindowSize> //
-    : __dev_attr_impl<::cudaDevAttrMaxAccessPolicyWindowSize, ::cuda::std::size_t>
-{};
-#if !_CCCL_HIP_COMPILATION()
-template <>
-struct __dev_attr<::cudaDevAttrReservedSharedMemoryPerBlock> //
-    : __dev_attr_impl<::cudaDevAttrReservedSharedMemoryPerBlock, ::cuda::std::size_t>
-{};
-#endif // !_CCCL_HIP_COMPILATION()
-template <>
-struct __dev_attr<::cudaDevAttrSparseCudaArraySupported> //
-    : __dev_attr_impl<::cudaDevAttrSparseCudaArraySupported, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrMemoryPoolsSupported> //
-    : __dev_attr_impl<::cudaDevAttrMemoryPoolsSupported, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrGPUDirectRDMASupported> //
-    : __dev_attr_impl<::cudaDevAttrGPUDirectRDMASupported, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrDeferredMappingCudaArraySupported> //
-    : __dev_attr_impl<::cudaDevAttrDeferredMappingCudaArraySupported, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrIpcEventSupport> //
-    : __dev_attr_impl<::cudaDevAttrIpcEventSupport, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrPageableMemoryAccessUsesHostPageTables>
-    : __dev_attr_impl<::cudaDevAttrPageableMemoryAccessUsesHostPageTables, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrHostRegisterReadOnlySupported> //
-    : __dev_attr_impl<::cudaDevAttrHostRegisterReadOnlySupported, bool>
-{};
-template <>
-struct __dev_attr<::cudaDevAttrGPUDirectRDMAFlushWritesOptions> //
-    : __dev_attr_impl<::cudaDevAttrGPUDirectRDMAFlushWritesOptions, ::cudaFlushGPUDirectRDMAWritesOptions>
+struct __dev_attr<::hipDeviceAttributeHdpMemFlushCntl> //
+    : __dev_attr_impl<::hipDeviceAttributeHdpMemFlushCntl, bool>
 {
-  static constexpr type host    = ::cudaFlushGPUDirectRDMAWritesOptionHost;
-  static constexpr type mem_ops = ::cudaFlushGPUDirectRDMAWritesOptionMemOps;
+#  if _CCCL_HIP_COMPILATION()
+  // NOTE(HIP/AMD): HIP has no attribute for this. hipDeviceAttributeHdpMemFlushCntl
+  // yields a register address, written as a pointer through the int* of
+  // hipDeviceGetAttribute, so it must not be queried. HIP has no API to flush
+  // remote writes.
+  [[nodiscard]] _CCCL_HOST_API type operator()(device_ref) const noexcept
+  {
+    return false;
+  }
+#  endif // _CCCL_HIP_COMPILATION()
 };
 template <>
-struct __dev_attr<::cudaDevAttrGPUDirectRDMAWritesOrdering> //
-    : __dev_attr_impl<::cudaDevAttrGPUDirectRDMAWritesOrdering, ::cudaGPUDirectRDMAWritesOrdering>
+struct __dev_attr<::hipDeviceAttributeHostRegisterSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeHostRegisterSupported, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeDirectManagedMemAccessFromHost> //
+    : __dev_attr_impl<::hipDeviceAttributeDirectManagedMemAccessFromHost, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeSharedMemPerBlockOptin> //
+    : __dev_attr_impl<::hipDeviceAttributeSharedMemPerBlockOptin, ::cuda::std::size_t>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributePersistingL2CacheMaxSize> //
+    : __dev_attr_impl<::hipDeviceAttributePersistingL2CacheMaxSize, ::cuda::std::size_t>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeAccessPolicyMaxWindowSize> //
+    : __dev_attr_impl<::hipDeviceAttributeAccessPolicyMaxWindowSize, ::cuda::std::size_t>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeReservedSharedMemPerBlock> //
+    : __dev_attr_impl<::hipDeviceAttributeReservedSharedMemPerBlock, ::cuda::std::size_t>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeVirtualMemoryManagementSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeVirtualMemoryManagementSupported, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeMemoryPoolsSupported> //
+    : __dev_attr_impl<::hipDeviceAttributeMemoryPoolsSupported, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeIsLargeBar> //
+    : __dev_attr_impl<::hipDeviceAttributeIsLargeBar, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeImageSupport> //
+    : __dev_attr_impl<::hipDeviceAttributeImageSupport, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeFineGrainSupport> //
+    : __dev_attr_impl<::hipDeviceAttributeFineGrainSupport, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributePageableMemoryAccessUsesHostPageTables>
+    : __dev_attr_impl<::hipDeviceAttributePageableMemoryAccessUsesHostPageTables, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeAsicRevision> //
+    : __dev_attr_impl<::hipDeviceAttributeAsicRevision, bool>
+{};
+template <>
+struct __dev_attr<::hipDeviceAttributeCooperativeMultiDeviceUnmatchedFunc> //
+    : __dev_attr_impl<::hipDeviceAttributeCooperativeMultiDeviceUnmatchedFunc, ::hipFlushGPUDirectRDMAWritesOptions>
 {
-  static constexpr type none        = ::cudaGPUDirectRDMAWritesOrderingNone;
-  static constexpr type owner       = ::cudaGPUDirectRDMAWritesOrderingOwner;
-  static constexpr type all_devices = ::cudaGPUDirectRDMAWritesOrderingAllDevices;
+  static constexpr type host    = ::hipFlushGPUDirectRDMAWritesOptionHost;
+  static constexpr type mem_ops = ::hipFlushGPUDirectRDMAWritesOptionMemOps;
 };
 template <>
-struct __dev_attr<::cudaDevAttrMemoryPoolSupportedHandleTypes> //
-    : __dev_attr_impl<::cudaDevAttrMemoryPoolSupportedHandleTypes, ::cudaMemAllocationHandleType>
+struct __dev_attr<::hipDeviceAttributeHdpRegFlushCntl> //
+    : __dev_attr_impl<::hipDeviceAttributeHdpRegFlushCntl, ::hipGPUDirectRDMAWritesOrdering>
 {
-  static constexpr type none                  = ::cudaMemHandleTypeNone;
-  static constexpr type posix_file_descriptor = ::cudaMemHandleTypePosixFileDescriptor;
-  static constexpr type win32                 = ::cudaMemHandleTypeWin32;
-  static constexpr type win32_kmt             = ::cudaMemHandleTypeWin32Kmt;
+  static constexpr type none        = ::hipGPUDirectRDMAWritesOrderingNone;
+  static constexpr type owner       = ::hipGPUDirectRDMAWritesOrderingOwner;
+  static constexpr type all_devices = ::hipGPUDirectRDMAWritesOrderingAllDevices;
+
+#  if _CCCL_HIP_COMPILATION()
+  // NOTE(HIP/AMD): HIP has no attribute for this. hipDeviceAttributeHdpRegFlushCntl
+  // yields a register address, written as a pointer through the int* of
+  // hipDeviceGetAttribute, so it must not be queried. HIP reports no GPUDirect
+  // RDMA write ordering (hipDeviceProp_t::gpuDirectRDMAWritesOrdering is 0).
+  [[nodiscard]] _CCCL_HOST_API type operator()(device_ref) const noexcept
+  {
+    return none;
+  }
+#  endif // _CCCL_HIP_COMPILATION()
+};
+template <>
+struct __dev_attr<::hipDeviceAttributeMemoryPoolSupportedHandleTypes> //
+    : __dev_attr_impl<::hipDeviceAttributeMemoryPoolSupportedHandleTypes, ::hipMemAllocationHandleType>
+{
+  static constexpr type none                  = ::hipMemHandleTypeNone;
+  static constexpr type posix_file_descriptor = ::hipMemHandleTypePosixFileDescriptor;
+  static constexpr type win32                 = ::hipMemHandleTypeWin32;
+  static constexpr type win32_kmt             = ::hipMemHandleTypeWin32Kmt;
 #  if _CCCL_CTK_AT_LEAST(12, 4)
   static constexpr type fabric = ::cudaMemHandleTypeFabric;
 #  else // ^^^ _CCCL_CTK_AT_LEAST(12, 4) ^^^ / vvv _CCCL_CTK_BELOW(12, 4) vvv
@@ -305,7 +317,7 @@ struct __dev_attr<::cudaDevAttrMemoryPoolSupportedHandleTypes> //
   // The fabric attribute is a CUDA-NVLink feature; just use the
   // 'none' (0x0) value as a placeholder on HIP. Tests that probe
   // 'fabric' must HIP-gate the assertion.
-  static inline constexpr type fabric = ::cudaMemHandleTypeNone;
+  static inline constexpr type fabric = ::hipMemHandleTypeNone;
 #  endif // ^^^ _CCCL_CTK_BELOW(12, 4) ^^^
 };
 #  if _CCCL_CTK_AT_LEAST(12, 2)
@@ -334,448 +346,449 @@ struct __dev_attr<::cudaDevAttrHostMemoryPoolsSupported> : __dev_attr_impl<::cud
 namespace device_attributes
 {
 // Maximum number of threads per block
-using max_threads_per_block_t = __dev_attr<::cudaDevAttrMaxThreadsPerBlock>;
+using max_threads_per_block_t = __dev_attr<::hipDeviceAttributeMaxThreadsPerBlock>;
 static constexpr max_threads_per_block_t max_threads_per_block{};
 
 // Maximum x-dimension of a block
-using max_block_dim_x_t = __dev_attr<::cudaDevAttrMaxBlockDimX>;
+using max_block_dim_x_t = __dev_attr<::hipDeviceAttributeMaxBlockDimX>;
 static constexpr max_block_dim_x_t max_block_dim_x{};
 
 // Maximum y-dimension of a block
-using max_block_dim_y_t = __dev_attr<::cudaDevAttrMaxBlockDimY>;
+using max_block_dim_y_t = __dev_attr<::hipDeviceAttributeMaxBlockDimY>;
 static constexpr max_block_dim_y_t max_block_dim_y{};
 
 // Maximum z-dimension of a block
-using max_block_dim_z_t = __dev_attr<::cudaDevAttrMaxBlockDimZ>;
+using max_block_dim_z_t = __dev_attr<::hipDeviceAttributeMaxBlockDimZ>;
 static constexpr max_block_dim_z_t max_block_dim_z{};
 
 // Maximum x-dimension of a grid
-using max_grid_dim_x_t = __dev_attr<::cudaDevAttrMaxGridDimX>;
+using max_grid_dim_x_t = __dev_attr<::hipDeviceAttributeMaxGridDimX>;
 static constexpr max_grid_dim_x_t max_grid_dim_x{};
 
 // Maximum y-dimension of a grid
-using max_grid_dim_y_t = __dev_attr<::cudaDevAttrMaxGridDimY>;
+using max_grid_dim_y_t = __dev_attr<::hipDeviceAttributeMaxGridDimY>;
 static constexpr max_grid_dim_y_t max_grid_dim_y{};
 
 // Maximum z-dimension of a grid
-using max_grid_dim_z_t = __dev_attr<::cudaDevAttrMaxGridDimZ>;
+using max_grid_dim_z_t = __dev_attr<::hipDeviceAttributeMaxGridDimZ>;
 static constexpr max_grid_dim_z_t max_grid_dim_z{};
 
 // Maximum amount of shared memory available to a thread block in bytes
-using max_shared_memory_per_block_t = __dev_attr<::cudaDevAttrMaxSharedMemoryPerBlock>;
+using max_shared_memory_per_block_t = __dev_attr<::hipDeviceAttributeMaxSharedMemoryPerBlock>;
 static constexpr max_shared_memory_per_block_t max_shared_memory_per_block{};
 
 // Memory available on device for __constant__ variables in a CUDA C kernel in bytes
-using total_constant_memory_t = __dev_attr<::cudaDevAttrTotalConstantMemory>;
+using total_constant_memory_t = __dev_attr<::hipDeviceAttributeTotalConstantMemory>;
 static constexpr total_constant_memory_t total_constant_memory{};
 
 // Warp size in threads
-using warp_size_t = __dev_attr<::cudaDevAttrWarpSize>;
+using warp_size_t = __dev_attr<::hipDeviceAttributeWarpSize>;
 static constexpr warp_size_t warp_size{};
 
 // Maximum pitch in bytes allowed by the memory copy functions that involve
 // memory regions allocated through cudaMallocPitch()
-using max_pitch_t = __dev_attr<::cudaDevAttrMaxPitch>;
+using max_pitch_t = __dev_attr<::hipDeviceAttributeMaxPitch>;
 static constexpr max_pitch_t max_pitch{};
 
 // Maximum 1D texture width
-using max_texture_1d_width_t = __dev_attr<::cudaDevAttrMaxTexture1DWidth>;
+using max_texture_1d_width_t = __dev_attr<::hipDeviceAttributeMaxTexture1DWidth>;
 static constexpr max_texture_1d_width_t max_texture_1d_width{};
 
 // Maximum width for a 1D texture bound to linear memory
-using max_texture_1d_linear_width_t = __dev_attr<::cudaDevAttrMaxTexture1DLinearWidth>;
+using max_texture_1d_linear_width_t = __dev_attr<::hipDeviceAttributeMaxTexture1DLinear>;
 static constexpr max_texture_1d_linear_width_t max_texture_1d_linear_width{};
 
 // Maximum mipmapped 1D texture width
-using max_texture_1d_mipmapped_width_t = __dev_attr<::cudaDevAttrMaxTexture1DMipmappedWidth>;
+using max_texture_1d_mipmapped_width_t = __dev_attr<::hipDeviceAttributeMaxTexture1DMipmap>;
 static constexpr max_texture_1d_mipmapped_width_t max_texture_1d_mipmapped_width{};
 
 // Maximum 2D texture width
-using max_texture_2d_width_t = __dev_attr<::cudaDevAttrMaxTexture2DWidth>;
+using max_texture_2d_width_t = __dev_attr<::hipDeviceAttributeMaxTexture2DWidth>;
 static constexpr max_texture_2d_width_t max_texture_2d_width{};
 
 // Maximum 2D texture height
-using max_texture_2d_height_t = __dev_attr<::cudaDevAttrMaxTexture2DHeight>;
+using max_texture_2d_height_t = __dev_attr<::hipDeviceAttributeMaxTexture2DHeight>;
 static constexpr max_texture_2d_height_t max_texture_2d_height{};
 
 // Maximum width for a 2D texture bound to linear memory
-using max_texture_2d_linear_width_t = __dev_attr<::cudaDevAttrMaxTexture2DLinearWidth>;
+using max_texture_2d_linear_width_t = __dev_attr<::hipDeviceAttributeMaxTexture2DLinear>;
 static constexpr max_texture_2d_linear_width_t max_texture_2d_linear_width{};
 
 // Maximum height for a 2D texture bound to linear memory
-using max_texture_2d_linear_height_t = __dev_attr<::cudaDevAttrMaxTexture2DLinearHeight>;
+using max_texture_2d_linear_height_t = __dev_attr<::hipDeviceAttributeMaxTexture2DLinear>;
 static constexpr max_texture_2d_linear_height_t max_texture_2d_linear_height{};
 
 // Maximum pitch in bytes for a 2D texture bound to linear memory
-using max_texture_2d_linear_pitch_t = __dev_attr<::cudaDevAttrMaxTexture2DLinearPitch>;
+using max_texture_2d_linear_pitch_t = __dev_attr<::hipDeviceAttributeMaxTexture2DLinear>;
 static constexpr max_texture_2d_linear_pitch_t max_texture_2d_linear_pitch{};
 
 // Maximum mipmapped 2D texture width
-using max_texture_2d_mipmapped_width_t = __dev_attr<::cudaDevAttrMaxTexture2DMipmappedWidth>;
+using max_texture_2d_mipmapped_width_t = __dev_attr<::hipDeviceAttributeMaxTexture2DMipmap>;
 static constexpr max_texture_2d_mipmapped_width_t max_texture_2d_mipmapped_width{};
 
 // Maximum mipmapped 2D texture height
-using max_texture_2d_mipmapped_height_t = __dev_attr<::cudaDevAttrMaxTexture2DMipmappedHeight>;
+using max_texture_2d_mipmapped_height_t = __dev_attr<::hipDeviceAttributeMaxTexture2DMipmap>;
 static constexpr max_texture_2d_mipmapped_height_t max_texture_2d_mipmapped_height{};
 
 // Maximum 3D texture width
-using max_texture_3d_width_t = __dev_attr<::cudaDevAttrMaxTexture3DWidth>;
+using max_texture_3d_width_t = __dev_attr<::hipDeviceAttributeMaxTexture3DWidth>;
 static constexpr max_texture_3d_width_t max_texture_3d_width{};
 
 // Maximum 3D texture height
-using max_texture_3d_height_t = __dev_attr<::cudaDevAttrMaxTexture3DHeight>;
+using max_texture_3d_height_t = __dev_attr<::hipDeviceAttributeMaxTexture3DHeight>;
 static constexpr max_texture_3d_height_t max_texture_3d_height{};
 
 // Maximum 3D texture depth
-using max_texture_3d_depth_t = __dev_attr<::cudaDevAttrMaxTexture3DDepth>;
+using max_texture_3d_depth_t = __dev_attr<::hipDeviceAttributeMaxTexture3DDepth>;
 static constexpr max_texture_3d_depth_t max_texture_3d_depth{};
 
 // Alternate maximum 3D texture width, 0 if no alternate maximum 3D texture size is supported
-using max_texture_3d_width_alt_t = __dev_attr<::cudaDevAttrMaxTexture3DWidthAlt>;
+using max_texture_3d_width_alt_t = __dev_attr<::hipDeviceAttributeMaxTexture3DAlt>;
 static constexpr max_texture_3d_width_alt_t max_texture_3d_width_alt{};
 
 // Alternate maximum 3D texture height, 0 if no alternate maximum 3D texture size is supported
-using max_texture_3d_height_alt_t = __dev_attr<::cudaDevAttrMaxTexture3DHeightAlt>;
+using max_texture_3d_height_alt_t = __dev_attr<::hipDeviceAttributeMaxTexture3DAlt>;
 static constexpr max_texture_3d_height_alt_t max_texture_3d_height_alt{};
 
 // Alternate maximum 3D texture depth, 0 if no alternate maximum 3D texture size is supported
-using max_texture_3d_depth_alt_t = __dev_attr<::cudaDevAttrMaxTexture3DDepthAlt>;
+using max_texture_3d_depth_alt_t = __dev_attr<::hipDeviceAttributeMaxTexture3DAlt>;
 static constexpr max_texture_3d_depth_alt_t max_texture_3d_depth_alt{};
 
 // Maximum cubemap texture width or height
-using max_texture_cubemap_width_t = __dev_attr<::cudaDevAttrMaxTextureCubemapWidth>;
+using max_texture_cubemap_width_t = __dev_attr<::hipDeviceAttributeMaxTextureCubemap>;
 static constexpr max_texture_cubemap_width_t max_texture_cubemap_width{};
 
 // Maximum 1D layered texture width
-using max_texture_1d_layered_width_t = __dev_attr<::cudaDevAttrMaxTexture1DLayeredWidth>;
+using max_texture_1d_layered_width_t = __dev_attr<::hipDeviceAttributeMaxTexture1DLayered>;
 static constexpr max_texture_1d_layered_width_t max_texture_1d_layered_width{};
 
 // Maximum layers in a 1D layered texture
-using max_texture_1d_layered_layers_t = __dev_attr<::cudaDevAttrMaxTexture1DLayeredLayers>;
+using max_texture_1d_layered_layers_t = __dev_attr<::hipDeviceAttributeMaxTexture1DLayered>;
 static constexpr max_texture_1d_layered_layers_t max_texture_1d_layered_layers{};
 
 // Maximum 2D layered texture width
-using max_texture_2d_layered_width_t = __dev_attr<::cudaDevAttrMaxTexture2DLayeredWidth>;
+using max_texture_2d_layered_width_t = __dev_attr<::hipDeviceAttributeMaxTexture2DLayered>;
 static constexpr max_texture_2d_layered_width_t max_texture_2d_layered_width{};
 
 // Maximum 2D layered texture height
-using max_texture_2d_layered_height_t = __dev_attr<::cudaDevAttrMaxTexture2DLayeredHeight>;
+using max_texture_2d_layered_height_t = __dev_attr<::hipDeviceAttributeMaxTexture2DLayered>;
 static constexpr max_texture_2d_layered_height_t max_texture_2d_layered_height{};
 
 // Maximum layers in a 2D layered texture
-using max_texture_2d_layered_layers_t = __dev_attr<::cudaDevAttrMaxTexture2DLayeredLayers>;
+using max_texture_2d_layered_layers_t = __dev_attr<::hipDeviceAttributeMaxTexture2DLayered>;
 static constexpr max_texture_2d_layered_layers_t max_texture_2d_layered_layers{};
 
 // Maximum cubemap layered texture width or height
-using max_texture_cubemap_layered_width_t = __dev_attr<::cudaDevAttrMaxTextureCubemapLayeredWidth>;
+using max_texture_cubemap_layered_width_t = __dev_attr<::hipDeviceAttributeMaxTextureCubemapLayered>;
 static constexpr max_texture_cubemap_layered_width_t max_texture_cubemap_layered_width{};
 
 // Maximum layers in a cubemap layered texture
-using max_texture_cubemap_layered_layers_t = __dev_attr<::cudaDevAttrMaxTextureCubemapLayeredLayers>;
+using max_texture_cubemap_layered_layers_t = __dev_attr<::hipDeviceAttributeMaxTextureCubemapLayered>;
 static constexpr max_texture_cubemap_layered_layers_t max_texture_cubemap_layered_layers{};
 
 // Maximum 1D surface width
-using max_surface_1d_width_t = __dev_attr<::cudaDevAttrMaxSurface1DWidth>;
+using max_surface_1d_width_t = __dev_attr<::hipDeviceAttributeMaxSurface1D>;
 static constexpr max_surface_1d_width_t max_surface_1d_width{};
 
 // Maximum 2D surface width
-using max_surface_2d_width_t = __dev_attr<::cudaDevAttrMaxSurface2DWidth>;
+using max_surface_2d_width_t = __dev_attr<::hipDeviceAttributeMaxSurface2D>;
 static constexpr max_surface_2d_width_t max_surface_2d_width{};
 
 // Maximum 2D surface height
-using max_surface_2d_height_t = __dev_attr<::cudaDevAttrMaxSurface2DHeight>;
+using max_surface_2d_height_t = __dev_attr<::hipDeviceAttributeMaxSurface2D>;
 static constexpr max_surface_2d_height_t max_surface_2d_height{};
 
 // Maximum 3D surface width
-using max_surface_3d_width_t = __dev_attr<::cudaDevAttrMaxSurface3DWidth>;
+using max_surface_3d_width_t = __dev_attr<::hipDeviceAttributeMaxSurface3D>;
 static constexpr max_surface_3d_width_t max_surface_3d_width{};
 
 // Maximum 3D surface height
-using max_surface_3d_height_t = __dev_attr<::cudaDevAttrMaxSurface3DHeight>;
+using max_surface_3d_height_t = __dev_attr<::hipDeviceAttributeMaxSurface3D>;
 static constexpr max_surface_3d_height_t max_surface_3d_height{};
 
 // Maximum 3D surface depth
-using max_surface_3d_depth_t = __dev_attr<::cudaDevAttrMaxSurface3DDepth>;
+using max_surface_3d_depth_t = __dev_attr<::hipDeviceAttributeMaxSurface3D>;
 static constexpr max_surface_3d_depth_t max_surface_3d_depth{};
 
 // Maximum 1D layered surface width
-using max_surface_1d_layered_width_t = __dev_attr<::cudaDevAttrMaxSurface1DLayeredWidth>;
+using max_surface_1d_layered_width_t = __dev_attr<::hipDeviceAttributeMaxSurface1DLayered>;
 static constexpr max_surface_1d_layered_width_t max_surface_1d_layered_width{};
 
 // Maximum layers in a 1D layered surface
-using max_surface_1d_layered_layers_t = __dev_attr<::cudaDevAttrMaxSurface1DLayeredLayers>;
+using max_surface_1d_layered_layers_t = __dev_attr<::hipDeviceAttributeMaxSurface1DLayered>;
 static constexpr max_surface_1d_layered_layers_t max_surface_1d_layered_layers{};
 
 // Maximum 2D layered surface width
-using max_surface_2d_layered_width_t = __dev_attr<::cudaDevAttrMaxSurface2DLayeredWidth>;
+using max_surface_2d_layered_width_t = __dev_attr<::hipDeviceAttributeMaxSurface2DLayered>;
 static constexpr max_surface_2d_layered_width_t max_surface_2d_layered_width{};
 
 // Maximum 2D layered surface height
-using max_surface_2d_layered_height_t = __dev_attr<::cudaDevAttrMaxSurface2DLayeredHeight>;
+using max_surface_2d_layered_height_t = __dev_attr<::hipDeviceAttributeMaxSurface2DLayered>;
 static constexpr max_surface_2d_layered_height_t max_surface_2d_layered_height{};
 
 // Maximum layers in a 2D layered surface
-using max_surface_2d_layered_layers_t = __dev_attr<::cudaDevAttrMaxSurface2DLayeredLayers>;
+using max_surface_2d_layered_layers_t = __dev_attr<::hipDeviceAttributeMaxSurface2DLayered>;
 static constexpr max_surface_2d_layered_layers_t max_surface_2d_layered_layers{};
 
 // Maximum cubemap surface width
-using max_surface_cubemap_width_t = __dev_attr<::cudaDevAttrMaxSurfaceCubemapWidth>;
+using max_surface_cubemap_width_t = __dev_attr<::hipDeviceAttributeMaxSurfaceCubemap>;
 static constexpr max_surface_cubemap_width_t max_surface_cubemap_width{};
 
 // Maximum cubemap layered surface width
-using max_surface_cubemap_layered_width_t = __dev_attr<::cudaDevAttrMaxSurfaceCubemapLayeredWidth>;
+using max_surface_cubemap_layered_width_t = __dev_attr<::hipDeviceAttributeMaxSurfaceCubemapLayered>;
 static constexpr max_surface_cubemap_layered_width_t max_surface_cubemap_layered_width{};
 
 // Maximum layers in a cubemap layered surface
-using max_surface_cubemap_layered_layers_t = __dev_attr<::cudaDevAttrMaxSurfaceCubemapLayeredLayers>;
+using max_surface_cubemap_layered_layers_t = __dev_attr<::hipDeviceAttributeMaxSurfaceCubemapLayered>;
 static constexpr max_surface_cubemap_layered_layers_t max_surface_cubemap_layered_layers{};
 
 // Maximum number of 32-bit registers available to a thread block
-using max_registers_per_block_t = __dev_attr<::cudaDevAttrMaxRegistersPerBlock>;
+using max_registers_per_block_t = __dev_attr<::hipDeviceAttributeMaxRegistersPerBlock>;
 static constexpr max_registers_per_block_t max_registers_per_block{};
 
 // Peak clock frequency in kilohertz
-using clock_rate_t = __dev_attr<::cudaDevAttrClockRate>;
+using clock_rate_t = __dev_attr<::hipDeviceAttributeClockRate>;
 static constexpr clock_rate_t clock_rate{};
 
 // Alignment requirement; texture base addresses aligned to textureAlign bytes
 // do not need an offset applied to texture fetches
-using texture_alignment_t = __dev_attr<::cudaDevAttrTextureAlignment>;
+using texture_alignment_t = __dev_attr<::hipDeviceAttributeTextureAlignment>;
 static constexpr texture_alignment_t texture_alignment{};
 
 // Pitch alignment requirement for 2D texture references bound to pitched memory
-using texture_pitch_alignment_t = __dev_attr<::cudaDevAttrTexturePitchAlignment>;
+using texture_pitch_alignment_t = __dev_attr<::hipDeviceAttributeTexturePitchAlignment>;
 static constexpr texture_pitch_alignment_t texture_pitch_alignment{};
 
 // true if the device can concurrently copy memory between host and device
 // while executing a kernel, or false if not
-using gpu_overlap_t = __dev_attr<::cudaDevAttrGpuOverlap>;
+using gpu_overlap_t = __dev_attr<::hipDeviceAttributeAsyncEngineCount>;
 static constexpr gpu_overlap_t gpu_overlap{};
 
 // Number of multiprocessors on the device
-using multiprocessor_count_t = __dev_attr<::cudaDevAttrMultiProcessorCount>;
+using multiprocessor_count_t = __dev_attr<::hipDeviceAttributeMultiprocessorCount>;
 static constexpr multiprocessor_count_t multiprocessor_count{};
 
 // true if there is a run time limit for kernels executed on the device, or
 // false if not
-using kernel_exec_timeout_t = __dev_attr<::cudaDevAttrKernelExecTimeout>;
+using kernel_exec_timeout_t = __dev_attr<::hipDeviceAttributeKernelExecTimeout>;
 static constexpr kernel_exec_timeout_t kernel_exec_timeout{};
 
 // true if the device is integrated with the memory subsystem, or false if not
-using integrated_t = __dev_attr<::cudaDevAttrIntegrated>;
+using integrated_t = __dev_attr<::hipDeviceAttributeIntegrated>;
 static constexpr integrated_t integrated{};
 
 // true if the device can map host memory into CUDA address space
-using can_map_host_memory_t = __dev_attr<::cudaDevAttrCanMapHostMemory>;
+using can_map_host_memory_t = __dev_attr<::hipDeviceAttributeCanMapHostMemory>;
 static constexpr can_map_host_memory_t can_map_host_memory{};
 
 // Compute mode is the compute mode that the device is currently in.
-using compute_mode_t = __dev_attr<::cudaDevAttrComputeMode>;
+using compute_mode_t = __dev_attr<::hipDeviceAttributeComputeMode>;
 static constexpr compute_mode_t compute_mode{};
 
 // true if the device supports executing multiple kernels within the same
 // context simultaneously, or false if not. It is not guaranteed that multiple
 // kernels will be resident on the device concurrently so this feature should
 // not be relied upon for correctness.
-using concurrent_kernels_t = __dev_attr<::cudaDevAttrConcurrentKernels>;
+using concurrent_kernels_t = __dev_attr<::hipDeviceAttributeConcurrentKernels>;
 static constexpr concurrent_kernels_t concurrent_kernels{};
 
 // true if error correction is enabled on the device, 0 if error correction is
 // disabled or not supported by the device
-using ecc_enabled_t = __dev_attr<::cudaDevAttrEccEnabled>;
+using ecc_enabled_t = __dev_attr<::hipDeviceAttributeEccEnabled>;
 static constexpr ecc_enabled_t ecc_enabled{};
 
 // PCI bus identifier of the device
-using pci_bus_id_t = __dev_attr<::cudaDevAttrPciBusId>;
+using pci_bus_id_t = __dev_attr<::hipDeviceAttributePciBusId>;
 static constexpr pci_bus_id_t pci_bus_id{};
 
 // PCI device (also known as slot) identifier of the device
-using pci_device_id_t = __dev_attr<::cudaDevAttrPciDeviceId>;
+using pci_device_id_t = __dev_attr<::hipDeviceAttributePciDeviceId>;
 static constexpr pci_device_id_t pci_device_id{};
 
 // true if the device is using a TCC driver. TCC is only available on Tesla
 // hardware running Windows Vista or later.
-using tcc_driver_t = __dev_attr<::cudaDevAttrTccDriver>;
+using tcc_driver_t = __dev_attr<::hipDeviceAttributeTccDriver>;
 static constexpr tcc_driver_t tcc_driver{};
 
 // Peak memory clock frequency in kilohertz
-using memory_clock_rate_t = __dev_attr<::cudaDevAttrMemoryClockRate>;
+using memory_clock_rate_t = __dev_attr<::hipDeviceAttributeMemoryClockRate>;
 static constexpr memory_clock_rate_t memory_clock_rate{};
 
 // Global memory bus width in bits
-using global_memory_bus_width_t = __dev_attr<::cudaDevAttrGlobalMemoryBusWidth>;
+using global_memory_bus_width_t = __dev_attr<::hipDeviceAttributeMemoryBusWidth>;
 static constexpr global_memory_bus_width_t global_memory_bus_width{};
 
 // Size of L2 cache in bytes. 0 if the device doesn't have L2 cache.
-using l2_cache_size_t = __dev_attr<::cudaDevAttrL2CacheSize>;
+using l2_cache_size_t = __dev_attr<::hipDeviceAttributeL2CacheSize>;
 static constexpr l2_cache_size_t l2_cache_size{};
 
 // Maximum resident threads per multiprocessor
-using max_threads_per_multiprocessor_t = __dev_attr<::cudaDevAttrMaxThreadsPerMultiProcessor>;
+using max_threads_per_multiprocessor_t = __dev_attr<::hipDeviceAttributeMaxThreadsPerMultiProcessor>;
 static constexpr max_threads_per_multiprocessor_t max_threads_per_multiprocessor{};
 
 // true if the device shares a unified address space with the host, or false
 // if not
-using unified_addressing_t = __dev_attr<::cudaDevAttrUnifiedAddressing>;
+using unified_addressing_t = __dev_attr<::hipDeviceAttributeUnifiedAddressing>;
 static constexpr unified_addressing_t unified_addressing{};
 
 // Major compute capability version number
-using compute_capability_major_t = __dev_attr<::cudaDevAttrComputeCapabilityMajor>;
+using compute_capability_major_t = __dev_attr<::hipDeviceAttributeComputeCapabilityMajor>;
 static constexpr compute_capability_major_t compute_capability_major{};
 
 // Minor compute capability version number
-using compute_capability_minor_t = __dev_attr<::cudaDevAttrComputeCapabilityMinor>;
+using compute_capability_minor_t = __dev_attr<::hipDeviceAttributeComputeCapabilityMinor>;
 static constexpr compute_capability_minor_t compute_capability_minor{};
 
 // true if the device supports stream priorities, or false if not
-using stream_priorities_supported_t = __dev_attr<::cudaDevAttrStreamPrioritiesSupported>;
+using stream_priorities_supported_t = __dev_attr<::hipDeviceAttributeStreamPrioritiesSupported>;
 static constexpr stream_priorities_supported_t stream_priorities_supported{};
 
 // true if device supports caching globals in L1 cache, false if not
-using global_l1_cache_supported_t = __dev_attr<::cudaDevAttrGlobalL1CacheSupported>;
+using global_l1_cache_supported_t = __dev_attr<::hipDeviceAttributeGlobalL1CacheSupported>;
 static constexpr global_l1_cache_supported_t global_l1_cache_supported{};
 
 // true if device supports caching locals in L1 cache, false if not
-using local_l1_cache_supported_t = __dev_attr<::cudaDevAttrLocalL1CacheSupported>;
+using local_l1_cache_supported_t = __dev_attr<::hipDeviceAttributeLocalL1CacheSupported>;
 static constexpr local_l1_cache_supported_t local_l1_cache_supported{};
 
 // Maximum amount of shared memory available to a multiprocessor in bytes;
 // this amount is shared by all thread blocks simultaneously resident on a
 // multiprocessor
-using max_shared_memory_per_multiprocessor_t = __dev_attr<::cudaDevAttrMaxSharedMemoryPerMultiprocessor>;
+using max_shared_memory_per_multiprocessor_t = __dev_attr<::hipDeviceAttributeMaxSharedMemoryPerMultiprocessor>;
 static constexpr max_shared_memory_per_multiprocessor_t max_shared_memory_per_multiprocessor{};
 
 // Maximum number of 32-bit registers available to a multiprocessor; this
 // number is shared by all thread blocks simultaneously resident on a
 // multiprocessor
-using max_registers_per_multiprocessor_t = __dev_attr<::cudaDevAttrMaxRegistersPerMultiprocessor>;
+using max_registers_per_multiprocessor_t = __dev_attr<::hipDeviceAttributeMaxRegistersPerMultiprocessor>;
 static constexpr max_registers_per_multiprocessor_t max_registers_per_multiprocessor{};
 
 // true if device supports allocating managed memory, false if not
-using managed_memory_t = __dev_attr<::cudaDevAttrManagedMemory>;
+using managed_memory_t = __dev_attr<::hipDeviceAttributeManagedMemory>;
 static constexpr managed_memory_t managed_memory{};
 
 // true if device is on a multi-GPU board, false if not
-using is_multi_gpu_board_t = __dev_attr<::cudaDevAttrIsMultiGpuBoard>;
+using is_multi_gpu_board_t = __dev_attr<::hipDeviceAttributeIsMultiGpuBoard>;
 static constexpr is_multi_gpu_board_t is_multi_gpu_board{};
 
 // Unique identifier for a group of devices on the same multi-GPU board
-using multi_gpu_board_group_id_t = __dev_attr<::cudaDevAttrMultiGpuBoardGroupID>;
+using multi_gpu_board_group_id_t = __dev_attr<::hipDeviceAttributeMultiGpuBoardGroupID>;
 static constexpr multi_gpu_board_group_id_t multi_gpu_board_group_id{};
 
 // true if the link between the device and the host supports native atomic
 // operations
-using host_native_atomic_supported_t = __dev_attr<::cudaDevAttrHostNativeAtomicSupported>;
+using host_native_atomic_supported_t = __dev_attr<::hipDeviceAttributeHostNativeAtomicSupported>;
 static constexpr host_native_atomic_supported_t host_native_atomic_supported{};
 
 // Ratio of single precision performance (in floating-point operations per
 // second) to double precision performance
-using single_to_double_precision_perf_ratio_t = __dev_attr<::cudaDevAttrSingleToDoublePrecisionPerfRatio>;
+using single_to_double_precision_perf_ratio_t = __dev_attr<::hipDeviceAttributeSingleToDoublePrecisionPerfRatio>;
 static constexpr single_to_double_precision_perf_ratio_t single_to_double_precision_perf_ratio{};
 
 // true if the device supports coherently accessing pageable memory without
 // calling cudaHostRegister on it, and false otherwise
-using pageable_memory_access_t = __dev_attr<::cudaDevAttrPageableMemoryAccess>;
+using pageable_memory_access_t = __dev_attr<::hipDeviceAttributePageableMemoryAccess>;
 static constexpr pageable_memory_access_t pageable_memory_access{};
 
 // true if the device can coherently access managed memory concurrently with
 // the CPU, and false otherwise
-using concurrent_managed_access_t = __dev_attr<::cudaDevAttrConcurrentManagedAccess>;
+using concurrent_managed_access_t = __dev_attr<::hipDeviceAttributeConcurrentManagedAccess>;
 static constexpr concurrent_managed_access_t concurrent_managed_access{};
 
 // true if the device supports Compute Preemption, false if not
-using compute_preemption_supported_t = __dev_attr<::cudaDevAttrComputePreemptionSupported>;
+using compute_preemption_supported_t = __dev_attr<::hipDeviceAttributeComputePreemptionSupported>;
 static constexpr compute_preemption_supported_t compute_preemption_supported{};
 
 // true if the device can access host registered memory at the same virtual
 // address as the CPU, and false otherwise
-using can_use_host_pointer_for_registered_mem_t = __dev_attr<::cudaDevAttrCanUseHostPointerForRegisteredMem>;
+using can_use_host_pointer_for_registered_mem_t = __dev_attr<::hipDeviceAttributeCanUseHostPointerForRegisteredMem>;
 static constexpr can_use_host_pointer_for_registered_mem_t can_use_host_pointer_for_registered_mem{};
 
 // true if the device supports launching cooperative kernels via
 // cudaLaunchCooperativeKernel, and false otherwise
-using cooperative_launch_t = __dev_attr<::cudaDevAttrCooperativeLaunch>;
+using cooperative_launch_t = __dev_attr<::hipDeviceAttributeCooperativeLaunch>;
 static constexpr cooperative_launch_t cooperative_launch{};
 
 // true if the device supports flushing of outstanding remote writes, and
 // false otherwise
-using can_flush_remote_writes_t = __dev_attr<::cudaDevAttrCanFlushRemoteWrites>;
+using can_flush_remote_writes_t = __dev_attr<::hipDeviceAttributeHdpMemFlushCntl>;
 static constexpr can_flush_remote_writes_t can_flush_remote_writes{};
 
 // true if the device supports host memory registration via cudaHostRegister,
 // and false otherwise
-using host_register_supported_t = __dev_attr<::cudaDevAttrHostRegisterSupported>;
+using host_register_supported_t = __dev_attr<::hipDeviceAttributeHostRegisterSupported>;
 static constexpr host_register_supported_t host_register_supported{};
 
 // true if the device accesses pageable memory via the host's page tables, and
 // false otherwise
-using pageable_memory_access_uses_host_page_tables_t = __dev_attr<::cudaDevAttrPageableMemoryAccessUsesHostPageTables>;
+using pageable_memory_access_uses_host_page_tables_t =
+  __dev_attr<::hipDeviceAttributePageableMemoryAccessUsesHostPageTables>;
 static constexpr pageable_memory_access_uses_host_page_tables_t pageable_memory_access_uses_host_page_tables{};
 
 // true if the host can directly access managed memory on the device without
 // migration, and false otherwise
-using direct_managed_mem_access_from_host_t = __dev_attr<::cudaDevAttrDirectManagedMemAccessFromHost>;
+using direct_managed_mem_access_from_host_t = __dev_attr<::hipDeviceAttributeDirectManagedMemAccessFromHost>;
 static constexpr direct_managed_mem_access_from_host_t direct_managed_mem_access_from_host{};
 
 // Maximum per block shared memory size on the device. This value can be opted
 // into when using dynamic_shared_memory with NonPortableSize set to true
-using max_shared_memory_per_block_optin_t = __dev_attr<::cudaDevAttrMaxSharedMemoryPerBlockOptin>;
+using max_shared_memory_per_block_optin_t = __dev_attr<::hipDeviceAttributeSharedMemPerBlockOptin>;
 static constexpr max_shared_memory_per_block_optin_t max_shared_memory_per_block_optin{};
 
 // Maximum number of thread blocks that can reside on a multiprocessor
-using max_blocks_per_multiprocessor_t = __dev_attr<::cudaDevAttrMaxBlocksPerMultiprocessor>;
+using max_blocks_per_multiprocessor_t = __dev_attr<::hipDeviceAttributeMaxBlocksPerMultiProcessor>;
 static constexpr max_blocks_per_multiprocessor_t max_blocks_per_multiprocessor{};
 
 // Maximum L2 persisting lines capacity setting in bytes
-using max_persisting_l2_cache_size_t = __dev_attr<::cudaDevAttrMaxPersistingL2CacheSize>;
+using max_persisting_l2_cache_size_t = __dev_attr<::hipDeviceAttributePersistingL2CacheMaxSize>;
 static constexpr max_persisting_l2_cache_size_t max_persisting_l2_cache_size{};
 
 // Maximum value of cudaAccessPolicyWindow::num_bytes
-using max_access_policy_window_size_t = __dev_attr<::cudaDevAttrMaxAccessPolicyWindowSize>;
+using max_access_policy_window_size_t = __dev_attr<::hipDeviceAttributeAccessPolicyMaxWindowSize>;
 static constexpr max_access_policy_window_size_t max_access_policy_window_size{};
 
 // Shared memory reserved by CUDA driver per block in bytes
-using reserved_shared_memory_per_block_t = __dev_attr<::cudaDevAttrReservedSharedMemoryPerBlock>;
+using reserved_shared_memory_per_block_t = __dev_attr<::hipDeviceAttributeReservedSharedMemPerBlock>;
 static constexpr reserved_shared_memory_per_block_t reserved_shared_memory_per_block{};
 
 // true if the device supports sparse CUDA arrays and sparse CUDA mipmapped arrays.
-using sparse_cuda_array_supported_t = __dev_attr<::cudaDevAttrSparseCudaArraySupported>;
+using sparse_cuda_array_supported_t = __dev_attr<::hipDeviceAttributeVirtualMemoryManagementSupported>;
 static constexpr sparse_cuda_array_supported_t sparse_cuda_array_supported{};
 
 // Device supports using the cudaHostRegister flag cudaHostRegisterReadOnly to
 // register memory that must be mapped as read-only to the GPU
-using host_register_read_only_supported_t = __dev_attr<::cudaDevAttrHostRegisterReadOnlySupported>;
+using host_register_read_only_supported_t = __dev_attr<::hipDeviceAttributeAsicRevision>;
 static constexpr host_register_read_only_supported_t host_register_read_only_supported{};
 
 // true if the device supports using the cudaMallocAsync and cudaMemPool
 // family of APIs, and false otherwise
-using memory_pools_supported_t = __dev_attr<::cudaDevAttrMemoryPoolsSupported>;
+using memory_pools_supported_t = __dev_attr<::hipDeviceAttributeMemoryPoolsSupported>;
 static constexpr memory_pools_supported_t memory_pools_supported{};
 
 // true if the device supports GPUDirect RDMA APIs, and false otherwise
-using gpu_direct_rdma_supported_t = __dev_attr<::cudaDevAttrGPUDirectRDMASupported>;
+using gpu_direct_rdma_supported_t = __dev_attr<::hipDeviceAttributeIsLargeBar>;
 static constexpr gpu_direct_rdma_supported_t gpu_direct_rdma_supported{};
 
 // bitmask to be interpreted according to the
 // cudaFlushGPUDirectRDMAWritesOptions enum
-using gpu_direct_rdma_flush_writes_options_t = __dev_attr<::cudaDevAttrGPUDirectRDMAFlushWritesOptions>;
+using gpu_direct_rdma_flush_writes_options_t = __dev_attr<::hipDeviceAttributeCooperativeMultiDeviceUnmatchedFunc>;
 static constexpr gpu_direct_rdma_flush_writes_options_t gpu_direct_rdma_flush_writes_options{};
 
 // see the cudaGPUDirectRDMAWritesOrdering enum for numerical values
-using gpu_direct_rdma_writes_ordering_t = __dev_attr<::cudaDevAttrGPUDirectRDMAWritesOrdering>;
+using gpu_direct_rdma_writes_ordering_t = __dev_attr<::hipDeviceAttributeHdpRegFlushCntl>;
 static constexpr gpu_direct_rdma_writes_ordering_t gpu_direct_rdma_writes_ordering{};
 
 // Bitmask of handle types supported with mempool based IPC
-using memory_pool_supported_handle_types_t = __dev_attr<::cudaDevAttrMemoryPoolSupportedHandleTypes>;
+using memory_pool_supported_handle_types_t = __dev_attr<::hipDeviceAttributeMemoryPoolSupportedHandleTypes>;
 static constexpr memory_pool_supported_handle_types_t memory_pool_supported_handle_types{};
 
 // true if the device supports deferred mapping CUDA arrays and CUDA mipmapped
 // arrays.
-using deferred_mapping_cuda_array_supported_t = __dev_attr<::cudaDevAttrDeferredMappingCudaArraySupported>;
+using deferred_mapping_cuda_array_supported_t = __dev_attr<::hipDeviceAttributeImageSupport>;
 static constexpr deferred_mapping_cuda_array_supported_t deferred_mapping_cuda_array_supported{};
 
 // true if the device supports IPC Events, false otherwise.
-using ipc_event_support_t = __dev_attr<::cudaDevAttrIpcEventSupport>;
+using ipc_event_support_t = __dev_attr<::hipDeviceAttributeFineGrainSupport>;
 static constexpr ipc_event_support_t ipc_event_support{};
 
 #  if _CCCL_CTK_AT_LEAST(12, 2)
@@ -834,7 +847,7 @@ static constexpr compute_capability_t compute_capability{};
 //! @endcode
 //!
 //! @sa device_attributes
-template <::cudaDeviceAttr _Attr>
+template <::hipDeviceAttribute_t _Attr>
 using device_attribute_result_t = typename __dev_attr<_Attr>::type;
 
 _CCCL_END_NAMESPACE_CUDA

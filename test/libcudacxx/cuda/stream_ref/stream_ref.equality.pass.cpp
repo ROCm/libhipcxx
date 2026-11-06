@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -34,8 +34,8 @@
 
 TEST_FUNC void test()
 {
-  cuda::stream_ref left{reinterpret_cast<cudaStream_t>(42)};
-  cuda::stream_ref right{reinterpret_cast<cudaStream_t>(1337)};
+  cuda::stream_ref left{reinterpret_cast<hipStream_t>(42)};
+  cuda::stream_ref right{reinterpret_cast<hipStream_t>(1337)};
   static_assert(noexcept(left == right));
   static_assert(noexcept(left != right));
 

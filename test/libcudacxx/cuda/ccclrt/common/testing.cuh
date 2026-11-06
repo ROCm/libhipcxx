@@ -46,7 +46,7 @@
 #include "utility.cuh"
 #include <c2h/catch2_test_helper.h>
 
-#define CUDART(call) REQUIRE((call) == cudaSuccess)
+#define CUDART(call) REQUIRE((call) == hipSuccess)
 
 // There is a problem with clang-cuda and nv/target, but we don't need the device side macros yet,
 // disable them for now
@@ -157,7 +157,7 @@ inline int cuda_driver_version()
 inline bool supports_cooperative_launch()
 {
   int value = 0;
-  CUDART(cudaDeviceGetAttribute(&value, cudaDevAttrCooperativeLaunch, 0));
+  CUDART(hipDeviceGetAttribute(&value, hipDeviceAttributeCooperativeLaunch, 0));
   return value != 0;
 }
 

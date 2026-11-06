@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2024-2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2024-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -160,9 +160,9 @@ void arrive_on_launch(
   *success_hptr = false;
   printf("arrive_on_kernel<%2zu><<<%u, %2u, %zu>>> ", sizeof(T), 1, block_size, buffer_size);
   arrive_on_kernel<T><<<1, block_size, buffer_size>>>(global_buffer, buffer_size, success_dptr);
-  cudaError_t result;
-  CUDA_CALL(result, cudaDeviceSynchronize());
-  CUDA_CALL(result, cudaGetLastError());
+  hipError_t result;
+  CUDA_CALL(result, hipDeviceSynchronize());
+  CUDA_CALL(result, hipGetLastError());
   printf("%s\n", *success_hptr ? "[ OK ]" : "[FAIL]");
   assert(*success_hptr);
 }
@@ -187,22 +187,22 @@ void arrive_on()
   char* global_buffer;
   char* host_buffer;
 
-  cudaError_t result;
-  CUDA_CALL(result, cudaHostAlloc(&success_hptr, sizeof(*success_hptr), cudaHostAllocMapped));
+  hipError_t result;
+  CUDA_CALL(result, hipHostAlloc(&success_hptr, sizeof(*success_hptr), hipHostAllocMapped));
   CUDA_CALL(result, cudaHostGetDevicePointer(&success_dptr, (void*) success_hptr, 0));
-  CUDA_CALL(result, cudaDeviceGetAttribute(&lanes_per_warp, cudaDevAttrWarpSize, 0));
-  CUDA_CALL(result, cudaDeviceGetAttribute(&max_shmem, cudaDevAttrMaxSharedMemoryPerBlock, 0));
+  CUDA_CALL(result, hipDeviceGetAttribute(&lanes_per_warp, hipDeviceAttributeWarpSize, 0));
+  CUDA_CALL(result, hipDeviceGetAttribute(&max_shmem, hipDeviceAttributeMaxSharedMemoryPerBlock, 0));
   cudaFuncAttributes attrib;
   CUDA_CALL(result, cudaFuncGetAttributes(&attrib, arrive_on_kernel<int4>));
   buffer_size = max_shmem - attrib.sharedSizeBytes;
-  CUDA_CALL(result, cudaMalloc(&global_buffer, buffer_size));
+  CUDA_CALL(result, hipMalloc(&global_buffer, buffer_size));
   host_buffer = new char[buffer_size];
 
   for (unsigned i = 0; i < buffer_size; ++i)
   {
     host_buffer[i] = rand() % CHAR_MAX;
   }
-  cudaMemcpy(global_buffer, host_buffer, buffer_size, cudaMemcpyHostToDevice);
+  hipMemcpy(global_buffer, host_buffer, buffer_size, hipMemcpyHostToDevice);
 
   // 1 Thread
   {
@@ -223,8 +223,8 @@ void arrive_on()
   }
 
   delete[] host_buffer;
-  CUDA_CALL(result, cudaFree(global_buffer));
-  CUDA_CALL(result, cudaFreeHost((void*) success_hptr));
+  CUDA_CALL(result, hipFree(global_buffer));
+  CUDA_CALL(result, hipHostFree((void*) success_hptr));
 }
 #endif // !TEST_COMPILER(NVRTC)
 

@@ -26,7 +26,7 @@
 #ifndef HETEROGENEOUS_HELPERS_H
 #define HETEROGENEOUS_HELPERS_H
 
-#include <libhipcxx/__amd/cuda_runtime.h>
+#include <hip/hip_runtime.h>
 
 #include <cuda/std/type_traits>
 
@@ -103,10 +103,10 @@ using threadcount_trait = threadcount_trait_impl<T>;
 #define HETEROGENEOUS_SAFE_CALL(...)                                                  \
   do                                                                                  \
   {                                                                                   \
-    cudaError_t err = __VA_ARGS__;                                                    \
-    if (err != cudaSuccess)                                                           \
+    hipError_t err = __VA_ARGS__;                                                    \
+    if (err != hipSuccess)                                                           \
     {                                                                                 \
-      printf("CUDA ERROR: %s: %s\n", cudaGetErrorName(err), cudaGetErrorString(err)); \
+      printf("CUDA ERROR: %s: %s\n", hipGetErrorName(err), hipGetErrorString(err)); \
       fflush(stdout);                                                                 \
       abort();                                                                        \
     }                                                                                 \
@@ -216,8 +216,8 @@ template <typename T, typename... Args>
 T* device_construct(void* address, Args... args)
 {
   construct_kernel<T><<<1, 1>>>(address, args...);
-  HETEROGENEOUS_SAFE_CALL(cudaGetLastError());
-  HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+  HETEROGENEOUS_SAFE_CALL(hipGetLastError());
+  HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
   return reinterpret_cast<T*>(address);
 }
 
@@ -225,20 +225,20 @@ template <typename T>
 void device_destroy(T* object)
 {
   destroy_kernel<<<1, 1>>>(object);
-  HETEROGENEOUS_SAFE_CALL(cudaGetLastError());
-  HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+  HETEROGENEOUS_SAFE_CALL(hipGetLastError());
+  HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
 }
 template <typename Fn>
 void device_launch_async(Fn& launcher)
 {
   auto streamManager = [launcher]() {
-    cudaStream_t stream;
-    HETEROGENEOUS_SAFE_CALL(cudaStreamCreate(&stream));
+    hipStream_t stream;
+    HETEROGENEOUS_SAFE_CALL(hipStreamCreate(&stream));
     launcher(stream);
-    HETEROGENEOUS_SAFE_CALL(cudaGetLastError());
+    HETEROGENEOUS_SAFE_CALL(hipGetLastError());
 
-    HETEROGENEOUS_SAFE_CALL(cudaStreamSynchronize(stream));
-    HETEROGENEOUS_SAFE_CALL(cudaStreamDestroy(stream));
+    HETEROGENEOUS_SAFE_CALL(hipStreamSynchronize(stream));
+    HETEROGENEOUS_SAFE_CALL(hipStreamDestroy(stream));
   };
 
   device_threads().push_back(std::thread(streamManager));
@@ -252,7 +252,7 @@ void device_initialize(T& object)
   fflush(stdout);
 #endif
 
-  auto kernel_launcher = [&object](cudaStream_t stream) {
+  auto kernel_launcher = [&object](hipStream_t stream) {
     constexpr auto tc = threadcount_trait<Tester>::value;
 #ifdef DEBUG_TESTERS
     printf("      %i device init threads launched\r\n", (int) tc);
@@ -265,7 +265,7 @@ void device_initialize(T& object)
 
   if (!async_initialize_trait<Tester>::value)
   {
-    HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+    HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
     sync_all();
   }
 }
@@ -278,7 +278,7 @@ void device_validate(T& object)
   fflush(stdout);
 #endif
 
-  auto kernel_launcher = [&object](cudaStream_t stream) {
+  auto kernel_launcher = [&object](hipStream_t stream) {
     constexpr auto tc = threadcount_trait<Tester>::value;
 #ifdef DEBUG_TESTERS
     printf("     %i device validate threads launched\r\n", (int) tc);
@@ -291,7 +291,7 @@ void device_validate(T& object)
 
   if (!async_validate_trait<Tester>::value)
   {
-    HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+    HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
     sync_all();
   }
 }
@@ -319,7 +319,7 @@ void host_initialize(T& object)
 
   if (!async_initialize_trait<Tester>::value)
   {
-    HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+    HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
     sync_all();
   }
 }
@@ -347,7 +347,7 @@ void host_validate(T& object)
 
   if (!async_initialize_trait<Tester>::value)
   {
-    HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+    HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
     sync_all();
   }
 }
@@ -393,8 +393,8 @@ void do_heterogeneous_test(T* test_input, type_list<Testers...>, type_list<Launc
     performer.validator(*test_input);
   }
 
-  HETEROGENEOUS_SAFE_CALL(cudaGetLastError());
-  HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+  HETEROGENEOUS_SAFE_CALL(hipGetLastError());
+  HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
 
   sync_all();
 }
@@ -445,13 +445,13 @@ void validate_device_dynamic(tester_list<Testers...> testers, Args... args)
 {
   auto test_input_creator = [args...]() -> T* {
     void* pointer = nullptr;
-    HETEROGENEOUS_SAFE_CALL(cudaMallocHost(&pointer, sizeof(T)));
+    HETEROGENEOUS_SAFE_CALL(hipHostMalloc(&pointer, sizeof(T)));
     return device_construct<T>(pointer, args...);
   };
 
   auto test_input_destructor = [](T* test_input) {
     device_destroy(test_input);
-    HETEROGENEOUS_SAFE_CALL(cudaFreeHost(test_input));
+    HETEROGENEOUS_SAFE_CALL(hipHostFree(test_input));
   };
 
   test_wrapper<tester_list<Testers...>, decltype(test_input_creator), decltype(test_input_destructor)> test_harness{
@@ -519,8 +519,8 @@ void validate_in_managed_memory_helper(const Creator& creator, const Destroyer& 
     performer.validator(*object);
   }
 
-  HETEROGENEOUS_SAFE_CALL(cudaGetLastError());
-  HETEROGENEOUS_SAFE_CALL(cudaDeviceSynchronize());
+  HETEROGENEOUS_SAFE_CALL(hipGetLastError());
+  HETEROGENEOUS_SAFE_CALL(hipDeviceSynchronize());
 
   sync_all();
 
@@ -536,24 +536,24 @@ void validate_managed(tester_list<Testers...>, Args... args)
 
   auto host_constructor = [args...]() -> T* {
     void* pointer;
-    HETEROGENEOUS_SAFE_CALL(cudaMallocManaged(&pointer, sizeof(T)));
+    HETEROGENEOUS_SAFE_CALL(hipMallocManaged(&pointer, sizeof(T)));
     return new (pointer) T(args...);
   };
 
   auto device_constructor = [args...]() -> T* {
     void* pointer;
-    HETEROGENEOUS_SAFE_CALL(cudaMallocManaged(&pointer, sizeof(T)));
+    HETEROGENEOUS_SAFE_CALL(hipMallocManaged(&pointer, sizeof(T)));
     return device_construct<T>(pointer, args...);
   };
 
   auto host_destructor = [](T* object) {
     object->~T();
-    HETEROGENEOUS_SAFE_CALL(cudaFree(object));
+    HETEROGENEOUS_SAFE_CALL(hipFree(object));
   };
 
   auto device_destructor = [](T* object) {
     device_destroy(object);
-    HETEROGENEOUS_SAFE_CALL(cudaFree(object));
+    HETEROGENEOUS_SAFE_CALL(hipFree(object));
   };
 
   validate_in_managed_memory_helper(host_constructor, host_destructor, host_init_device_check);
@@ -600,9 +600,9 @@ void validate_managed(tester_list<Testers...>, Args... args)
 bool check_managed_memory_support(bool is_async)
 {
   int current_device, property_value;
-  HETEROGENEOUS_SAFE_CALL(cudaGetDevice(&current_device));
-  HETEROGENEOUS_SAFE_CALL(cudaDeviceGetAttribute(
-    &property_value, is_async ? cudaDevAttrConcurrentManagedAccess : cudaDevAttrManagedMemory, current_device));
+  HETEROGENEOUS_SAFE_CALL(hipGetDevice(&current_device));
+  HETEROGENEOUS_SAFE_CALL(hipDeviceGetAttribute(
+    &property_value, is_async ? hipDeviceAttributeConcurrentManagedAccess : hipDeviceAttributeManagedMemory, current_device));
   return property_value == 1;
 }
 

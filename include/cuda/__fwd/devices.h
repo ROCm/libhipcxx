@@ -52,7 +52,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
 class __physical_device;
 class device_ref;
-template <::cudaDeviceAttr _Attr>
+template <::hipDeviceAttribute_t _Attr>
 struct __dev_attr;
 #endif // (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
 

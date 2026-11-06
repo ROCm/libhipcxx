@@ -121,7 +121,7 @@ C2H_TEST_LIST(
       // Ensure that we properly reset the input buffer
       CCCLRT_CHECK(input.data() == nullptr);
       CCCLRT_CHECK(input.size() == 0);
-      CCCLRT_CHECK(input.stream() == cuda::stream_ref{cudaStream_t{}});
+      CCCLRT_CHECK(input.stream() == cuda::stream_ref{hipStream_t{}});
     }
   }
 
@@ -138,7 +138,7 @@ C2H_TEST_LIST(
     // Ensure that we properly reset the input buffer
     CCCLRT_CHECK(input.data() == nullptr);
     CCCLRT_CHECK(input.size() == 0);
-    CCCLRT_CHECK(input.stream() == cuda::stream_ref{cudaStream_t{}});
+    CCCLRT_CHECK(input.stream() == cuda::stream_ref{hipStream_t{}});
   }
 
   SECTION("assignment")
@@ -161,7 +161,7 @@ C2H_TEST_LIST(
       CCCLRT_CHECK(input.data() == nullptr);
       CCCLRT_CHECK(input.size() == 0);
       CCCLRT_CHECK(input.size_bytes() == 0);
-      CCCLRT_CHECK(input.stream() == cuda::stream_ref{cudaStream_t{}});
+      CCCLRT_CHECK(input.stream() == cuda::stream_ref{hipStream_t{}});
     }
 
     { // Ensure self move assignment does not do anything

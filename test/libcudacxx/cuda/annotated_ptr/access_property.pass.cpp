@@ -33,10 +33,10 @@
 #include "utils.h"
 
 template <typename T>
-TEST_FUNC __noinline__ void test_global_implicit_property(T ap, cudaAccessProperty cp)
+TEST_FUNC __noinline__ void test_global_implicit_property(T ap, hipAccessProperty cp)
 {
   // Test implicit conversions
-  cudaAccessProperty v = ap;
+  hipAccessProperty v = ap;
   assert(cp == v);
 
   // Test default, copy constructor, and copy-assignent
@@ -78,9 +78,9 @@ static_assert(alignof(cuda::access_property) == 8);
 
 int main(int argc, char** argv)
 {
-  test_global_implicit_property(cuda::access_property::normal{}, cudaAccessProperty::cudaAccessPropertyNormal);
-  test_global_implicit_property(cuda::access_property::streaming{}, cudaAccessProperty::cudaAccessPropertyStreaming);
-  test_global_implicit_property(cuda::access_property::persisting{}, cudaAccessProperty::cudaAccessPropertyPersisting);
+  test_global_implicit_property(cuda::access_property::normal{}, hipAccessProperty::hipAccessPropertyNormal);
+  test_global_implicit_property(cuda::access_property::streaming{}, hipAccessProperty::hipAccessPropertyStreaming);
+  test_global_implicit_property(cuda::access_property::persisting{}, hipAccessProperty::hipAccessPropertyPersisting);
 
   test_global();
   test_shared();

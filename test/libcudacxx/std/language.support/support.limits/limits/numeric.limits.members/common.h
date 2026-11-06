@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef NUMERIC_LIMITS_MEMBERS_COMMON_H
 #define NUMERIC_LIMITS_MEMBERS_COMMON_H
 
@@ -27,72 +49,72 @@ TEST_FUNC bool float_eq(T x, T y)
 }
 
 #if _CCCL_HAS_NVFP4_E2M1()
-TEST_FUNC inline __nv_fp4_e2m1 make_fp4_e2m1(double x)
+TEST_FUNC inline __hip_fp4_e2m1 make_fp4_e2m1(double x)
 {
-  __nv_fp4_e2m1 res;
+  __hip_fp4_e2m1 res;
   res.__x = __nv_cvt_double_to_fp4(x, __NV_E2M1, cudaRoundNearest);
   return res;
 }
-TEST_FUNC inline bool float_eq(__nv_fp4_e2m1 x, __nv_fp4_e2m1 y)
+TEST_FUNC inline bool float_eq(__hip_fp4_e2m1 x, __hip_fp4_e2m1 y)
 {
   return x.__x == y.__x;
 }
 #endif // _CCCL_HAS_NVFP4_E2M1()
 
 #if _CCCL_HAS_NVFP6_E2M3()
-TEST_FUNC inline __nv_fp6_e2m3 make_fp6_e2m3(double x)
+TEST_FUNC inline __hip_fp6_e2m3 make_fp6_e2m3(double x)
 {
-  __nv_fp6_e2m3 res;
+  __hip_fp6_e2m3 res;
   res.__x = __nv_cvt_double_to_fp6(x, __NV_E2M3, cudaRoundNearest);
   return res;
 }
-TEST_FUNC inline bool float_eq(__nv_fp6_e2m3 x, __nv_fp6_e2m3 y)
+TEST_FUNC inline bool float_eq(__hip_fp6_e2m3 x, __hip_fp6_e2m3 y)
 {
   return x.__x == y.__x;
 }
 #endif // _CCCL_HAS_NVFP6_E2M3()
 
 #if _CCCL_HAS_NVFP6_E3M2()
-TEST_FUNC inline __nv_fp6_e3m2 make_fp6_e3m2(double x)
+TEST_FUNC inline __hip_fp6_e3m2 make_fp6_e3m2(double x)
 {
-  __nv_fp6_e3m2 res;
+  __hip_fp6_e3m2 res;
   res.__x = __nv_cvt_double_to_fp6(x, __NV_E3M2, cudaRoundNearest);
   return res;
 }
-TEST_FUNC inline bool float_eq(__nv_fp6_e3m2 x, __nv_fp6_e3m2 y)
+TEST_FUNC inline bool float_eq(__hip_fp6_e3m2 x, __hip_fp6_e3m2 y)
 {
   return x.__x == y.__x;
 }
 #endif // _CCCL_HAS_NVFP6_E3M2()
 
 #if _CCCL_HAS_NVFP8_E4M3()
-TEST_FUNC inline __nv_fp8_e4m3 make_fp8_e4m3(double x, __nv_saturation_t sat = __NV_NOSAT)
+TEST_FUNC inline __hip_fp8_e4m3 make_fp8_e4m3(double x, __hip_saturation_t sat = __HIP_NOSAT)
 {
-  __nv_fp8_e4m3 res;
-  res.__x = __nv_cvt_double_to_fp8(x, sat, __NV_E4M3);
+  __hip_fp8_e4m3 res;
+  res.__x = __hip_cvt_double_to_fp8(x, sat, __HIP_E4M3);
   return res;
 }
-TEST_FUNC inline bool float_eq(__nv_fp8_e4m3 x, __nv_fp8_e4m3 y)
+TEST_FUNC inline bool float_eq(__hip_fp8_e4m3 x, __hip_fp8_e4m3 y)
 {
   return x.__x == y.__x;
 }
 #endif // _CCCL_HAS_NVFP8_E4M3()
 
 #if _CCCL_HAS_NVFP8_E5M2()
-TEST_FUNC inline __nv_fp8_e5m2 make_fp8_e5m2(double x, __nv_saturation_t sat = __NV_NOSAT)
+TEST_FUNC inline __hip_fp8_e5m2 make_fp8_e5m2(double x, __hip_saturation_t sat = __HIP_NOSAT)
 {
-  __nv_fp8_e5m2 res;
-  res.__x = __nv_cvt_double_to_fp8(x, sat, __NV_E5M2);
+  __hip_fp8_e5m2 res;
+  res.__x = __hip_cvt_double_to_fp8(x, sat, __HIP_E5M2);
   return res;
 }
-TEST_FUNC inline bool float_eq(__nv_fp8_e5m2 x, __nv_fp8_e5m2 y)
+TEST_FUNC inline bool float_eq(__hip_fp8_e5m2 x, __hip_fp8_e5m2 y)
 {
   return x.__x == y.__x;
 }
 #endif // _CCCL_HAS_NVFP8_E5M2()
 
 #if _CCCL_HAS_NVFP8_E8M0()
-TEST_FUNC inline __nv_fp8_e8m0 make_fp8_e8m0(double x, __nv_saturation_t sat = __NV_NOSAT)
+TEST_FUNC inline __nv_fp8_e8m0 make_fp8_e8m0(double x, __hip_saturation_t sat = __HIP_NOSAT)
 {
   __nv_fp8_e8m0 res;
   res.__x = __nv_cvt_double_to_e8m0(x, sat, cudaRoundZero);
@@ -116,7 +138,7 @@ TEST_FUNC inline bool float_eq(__half x, __half y)
 #endif // _CCCL_HAS_NVFP16
 
 #if _CCCL_HAS_NVBF16()
-TEST_FUNC inline bool float_eq(__nv_bfloat16 x, __nv_bfloat16 y)
+TEST_FUNC inline bool float_eq(__hip_bfloat16 x, __hip_bfloat16 y)
 {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
   return __heq(x, y);

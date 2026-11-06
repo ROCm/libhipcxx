@@ -59,7 +59,7 @@ TEST_FUNC constexpr bool test()
   test<::std::complex<__half>, 2>();
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  test<::std::complex<__nv_bfloat16>, 2>();
+  test<::std::complex<__hip_bfloat16>, 2>();
 #endif // _CCCL_HAS_NVBF16()
 
   // pair always has a size of 2

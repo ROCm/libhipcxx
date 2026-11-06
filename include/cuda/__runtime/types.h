@@ -43,10 +43,7 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): mirror the CTK enablement on HIP. The libhipcxx/__amd/cuda_runtime.h
-// shim aliases ::cudaMemLocation -> ::hipMemLocation and the
-// ::cudaMemLocationType{Host,Device} enumerators, so the body below
-// compiles unchanged on HIP.
+// NOTE(HIP/AMD): mirror the CTK enablement on HIP.
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/std/__cccl/prologue.h>
@@ -57,9 +54,9 @@ _CCCL_DIAG_PUSH
 _CCCL_DIAG_SUPPRESS_CLANG("-Wmissing-braces")
 // clang complains about missing braces in CUmemLocation constructor but GCC complains if we add them
 
-using memory_location = ::cudaMemLocation;
+using memory_location = ::hipMemLocation;
 #  if _CCCL_CTK_AT_LEAST(12, 2) || _CCCL_HIP_COMPILATION()
-inline constexpr memory_location host_memory_location = {::cudaMemLocationTypeHost, 0};
+inline constexpr memory_location host_memory_location = {::hipMemLocationTypeHost, 0};
 #  endif // _CCCL_CTK_AT_LEAST(12, 2) || _CCCL_HIP_COMPILATION()
 
 _CCCL_DIAG_POP

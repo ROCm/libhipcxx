@@ -93,7 +93,7 @@ TEST_FUNC _CCCL_CONSTEXPR_BIT_CAST void test_fp_get_exp(T val)
   if constexpr (cuda::std::__fp_has_nan_v<fmt>)
   {
 #if _CCCL_HAS_NVFP8_E4M3()
-    if constexpr (cuda::std::is_same_v<T, __nv_fp8_e4m3>)
+    if constexpr (cuda::std::is_same_v<T, __hip_fp8_e4m3>)
     {
       // __nv_fp8_e4m3 has only 2 NaNs so more of exponent are valid
       test_fp_get_exp(cuda::std::numeric_limits<T>::quiet_NaN(), cuda::std::__fp_exp_max_v<fmt>);
@@ -128,26 +128,26 @@ TEST_FUNC bool test(float val)
   test<__half>(val);
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test<__nv_bfloat16>(val);
+  test<__hip_bfloat16>(val);
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 #if _CCCL_HAS_NVFP8_E4M3()
-  test<__nv_fp8_e4m3>();
+  test<__hip_fp8_e4m3>();
 #endif // _CCCL_HAS_NVFP8_E4M3
 #if _CCCL_HAS_NVFP8_E5M2()
-  test<__nv_fp8_e5m2>();
+  test<__hip_fp8_e5m2>();
 #endif // _CCCL_HAS_NVFP8_E5M2
 #if _CCCL_HAS_NVFP8_E8M0()
   test<__nv_fp8_e8m0>();
 #endif // _CCCL_HAS_NVFP8_E8M0
 #if _CCCL_HAS_NVFP6_E2M3()
-  test<__nv_fp6_e2m3>();
+  test<__hip_fp6_e2m3>();
 #endif // _CCCL_HAS_NVFP6_E2M3
 #if _CCCL_HAS_NVFP6_E3M2()
-  test<__nv_fp6_e3m2>();
+  test<__hip_fp6_e3m2>();
 #endif // _CCCL_HAS_NVFP6_E3M2
 #if _CCCL_HAS_NVFP4_E2M1()
-  test<__nv_fp4_e2m1>();
+  test<__hip_fp4_e2m1>();
 #endif // _CCCL_HAS_NVFP4_E2M1
 
   return true;

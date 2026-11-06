@@ -241,7 +241,7 @@ template <class _Tp>
   }
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  else if constexpr (is_same_v<_Tp, __nv_bfloat16>)
+  else if constexpr (is_same_v<_Tp, __hip_bfloat16>)
   {
     __cccl_nvfp_manip_helper<_Tp> __helper{};
     __helper.__x = __v;
@@ -249,7 +249,7 @@ template <class _Tp>
   }
 #endif // _CCCL_HAS_NVBF16()
 #if _CCCL_HAS_NVFP8_E4M3()
-  else if constexpr (is_same_v<_Tp, __nv_fp8_e4m3>)
+  else if constexpr (is_same_v<_Tp, __hip_fp8_e4m3>)
   {
     _Tp __ret{};
     __ret.__x = __v;
@@ -257,7 +257,7 @@ template <class _Tp>
   }
 #endif // _CCCL_HAS_NVFP8_E4M3()
 #if _CCCL_HAS_NVFP8_E5M2()
-  else if constexpr (is_same_v<_Tp, __nv_fp8_e5m2>)
+  else if constexpr (is_same_v<_Tp, __hip_fp8_e5m2>)
   {
     _Tp __ret{};
     __ret.__x = __v;
@@ -273,27 +273,27 @@ template <class _Tp>
   }
 #endif // _CCCL_HAS_NVFP8_E8M0()
 #if _CCCL_HAS_NVFP6_E2M3()
-  else if constexpr (is_same_v<_Tp, __nv_fp6_e2m3>)
+  else if constexpr (is_same_v<_Tp, __hip_fp6_e2m3>)
   {
-    _CCCL_ASSERT((__v & 0xc0u) == 0u, "Invalid __nv_fp6_e2m3 storage value");
+    _CCCL_ASSERT((__v & 0xc0u) == 0u, "Invalid __hip_fp6_e2m3 storage value");
     _Tp __ret{};
     __ret.__x = __v;
     return __ret;
   }
 #endif // _CCCL_HAS_NVFP6_E2M3()
 #if _CCCL_HAS_NVFP6_E3M2()
-  else if constexpr (is_same_v<_Tp, __nv_fp6_e3m2>)
+  else if constexpr (is_same_v<_Tp, __hip_fp6_e3m2>)
   {
-    _CCCL_ASSERT((__v & 0xc0u) == 0u, "Invalid __nv_fp6_e3m2 storage value");
+    _CCCL_ASSERT((__v & 0xc0u) == 0u, "Invalid __hip_fp6_e3m2 storage value");
     _Tp __ret{};
     __ret.__x = __v;
     return __ret;
   }
 #endif // _CCCL_HAS_NVFP6_E3M2()
 #if _CCCL_HAS_NVFP4_E2M1()
-  else if constexpr (is_same_v<_Tp, __nv_fp4_e2m1>)
+  else if constexpr (is_same_v<_Tp, __hip_fp4_e2m1>)
   {
-    _CCCL_ASSERT((__v & 0xf0u) == 0u, "Invalid __nv_fp4_e2m1 storage value");
+    _CCCL_ASSERT((__v & 0xf0u) == 0u, "Invalid __hip_fp4_e2m1 storage value");
     _Tp __ret{};
     __ret.__x = __v;
     return __ret;
@@ -333,19 +333,19 @@ template <class _Tp>
   }
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  else if constexpr (is_same_v<_Tp, __nv_bfloat16>)
+  else if constexpr (is_same_v<_Tp, __hip_bfloat16>)
   {
     return __cccl_nvfp_manip_helper<_Tp>{__v}.__x;
   }
 #endif // _CCCL_HAS_NVBF16()
 #if _CCCL_HAS_NVFP8_E4M3()
-  else if constexpr (is_same_v<_Tp, __nv_fp8_e4m3>)
+  else if constexpr (is_same_v<_Tp, __hip_fp8_e4m3>)
   {
     return __v.__x;
   }
 #endif // _CCCL_HAS_NVFP8_E4M3()
 #if _CCCL_HAS_NVFP8_E5M2()
-  else if constexpr (is_same_v<_Tp, __nv_fp8_e5m2>)
+  else if constexpr (is_same_v<_Tp, __hip_fp8_e5m2>)
   {
     return __v.__x;
   }
@@ -357,19 +357,19 @@ template <class _Tp>
   }
 #endif // _CCCL_HAS_NVFP8_E8M0()
 #if _CCCL_HAS_NVFP6_E2M3()
-  else if constexpr (is_same_v<_Tp, __nv_fp6_e2m3>)
+  else if constexpr (is_same_v<_Tp, __hip_fp6_e2m3>)
   {
     return __v.__x;
   }
 #endif // _CCCL_HAS_NVFP6_E2M3()
 #if _CCCL_HAS_NVFP6_E3M2()
-  else if constexpr (is_same_v<_Tp, __nv_fp6_e3m2>)
+  else if constexpr (is_same_v<_Tp, __hip_fp6_e3m2>)
   {
     return __v.__x;
   }
 #endif // _CCCL_HAS_NVFP6_E3M2()
 #if _CCCL_HAS_NVFP4_E2M1()
-  else if constexpr (is_same_v<_Tp, __nv_fp4_e2m1>)
+  else if constexpr (is_same_v<_Tp, __hip_fp4_e2m1>)
   {
     return __v.__x;
   }

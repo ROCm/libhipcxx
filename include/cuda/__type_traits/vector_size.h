@@ -216,26 +216,25 @@ inline constexpr ::cuda::std::size_t vector_size_v<::__half2> = 2;
 
 #  if _CCCL_HAS_NVBF16()
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_bfloat162> = 2;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_bfloat162> = 2;
 #  endif // _CCCL_HAS_NVBF16()
 
 // NOTE(HIP/AMD): the e4m3/e5m2 fp8 vector types do exist on HIP -- HIP ships
-// __hip_fp8x{2,4}_{e4m3,e5m2} in <hip/hip_fp8.h> and <libhipcxx/__amd/cuda_runtime.h>
-// aliases them to the upstream __nv_fp8x* names, so _CCCL_HAS_NVFP8() is 1 on HIP.
+// __hip_fp8x{2,4}_{e4m3,e5m2} in <hip/hip_fp8.h>, so _CCCL_HAS_NVFP8() is 1 on HIP.
 // The e8m0 family (CTK 12.8+) and all fp6/fp4 vector types have no HIP analogue;
 // their _CCCL_HAS_* macros are 0 there, so those blocks drop out on HIP.
 #  if _CCCL_HAS_NVFP8_E4M3()
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp8x2_e4m3> = 2;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp8x2_e4m3> = 2;
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp8x4_e4m3> = 4;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp8x4_e4m3> = 4;
 #  endif // _CCCL_HAS_NVFP8_E4M3()
 
 #  if _CCCL_HAS_NVFP8_E5M2()
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp8x2_e5m2> = 2;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp8x2_e5m2> = 2;
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp8x4_e5m2> = 4;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp8x4_e5m2> = 4;
 #  endif // _CCCL_HAS_NVFP8_E5M2()
 
 #  if _CCCL_HAS_NVFP8_E8M0()
@@ -247,23 +246,23 @@ inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp8x4_e8m0> = 4;
 
 #  if _CCCL_HAS_NVFP6_E2M3()
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp6x2_e2m3> = 2;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp6x2_e2m3> = 2;
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp6x4_e2m3> = 4;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp6x4_e2m3> = 4;
 #  endif // _CCCL_HAS_NVFP6_E2M3()
 
 #  if _CCCL_HAS_NVFP6_E3M2()
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp6x2_e3m2> = 2;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp6x2_e3m2> = 2;
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp6x4_e3m2> = 4;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp6x4_e3m2> = 4;
 #  endif // _CCCL_HAS_NVFP6_E3M2()
 
 #  if _CCCL_HAS_NVFP4_E2M1()
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp4x2_e2m1> = 2;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp4x2_e2m1> = 2;
 template <>
-inline constexpr ::cuda::std::size_t vector_size_v<::__nv_fp4x4_e2m1> = 4;
+inline constexpr ::cuda::std::size_t vector_size_v<::__hip_fp4x4_e2m1> = 4;
 #  endif // _CCCL_HAS_NVFP4_E2M1()
 
 template <class _Tp>

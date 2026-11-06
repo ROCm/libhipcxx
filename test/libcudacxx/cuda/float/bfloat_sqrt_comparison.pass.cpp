@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -37,17 +37,17 @@
 
 struct func
 {
-  TEST_FUNC __nv_bfloat16 operator()(cuda::std::size_t i) const
+  TEST_FUNC __hip_bfloat16 operator()(cuda::std::size_t i) const
   {
-    auto raw = __nv_bfloat16_raw();
+    auto raw = __hip_bfloat16_raw();
     raw.x    = (unsigned short) i;
-    return cuda::std::sqrt(__nv_bfloat16(raw));
+    return cuda::std::sqrt(__hip_bfloat16(raw));
   }
 };
 
 void test()
 {
-  compare_host_device<__nv_bfloat16>(func());
+  compare_host_device<__hip_bfloat16>(func());
 }
 
 int main(int argc, char** argv)

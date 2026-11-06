@@ -49,13 +49,13 @@
 #define _CCCL_TRY_CUDA_API(_NAME, _MSG, ...)                     \
   do                                                             \
   {                                                              \
-    const ::cudaError_t __status = _NAME(__VA_ARGS__);           \
+    const ::hipError_t __status = _NAME(__VA_ARGS__);           \
     switch (__status)                                            \
     {                                                            \
-      case ::cudaSuccess:                                        \
+      case ::hipSuccess:                                        \
         break;                                                   \
       default:                                                   \
-        (void) ::cudaGetLastError(); /* clear CUDA error state */ \
+        (void) ::hipGetLastError(); /* clear CUDA error state */ \
         _CCCL_THROW(::cuda::cuda_error, __status, _MSG, #_NAME); \
     }                                                            \
   } while (0)
@@ -63,22 +63,22 @@
 #define _CCCL_ASSERT_CUDA_API(_NAME, _MSG, ...)                         \
   do                                                                    \
   {                                                                     \
-    [[maybe_unused]] const ::cudaError_t __status = _NAME(__VA_ARGS__); \
-    (void) ::cudaGetLastError(); /* clear CUDA error state */           \
-    _CCCL_ASSERT(__status == cudaSuccess, _MSG);                        \
+    [[maybe_unused]] const ::hipError_t __status = _NAME(__VA_ARGS__); \
+    (void) ::hipGetLastError(); /* clear CUDA error state */           \
+    _CCCL_ASSERT(__status == hipSuccess, _MSG);                        \
   } while (0)
 
 #define _CCCL_LOG_CUDA_API(_NAME, _MSG, ...)                                       \
   [&]() {                                                                          \
-    const ::cudaError_t __status = _NAME(__VA_ARGS__);                             \
-    if (__status != ::cudaSuccess)                                                 \
+    const ::hipError_t __status = _NAME(__VA_ARGS__);                             \
+    if (__status != ::hipSuccess)                                                 \
     {                                                                              \
       ::cuda::__msg_storage __msg_buffer;                                          \
       ::cuda::__detail::__format_cuda_error(__msg_buffer, __status, _MSG, #_NAME); \
       ::fprintf(stderr, "%s\n", __msg_buffer.__buffer);                            \
       ::fflush(stderr);                                                            \
     }                                                                              \
-    (void) ::cudaGetLastError(); /* clear CUDA error state */                      \
+    (void) ::hipGetLastError(); /* clear CUDA error state */                      \
     return __status;                                                               \
   }()
 

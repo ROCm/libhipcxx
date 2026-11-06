@@ -320,7 +320,7 @@ TEST_FUNC bool tests_nvfp()
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-  for (__nv_bfloat16 i :
+  for (__hip_bfloat16 i :
        {__float2bfloat16(0.0f),
         __float2bfloat16(1.0f),
         __float2bfloat16(-1.0f),
@@ -332,19 +332,19 @@ TEST_FUNC bool tests_nvfp()
     test_memcpy_roundtrip(i);
   }
 
-  for (__nv_bfloat162 i :
-       {__nv_bfloat162{__float2bfloat16(0.0f), __float2bfloat16(1.0f)},
-        __nv_bfloat162{__float2bfloat16(-1.0f), __float2bfloat16(2.0f)},
-        __nv_bfloat162{__float2bfloat16(10.0f), __float2bfloat16(-10.0f)},
-        __nv_bfloat162{__float2bfloat16(2.71828f), __float2bfloat16(3.14159f)}})
+  for (__hip_bfloat162 i :
+       {__hip_bfloat162{__float2bfloat16(0.0f), __float2bfloat16(1.0f)},
+        __hip_bfloat162{__float2bfloat16(-1.0f), __float2bfloat16(2.0f)},
+        __hip_bfloat162{__float2bfloat16(10.0f), __float2bfloat16(-10.0f)},
+        __hip_bfloat162{__float2bfloat16(2.71828f), __float2bfloat16(3.14159f)}})
   {
     test_memcpy_roundtrip(i);
   }
 
-  test_memcpy_roundtrip(cuda::std::array<__nv_bfloat16, 2>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)});
-  test_memcpy_roundtrip(cuda::std::pair<__nv_bfloat16, __nv_bfloat16>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)});
+  test_memcpy_roundtrip(cuda::std::array<__hip_bfloat16, 2>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)});
+  test_memcpy_roundtrip(cuda::std::pair<__hip_bfloat16, __hip_bfloat16>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)});
 
-  using complex_bfloat = cuda::std::complex<__nv_bfloat16>;
+  using complex_bfloat = cuda::std::complex<__hip_bfloat16>;
   for (complex_bfloat i :
        {complex_bfloat{__float2bfloat16(0.0f), __float2bfloat16(1.0f)},
         complex_bfloat{__float2bfloat16(1.0f), __float2bfloat16(-1.0f)},
@@ -356,7 +356,7 @@ TEST_FUNC bool tests_nvfp()
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
 #if _LIBCUDACXX_HAS_NVFP16() && _LIBCUDACXX_HAS_NVBF16()
-  test_memcpy_roundtrip(cuda::std::tuple<__half, __nv_bfloat16>{__float2half(1.0f), __float2bfloat16(2.0f)});
+  test_memcpy_roundtrip(cuda::std::tuple<__half, __hip_bfloat16>{__float2half(1.0f), __float2bfloat16(2.0f)});
 #endif // _LIBCUDACXX_HAS_NVFP16() && _LIBCUDACXX_HAS_NVBF16()
   return true;
 }

@@ -51,40 +51,40 @@ static_assert(cuda::std::is_move_assignable<cuda::device_memory_pool_ref>::value
 static_assert(cuda::std::is_trivially_destructible<cuda::device_memory_pool_ref>::value);
 static_assert(!cuda::std::is_empty<cuda::device_memory_pool_ref>::value);
 
-static bool ensure_release_threshold(::cudaMemPool_t pool, const size_t expected_threshold)
+static bool ensure_release_threshold(::hipMemPool_t pool, const size_t expected_threshold)
 {
   size_t release_threshold = expected_threshold + 1337; // use something different than the expected threshold
   _CCCL_TRY_CUDA_API(
-    ::cudaMemPoolGetAttribute,
-    "Failed to call cudaMemPoolGetAttribute",
+    ::hipMemPoolGetAttribute,
+    "Failed to call hipMemPoolGetAttribute",
     pool,
-    ::cudaMemPoolAttrReleaseThreshold,
+    ::hipMemPoolAttrReleaseThreshold,
     &release_threshold);
   return release_threshold == expected_threshold;
 }
 
-static bool ensure_disable_reuse(::cudaMemPool_t pool, const int driver_version)
+static bool ensure_disable_reuse(::hipMemPool_t pool, const int driver_version)
 {
   int disable_reuse = 0;
   _CCCL_TRY_CUDA_API(
-    ::cudaMemPoolGetAttribute,
-    "Failed to call cudaMemPoolGetAttribute",
+    ::hipMemPoolGetAttribute,
+    "Failed to call hipMemPoolGetAttribute",
     pool,
-    ::cudaMemPoolReuseAllowOpportunistic,
+    ::hipMemPoolReuseAllowOpportunistic,
     &disable_reuse);
 
   constexpr int min_async_version = 11050;
   return driver_version < min_async_version ? disable_reuse == 0 : disable_reuse != 0;
 }
 
-static bool ensure_export_handle(::cudaMemPool_t pool, const ::cudaMemAllocationHandleType allocation_handle)
+static bool ensure_export_handle(::hipMemPool_t pool, const ::hipMemAllocationHandleType allocation_handle)
 {
   size_t handle              = 0;
-  const ::cudaError_t status = ::cudaMemPoolExportToShareableHandle(&handle, pool, allocation_handle, 0);
-  ::cudaGetLastError(); // Clear CUDA error state
+  const ::hipError_t status = ::hipMemPoolExportToShareableHandle(&handle, pool, allocation_handle, 0);
+  ::hipGetLastError(); // Clear CUDA error state
 
   // If no export was defined we need to query cudaErrorInvalidValue
-  return allocation_handle == ::cudaMemHandleTypeNone ? status == ::cudaErrorInvalidValue : status == ::cudaSuccess;
+  return allocation_handle == ::hipMemHandleTypeNone ? status == ::hipErrorInvalidValue : status == ::hipSuccess;
 }
 
 C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
@@ -94,13 +94,13 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
 
   int driver_version = 0;
   {
-    _CCCL_TRY_CUDA_API(::cudaDriverGetVersion, "Failed to call cudaDriverGetVersion", &driver_version);
+    _CCCL_TRY_CUDA_API(::hipDriverGetVersion, "Failed to call hipDriverGetVersion", &driver_version);
   }
 
-  ::cudaMemPool_t current_default_pool{};
+  ::hipMemPool_t current_default_pool{};
   {
-    _CCCL_TRY_CUDA_API(::cudaDeviceGetDefaultMemPool,
-                       "Failed to call cudaDeviceGetDefaultMemPool",
+    _CCCL_TRY_CUDA_API(::hipDeviceGetDefaultMemPool,
+                       "Failed to call hipDeviceGetDefaultMemPool",
                        &current_default_pool,
                        current_device);
   }
@@ -116,30 +116,30 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
     // Ensure that the pool was not destroyed by allocating something
     void* ptr{nullptr};
     _CCCL_TRY_CUDA_API(
-      ::cudaMallocAsync,
+      ::hipMallocAsync,
       "Failed to allocate with pool passed to cuda::device_memory_pool_ref",
       &ptr,
       42,
       current_default_pool,
-      ::cudaStream_t{nullptr});
+      ::hipStream_t{nullptr});
     CHECK(ptr != nullptr);
 
     _CCCL_ASSERT_CUDA_API(
-      ::cudaFreeAsync,
+      ::hipFreeAsync,
       "Failed to deallocate with pool passed to cuda::device_memory_pool_ref",
       ptr,
-      ::cudaStream_t{nullptr});
+      ::hipStream_t{nullptr});
   }
 
   SECTION("Construct from mempool handle")
   {
-    ::cudaMemPoolProps pool_properties{};
-    pool_properties.allocType     = ::cudaMemAllocationTypePinned;
-    pool_properties.handleTypes   = ::cudaMemAllocationHandleType(0);
-    pool_properties.location.type = ::cudaMemLocationTypeDevice;
+    ::hipMemPoolProps pool_properties{};
+    pool_properties.allocType     = ::hipMemAllocationTypePinned;
+    pool_properties.handleTypes   = ::hipMemAllocationHandleType(0);
+    pool_properties.location.type = ::hipMemLocationTypeDevice;
     pool_properties.location.id   = current_device;
-    cudaMemPool_t cuda_pool_handle{};
-    _CCCL_TRY_CUDA_API(::cudaMemPoolCreate, "Failed to call cudaMemPoolCreate", &cuda_pool_handle, &pool_properties);
+    hipMemPool_t cuda_pool_handle{};
+    _CCCL_TRY_CUDA_API(::hipMemPoolCreate, "Failed to call hipMemPoolCreate", &cuda_pool_handle, &pool_properties);
 
     {
       test_resource from_cudaMemPool{cuda_pool_handle};
@@ -150,19 +150,19 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
     // Ensure that the pool was not destroyed by allocating something
     void* ptr{nullptr};
     _CCCL_TRY_CUDA_API(
-      ::cudaMallocAsync,
+      ::hipMallocAsync,
       "Failed to allocate with pool passed to cuda::device_memory_pool_ref",
       &ptr,
       42,
       current_default_pool,
-      ::cudaStream_t{nullptr});
+      ::hipStream_t{nullptr});
     CHECK(ptr != nullptr);
 
     _CCCL_ASSERT_CUDA_API(
-      ::cudaFreeAsync,
+      ::hipFreeAsync,
       "Failed to deallocate with pool passed to cuda::device_memory_pool_ref",
       ptr,
-      ::cudaStream_t{nullptr});
+      ::hipStream_t{nullptr});
   }
 
   SECTION("Construct with initial pool size")
@@ -172,7 +172,7 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
     };
     cuda::device_memory_pool from_initial_pool_size{current_device, props};
 
-    ::cudaMemPool_t get = from_initial_pool_size.get();
+    ::hipMemPool_t get = from_initial_pool_size.get();
     CHECK(get != current_default_pool);
 
     // Ensure we use the right release threshold
@@ -182,7 +182,7 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
     CHECK(ensure_disable_reuse(get, driver_version));
 
     // Ensure that we disable export
-    CHECK(ensure_export_handle(get, ::cudaMemHandleTypeNone));
+    CHECK(ensure_export_handle(get, ::hipMemHandleTypeNone));
   }
 
   SECTION("Construct with release threshold")
@@ -193,7 +193,7 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
     };
     cuda::device_memory_pool with_threshold{current_device, props};
 
-    ::cudaMemPool_t get = with_threshold.get();
+    ::hipMemPool_t get = with_threshold.get();
     CHECK(get != current_default_pool);
 
     // Ensure we use the right release threshold
@@ -203,24 +203,24 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
     CHECK(ensure_disable_reuse(get, driver_version));
 
     // Ensure that we disable export
-    CHECK(ensure_export_handle(get, ::cudaMemHandleTypeNone));
+    CHECK(ensure_export_handle(get, ::hipMemHandleTypeNone));
   }
 
   // Allocation handles are only supported after 11.2 and not on Windows
 #if !_CCCL_OS(WINDOWS)
   if (cuda::devices[0].attribute(::cuda::device_attributes::memory_pool_supported_handle_types)
-      & ::cudaMemHandleTypePosixFileDescriptor)
+      & ::hipMemHandleTypePosixFileDescriptor)
   {
     SECTION("Construct with allocation handle")
     {
       cuda::memory_pool_properties props = {
         20,
         42,
-        ::cudaMemHandleTypePosixFileDescriptor,
+        ::hipMemHandleTypePosixFileDescriptor,
       };
       cuda::device_memory_pool with_allocation_handle{current_device, props};
 
-      ::cudaMemPool_t get = with_allocation_handle.get();
+      ::hipMemPool_t get = with_allocation_handle.get();
       CHECK(get != current_default_pool);
 
       // Ensure we use the right release threshold
@@ -239,18 +239,18 @@ C2H_CCCLRT_TEST("device_memory_pool construction", "[memory_resource]")
 static void ensure_device_ptr(void* ptr)
 {
   CHECK(ptr != nullptr);
-  cudaPointerAttributes attributes;
-  cudaError_t status = cudaPointerGetAttributes(&attributes, ptr);
-  CHECK(status == cudaSuccess);
-  CHECK(attributes.type == cudaMemoryTypeDevice);
+  hipPointerAttribute_t attributes;
+  hipError_t status = hipPointerGetAttributes(&attributes, ptr);
+  CHECK(status == hipSuccess);
+  CHECK(attributes.type == hipMemoryTypeDevice);
 }
 
 C2H_CCCLRT_TEST("device_memory_pool allocation", "[memory_resource]")
 {
-  cudaStream_t raw_stream;
+  hipStream_t raw_stream;
   {
     cuda::__ensure_current_context guard{cuda::device_ref{0}};
-    cudaStreamCreate(&raw_stream);
+    hipStreamCreate(&raw_stream);
   }
   cuda::device_memory_pool_ref res = cuda::device_default_memory_pool(cuda::device_ref{0});
 
@@ -356,7 +356,7 @@ C2H_CCCLRT_TEST("device_memory_pool allocation", "[memory_resource]")
 #endif // _CCCL_HAS_EXCEPTIONS()
   {
     cuda::__ensure_current_context guard{cuda::device_ref{0}};
-    cudaStreamDestroy(raw_stream);
+    hipStreamDestroy(raw_stream);
   }
 }
 
@@ -373,14 +373,14 @@ C2H_CCCLRT_TEST("device_memory_pool comparison", "[memory_resource]")
   }
 
   { // comparison against a plain device_memory_pool_ref with a different pool
-    cudaMemPool_t cuda_pool_handle{};
+    hipMemPool_t cuda_pool_handle{};
     {
-      ::cudaMemPoolProps pool_properties{};
-      pool_properties.allocType     = ::cudaMemAllocationTypePinned;
-      pool_properties.handleTypes   = ::cudaMemAllocationHandleType(0);
-      pool_properties.location.type = ::cudaMemLocationTypeDevice;
+      ::hipMemPoolProps pool_properties{};
+      pool_properties.allocType     = ::hipMemAllocationTypePinned;
+      pool_properties.handleTypes   = ::hipMemAllocationHandleType(0);
+      pool_properties.location.type = ::hipMemLocationTypeDevice;
       pool_properties.location.id   = current_device;
-      _CCCL_TRY_CUDA_API(::cudaMemPoolCreate, "Failed to call cudaMemPoolCreate", &cuda_pool_handle, &pool_properties);
+      _CCCL_TRY_CUDA_API(::hipMemPoolCreate, "Failed to call hipMemPoolCreate", &cuda_pool_handle, &pool_properties);
     }
     cuda::device_memory_pool_ref second{cuda_pool_handle};
     CHECK((first != second));

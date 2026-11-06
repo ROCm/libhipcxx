@@ -37,10 +37,10 @@
 #define CUDA_SAFE_CALL(...)                                                           \
   do                                                                                  \
   {                                                                                   \
-    cudaError_t err = __VA_ARGS__;                                                    \
-    if (err != cudaSuccess)                                                           \
+    hipError_t err = __VA_ARGS__;                                                    \
+    if (err != hipSuccess)                                                           \
     {                                                                                 \
-      printf("CUDA ERROR: %s: %s\n", cudaGetErrorName(err), cudaGetErrorString(err)); \
+      printf("CUDA ERROR: %s: %s\n", hipGetErrorName(err), hipGetErrorString(err)); \
       exit(1);                                                                        \
     }                                                                                 \
   } while (false)
@@ -105,8 +105,8 @@ __half_raw convert_to_raw(__half h){
   return __half_raw(h);
 }
 
-__nv_bfloat16_raw convert_to_raw(__nv_bfloat16 b){
-  return __nv_bfloat16_raw(b);
+__hip_bfloat16_raw convert_to_raw(__hip_bfloat16 b){
+  return __hip_bfloat16_raw(b);
 }
 
 template <typename T, cuda::std::size_t Bitpatterns>
@@ -121,13 +121,13 @@ struct calculate_problem_sizes<T, 1, Bitpatterns>
     T* host_buffer = new T[problem_size]();
 
     T* device_buffer = nullptr;
-    CUDA_SAFE_CALL(cudaMallocManaged(&device_buffer, sizeof(T) * problem_size));
-    CUDA_SAFE_CALL(cudaMemset(device_buffer, 0, sizeof(T) * problem_size));
+    CUDA_SAFE_CALL(hipMallocManaged(&device_buffer, sizeof(T) * problem_size));
+    CUDA_SAFE_CALL(hipMemset(device_buffer, 0, sizeof(T) * problem_size));
 
     generate(f, host_buffer, problem_size, args...);
     generate_kernel<<<problem_size / 256, 256>>>(f, device_buffer, problem_size, args...);
-    CUDA_SAFE_CALL(cudaDeviceSynchronize());
-    CUDA_SAFE_CALL(cudaGetLastError());
+    CUDA_SAFE_CALL(hipDeviceSynchronize());
+    CUDA_SAFE_CALL(hipGetLastError());
 
     bool good = true;
 
@@ -159,7 +159,7 @@ struct calculate_problem_sizes<T, 1, Bitpatterns>
       }
     }
 
-    CUDA_SAFE_CALL(cudaFree(device_buffer));
+    CUDA_SAFE_CALL(hipFree(device_buffer));
     delete[] host_buffer;
 
     return good;

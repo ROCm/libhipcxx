@@ -194,9 +194,9 @@ _CCCL_API inline complex<__half> sinh(const complex<__half>& __x) noexcept
 
 #if _LIBCUDACXX_HAS_NVBF16()
 template <>
-_CCCL_API inline complex<__nv_bfloat16> sinh(const complex<__nv_bfloat16>& __x) noexcept
+_CCCL_API inline complex<__hip_bfloat16> sinh(const complex<__hip_bfloat16>& __x) noexcept
 {
-  return complex<__nv_bfloat16>{::cuda::std::sinh(complex<float>{__x})};
+  return complex<__hip_bfloat16>{::cuda::std::sinh(complex<float>{__x})};
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
@@ -372,9 +372,9 @@ _CCCL_API inline complex<__half> cosh(const complex<__half>& __x) noexcept
 
 #if _LIBCUDACXX_HAS_NVBF16()
 template <>
-_CCCL_API inline complex<__nv_bfloat16> cosh(const complex<__nv_bfloat16>& __x) noexcept
+_CCCL_API inline complex<__hip_bfloat16> cosh(const complex<__hip_bfloat16>& __x) noexcept
 {
-  return complex<__nv_bfloat16>{::cuda::std::cosh(complex<float>{__x})};
+  return complex<__hip_bfloat16>{::cuda::std::cosh(complex<float>{__x})};
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 

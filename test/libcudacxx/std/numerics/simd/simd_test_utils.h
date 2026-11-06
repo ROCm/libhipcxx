@@ -183,8 +183,8 @@ TEST_FUNC constexpr simd::basic_vec<T, simd::fixed_size<N>> make_iota_vec()
 
 #if _LIBCUDACXX_HAS_NVBF16()
 #  define _SIMD_TEST_BF16()                                       \
-    test_type<__nv_bfloat16, 1>();                                \
-    test_type<__nv_bfloat16, 4>();
+    test_type<__hip_bfloat16, 1>();                                \
+    test_type<__hip_bfloat16, 4>();
 #else
 #  define _SIMD_TEST_BF16()
 #endif

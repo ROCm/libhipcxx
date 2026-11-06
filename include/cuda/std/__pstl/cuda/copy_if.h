@@ -100,7 +100,7 @@ struct __pstl_dispatch<__pstl_algorithm::__copy_if, __execution_backend::__cuda>
     using _OffsetType = iter_difference_t<_InputIterator>;
     _OffsetType __ret;
 
-    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStream_t{}}, __policy);
+    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStream_t{}}, __policy);
 
     // Determine temporary device storage requirements
     void* __temp_storage = nullptr;
@@ -135,12 +135,12 @@ struct __pstl_dispatch<__pstl_algorithm::__copy_if, __execution_backend::__cuda>
 
       // Copy the result back from storage
       _CCCL_TRY_CUDA_API(
-        ::cudaMemcpyAsync,
+        ::hipMemcpyAsync,
         "__pstl_cuda_select_if: copy of result from device to host failed",
         ::cuda::std::addressof(__ret),
         __storage.template __get_ptr<0>(),
         sizeof(_OffsetType),
-        ::cudaMemcpyDefault,
+        ::hipMemcpyDefault,
         __stream.get());
     }
 
@@ -166,7 +166,7 @@ struct __pstl_dispatch<__pstl_algorithm::__copy_if, __execution_backend::__cuda>
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == ::cudaErrorMemoryAllocation)
+        if (__err.status() == ::hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }

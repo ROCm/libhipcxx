@@ -457,8 +457,8 @@ C2H_TEST("Dims queries indexing and ambient hierarchy", "[hierarchy]")
       kernel<<<grid, block>>>(hierarchy);
       // NOTE(HIP/AMD): on HIP a rejected launch is sticky and hipDeviceSynchronize()
       // neither reports nor clears it, so check the launch itself.
-      CUDART(cudaGetLastError());
-      CUDART(cudaDeviceSynchronize());
+      CUDART(hipGetLastError());
+      CUDART(hipDeviceSynchronize());
     },
     hierarchies);
 }
@@ -488,19 +488,19 @@ __global__ void rank_kernel_cg(Hierarchy hierarchy, unsigned int* out)
 C2H_TEST("On device rank calculation", "[hierarchy]")
 {
   unsigned int* ptr;
-  CUDART(cudaMalloc((void**) &ptr, 2 * 1024 * sizeof(unsigned int)));
+  CUDART(hipMalloc((void**) &ptr, 2 * 1024 * sizeof(unsigned int)));
 
   const auto hierarchy_static = cuda::make_hierarchy(cuda::block_dims<256>(), cuda::grid_dims(dim3(2, 2, 2)));
   rank_kernel<<<dim3(2, 2, 2), 256>>>(hierarchy_static, ptr);
-  CUDART(cudaGetLastError());
-  CUDART(cudaDeviceSynchronize());
+  CUDART(hipGetLastError());
+  CUDART(hipDeviceSynchronize());
   rank_kernel_cg<<<dim3(2, 2, 2), 256>>>(hierarchy_static, ptr);
-  CUDART(cudaGetLastError());
-  CUDART(cudaDeviceSynchronize());
+  CUDART(hipGetLastError());
+  CUDART(hipDeviceSynchronize());
   rank_kernel_optimized<<<dim3(2, 2, 2), 256>>>(hierarchy_static, ptr);
-  CUDART(cudaGetLastError());
-  CUDART(cudaDeviceSynchronize());
-  CUDART(cudaFree(ptr));
+  CUDART(hipGetLastError());
+  CUDART(hipDeviceSynchronize());
+  CUDART(hipFree(ptr));
 }
 
 template <typename Hierarchy>
@@ -613,8 +613,8 @@ C2H_TEST("Examples", "[hierarchy]")
     auto hierarchy                           = cuda::make_hierarchy(cuda::grid_dims(16), cuda::block_dims<8, 8, 8>());
     auto [grid_dimensions, block_dimensions] = cuda::get_launch_dimensions(hierarchy);
     examples_kernel<<<grid_dimensions, block_dimensions>>>(hierarchy);
-    CUDART(cudaGetLastError());
-    CUDART(cudaDeviceSynchronize());
+    CUDART(hipGetLastError());
+    CUDART(hipDeviceSynchronize());
   }
 }
 

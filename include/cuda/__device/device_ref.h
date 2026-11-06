@@ -133,7 +133,7 @@ public:
   }
 
   //! @overload
-  template <::cudaDeviceAttr _Attr>
+  template <::hipDeviceAttribute_t _Attr>
   [[nodiscard]] _CCCL_HOST_API auto attribute() const
   {
     return attribute(__dev_attr<_Attr>());
@@ -144,7 +144,7 @@ public:
   //! @return The memory location of this device
   [[nodiscard]] _CCCL_HOST_API operator memory_location() const noexcept
   {
-    return memory_location{::cudaMemLocationTypeDevice, get()};
+    return memory_location{::hipMemLocationTypeDevice, get()};
   }
 
   //! @brief Initializes the primary context of the device.
@@ -153,7 +153,7 @@ public:
   //! @brief Retrieve the primary context of this device.
   //!
   //! @return The primary CUDA context for this device.
-  [[nodiscard]] _CCCL_HOST_API ::CUcontext __primary_context() const; // implemented in
+  [[nodiscard]] _CCCL_HOST_API ::hipCtx_t __primary_context() const; // implemented in
                                                                       // <cuda/__device/physical_device.h> to avoid
                                                                       // circular dependency
 

@@ -132,28 +132,28 @@ void test()
 
 #if !defined(__HIP_PLATFORM_AMD__)
   int cc_major{};
-  assert(cudaDeviceGetAttribute(&cc_major, cudaDevAttrComputeCapabilityMajor, 0) == cudaSuccess);
+  assert(hipDeviceGetAttribute(&cc_major, hipDeviceAttributeComputeCapabilityMajor, 0) == hipSuccess);
 
-  cudaLaunchAttribute launch_attrs[1]{};
+  hipLaunchAttribute launch_attrs[1]{};
   launch_attrs[0].id               = cudaLaunchAttributeClusterDimension;
   launch_attrs[0].val.clusterDim.x = 2;
   launch_attrs[0].val.clusterDim.y = 1;
   launch_attrs[0].val.clusterDim.z = 1;
 
-  cudaLaunchConfig_t launch_config{};
+  hipLaunchConfig_t launch_config{};
   launch_config.gridDim  = 2;
   launch_config.blockDim = 1;
   launch_config.attrs    = launch_attrs;
   launch_config.numAttrs = (cc_major >= 9) ? 1 : 0;
 
   void* args[]{&my_struct};
-  assert(cudaLaunchKernelExC(&launch_config, (const void*) test_kernel, args) == cudaSuccess);
+  assert(hipLaunchKernelExC(&launch_config, (const void*) test_kernel, args) == hipSuccess);
 #else // NOTE(HIP/AMD): thread-block clusters are NVIDIA-only; launch the kernel
       // directly so the global/shared/local/grid_constant address-space checks
       // still run (cluster_shared falls back to shared on AMDGCN).
   test_kernel<<<2, 1>>>(my_struct);
 #endif // !defined(__HIP_PLATFORM_AMD__)
-  assert(cudaDeviceSynchronize() == cudaSuccess);
+  assert(hipDeviceSynchronize() == hipSuccess);
 }
 #endif // !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 

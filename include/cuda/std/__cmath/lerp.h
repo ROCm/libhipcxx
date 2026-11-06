@@ -100,7 +100,7 @@ template <typename _Fp>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 lerp(__nv_bfloat16 __a, __nv_bfloat16 __b, __nv_bfloat16 __t) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 lerp(__hip_bfloat16 __a, __hip_bfloat16 __b, __hip_bfloat16 __t) noexcept
 {
   return __float2bfloat16(::cuda::std::__lerp(__bfloat162float(__a), __bfloat162float(__b), __bfloat162float(__t)));
 }

@@ -324,7 +324,7 @@ TEST_FUNC bool tests()
 
 #if _LIBCUDACXX_HAS_NVBF16()
   // Extended floating point type __half
-  for (__nv_bfloat16 i :
+  for (__hip_bfloat16 i :
        {__float2bfloat16(0.0f),
         __float2bfloat16(1.0f),
         __float2bfloat16(-1.0f),

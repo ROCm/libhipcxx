@@ -115,7 +115,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
   else
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-    if constexpr (is_same_v<_Tp, ::__nv_bfloat16>)
+    if constexpr (is_same_v<_Tp, ::__hip_bfloat16>)
   {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
     return ::__hmax(__x, __y);
@@ -247,7 +247,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
   else
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-    if constexpr (is_same_v<_Tp, ::__nv_bfloat16>)
+    if constexpr (is_same_v<_Tp, ::__hip_bfloat16>)
   {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
     return ::__hmin(__x, __y);

@@ -39,7 +39,7 @@
 #include "utils/platform.h"
 #include <stdio.h>
 
-ArgList nvrtcArguments;
+ArgList hiprtcArguments;
 ArgList ignoredArguments;
 std::string outputDir;
 std::string outputFile;
@@ -100,10 +100,10 @@ static ArchConfig translate_gpu_arch(const std::string& arch)
 static std::string current_device_arch()
 {
   hipDevice_t device;
-  cudaDeviceProp device_prop;
+  hipDeviceProp_t device_prop;
 
-  (void)cudaGetDevice(&device);
-  (void)cudaGetDeviceProperties(&device_prop, device);
+  (void)hipGetDevice(&device);
+  (void)hipGetDeviceProperties(&device_prop, device);
 
   // Keep an optional -strict suffix. Feature suffixes after ':' are not part of the offload id.
   const std::regex gfx_arch_pattern("(gfx[0-9a-fA-F]+(?:-strict)?)(:[-+:\\w]+)?");
@@ -189,7 +189,7 @@ ArgPair argHandlers[] = {
    make_greedy_handler("^-I$")},
   {std::regex("^-I ?(.+)$"),
    [](const std::smatch& match) {
-     nvrtcArguments.emplace_back(match[0].str());
+     hiprtcArguments.emplace_back(match[0].str());
      return NORMAL;
    }},
   {make_greedy_handler("^(-include|-isystem)$")},
@@ -198,7 +198,7 @@ ArgPair argHandlers[] = {
    std::regex("^-include ?(.+)$"),
    [](const std::smatch& match) {
     // NOTE(HIPRTC): --pre-include is not supported.
-     nvrtcArguments.emplace_back("-include" + match[1].str());
+     hiprtcArguments.emplace_back("-include" + match[1].str());
      return NORMAL;
    }},
   {make_greedy_handler("^-o$")},
@@ -228,7 +228,7 @@ ArgPair argHandlers[] = {
   {// Matches the many various versions of dialect switch and normalizes it
    std::regex("^[-/]std[:=](.+)$"),
    [](const std::smatch& match) {
-     nvrtcArguments.emplace_back("-std=" + match[1].str());
+     hiprtcArguments.emplace_back("-std=" + match[1].str());
      return NORMAL;
    }},
   {// Capture an argument that is just '-'. If no input file is listed input is on stdin
@@ -259,7 +259,7 @@ ArgPair argHandlers[] = {
      inputFile = match[0].str();
      // NOTE(HIPRTC): HIPRTC does not like whitespace after -I
      // Capture directory of input file as an include path
-     nvrtcArguments.emplace_back("-I" + match[1].str());
+     hiprtcArguments.emplace_back("-I" + match[1].str());
      return NORMAL;
    }},
   {// NOTE(HIP/AMD): forward warning-control flags (-W..., e.g. -Werror,
@@ -270,7 +270,7 @@ ArgPair argHandlers[] = {
    // never observe the expected compilation failure.
    std::regex("^-W.*$"),
    [](const std::smatch& match) {
-     nvrtcArguments.emplace_back(match[0].str());
+     hiprtcArguments.emplace_back(match[0].str());
      return NORMAL;
    }},
   {// Throw away remaining arguments
@@ -364,8 +364,8 @@ int main(int argc, char** argv)
 
   // NOTE(HIP/AMD): We need to define CCCL_ENABLE_OPTIONAL_REF
   // otherwise 20 tests related to the optional header fail. Issue #149.
-  nvrtcArguments.emplace_back("-DCCCL_ENABLE_OPTIONAL_REF");
-  nvrtcArguments.emplace_back("-DCCCL_ENABLE_ASSERTIONS");
+  hiprtcArguments.emplace_back("-DCCCL_ENABLE_OPTIONAL_REF");
+  hiprtcArguments.emplace_back("-DCCCL_ENABLE_ASSERTIONS");
   if (!skipOutput)
   {
     std::ofstream ostr(outputTemplate + ".build.yml");
@@ -376,7 +376,7 @@ int main(int argc, char** argv)
     ostr << "builds:\n";
     for (const auto& build : buildList)
     {
-      auto gpuCode            = nvrtc_build_prog(testCu, build, nvrtcArguments);
+      auto gpuCode            = hiprtc_build_prog(testCu, build, hiprtcArguments);
       std::string gpuCodeFile = outputTemplate + "." + archString(build) + ".gpu";
       write_output_file(gpuCode.data(), gpuCode.size(), gpuCodeFile);
       ostr << "  - ";
@@ -389,7 +389,7 @@ int main(int argc, char** argv)
   {
     for (const auto& build : buildList)
     {
-      auto gpuCode = nvrtc_build_prog(testCu, build, nvrtcArguments);
+      auto gpuCode = hiprtc_build_prog(testCu, build, hiprtcArguments);
     }
   }
 

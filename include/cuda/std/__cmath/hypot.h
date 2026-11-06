@@ -130,7 +130,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 hypot(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 hypot(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
 {
   return __float2bfloat16(::cuda::std::hypotf(__bfloat162float(__x), __bfloat162float(__y)));
 }
@@ -217,7 +217,7 @@ template <class _Tp>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 hypot(__nv_bfloat16 __x, __nv_bfloat16 __y, __nv_bfloat16 __z) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 hypot(__hip_bfloat16 __x, __hip_bfloat16 __y, __hip_bfloat16 __z) noexcept
 {
   return __float2bfloat16(::cuda::std::__hypot(__bfloat162float(__x), __bfloat162float(__y), __bfloat162float(__z)));
 }

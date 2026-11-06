@@ -52,7 +52,7 @@ void test(Policy pol)
 {
   namespace execution = cuda::std::execution;
 
-  cuda::stream_ref default_stream{cudaStreamPerThread};
+  cuda::stream_ref default_stream{hipStreamPerThread};
   { // Ensure that the plain policy does not provide a stream
     assert(cuda::__call_or(::cuda::get_stream, default_stream, pol) == default_stream);
   }

@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef CUDA_TEST_CONTAINER_VECTOR_HELPER_H
 #define CUDA_TEST_CONTAINER_VECTOR_HELPER_H
 
@@ -71,7 +93,7 @@ bool equal_range(const Buffer& buf)
     }
     cuda::__ensure_current_context guard{cuda::device_ref{0}};
     check_equal_kernel<<<1, 1, 0, buf.stream().get()>>>(buf.begin());
-    CCCLRT_CHECK(cudaGetLastError() == cudaSuccess);
+    CCCLRT_CHECK(hipGetLastError() == hipSuccess);
     buf.stream().sync();
     return true;
   }
@@ -90,12 +112,12 @@ bool compare_value(const T& value, const T& expected)
     // copy the value to host
     T host_value;
     _CCCL_TRY_CUDA_API(
-      ::cudaMemcpy,
+      ::hipMemcpy,
       "failed to copy value",
       cuda::std::addressof(host_value),
       cuda::std::addressof(value),
       sizeof(T),
-      ::cudaMemcpyDefault);
+      ::hipMemcpyDefault);
     return host_value == expected;
   }
 }
@@ -112,12 +134,12 @@ void assign_value(T& value, const T& input)
     cuda::__ensure_current_context guard{cuda::device_ref{0}};
     // copy the input to device
     _CCCL_TRY_CUDA_API(
-      ::cudaMemcpy,
+      ::hipMemcpy,
       "failed to copy value",
       cuda::std::addressof(value),
       cuda::std::addressof(input),
       sizeof(T),
-      ::cudaMemcpyDefault);
+      ::hipMemcpyDefault);
   }
 }
 
@@ -157,7 +179,7 @@ bool equal_size_value(const Buffer& buf, const size_t size, const typename Buffe
     }
     cuda::__ensure_current_context guard{cuda::device_ref{0}};
     check_equal_value_kernel<<<1, 1, 0, buf.stream().get()>>>(buf.begin(), size, value);
-    CCCLRT_CHECK(cudaGetLastError() == cudaSuccess);
+    CCCLRT_CHECK(hipGetLastError() == hipSuccess);
     buf.stream().sync();
     return true;
   }

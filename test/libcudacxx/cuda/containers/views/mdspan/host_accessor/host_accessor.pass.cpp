@@ -43,7 +43,7 @@ bool host_accessor_test()
 {
   int array[] = {1, 2, 3, 4};
   int* h_ptr;
-  assert(cudaMallocHost(&h_ptr, 4) == cudaSuccess);
+  assert(hipHostMalloc(&h_ptr, 4) == hipSuccess);
   cuda::host_mdspan<int, ext_t> h_md{array, ext_t{}};
   cuda::host_mdspan<int, ext_t> h_md2{h_ptr, ext_t{}};
   unused(h_md);

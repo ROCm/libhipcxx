@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___TYPE_TRAITS_NUM_BITS_H
 #define _CUDA_STD___TYPE_TRAITS_NUM_BITS_H
 
@@ -48,19 +70,19 @@ template <typename _Tp, typename _RawTp = remove_cvref_t<_Tp>>
   }
 #endif // _CCCL_HAS_NVFP16
 #if _CCCL_HAS_NVBF16()
-  else if constexpr (is_same_v<_RawTp, __nv_bfloat16> || is_same_v<_RawTp, __nv_bfloat162>)
+  else if constexpr (is_same_v<_RawTp, __hip_bfloat16> || is_same_v<_RawTp, __hip_bfloat162>)
   {
     return sizeof(_RawTp) * CHAR_BIT;
   }
 #endif // _CCCL_HAS_NVBF16
 #if _CCCL_HAS_NVFP8_E4M3()
-  else if constexpr (is_same_v<_RawTp, __nv_fp8_e4m3>)
+  else if constexpr (is_same_v<_RawTp, __hip_fp8_e4m3>)
   {
     return 8;
   }
 #endif // _CCCL_HAS_NVFP8_E4M3()
 #if _CCCL_HAS_NVFP8_E5M2()
-  else if constexpr (is_same_v<_RawTp, __nv_fp8_e5m2>)
+  else if constexpr (is_same_v<_RawTp, __hip_fp8_e5m2>)
   {
     return 8;
   }
@@ -72,19 +94,19 @@ template <typename _Tp, typename _RawTp = remove_cvref_t<_Tp>>
   }
 #endif // _CCCL_HAS_NVFP8_E8M0()
 #if _CCCL_HAS_NVFP6_E3M2()
-  else if constexpr (is_same_v<_RawTp, __nv_fp6_e3m2>)
+  else if constexpr (is_same_v<_RawTp, __hip_fp6_e3m2>)
   {
     return 6;
   }
 #endif // _CCCL_HAS_NVFP6_E3M2()
 #if _CCCL_HAS_NVFP6_E2M3()
-  else if constexpr (is_same_v<_RawTp, __nv_fp6_e2m3>)
+  else if constexpr (is_same_v<_RawTp, __hip_fp6_e2m3>)
   {
     return 6;
   }
 #endif // _CCCL_HAS_NVFP6_E2M3()
 #if _CCCL_HAS_NVFP4_E2M1()
-  else if constexpr (is_same_v<_RawTp, __nv_fp4_e2m1>)
+  else if constexpr (is_same_v<_RawTp, __hip_fp4_e2m1>)
   {
     return 4;
   }

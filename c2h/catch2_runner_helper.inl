@@ -31,8 +31,7 @@
 //! is configured to compile each test as a separate binary, this file is included into each test.
 
 // NOTE(HIP/AMD): restore the runtime-API wrapper include dropped upstream so
-// cudaGetDeviceCount / cudaSetDevice / cudaSuccess resolve (shimmed to the
-// hip* equivalents in <libhipcxx/__amd/cuda_runtime.h>) for the shared
+// hipGetDeviceCount / hipSetDevice / hipSuccess resolve for the shared
 // cccl.c2h.main runner on HIP.
 #include <cuda/__runtime/api_wrapper.h>
 
@@ -41,7 +40,7 @@
 int device_guard(int device_id)
 {
   int device_count{};
-  if (cudaGetDeviceCount(&device_count) != cudaSuccess)
+  if (hipGetDeviceCount(&device_count) != hipSuccess)
   {
     std::cerr << "Failed getting number of devices" << '\n';
     std::exit(-1);
@@ -58,7 +57,7 @@ int device_guard(int device_id)
 
 void set_device(int device_id)
 {
-  if (cudaSetDevice(device_guard(device_id)) != cudaSuccess)
+  if (hipSetDevice(device_guard(device_id)) != hipSuccess)
   {
     std::cerr << "Failed to set device ID: " << device_id << '\n';
     std::exit(-1);

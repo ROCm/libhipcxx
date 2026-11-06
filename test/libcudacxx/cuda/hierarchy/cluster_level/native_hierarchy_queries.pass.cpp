@@ -85,7 +85,7 @@ __global__ void test_kernel()
 void test()
 {
   [[maybe_unused]] int cc_major{};
-  assert(cudaDeviceGetAttribute(&cc_major, cudaDevAttrComputeCapabilityMajor, 0) == cudaSuccess);
+  assert(hipDeviceGetAttribute(&cc_major, hipDeviceAttributeComputeCapabilityMajor, 0) == hipSuccess);
 
   // thread block clusters require compute capability at least 9.0
   [[maybe_unused]] const bool enable_clusters = cc_major >= 9;
@@ -97,24 +97,24 @@ void test()
 #if !defined(__HIP_PLATFORM_AMD__) // NOTE(HIP/AMD): thread-block clusters are NVIDIA-only
   if (enable_clusters)
   {
-    cudaLaunchAttribute attribute[1]{};
+    hipLaunchAttribute attribute[1]{};
     attribute[0].id               = cudaLaunchAttributeClusterDimension;
     attribute[0].val.clusterDim.x = 4;
     attribute[0].val.clusterDim.y = 2;
     attribute[0].val.clusterDim.z = 1;
 
-    cudaLaunchConfig_t config{};
+    hipLaunchConfig_t config{};
     config.gridDim  = {12, 10, 3};
     config.blockDim = {2, 8, 4};
     config.attrs    = attribute;
     config.numAttrs = 1;
 
     void* pargs[1]{};
-    assert(cudaLaunchKernelExC(&config, (const void*) test_kernel, pargs) == cudaSuccess);
+    assert(hipLaunchKernelExC(&config, (const void*) test_kernel, pargs) == hipSuccess);
   }
 #endif // !defined(__HIP_PLATFORM_AMD__)
 
-  assert(cudaDeviceSynchronize() == cudaSuccess);
+  assert(hipDeviceSynchronize() == hipSuccess);
 }
 #endif // !_CCCL_COMPILER(NVRTC)
 
