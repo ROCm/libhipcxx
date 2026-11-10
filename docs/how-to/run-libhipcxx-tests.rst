@@ -169,6 +169,27 @@ useful on machines without a GPU or when targeting a different architecture:
 
     lit ../test/libcudacxx/std/containers/views/views.span -sv -Dexecutor="NoopExecutor()"
 
+``NoopExecutor`` discards the compiled tests. To compile the tests once and run them later
+without compiling again, use ``--param prebuilt_mode=build`` and then
+``--param prebuilt_mode=run``. This works for both HIP and HIPRTC builds:
+
+.. code-block:: shell
+
+    # Compile the tests and keep the results; nothing runs on the GPU
+    lit ../test/libcudacxx/std/containers/views/views.span -sv --param prebuilt_mode=build
+
+    # Run the kept results without compiling
+    lit ../test/libcudacxx/std/containers/views/views.span -sv --param prebuilt_mode=run
+
+``.fail.cpp`` and ``.sh.cpp`` tests have no run step. ``prebuilt_mode=build`` evaluates them
+completely and ``prebuilt_mode=run`` reports them as unsupported.
+
+To do this for the whole suite as part of the build, configure with
+``-DLIBHIPCXX_PREBUILD_LIT_TESTS=ON``. The build then compiles every lit test (target
+``libcudacxx.test.lit.prebuild``, part of ``all``), and the ``libcudacxx.test.lit`` CTest entry
+only runs them. The build compiles for the architectures in ``CMAKE_HIP_ARCHITECTURES``, so
+set it explicitly when the build machine has no GPU.
+
 To test a different C++ standard, pass ``--param=std=<standard>``, for example:
 
 .. code-block:: shell
