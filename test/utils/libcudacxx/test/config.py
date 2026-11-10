@@ -357,12 +357,22 @@ class Configuration(object):
     def get_test_format(self):
         from libcudacxx.test.format import LibcxxTestFormat
 
+        prebuilt_mode = self.get_lit_conf("prebuilt_mode", "")
+        if prebuilt_mode not in LibcxxTestFormat.PREBUILT_MODES:
+            self.lit_config.fatal(
+                "parameter 'prebuilt_mode' should be one of %r, got %r"
+                % (LibcxxTestFormat.PREBUILT_MODES, prebuilt_mode)
+            )
+        if prebuilt_mode:
+            self.lit_config.note("Using prebuilt_mode: %s" % prebuilt_mode)
+
         return LibcxxTestFormat(
             self.cxx,
             self.use_clang_verify,
             self.execute_external,
             self.executor,
             exec_env=self.exec_env,
+            prebuilt_mode=prebuilt_mode,
         )
 
     def configure_executor(self):
