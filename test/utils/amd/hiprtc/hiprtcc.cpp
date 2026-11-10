@@ -380,7 +380,7 @@ int main(int argc, char** argv)
       std::string gpuCodeFile = outputTemplate + "." + archString(build) + ".gpu";
       write_output_file(gpuCode.data(), gpuCode.size(), gpuCodeFile);
       ostr << "  - ";
-      ostr << '\'' << gpuCodeFile << '\'';
+      ostr << '\'' << std::filesystem::path(gpuCodeFile).filename().string() << '\'';
       ostr << '\n';
     }
     ostr.close();

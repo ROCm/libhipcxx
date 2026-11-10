@@ -29,6 +29,7 @@
 #include <hip/hip_runtime.h>
 #include <hip/hiprtc.h>
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <iterator>
