@@ -190,6 +190,15 @@ To do this for the whole suite as part of the build, configure with
 only runs them. The build compiles for the architectures in ``CMAKE_HIP_ARCHITECTURES``, so
 set it explicitly when the build machine has no GPU.
 
+To run the prebuilt tests on another machine, also configure the build with
+``-DLIBHIPCXX_INSTALL_TESTS=ON``. ``cmake --install`` then installs the prebuilt tree into
+``<prefix>/share/libhipcxx/lit``, together with the architectures and C++ standard it was
+built for. On the test machine, configure libhipcxx with
+``-DLIBHIPCXX_PREBUILT_LIT_DIR=<prefix>/share/libhipcxx/lit`` and run
+``ctest --tests-regex '^libcudacxx\.test\.lit$'``. The ``libcudacxx.test.lit`` entry then runs the
+installed tests with ``prebuilt_mode=run`` and compiles nothing. To use lit directly, pass
+``--param prebuilt_dir=<prefix>/share/libhipcxx/lit`` together with ``--param prebuilt_mode=run``.
+
 To test a different C++ standard, pass ``--param=std=<standard>``, for example:
 
 .. code-block:: shell
