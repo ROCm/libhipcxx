@@ -649,6 +649,34 @@ else()
   set(LIBCUDACXX_ENABLE_PEDANTIC_WARNINGS False)
 endif()
 
+# NOTE(HIP/AMD): run a prebuilt lit test tree instead of compiling the tests,
+# e.g. the one LIBHIPCXX_INSTALL_TESTS installs into share/libhipcxx/lit when
+# LIBHIPCXX_PREBUILD_LIT_TESTS is ON. lit selects tests by offload arch and C++
+# standard, so take both from the tree: a test lit skipped while building is
+# missing from the tree.
+set(
+  LIBHIPCXX_PREBUILT_LIT_DIR
+  ""
+  CACHE PATH
+  "Prebuilt lit test tree that the libcudacxx.test.lit CTest entry runs instead of compiling the tests."
+)
+set(_libcudacxx_prebuilt_lit_config_name "prebuilt_lit_config.cmake")
+if (LIBHIPCXX_PREBUILT_LIT_DIR)
+  set(_libcudacxx_prebuilt_lit_config
+    "${LIBHIPCXX_PREBUILT_LIT_DIR}/${_libcudacxx_prebuilt_lit_config_name}")
+  if (NOT EXISTS "${_libcudacxx_prebuilt_lit_config}")
+    message(FATAL_ERROR
+      "LIBHIPCXX_PREBUILT_LIT_DIR has no ${_libcudacxx_prebuilt_lit_config_name}: "
+      "${LIBHIPCXX_PREBUILT_LIT_DIR}")
+  endif()
+  include("${_libcudacxx_prebuilt_lit_config}")
+  set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBHIPCXX_PREBUILT_LIT_COMPUTE_ARCHS}")
+  set(LIBCUDACXX_TEST_STANDARD_VER "${LIBHIPCXX_PREBUILT_LIT_STANDARD_VER}")
+  message(STATUS
+    "Running prebuilt lit tests from ${LIBHIPCXX_PREBUILT_LIT_DIR} "
+    "(archs: ${LIBCUDACXX_COMPUTE_ARCHS_STRING}, ${LIBCUDACXX_TEST_STANDARD_VER})")
+endif()
+
 set(lit_site_cfg_path "${CMAKE_CURRENT_BINARY_DIR}/lit.site.cfg")
 configure_lit_site_cfg(
   "${CMAKE_CURRENT_SOURCE_DIR}/lit.site.cfg.in"
@@ -795,6 +823,40 @@ if (LIBHIPCXX_PREBUILD_LIT_TESTS)
     DEPENDS "${_libcudacxx_lit_prebuild_stamp}"
   )
   set(_libcudacxx_lit_run_flags --param prebuilt_mode=run)
+
+  if (LIBHIPCXX_INSTALL_TESTS)
+    # Install the kept results (the 'Output' directories under the lit exec
+    # root) together with the settings LIBHIPCXX_PREBUILT_LIT_DIR needs to
+    # select the same tests again.
+    include(GNUInstallDirs)
+    set(_libcudacxx_prebuilt_lit_install_dir "${CMAKE_INSTALL_DATADIR}/libhipcxx/lit")
+    set(_libcudacxx_prebuilt_lit_config
+      "${CMAKE_CURRENT_BINARY_DIR}/${_libcudacxx_prebuilt_lit_config_name}")
+    file(WRITE "${_libcudacxx_prebuilt_lit_config}"
+      "set(LIBHIPCXX_PREBUILT_LIT_COMPUTE_ARCHS \"${LIBCUDACXX_COMPUTE_ARCHS_STRING}\")\n"
+      "set(LIBHIPCXX_PREBUILT_LIT_STANDARD_VER \"${LIBCUDACXX_TEST_STANDARD_VER}\")\n")
+    install(
+      FILES "${_libcudacxx_prebuilt_lit_config}"
+      DESTINATION "${_libcudacxx_prebuilt_lit_install_dir}"
+    )
+    install(
+      DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test/"
+      DESTINATION "${_libcudacxx_prebuilt_lit_install_dir}"
+      USE_SOURCE_PERMISSIONS
+      FILES_MATCHING
+      REGEX "/Output/[^/]+$"
+    )
+  endif()
+elseif (LIBHIPCXX_PREBUILT_LIT_DIR)
+  set(
+    _libcudacxx_lit_run_flags
+    --param prebuilt_mode=run
+    "--param=prebuilt_dir=${LIBHIPCXX_PREBUILT_LIT_DIR}"
+  )
+endif()
+if (LIBHIPCXX_PREBUILD_LIT_TESTS AND LIBHIPCXX_PREBUILT_LIT_DIR)
+  message(FATAL_ERROR
+    "LIBHIPCXX_PREBUILD_LIT_TESTS and LIBHIPCXX_PREBUILT_LIT_DIR are mutually exclusive.")
 endif()
 
 add_test(
