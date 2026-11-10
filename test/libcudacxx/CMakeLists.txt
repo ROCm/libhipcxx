@@ -731,6 +731,72 @@ if(libcudacxx_LIT_PARALLEL_LEVEL GREATER 0)
   set(_libcudacxx_lit_j_flag -j "${libcudacxx_LIT_PARALLEL_LEVEL}")
 endif()
 
+# NOTE(HIP/AMD): compile the lit tests during the build and only run them from
+# CTest, so test machines need no compiler work. The build runs lit with
+# '--param prebuilt_mode=build', which compiles every test and keeps the
+# result next to its temp path; 'libcudacxx.test.lit' then runs lit with
+# '--param prebuilt_mode=run' (see LibcxxTestFormat in
+# test/utils/libcudacxx/test/format.py). The build step depends on every
+# header and test file, since lit tracks no dependencies of its own.
+option(
+  LIBHIPCXX_PREBUILD_LIT_TESTS
+  "Compile the lit tests as part of the build. The libcudacxx.test.lit CTest entry then only runs them."
+  OFF
+)
+set(_libcudacxx_lit_run_flags "")
+if (LIBHIPCXX_PREBUILD_LIT_TESTS)
+  file(
+    GLOB_RECURSE _libcudacxx_lit_prebuild_inputs
+    CONFIGURE_DEPENDS
+    "${libcudacxx_SOURCE_DIR}/include/*"
+    "${libcudacxx_SOURCE_DIR}/test/libcudacxx/*"
+    "${libcudacxx_SOURCE_DIR}/test/support/*"
+    "${libcudacxx_SOURCE_DIR}/test/utils/libcudacxx/*"
+  )
+  # Run after the other test targets, as lit uses every core by itself.
+  set(_libcudacxx_lit_prebuild_after)
+  foreach (
+    _target
+    IN ITEMS
+      libcudacxx.test.public_headers
+      libcudacxx.test.internal_headers
+      libcudacxx.test.public_headers_host_only
+      libcudacxx.test.c2h_all
+  )
+    if (TARGET ${_target})
+      list(APPEND _libcudacxx_lit_prebuild_after ${_target})
+    endif()
+  endforeach()
+  set(_libcudacxx_lit_prebuild_stamp "${CMAKE_CURRENT_BINARY_DIR}/lit_prebuild.stamp")
+  add_custom_command(
+    OUTPUT "${_libcudacxx_lit_prebuild_stamp}"
+    # gersemi: off
+    COMMAND
+      "${CMAKE_COMMAND}" -E env "LIBCUDACXX_SITE_CONFIG=${lit_site_cfg_path}"
+        "${libcudacxx_LIT}"
+          -sv --no-progress-bar
+          ${libcudacxx_LIT_FLAGS}
+          ${_libcudacxx_lit_j_flag}
+          --param prebuilt_mode=build
+          "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
+    COMMAND "${CMAKE_COMMAND}" -E touch "${_libcudacxx_lit_prebuild_stamp}"
+    # gersemi: on
+    DEPENDS
+      "${lit_site_cfg_path}"
+      ${_libcudacxx_lit_prebuild_inputs}
+      ${_libcudacxx_lit_prebuild_after}
+      ${LIBHIPCXX_TEST_DEPENDS}
+    COMMENT "Building the libcudacxx lit tests (prebuilt_mode=build)"
+    USES_TERMINAL
+  )
+  add_custom_target(
+    libcudacxx.test.lit.prebuild
+    ALL
+    DEPENDS "${_libcudacxx_lit_prebuild_stamp}"
+  )
+  set(_libcudacxx_lit_run_flags --param prebuilt_mode=run)
+endif()
+
 add_test(
   NAME libcudacxx.test.lit
   # gersemi: off
@@ -740,6 +806,7 @@ add_test(
         -vv --no-progress-bar --time-tests
         ${libcudacxx_LIT_FLAGS}
         ${_libcudacxx_lit_j_flag}
+        ${_libcudacxx_lit_run_flags}
         "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
     # gersemi: on
     USES_TERMINAL
