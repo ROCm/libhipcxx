@@ -55,14 +55,35 @@ class LibcxxTestFormat(object):
       FOO.runfail.cpp - Negative test case which is expected to compile, run,
                         and exit with non-zero exit code.
       FOO.sh.cpp   - A test that uses LIT's ShTest format.
+
+    prebuilt_mode splits compiling and running into two lit invocations:
+      ""      - Compile and run every test (default).
+      "build" - Compile the .pass/.runfail tests and keep the result next to
+                the test's temp path instead of running it. .fail and .sh
+                tests are evaluated completely, as they have no run step.
+      "run"   - Run the results kept by "build" without compiling. .fail and
+                .sh tests were already evaluated by "build" and are reported
+                as UNSUPPORTED.
     """
 
-    def __init__(self, cxx, use_verify_for_fail, execute_external, executor, exec_env):
+    PREBUILT_MODES = ("", "build", "run")
+
+    def __init__(
+        self,
+        cxx,
+        use_verify_for_fail,
+        execute_external,
+        executor,
+        exec_env,
+        prebuilt_mode="",
+    ):
+        assert prebuilt_mode in self.PREBUILT_MODES
         self.cxx = copy.deepcopy(cxx)
         self.use_verify_for_fail = use_verify_for_fail
         self.execute_external = execute_external
         self.executor = executor
         self.exec_env = dict(exec_env)
+        self.prebuilt_mode = prebuilt_mode
 
     @staticmethod
     def _make_custom_parsers():
@@ -241,6 +262,12 @@ class LibcxxTestFormat(object):
                 if flag.startswith("-gencode=") or flag.startswith("--generate-code=")
             ]
 
+        if self.prebuilt_mode == "run" and (is_sh_test or is_fail_test):
+            return (
+                lit.Test.UNSUPPORTED,
+                "Compile-only test, evaluated by prebuilt_mode=build",
+            )
+
         # Dispatch the test based on its suffix.
         if is_sh_test:
             if not isinstance(self.executor, LocalExecutor):
@@ -277,6 +304,15 @@ class LibcxxTestFormat(object):
         object_path = tmpBase + ".o"
         # Create the output directory if it does not already exist.
         libcudacxx.util.mkdir_p(os.path.dirname(tmpBase))
+        if self.prebuilt_mode == "run":
+            return self._run_prebuilt_test(test, tmpBase, exec_path, run_should_pass)
+        if self.prebuilt_mode == "build":
+            for path in self._prebuilt_outputs(tmpBase, exec_path):
+                libcudacxx.util.cleanFile(path)
+        # A combined run over a prebuilt tree refreshes the prebuilt executable
+        # instead of deleting it, so a later prebuilt_mode=run still finds it.
+        keep_exec = self.prebuilt_mode == "build" or os.path.exists(exec_path)
+        compiled = False
         try:
             is_flaky = self._get_parser("FLAKY_TEST.", parsers).getValue()
             # TODO(AMD): set this to 1 again when tests have stabilized with TheRock
@@ -294,6 +330,7 @@ class LibcxxTestFormat(object):
                         source_path, out=exec_path, object_file=object_path,
                         cwd=execDir)
                     compile_cmd = cmd
+                    compiled = rc == 0
                     if rc != 0:
                         report = libcudacxx.util.makeReport(cmd, out, err, rc)
                         report += "Compilation failed unexpectedly!"
@@ -301,6 +338,12 @@ class LibcxxTestFormat(object):
                             return lit.Test.Result(lit.Test.FAIL, report)
                         else:
                             continue
+                    if self.prebuilt_mode == "build":
+                        report = libcudacxx.util.makeReport(cmd, out, err, rc)
+                        if test.isExpectedToFail():
+                            # Not yet known whether it fails; prebuilt_mode=run decides.
+                            return lit.Test.Result(lit.Test.UNSUPPORTED, report)
+                        return lit.Test.Result(lit.Test.PASS, report)
                     # Run the test
                     local_cwd = os.path.dirname(source_path)
                     env = None
@@ -351,7 +394,65 @@ class LibcxxTestFormat(object):
             # Note that cleanup of exec_file happens in `_clean()`. If you
             # override this, cleanup is your responsibility.
             libcudacxx.util.cleanFile(object_path)
-            self._clean(exec_path)
+            if not (keep_exec and compiled):
+                self._clean(exec_path)
+
+    @staticmethod
+    def _prebuilt_outputs(tmpBase, exec_path):
+        # Offline builds produce exec_path. hiprtcc writes no executable but a
+        # '<tmpBase>.build.yml' index that 'hiprtcc <exec_path>' loads to run.
+        return [exec_path, tmpBase + ".build.yml"]
+
+    def _run_prebuilt_test(self, test, tmpBase, exec_path, run_should_pass):
+        if not any(os.path.exists(p) for p in self._prebuilt_outputs(tmpBase, exec_path)):
+            return lit.Test.Result(
+                lit.Test.FAIL,
+                "No prebuilt test found at '%s'. Build the tests with "
+                "prebuilt_mode=build first.\n" % exec_path,
+            )
+        local_cwd = os.path.dirname(test.getSourcePath())
+        env = self.exec_env if self.exec_env else None
+        data_files = [
+            os.path.join(local_cwd, f)
+            for f in os.listdir(local_cwd)
+            if f.endswith(".dat")
+        ]
+        # TODO(AMD): set this to 1 again when tests have stabilized with TheRock
+        # (https://github.com/ROCm/libhipcxx/issues/14)
+        max_retry = 3
+        retry_count = -1
+        while retry_count < max_retry:
+            retry_count += 1
+            time_out_detected = False
+            try:
+                cmd, out, err, rc = self.executor.run(
+                    exec_path, [exec_path], local_cwd, data_files, env
+                )
+                report = libcudacxx.util.makeReport(cmd, out, err, rc)
+                result_expected = (rc == 0) == run_should_pass
+            except (
+                libcudacxx.util.ExecuteCommandTimeoutException,
+                lit.util.ExecuteCommandTimeoutException,
+            ) as e:
+                rc = -42
+                out = "None"
+                report = libcudacxx.util.makeReport([exec_path], out, str(e), rc)
+                result_expected = False
+                time_out_detected = True
+            if result_expected:
+                res = lit.Test.PASS if retry_count == 0 else lit.Test.FLAKYPASS
+                return lit.Test.Result(res, report)
+            # Rarely devices are unavailable, so just restart the test to avoid false negatives.
+            elif rc != 0 and "hipErrorNoDevice" in out and max_retry <= 5:
+                max_retry += 1
+            elif retry_count >= max_retry:
+                if run_should_pass:
+                    report += f"Prebuilt test failed unexpectedly after {retry_count} retry attempt(s)!"
+                else:
+                    report += f"Prebuilt test succeeded unexpectedly after {retry_count} retry attempt(s)!"
+                if time_out_detected:
+                    return lit.Test.Result(lit.Test.TIMEOUT, report)
+                return lit.Test.Result(lit.Test.FAIL, report)
 
     def _evaluate_fail_test(self, test, test_cxx, parsers):
         source_path = test.getSourcePath()
