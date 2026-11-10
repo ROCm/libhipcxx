@@ -43,6 +43,11 @@ import libcudacxx.util
 # pylint: disable=import-error
 from libcudacxx.test.executor import LocalExecutor as LocalExecutor
 
+_TIMEOUT_EXCEPTIONS = (
+    libcudacxx.util.ExecuteCommandTimeoutException,
+    lit.util.ExecuteCommandTimeoutException,
+)
+
 
 class LibcxxTestFormat(object):
     """
@@ -67,6 +72,9 @@ class LibcxxTestFormat(object):
     """
 
     PREBUILT_MODES = ("", "build", "run")
+    # TODO(AMD): set this to 1 again when tests have stabilized with TheRock
+    # (https://github.com/ROCm/libhipcxx/issues/14)
+    MAX_RETRY = 3
 
     def __init__(
         self,
@@ -306,90 +314,44 @@ class LibcxxTestFormat(object):
         libcudacxx.util.mkdir_p(os.path.dirname(tmpBase))
         if self.prebuilt_mode == "run":
             return self._run_prebuilt_test(test, tmpBase, exec_path, run_should_pass)
+        compile_cmd_path = self._compile_cmd_path(tmpBase)
         if self.prebuilt_mode == "build":
-            for path in self._prebuilt_outputs(tmpBase, exec_path):
+            for path in self._prebuilt_outputs(tmpBase, exec_path) + [compile_cmd_path]:
                 libcudacxx.util.cleanFile(path)
+        keep_compile_cmd = self.prebuilt_mode == "build" or os.path.exists(compile_cmd_path)
         # A combined run over a prebuilt tree refreshes the prebuilt executable
         # instead of deleting it, so a later prebuilt_mode=run still finds it.
         keep_exec = self.prebuilt_mode == "build" or os.path.exists(exec_path)
         compiled = False
-        try:
-            is_flaky = self._get_parser("FLAKY_TEST.", parsers).getValue()
-            # TODO(AMD): set this to 1 again when tests have stabilized with TheRock
-            # (https://github.com/ROCm/libhipcxx/issues/14)
-            max_retry = 3 #if is_flaky else 1
-            time_out_detected = False
-            compile_cmd = "None"
-            out = "None"
-            retry_count = -1
-            while retry_count < max_retry:
-                retry_count += 1
-                try:
-                    # Compile the test
-                    cmd, out, err, rc = test_cxx.compileLinkTwoSteps(
-                        source_path, out=exec_path, object_file=object_path,
-                        cwd=execDir)
-                    compile_cmd = cmd
-                    compiled = rc == 0
-                    if rc != 0:
-                        report = libcudacxx.util.makeReport(cmd, out, err, rc)
-                        report += "Compilation failed unexpectedly!"
-                        if retry_count >= max_retry:
-                            return lit.Test.Result(lit.Test.FAIL, report)
-                        else:
-                            continue
-                    if self.prebuilt_mode == "build":
-                        report = libcudacxx.util.makeReport(cmd, out, err, rc)
-                        if test.isExpectedToFail():
-                            # Not yet known whether it fails; prebuilt_mode=run decides.
-                            return lit.Test.Result(lit.Test.UNSUPPORTED, report)
-                        return lit.Test.Result(lit.Test.PASS, report)
-                    # Run the test
-                    local_cwd = os.path.dirname(source_path)
-                    env = None
-                    if self.exec_env:
-                        env = self.exec_env
-                    # TODO: Only list actually needed files in file_deps.
-                    # Right now we just mark all of the .dat files in the same
-                    # directory as dependencies, but it's likely less than that. We
-                    # should add a `// FILE-DEP: foo.dat` to each test to track this.
-                    data_files = [
-                        os.path.join(local_cwd, f)
-                        for f in os.listdir(local_cwd)
-                        if f.endswith(".dat")
-                    ]
-                    cmd, out, err, rc = self.executor.run(
-                        exec_path, [exec_path], local_cwd, data_files, env
-                    )
-                    report = "Compiled With: '%s'\n" % " ".join(compile_cmd)
-                    report += libcudacxx.util.makeReport(cmd, out, err, rc)
-                    result_expected = (rc == 0) == run_should_pass
-                except (libcudacxx.util.ExecuteCommandTimeoutException, lit.util.ExecuteCommandTimeoutException) as e:
-                    err = str(e)
-                    rc = -42
-                    out = "None"
-                    report = "Compiled With: '%s'\n" % " ".join(compile_cmd)
-                    report += libcudacxx.util.makeReport(compile_cmd, out, err, rc)
-                    result_expected = False
-                    time_out_detected = True
-                if result_expected:
-                    res = lit.Test.PASS if retry_count == 0 else lit.Test.FLAKYPASS
-                    return lit.Test.Result(res, report)
-                # Rarely devices are unavailable, so just restart the test to avoid false negatives.
-                elif (
-                    rc != 0 and "hipErrorNoDevice" in out and max_retry <= 5
-                ):
-                    max_retry += 1
-                elif retry_count >= max_retry:
-                    if run_should_pass:
-                        report += f"Compiled test failed unexpectedly after {retry_count} retry attempt(s)!"
-                    else:
-                        report += f"Compiled test succeeded unexpectedly after {retry_count} retry attempt(s)!"
-                    if time_out_detected:
-                        return lit.Test.Result(lit.Test.TIMEOUT, report)
-                    return lit.Test.Result(lit.Test.FAIL, report)
 
-            assert False  # Unreachable
+        def attempt(retry_count):
+            nonlocal compiled
+            compiled = False
+            try:
+                cmd, out, err, rc = test_cxx.compileLinkTwoSteps(
+                    source_path, out=exec_path, object_file=object_path, cwd=execDir
+                )
+            except _TIMEOUT_EXCEPTIONS as e:
+                return "timeout", self._timeout_report(e) + "Compilation timed out!\n"
+            report = libcudacxx.util.makeReport(cmd, out, err, rc)
+            if rc != 0:
+                return "fail", report + "Compilation failed unexpectedly!\n"
+            compiled = True
+            compile_cmd = " ".join(cmd)
+            if keep_compile_cmd:
+                with open(compile_cmd_path, "w") as f:
+                    f.write(compile_cmd)
+            if self.prebuilt_mode == "build":
+                if test.isExpectedToFail():
+                    # Not yet known whether it fails; prebuilt_mode=run decides.
+                    return lit.Test.UNSUPPORTED, report
+                return "pass", report
+            return self._run_test_exe(
+                test, exec_path, compile_cmd, run_should_pass, retry_count
+            )
+
+        try:
+            return self._retry(attempt)
         finally:
             # Note that cleanup of exec_file happens in `_clean()`. If you
             # override this, cleanup is your responsibility.
@@ -397,11 +359,79 @@ class LibcxxTestFormat(object):
             if not (keep_exec and compiled):
                 self._clean(exec_path)
 
+    def _retry(self, attempt):
+        """Calls attempt(retry_count) until it passes or no retries are left.
+
+        attempt returns (outcome, report). outcome is "pass", "fail",
+        "timeout", "no_device" for a test that found no GPU, which gets extra
+        retries, or a lit.Test.ResultCode that is returned as is.
+        """
+        max_retry = self.MAX_RETRY
+        retry_count = 0
+        while True:
+            outcome, report = attempt(retry_count)
+            if isinstance(outcome, lit.Test.ResultCode):
+                return lit.Test.Result(outcome, report)
+            if outcome == "pass":
+                code = lit.Test.FLAKYPASS if retry_count else lit.Test.PASS
+                return lit.Test.Result(code, report)
+            if outcome == "no_device" and max_retry < 2 * self.MAX_RETRY:
+                max_retry += 1
+            elif retry_count >= max_retry:
+                code = lit.Test.TIMEOUT if outcome == "timeout" else lit.Test.FAIL
+                return lit.Test.Result(code, report)
+            retry_count += 1
+
+    def _run_test_exe(self, test, exec_path, compile_cmd, run_should_pass, retry_count):
+        local_cwd = os.path.dirname(test.getSourcePath())
+        env = self.exec_env if self.exec_env else None
+        # TODO: Only list actually needed files in file_deps.
+        # Right now we just mark all of the .dat files in the same
+        # directory as dependencies, but it's likely less than that. We
+        # should add a `// FILE-DEP: foo.dat` to each test to track this.
+        data_files = [
+            os.path.join(local_cwd, f)
+            for f in os.listdir(local_cwd)
+            if f.endswith(".dat")
+        ]
+        report = "Compiled With: '%s'\n" % compile_cmd if compile_cmd else ""
+        try:
+            cmd, out, err, rc = self.executor.run(
+                exec_path, [exec_path], local_cwd, data_files, env
+            )
+        except _TIMEOUT_EXCEPTIONS as e:
+            outcome = "timeout"
+            report += self._timeout_report(e)
+        else:
+            report += libcudacxx.util.makeReport(cmd, out, err, rc)
+            if (rc == 0) == run_should_pass:
+                return "pass", report
+            # Rarely devices are unavailable, so just restart the test to avoid false negatives.
+            outcome = "no_device" if rc != 0 and "hipErrorNoDevice" in out else "fail"
+        expected = "failed" if run_should_pass else "succeeded"
+        report += f"Test {expected} unexpectedly after {retry_count} retry attempt(s)!\n"
+        return outcome, report
+
+    @staticmethod
+    def _timeout_report(e):
+        # libcudacxx's timeout exception carries the command that timed out.
+        cmd = getattr(e, "command", None) or ["None"]
+        if isinstance(cmd, str):
+            cmd = [cmd]
+        err = getattr(e, "err", "") + getattr(e, "msg", str(e)) + "\n"
+        return libcudacxx.util.makeReport(cmd, getattr(e, "out", ""), err, -42)
+
     @staticmethod
     def _prebuilt_outputs(tmpBase, exec_path):
         # Offline builds produce exec_path. hiprtcc writes no executable but a
         # '<tmpBase>.build.yml' index that 'hiprtcc <exec_path>' loads to run.
         return [exec_path, tmpBase + ".build.yml"]
+
+    @staticmethod
+    def _compile_cmd_path(tmpBase):
+        # prebuilt_mode=build records the compile command here so that
+        # prebuilt_mode=run can report it.
+        return tmpBase + ".compile_cmd"
 
     def _run_prebuilt_test(self, test, tmpBase, exec_path, run_should_pass):
         if not any(os.path.exists(p) for p in self._prebuilt_outputs(tmpBase, exec_path)):
@@ -410,49 +440,17 @@ class LibcxxTestFormat(object):
                 "No prebuilt test found at '%s'. Build the tests with "
                 "prebuilt_mode=build first.\n" % exec_path,
             )
-        local_cwd = os.path.dirname(test.getSourcePath())
-        env = self.exec_env if self.exec_env else None
-        data_files = [
-            os.path.join(local_cwd, f)
-            for f in os.listdir(local_cwd)
-            if f.endswith(".dat")
-        ]
-        # TODO(AMD): set this to 1 again when tests have stabilized with TheRock
-        # (https://github.com/ROCm/libhipcxx/issues/14)
-        max_retry = 3
-        retry_count = -1
-        while retry_count < max_retry:
-            retry_count += 1
-            time_out_detected = False
-            try:
-                cmd, out, err, rc = self.executor.run(
-                    exec_path, [exec_path], local_cwd, data_files, env
-                )
-                report = libcudacxx.util.makeReport(cmd, out, err, rc)
-                result_expected = (rc == 0) == run_should_pass
-            except (
-                libcudacxx.util.ExecuteCommandTimeoutException,
-                lit.util.ExecuteCommandTimeoutException,
-            ) as e:
-                rc = -42
-                out = "None"
-                report = libcudacxx.util.makeReport([exec_path], out, str(e), rc)
-                result_expected = False
-                time_out_detected = True
-            if result_expected:
-                res = lit.Test.PASS if retry_count == 0 else lit.Test.FLAKYPASS
-                return lit.Test.Result(res, report)
-            # Rarely devices are unavailable, so just restart the test to avoid false negatives.
-            elif rc != 0 and "hipErrorNoDevice" in out and max_retry <= 5:
-                max_retry += 1
-            elif retry_count >= max_retry:
-                if run_should_pass:
-                    report += f"Prebuilt test failed unexpectedly after {retry_count} retry attempt(s)!"
-                else:
-                    report += f"Prebuilt test succeeded unexpectedly after {retry_count} retry attempt(s)!"
-                if time_out_detected:
-                    return lit.Test.Result(lit.Test.TIMEOUT, report)
-                return lit.Test.Result(lit.Test.FAIL, report)
+        compile_cmd = None
+        try:
+            with open(self._compile_cmd_path(tmpBase)) as f:
+                compile_cmd = f.read()
+        except OSError:
+            pass
+        return self._retry(
+            lambda retry_count: self._run_test_exe(
+                test, exec_path, compile_cmd, run_should_pass, retry_count
+            )
+        )
 
     def _evaluate_fail_test(self, test, test_cxx, parsers):
         source_path = test.getSourcePath()
@@ -499,40 +497,20 @@ class LibcxxTestFormat(object):
                     ]
                 else:
                     test_cxx.flags += ["-Xcompiler", "-Werror=unused-result"]
-        cmd = ""
-        out = "None"
-        report = ""
-        # TODO(AMD): set this to 1 again when tests have stabilized with TheRock
-        # (https://github.com/ROCm/libhipcxx/issues/14)
-        max_retry = 3 #if is_flaky else 1
-        time_out_detected = False
-        for retry_count in range(max_retry):
+
+        def attempt(retry_count):
             try:
                 cmd, out, err, rc = test_cxx.compile(source_path, out=os.devnull)
-            except (libcudacxx.util.ExecuteCommandTimeoutException, lit.util.ExecuteCommandTimeoutException) as e:
-                err = str(e)
-                rc = -42
-                out = "None"
-                result_expected = False
-                time_out_detected = True
-
-            def check_rc(rc):
-                return rc == 0 if use_verify else rc != 0
-                
+            except _TIMEOUT_EXCEPTIONS as e:
+                return "timeout", self._timeout_report(e)
             report = libcudacxx.util.makeReport(cmd, out, err, rc)
-            if time_out_detected:
-                if retry_count + 1 == max_retry:
-                    return lit.Test.Result(lit.Test.TIMEOUT, report)
-                else:
-                    continue
-            else:
-                if check_rc(rc):
-                    res = lit.Test.PASS if retry_count == 0 else lit.Test.FLAKYPASS
-                    return lit.Test.Result(res, report)
-                else:
-                    report += (
-                        "Expected compilation to fail!\n"
-                        if not use_verify
-                        else "Expected compilation using verify to pass!\n"
-                    )
-                    return lit.Test.Result(lit.Test.FAIL, report)
+            if (rc == 0) == use_verify:
+                return "pass", report
+            report += (
+                "Expected compilation to fail!\n"
+                if not use_verify
+                else "Expected compilation using verify to pass!\n"
+            )
+            return lit.Test.FAIL, report
+
+        return self._retry(attempt)
