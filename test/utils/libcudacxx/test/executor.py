@@ -6,8 +6,33 @@
 #
 # ===----------------------------------------------------------------------===##
 
+# MIT License
+#
+# Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+import contextlib
 import os
 import platform
+import shutil
+import uuid
 
 from libcudacxx.test import tracing
 from libcudacxx.util import executeCommand
@@ -42,6 +67,39 @@ class LocalExecutor(Executor):
             work_dir = os.getcwd()
         out, err, rc = executeCommand(cmd, cwd=work_dir, env=env, timeout=self.timeout)
         return (cmd, out, err, rc)
+
+
+# NOTE(HIP/AMD): Windows searches an executable's own directory for DLLs
+# before System32 and only checks PATH last. Running each test through a
+# hardlink in bin_dir makes that the application directory, so the HIP
+# runtime installed there wins over a different one in System32. Used by the
+# installed lit tests (LIBHIPCXX_INSTALL_TESTS) on Windows.
+class BinDirExecutor(LocalExecutor):
+    def __init__(self, bin_dir, timeout=0):
+        super(BinDirExecutor, self).__init__()
+        if not os.path.isdir(bin_dir):
+            raise FileNotFoundError("bin_dir not found: %s" % bin_dir)
+        self.bin_dir = bin_dir
+        self.timeout = timeout
+
+    def run(self, exe_path, cmd=None, work_dir=".", file_deps=None, env=None):
+        cmd = cmd or [exe_path]
+        staged = os.path.join(self.bin_dir, "lit-%s.exe" % uuid.uuid4().hex)
+        try:
+            os.link(exe_path, staged)
+        except OSError:
+            # Hardlinks fail across volumes.
+            shutil.copy2(exe_path, staged)
+        try:
+            staged_cmd = [staged if arg == exe_path else arg for arg in cmd]
+            _, out, err, rc = super(BinDirExecutor, self).run(
+                staged, staged_cmd, work_dir, file_deps, env
+            )
+            # Report the real test executable, not the deleted staged copy.
+            return cmd, out, err, rc
+        finally:
+            with contextlib.suppress(OSError):
+                os.remove(staged)
 
 
 class NoopExecutor(Executor):
