@@ -60,6 +60,17 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS)
   cccl_get_c2h()
 endif()
 
+# NOTE(HIP/AMD): install the c2h test executables into '<prefix>/bin' together
+# with a relocatable '<prefix>/bin/libhipcxx/CTestTestfile.cmake', so a
+# packaged build can run them with 'ctest --test-dir <prefix>/bin/libhipcxx'
+# without configuring or building anything. Keeping the executables in 'bin'
+# also lets Windows resolve the HIP runtime DLLs installed next to them.
+option(
+  LIBHIPCXX_INSTALL_TESTS
+  "Install the c2h test executables and a relocatable CTest file into <prefix>/bin."
+  OFF
+)
+
 # NOTE(HIP/AMD): rocThrust is found inside c2h/CMakeLists.txt (see
 # cccl_get_c2h() above), but the resulting 'rocthrust_FOUND' variable
 # is local to that subdirectory. Re-do the lookup here so we can use
@@ -115,6 +126,12 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT LIBHI
 
   set(c2h_all_target "libcudacxx.test.c2h_all")
   add_custom_target(${c2h_all_target})
+
+  if (LIBHIPCXX_INSTALL_TESTS)
+    include(GNUInstallDirs)
+    set(c2h_install_test_file "${CMAKE_CURRENT_BINARY_DIR}/install_CTestTestfile.cmake")
+    file(WRITE "${c2h_install_test_file}" "# libhipcxx c2h tests, generated for the install tree.\n")
+  endif()
 
   # NOTE(HIP/AMD): see the long-form comment inside libcudacxx_add_test()
   # below for the rationale. Briefly: commit 7b770425d9 extended the strict
@@ -203,6 +220,12 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT LIBHI
     endif()
 
     add_dependencies(${c2h_all_target} ${target_name})
+
+    if (LIBHIPCXX_INSTALL_TESTS)
+      install(TARGETS ${target_name} RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+      file(APPEND "${c2h_install_test_file}"
+        "add_test(${target_name} \"../${target_name}${CMAKE_EXECUTABLE_SUFFIX}\")\n")
+    endif()
   endfunction()
 
   foreach (test_src IN LISTS test_srcs)
@@ -221,6 +244,14 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT LIBHI
     endif()
     libcudacxx_add_test(test_target "${test_src}")
   endforeach()
+
+  if (LIBHIPCXX_INSTALL_TESTS)
+    install(
+      FILES "${c2h_install_test_file}"
+      DESTINATION "${CMAKE_INSTALL_BINDIR}/libhipcxx"
+      RENAME "CTestTestfile.cmake"
+    )
+  endif()
 elseif (LIBCUDACXX_ENABLE_CUDA OR LIBCUDACXX_ENABLE_HIP)
   # NOTE(HIP/AMD): when the per-test executables above are not created
   # (c2h disabled, or NVRTC/hipRTC runtime compilation), still define an
