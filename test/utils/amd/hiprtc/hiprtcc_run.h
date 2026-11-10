@@ -53,7 +53,13 @@ static ExecutionConfig load_execution_config_from_file(const std::string& file)
 
     if (match.size())
     {
-      builds.emplace_back(match[1].str());
+      // Builds are stored relative to the .build.yml so a prebuilt test tree can be moved.
+      std::filesystem::path build(match[1].str());
+      if (build.is_relative())
+      {
+        build = std::filesystem::path(file).parent_path() / build;
+      }
+      builds.emplace_back(build.string());
     }
 
     line_begin = line_end + 1;
