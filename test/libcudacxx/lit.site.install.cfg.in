@@ -1,0 +1,67 @@
+# MIT License
+#
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Site config of the installed, prebuilt lit tests (LIBHIPCXX_INSTALL_TESTS
+# with LIBHIPCXX_PREBUILD_LIT_TESTS). It is the build's site config with every
+# build-machine path moved to this directory, '<prefix>/bin' or '<prefix>',
+# so that the installed tree runs from wherever it is unpacked.
+@AUTO_GEN_COMMENT@
+import os
+import platform
+
+_pkg_dir = os.path.dirname(os.path.abspath(__file__))
+_bin_dir = os.path.dirname(os.path.dirname(_pkg_dir))
+_prefix_dir = os.path.normpath(os.path.join(_bin_dir, "@LIBHIPCXX_LIT_BIN_TO_PREFIX@"))
+
+@LIBHIPCXX_LIT_SITE_CFG_BODY@
+
+# (build path, installed path, path below the installed path that must exist).
+# A build path is only moved if the installed path has that entry, e.g. the
+# compiler is only taken from '<prefix>' if '<prefix>' holds one.
+_relocations = [
+@LIBHIPCXX_LIT_RELOCATIONS@
+]
+_relocations = sorted(
+    (
+        (old, new)
+        for old, new, required in _relocations
+        if os.path.exists(os.path.join(new, required))
+    ),
+    key=lambda relocation: -len(relocation[0]),
+)
+for _name, _value in list(vars(config).items()):
+    if isinstance(_value, str):
+        for _old, _new in _relocations:
+            _value = _value.replace(_old, _new.replace(os.sep, "/"))
+        setattr(config, _name, _value)
+
+# Only run the tests the build compiled.
+config.prebuilt_mode = "run"
+if platform.system() == "Windows" and config.executor == "None":
+    config.executor = "BinDirExecutor(%r, %s)" % (
+        _bin_dir,
+        config.maxIndividualTestTime,
+    )
+
+lit_config.load_config(
+    config, os.path.join(_pkg_dir, "src", "test", "libcudacxx", "lit.cfg")
+)

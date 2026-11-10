@@ -191,13 +191,15 @@ only runs them. The build compiles for the architectures in ``CMAKE_HIP_ARCHITEC
 set it explicitly when the build machine has no GPU.
 
 To run the prebuilt tests on another machine, also configure the build with
-``-DLIBHIPCXX_INSTALL_TESTS=ON``. ``cmake --install`` then installs the prebuilt tree into
-``<prefix>/share/libhipcxx/lit``, together with the architectures and C++ standard it was
-built for. On the test machine, configure libhipcxx with
-``-DLIBHIPCXX_PREBUILT_LIT_DIR=<prefix>/share/libhipcxx/lit`` and run
-``ctest --tests-regex '^libcudacxx\.test\.lit$'``. The ``libcudacxx.test.lit`` entry then runs the
-installed tests with ``prebuilt_mode=run`` and compiles nothing. To use lit directly, pass
-``--param prebuilt_dir=<prefix>/share/libhipcxx/lit`` together with ``--param prebuilt_mode=run``.
+``-DLIBHIPCXX_INSTALL_TESTS=ON``. ``cmake --install`` then installs them into
+``<prefix>/bin/libhipcxx/lit-amdclang`` (``lit-hiprtc`` for a ``LIBHIPCXX_TEST_WITH_HIPRTC``
+build, which also installs ``<prefix>/bin/hiprtcc``). The directory holds the prebuilt tests, the
+test sources and headers that lit reads, a relocatable ``lit.site.cfg`` and a
+``CTestTestfile.cmake``. The tests run with ``prebuilt_mode=run`` and need lit (see
+``requirements-test.txt``) and, for lit's compiler probes, the compiler used for the build; it is
+taken from ``<prefix>/lib/llvm/bin`` if present there. ``ctest --test-dir <prefix>/bin/libhipcxx``
+runs the c2h and amdclang++ lit tests; ``ctest --test-dir <prefix>/bin/libhipcxx/lit-hiprtc`` runs
+the hiprtc lit tests.
 
 To test a different C++ standard, pass ``--param=std=<standard>``, for example:
 

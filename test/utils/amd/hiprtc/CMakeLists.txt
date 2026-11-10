@@ -26,3 +26,10 @@ add_executable(libcudacxx.nvrtcc hiprtcc.cpp)
 set_target_properties(libcudacxx.nvrtcc PROPERTIES OUTPUT_NAME hiprtcc)
 target_link_libraries(libcudacxx.nvrtcc hiprtc::hiprtc hip::host)
 target_compile_features(libcudacxx.nvrtcc PRIVATE cxx_std_17)
+
+# The installed prebuilt hiprtc lit tests run through hiprtcc (see
+# LIBHIPCXX_INSTALL_TESTS in test/libcudacxx/CMakeLists.txt).
+if (LIBHIPCXX_INSTALL_TESTS AND LIBHIPCXX_PREBUILD_LIT_TESTS)
+  include(GNUInstallDirs)
+  install(TARGETS libcudacxx.nvrtcc RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+endif()

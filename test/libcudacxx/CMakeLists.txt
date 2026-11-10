@@ -70,6 +70,13 @@ option(
   "Install the c2h test executables and a relocatable CTest file into <prefix>/bin."
   OFF
 )
+# The test tiers that ROCm's CTest runners select with 'ctest -L <tier>'.
+set(
+  LIBHIPCXX_INSTALL_TESTS_LABELS
+  "quick;standard;comprehensive;full"
+  CACHE STRING
+  "CTest labels of the installed tests (LIBHIPCXX_INSTALL_TESTS)."
+)
 
 # NOTE(HIP/AMD): rocThrust is found inside c2h/CMakeLists.txt (see
 # cccl_get_c2h() above), but the resulting 'rocthrust_FOUND' variable
@@ -224,7 +231,8 @@ if (LIBCUDACXX_ENABLE_C2H_TESTS AND NOT LIBCUDACXX_TEST_WITH_NVRTC AND NOT LIBHI
     if (LIBHIPCXX_INSTALL_TESTS)
       install(TARGETS ${target_name} RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
       file(APPEND "${c2h_install_test_file}"
-        "add_test(${target_name} \"../${target_name}${CMAKE_EXECUTABLE_SUFFIX}\")\n")
+        "add_test(${target_name} \"../${target_name}${CMAKE_EXECUTABLE_SUFFIX}\")\n"
+        "set_tests_properties(${target_name} PROPERTIES LABELS \"${LIBHIPCXX_INSTALL_TESTS_LABELS}\")\n")
     endif()
   endfunction()
 
@@ -649,34 +657,6 @@ else()
   set(LIBCUDACXX_ENABLE_PEDANTIC_WARNINGS False)
 endif()
 
-# NOTE(HIP/AMD): run a prebuilt lit test tree instead of compiling the tests,
-# e.g. the one LIBHIPCXX_INSTALL_TESTS installs into share/libhipcxx/lit when
-# LIBHIPCXX_PREBUILD_LIT_TESTS is ON. lit selects tests by offload arch and C++
-# standard, so take both from the tree: a test lit skipped while building is
-# missing from the tree.
-set(
-  LIBHIPCXX_PREBUILT_LIT_DIR
-  ""
-  CACHE PATH
-  "Prebuilt lit test tree that the libcudacxx.test.lit CTest entry runs instead of compiling the tests."
-)
-set(_libcudacxx_prebuilt_lit_config_name "prebuilt_lit_config.cmake")
-if (LIBHIPCXX_PREBUILT_LIT_DIR)
-  set(_libcudacxx_prebuilt_lit_config
-    "${LIBHIPCXX_PREBUILT_LIT_DIR}/${_libcudacxx_prebuilt_lit_config_name}")
-  if (NOT EXISTS "${_libcudacxx_prebuilt_lit_config}")
-    message(FATAL_ERROR
-      "LIBHIPCXX_PREBUILT_LIT_DIR has no ${_libcudacxx_prebuilt_lit_config_name}: "
-      "${LIBHIPCXX_PREBUILT_LIT_DIR}")
-  endif()
-  include("${_libcudacxx_prebuilt_lit_config}")
-  set(LIBCUDACXX_COMPUTE_ARCHS_STRING "${LIBHIPCXX_PREBUILT_LIT_COMPUTE_ARCHS}")
-  set(LIBCUDACXX_TEST_STANDARD_VER "${LIBHIPCXX_PREBUILT_LIT_STANDARD_VER}")
-  message(STATUS
-    "Running prebuilt lit tests from ${LIBHIPCXX_PREBUILT_LIT_DIR} "
-    "(archs: ${LIBCUDACXX_COMPUTE_ARCHS_STRING}, ${LIBCUDACXX_TEST_STANDARD_VER})")
-endif()
-
 set(lit_site_cfg_path "${CMAKE_CURRENT_BINARY_DIR}/lit.site.cfg")
 configure_lit_site_cfg(
   "${CMAKE_CURRENT_SOURCE_DIR}/lit.site.cfg.in"
@@ -825,38 +805,123 @@ if (LIBHIPCXX_PREBUILD_LIT_TESTS)
   set(_libcudacxx_lit_run_flags --param prebuilt_mode=run)
 
   if (LIBHIPCXX_INSTALL_TESTS)
-    # Install the kept results (the 'Output' directories under the lit exec
-    # root) together with the settings LIBHIPCXX_PREBUILT_LIT_DIR needs to
-    # select the same tests again.
+    # Install the prebuilt tests as '<prefix>/bin/libhipcxx/lit-<variant>/'
+    # with everything lit reads while running them: the kept results (the
+    # 'Output' directories under the exec root 'test/'), the test sources it
+    # discovers and parses for REQUIRES/UNSUPPORTED/XFAIL, the headers and
+    # support files its compiler probes use, its python modules, a
+    # relocatable site config and a CTest file. The amdclang++ and hiprtc
+    # builds install side by side.
     include(GNUInstallDirs)
-    set(_libcudacxx_prebuilt_lit_install_dir "${CMAKE_INSTALL_DATADIR}/libhipcxx/lit")
-    set(_libcudacxx_prebuilt_lit_config
-      "${CMAKE_CURRENT_BINARY_DIR}/${_libcudacxx_prebuilt_lit_config_name}")
-    file(WRITE "${_libcudacxx_prebuilt_lit_config}"
-      "set(LIBHIPCXX_PREBUILT_LIT_COMPUTE_ARCHS \"${LIBCUDACXX_COMPUTE_ARCHS_STRING}\")\n"
-      "set(LIBHIPCXX_PREBUILT_LIT_STANDARD_VER \"${LIBCUDACXX_TEST_STANDARD_VER}\")\n")
-    install(
-      FILES "${_libcudacxx_prebuilt_lit_config}"
-      DESTINATION "${_libcudacxx_prebuilt_lit_install_dir}"
-    )
+    if (LIBHIPCXX_TEST_WITH_HIPRTC)
+      set(_libcudacxx_lit_variant hiprtc)
+    else()
+      set(_libcudacxx_lit_variant amdclang)
+    endif()
+    set(_libcudacxx_lit_pkg "lit-${_libcudacxx_lit_variant}")
+    set(_libcudacxx_lit_pkg_dir "${CMAKE_INSTALL_BINDIR}/libhipcxx/${_libcudacxx_lit_pkg}")
+
     install(
       DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/test/"
-      DESTINATION "${_libcudacxx_prebuilt_lit_install_dir}"
+      DESTINATION "${_libcudacxx_lit_pkg_dir}/test"
       USE_SOURCE_PERMISSIONS
       FILES_MATCHING
       REGEX "/Output/[^/]+$"
     )
+    install(
+      DIRECTORY "${libcudacxx_SOURCE_DIR}/include"
+      DESTINATION "${_libcudacxx_lit_pkg_dir}/src"
+    )
+    install(
+      DIRECTORY
+        "${libcudacxx_SOURCE_DIR}/test/libcudacxx"
+        "${libcudacxx_SOURCE_DIR}/test/support"
+        "${libcudacxx_SOURCE_DIR}/test/utils"
+      DESTINATION "${_libcudacxx_lit_pkg_dir}/src/test"
+      PATTERN "Output" EXCLUDE
+      PATTERN "__pycache__" EXCLUDE
+    )
+    install(
+      FILES "${libcudacxx_SOURCE_DIR}/requirements-test.txt"
+      DESTINATION "${_libcudacxx_lit_pkg_dir}"
+    )
+
+    # The site config moves the build paths to the installed tree: the build
+    # tree to this directory, the sources to 'src/', hiprtcc to '<prefix>/bin'
+    # and the ROCm root of the compiler and of HIP to '<prefix>'.
+    set(_libcudacxx_lit_relocations
+      "    (\"${LIBCUDACXX_BINARY_DIR}\", _pkg_dir, \"\"),\n"
+      "    (\"${libcudacxx_SOURCE_DIR}\", os.path.join(_pkg_dir, \"src\"), \"\"),\n"
+    )
+    if (LIBHIPCXX_TEST_WITH_HIPRTC)
+      get_filename_component(_libcudacxx_hiprtcc_dir "${LIBCUDACXX_CUDA_COMPILER}" DIRECTORY)
+      get_filename_component(_libcudacxx_hiprtcc_name "${LIBCUDACXX_CUDA_COMPILER}" NAME)
+      list(APPEND _libcudacxx_lit_relocations
+        "    (\"${_libcudacxx_hiprtcc_dir}\", _bin_dir, \"${_libcudacxx_hiprtcc_name}\"),\n")
+    elseif ("${LIBCUDACXX_CUDA_COMPILER}" MATCHES "^(.+)/lib/llvm/bin/([^/]+)$")
+      list(APPEND _libcudacxx_lit_relocations
+        "    (\"${CMAKE_MATCH_1}\", _prefix_dir, \"lib/llvm/bin/${CMAKE_MATCH_2}\"),\n")
+    endif()
+    if (HIP_INCLUDE_DIR)
+      get_filename_component(_libcudacxx_hip_root "${HIP_INCLUDE_DIR}" DIRECTORY)
+      list(APPEND _libcudacxx_lit_relocations
+        "    (\"${_libcudacxx_hip_root}\", _prefix_dir, \"include/hip\"),\n")
+    endif()
+    string(JOIN "" LIBHIPCXX_LIT_RELOCATIONS ${_libcudacxx_lit_relocations})
+    file(RELATIVE_PATH LIBHIPCXX_LIT_BIN_TO_PREFIX
+      "${CMAKE_INSTALL_FULL_BINDIR}" "${CMAKE_INSTALL_PREFIX}")
+    if (NOT LIBHIPCXX_LIT_BIN_TO_PREFIX)
+      set(LIBHIPCXX_LIT_BIN_TO_PREFIX ".")
+    endif()
+    # The build's site config without its final load_config() call, which
+    # the installed one makes after moving the paths.
+    file(READ "${lit_site_cfg_path}" LIBHIPCXX_LIT_SITE_CFG_BODY)
+    string(REGEX REPLACE "lit_config\\.load_config\\([^\n]*\\)[\n]*$" ""
+      LIBHIPCXX_LIT_SITE_CFG_BODY "${LIBHIPCXX_LIT_SITE_CFG_BODY}")
+    set(_libcudacxx_lit_install_cfg "${CMAKE_CURRENT_BINARY_DIR}/${_libcudacxx_lit_pkg}.site.cfg")
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/lit.site.install.cfg.in"
+      "${_libcudacxx_lit_install_cfg}"
+      @ONLY
+    )
+    install(
+      FILES "${_libcudacxx_lit_install_cfg}"
+      DESTINATION "${_libcudacxx_lit_pkg_dir}"
+      RENAME "lit.site.cfg"
+    )
+
+    # CTest runs the tests with the CTest file's directory as working
+    # directory, so the paths below are relative to it.
+    get_filename_component(_libcudacxx_lit_name "${libcudacxx_LIT}" NAME_WE)
+    set(_libcudacxx_lit_test "libcudacxx.test.lit.${_libcudacxx_lit_variant}")
+    set(_libcudacxx_lit_install_ctest "${CMAKE_CURRENT_BINARY_DIR}/${_libcudacxx_lit_pkg}_CTestTestfile.cmake")
+    file(WRITE "${_libcudacxx_lit_install_ctest}"
+      "# libhipcxx prebuilt lit tests, generated for the install tree.\n"
+      "add_test(${_libcudacxx_lit_test} \"${_libcudacxx_lit_name}\" -sv --no-progress-bar"
+      " \"--param=libcudacxx_site_config=lit.site.cfg\" \"src/test/libcudacxx\")\n"
+      "set_tests_properties(${_libcudacxx_lit_test} PROPERTIES LABELS \"${LIBHIPCXX_INSTALL_TESTS_LABELS}\")\n"
+    )
+    install(
+      FILES "${_libcudacxx_lit_install_ctest}"
+      DESTINATION "${_libcudacxx_lit_pkg_dir}"
+      RENAME "CTestTestfile.cmake"
+    )
+    # 'ctest --test-dir <prefix>/bin/libhipcxx' runs the amdclang++ lit tests
+    # together with the c2h tests. The hiprtc tests have their own directory,
+    # as they come from a separate build.
+    if (NOT LIBHIPCXX_TEST_WITH_HIPRTC)
+      if (NOT c2h_install_test_file)
+        set(c2h_install_test_file "${CMAKE_CURRENT_BINARY_DIR}/install_CTestTestfile.cmake")
+        file(WRITE "${c2h_install_test_file}" "# libhipcxx tests, generated for the install tree.\n")
+        install(
+          FILES "${c2h_install_test_file}"
+          DESTINATION "${CMAKE_INSTALL_BINDIR}/libhipcxx"
+          RENAME "CTestTestfile.cmake"
+        )
+      endif()
+      file(APPEND "${c2h_install_test_file}" "subdirs(\"${_libcudacxx_lit_pkg}\")\n")
+    endif()
   endif()
-elseif (LIBHIPCXX_PREBUILT_LIT_DIR)
-  set(
-    _libcudacxx_lit_run_flags
-    --param prebuilt_mode=run
-    "--param=prebuilt_dir=${LIBHIPCXX_PREBUILT_LIT_DIR}"
-  )
-endif()
-if (LIBHIPCXX_PREBUILD_LIT_TESTS AND LIBHIPCXX_PREBUILT_LIT_DIR)
-  message(FATAL_ERROR
-    "LIBHIPCXX_PREBUILD_LIT_TESTS and LIBHIPCXX_PREBUILT_LIT_DIR are mutually exclusive.")
 endif()
 
 add_test(
