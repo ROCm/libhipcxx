@@ -1160,7 +1160,9 @@ class Configuration(object):
             # Do a check with the user/config flag to ensure that the flag is supported.
             if not self.cxx.hasCompileFlag([stdflag] + extraflags):
                 raise OSError(
-                    "Configured compiler does not support flag {0}".format(stdflag)
+                    "Configured compiler does not support flag {0}\n{1}".format(
+                        stdflag, libcudacxx.util.makeReport(*self.cxx.last_flag_check)
+                    )
                 )
 
             self.cxx.flags += [stdflag]
