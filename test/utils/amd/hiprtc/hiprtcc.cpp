@@ -313,8 +313,8 @@ int main(int argc, char** argv)
   }
 
   // An explicit --offload-arch (including gfx1250-strict) is the compile target.
-  // Otherwise hiprtcc compiles for the current device.
-  if (!offloadArchExplicit)
+  // Otherwise hiprtcc compiles for the current device. Only a build needs the build list.
+  if (!offloadArchExplicit && building)
   {
     buildList.emplace(translate_gpu_arch(current_device_arch()));
   }

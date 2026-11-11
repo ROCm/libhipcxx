@@ -502,6 +502,14 @@ class Configuration(object):
 
             self.cxx.default_dialect = "c++11"
             self.cxx.source_lang = 'hip'
+            # NOTE(HIP/AMD): without --offload-arch, hiprtcc compiles for the
+            # current device, so the flag probes would need a GPU, which the
+            # machine prebuilding the tests may not have.
+            self.cxx.probe_flags = [
+                "--offload-arch={0}".format(arch)
+                for arch in re.split("\\s|;|,", self.get_lit_conf("compute_archs") or "")
+                if arch.startswith("gfx")
+            ]
             maj_v, min_v, patch_v = self.cxx.version
             self.config.available_features.add("hiprtc")
             self.config.available_features.add('%s-%s' % (self.cxx.type, maj_v))
