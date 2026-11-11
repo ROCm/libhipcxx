@@ -570,7 +570,11 @@ if (${CMAKE_CUDA_COMPILER_ID} STREQUAL "AMDCLANG")
     # queries the HIP runtime directly at compile time to get the real GPU
     # arch (e.g. gfx1101). lit's config.py ignores "native" for the hipcc
     # compiler type, so this must be injected explicitly here.
-    string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " --offload-arch=native")
+    # Prebuilt tests are built for the configured archs only, on a machine
+    # that may have no GPU.
+    if (NOT LIBHIPCXX_PREBUILD_LIT_TESTS)
+      string(APPEND LIBCUDACXX_TEST_COMPILER_FLAGS " --offload-arch=native")
+    endif()
   endif()
   # hipcc used to add the HIP runtime library automatically; with amdclang++
   # we must link it explicitly.

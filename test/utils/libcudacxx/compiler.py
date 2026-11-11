@@ -66,6 +66,8 @@ class CXXCompiler(object):
         self.compile_flags = list(compile_flags or [])
         self.link_flags = list(link_flags or [])
         self.warning_flags = list(warning_flags or [])
+        # NOTE(HIP/AMD): extra flags for hasCompileFlag() only.
+        self.probe_flags = []
         self.verify_supported = verify_supported
         self.use_verify = use_verify
         self.verify_flags = list(verify_flags or [])
@@ -513,6 +515,8 @@ class CXXCompiler(object):
             flags += ["-Werror", "-fsyntax-only"]
         if self.type == "clang" and self.source_lang == "cu":
             flags += ["-Wno-unused-command-line-argument"]
+
+        flags += [f for f in self.probe_flags if f not in self.compile_flags]
 
         if self.type == 'hiprtcc':
             # NOTE(HIP/AMD): HIPRTC does not like compiling empty files
