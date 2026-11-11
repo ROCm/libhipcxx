@@ -420,6 +420,9 @@ class Configuration(object):
             # If format is incorrect, fall through to file-based detection
 
         # 1. Find rocm_version.h
+        # hipconfig need not be on PATH, e.g. in TheRock's build environment.
+        if shutil.which("hipconfig") is None:
+            return None
         out, err, code = libcudacxx.util.executeCommand(
             ["hipconfig", "--path"]  # find HIP base path
         )
