@@ -68,6 +68,7 @@ class CXXCompiler(object):
         self.warning_flags = list(warning_flags or [])
         # NOTE(HIP/AMD): extra flags for hasCompileFlag() only.
         self.probe_flags = []
+        self.last_flag_check = None
         self.verify_supported = verify_supported
         self.use_verify = use_verify
         self.verify_flags = list(verify_flags or [])
@@ -532,6 +533,8 @@ class CXXCompiler(object):
         cmd, out, err, rc = self.checkCompileFlag(
             empty_cpp, out=os.devnull, flags=flags
         )
+        # NOTE(HIP/AMD): kept so a failed required flag can be reported.
+        self.last_flag_check = (cmd, out, err, rc)
         if out.find("flag is not supported with the configured host compiler") != -1:
             return False
         if err.find("flag is not supported with the configured host compiler") != -1:
