@@ -188,6 +188,18 @@ class LibcxxTestFormat(object):
         substitutions = lit.TestRunner.getDefaultSubstitutions(test, tmpDir, tmpBase)
         script = lit.TestRunner.applySubstitutions(script, substitutions)
 
+        # Dispatched before the per-test flag checks below, which call the
+        # compiler that a machine running prebuilt tests need not have.
+        if self.prebuilt_mode == "run":
+            if is_sh_test or is_fail_test:
+                return (
+                    lit.Test.UNSUPPORTED,
+                    "Compile-only test, evaluated by prebuilt_mode=build",
+                )
+            return self._run_prebuilt_test(
+                test, tmpBase, tmpBase + ".exe", run_should_pass=is_pass_test
+            )
+
         test_cxx = copy.deepcopy(self.cxx)
         if is_fail_test:
             test_cxx.useCCache(False)
@@ -270,12 +282,6 @@ class LibcxxTestFormat(object):
                 if flag.startswith("-gencode=") or flag.startswith("--generate-code=")
             ]
 
-        if self.prebuilt_mode == "run" and (is_sh_test or is_fail_test):
-            return (
-                lit.Test.UNSUPPORTED,
-                "Compile-only test, evaluated by prebuilt_mode=build",
-            )
-
         # Dispatch the test based on its suffix.
         if is_sh_test:
             if not isinstance(self.executor, LocalExecutor):
@@ -312,8 +318,6 @@ class LibcxxTestFormat(object):
         object_path = tmpBase + ".o"
         # Create the output directory if it does not already exist.
         libcudacxx.util.mkdir_p(os.path.dirname(tmpBase))
-        if self.prebuilt_mode == "run":
-            return self._run_prebuilt_test(test, tmpBase, exec_path, run_should_pass)
         compile_cmd_path = self._compile_cmd_path(tmpBase)
         if self.prebuilt_mode == "build":
             for path in self._prebuilt_outputs(tmpBase, exec_path) + [compile_cmd_path]:
