@@ -813,8 +813,8 @@ if (LIBHIPCXX_PREBUILD_LIT_TESTS)
     # with everything lit reads while running them: the kept results (the
     # 'Output' directories under the exec root 'test/'), the test sources it
     # discovers and parses for REQUIRES/UNSUPPORTED/XFAIL, the headers and
-    # support files its compiler probes use, its python modules, a
-    # relocatable site config and a CTest file. The amdclang++ and hiprtc
+    # support files, its python modules, a relocatable site config, the
+    # compiler configuration detected by the build and a CTest file. The amdclang++ and hiprtc
     # builds install side by side.
     include(GNUInstallDirs)
     if (LIBHIPCXX_TEST_WITH_HIPRTC)
@@ -892,6 +892,12 @@ if (LIBHIPCXX_PREBUILD_LIT_TESTS)
       FILES "${_libcudacxx_lit_install_cfg}"
       DESTINATION "${_libcudacxx_lit_pkg_dir}"
       RENAME "lit.site.cfg"
+    )
+    # Written by prebuilt_mode=build, so that prebuilt_mode=run never calls
+    # the compiler (see Configuration.PREBUILT_CONFIG_NAME).
+    install(
+      FILES "${LIBCUDACXX_BINARY_DIR}/lit.prebuilt.json"
+      DESTINATION "${_libcudacxx_lit_pkg_dir}"
     )
 
     # CTest runs the tests with the CTest file's directory as working

@@ -24,6 +24,7 @@
 # THE SOFTWARE.
 
 import ctypes
+import json
 import os
 import platform
 import re
@@ -97,6 +98,7 @@ class Configuration(object):
         self.debug_build = self.get_lit_bool("debug_build", default=False)
         self.exec_env = dict(os.environ)
         self.exec_env["CUDA_MODULE_LOADING"] = "EAGER"
+        self.prebuilt_rocm_version = None
         self.use_target = False
         self.use_system_cxx_lib = False
         self.use_clang_verify = False
@@ -290,7 +292,81 @@ class Configuration(object):
         else:
             return "lib" + name + ".a"
 
+    # NOTE(HIP/AMD): what prebuilt_mode=build detected from the compiler, so
+    # that prebuilt_mode=run selects the same tests without a compiler.
+    PREBUILT_CONFIG_NAME = "lit.prebuilt.json"
+    PREBUILT_CXX_ATTRS = (
+        "type",
+        "version",
+        "default_dialect",
+        "source_lang",
+        "flags",
+        "compile_flags",
+        "link_flags",
+        "warning_flags",
+        "modules_flags",
+        "use_modules",
+        "use_warnings",
+    )
+
+    def _prebuilt_config_path(self):
+        root = self.libcudacxx_obj_root or self.config.test_exec_root
+        return os.path.join(root, self.PREBUILT_CONFIG_NAME)
+
     def configure(self):
+        prebuilt_mode = self.get_lit_conf("prebuilt_mode", "")
+        if prebuilt_mode == "run":
+            self.configure_from_prebuilt_config()
+            return
+        self.configure_full()
+        if prebuilt_mode == "build":
+            self.write_prebuilt_config()
+
+    def write_prebuilt_config(self):
+        prebuilt = {
+            "cxx": {attr: getattr(self.cxx, attr) for attr in self.PREBUILT_CXX_ATTRS},
+            "available_features": sorted(self.config.available_features),
+            "use_clang_verify": bool(self.use_clang_verify),
+            # The tests were built against this ROCm, not the one lit finds at run time.
+            "rocm_version": self.get_rocm_version(),
+        }
+        with open(self._prebuilt_config_path(), "w") as f:
+            json.dump(prebuilt, f, indent=2, sort_keys=True)
+
+    def configure_from_prebuilt_config(self):
+        self.configure_executor()
+        self.configure_use_system_cxx_lib()
+        self.configure_target_info()
+        self.configure_src_root()
+        self.configure_obj_root()
+        self.configure_cxx_library_root()
+        path = self._prebuilt_config_path()
+        try:
+            with open(path) as f:
+                prebuilt = json.load(f)
+        except OSError as e:
+            self.lit_config.fatal(
+                "prebuilt_mode=run needs '%s' from prebuilt_mode=build: %s" % (path, e)
+            )
+        cxx = prebuilt["cxx"]
+        self.cxx = CXXCompiler(
+            path=self.get_lit_conf("cxx_under_test"),
+            first_arg=self.get_lit_conf("cxx_first_arg"),
+            cxx_type=cxx["type"],
+            cxx_version=tuple(cxx["version"]),
+        )
+        for attr in self.PREBUILT_CXX_ATTRS:
+            setattr(self.cxx, attr, tuple(cxx[attr]) if attr == "version" else cxx[attr])
+        self.config.available_features.update(prebuilt["available_features"])
+        self.use_clang_verify = prebuilt["use_clang_verify"]
+        rocm_version = prebuilt["rocm_version"]
+        self.prebuilt_rocm_version = tuple(rocm_version) if rocm_version else None
+        self.configure_no_execute()
+        self.configure_execute_external()
+        self.configure_env()
+        self.lit_config.note("Using the compiler configuration from '%s'" % path)
+
+    def configure_full(self):
         self.configure_executor()
         self.configure_use_system_cxx_lib()
         self.configure_target_info()
@@ -406,6 +482,8 @@ class Configuration(object):
         self.target_info = make_target_info(self)
 
     def get_rocm_version(self):
+        if self.prebuilt_rocm_version is not None:
+            return self.prebuilt_rocm_version
         rocm_version = os.getenv('ROCM_VERSION', None)
         if rocm_version is not None:
             parts = rocm_version.split(".")
