@@ -94,16 +94,32 @@ __device__ void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t
 #  pragma clang diagnostic pop
 #endif // defined(__HIP_PLATFORM_AMD__)
 
-// NOTE(HIP/AMD): single switch for the ROCm 7.14 HIP teardown-spin workaround, so
-// its two halves cannot be removed independently: the _Exit(0) destructor in
+// NOTE(HIP/AMD): single switch for the libamdhip64 DSO-destructor busy-spin, so
+// its two halves cannot be removed independently: the _Exit destructor in
 // heterogeneous/helpers.h, and the abort() here that stops that destructor turning
-// a failed HIP call into a pass. Not reproducible on ROCm 10; drop with 7.x.
-#if LIBHIPCXX_ROCM_VERSION_EQ(7, 14)
+// a failed HIP call into a pass.
+//
+// Seen on ROCm 7.14 and again on ROCm 10. The heterogeneous tests time out, and
+// the lit durations quantize at multiples of the per-test timeout (one spin per
+// retry). A retry that misses the exit storm finishes in tens of seconds. Gate
+// on 7.14 and on every ROCm 10+ until the runtime defect is gone.
+//
+// The destructor ends the process with libhipcxx_teardown_exit_code(), which
+// stays 0 unless a return path below records another code. abort() does not run
+// the destructor, so assertion failures and HIP_CALL failures keep their status.
+#if (LIBHIPCXX_ROCM_VERSION_EQ(7, 14)) || (ROCM_VERSION_MAJOR >= 10)
 #  define LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR 1
 #  define LIBHIPCXX_TEST_FAIL_EXIT()      abort()
+inline int& libhipcxx_teardown_exit_code()
+{
+    static int code = 0;
+    return code;
+}
+#  define LIBHIPCXX_NOTE_EXIT_CODE(code) (libhipcxx_teardown_exit_code() = (code))
 #else
 #  define LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR 0
 #  define LIBHIPCXX_TEST_FAIL_EXIT()      exit(1)
+#  define LIBHIPCXX_NOTE_EXIT_CODE(code)  ((void) (code))
 #endif
 
 #define HIP_CALL(err, ...) \
@@ -171,6 +187,7 @@ int main(int argc, char** argv)
     int ret = fake_main(argc, argv);
     if (ret != 0)
     {
+        LIBHIPCXX_NOTE_EXIT_CODE(ret);
         return ret;
     }
 
@@ -184,6 +201,7 @@ int main(int argc, char** argv)
     HIP_CALL(err, hipMemcpy(&ret, hip_ret, sizeof(int), hipMemcpyDeviceToHost));
     HIP_CALL(err, hipFree(hip_ret));
 
+    LIBHIPCXX_NOTE_EXIT_CODE(ret);
     return ret;
 }
 
