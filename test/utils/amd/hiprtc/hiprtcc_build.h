@@ -51,8 +51,6 @@ GpuProg hiprtc_build_prog(const std::string& testCu, const ArchConfig& config, c
 {
   // Assemble arguments
   std::vector<const char*> optList;
-  // NOTE(HIPRTC): -fgpu-rdc is required to generate LLVM IR
-  optList.emplace_back("-fgpu-rdc");
   // Be careful with lifetimes here
   std::for_each(argList.begin(), argList.end(), [&](const auto& it) {
     optList.emplace_back(it.c_str());
@@ -89,51 +87,13 @@ GpuProg hiprtc_build_prog(const std::string& testCu, const ArchConfig& config, c
     exit(1);
   }
 
+  // NOTE(HIPRTC): take the code object straight from the compile. hiprtcLinkComplete
+  // always targets the current device and ignores HIPRTC_JIT_TARGET, so linking would
+  // need a GPU even with an explicit --offload-arch.
   size_t codeSize;
-  GpuProg code;
-  
-  if (isArchReal(config))
-  {
-    HIPRTC_SAFE_CALL(hiprtcGetBitcodeSize(prog, &codeSize));
-    code.resize(codeSize);
-    HIPRTC_SAFE_CALL(hiprtcGetBitcode(prog, code.data()));
-  }
-  else
-  {
-    HIPRTC_SAFE_CALL(hiprtcGetCodeSize(prog, &codeSize));
-    code.resize(codeSize);
-    HIPRTC_SAFE_CALL(hiprtcGetCode(prog, code.data()));
-  }
-
-  std::vector<hiprtcJIT_option> option_keys;
-  std::vector<void*> option_vals;
-  int arch = std::atoi(archString(config).substr(3).c_str()); 
-  option_keys.push_back(HIPRTC_JIT_TARGET);
-  printf("++++ arch %d\n", arch);
-  option_vals.push_back((void*)(intptr_t)&arch);
-  hiprtcLinkState rtc_link_state;
-  HIPRTC_SAFE_CALL(hiprtcLinkCreate((unsigned)option_keys.size(), // number of options
-                  option_keys.data(),            // Array of options
-                  option_vals.data(),            // Array of option values cast to void*
-                  &rtc_link_state ));             // hiprtc link state created upon success
-
-  HIPRTC_SAFE_CALL(hiprtcLinkAddData(rtc_link_state,        // hiprtc link state
-                  HIPRTC_JIT_INPUT_LLVM_BITCODE,            // type of the input data or bitcode
-                  code.data(),          // input data which is null terminated
-                  codeSize,         // size of the input data
-                  "test.cu",                   // optional name for this input
-                  0,                     // size of the options
-                  0,                     // Array of options applied to this input
-                  0));
-  
-  void* codePtr = nullptr;
-  size_t codeSize2 = 0;
-
-  HIPRTC_SAFE_CALL(hiprtcLinkComplete(rtc_link_state,       // hiprtc link state
-                  &codePtr,              // upon success, points to the output binary
-                  &codeSize2));         // size of the binary is stored (optional)
-  GpuProg code2(reinterpret_cast<char*>(codePtr), reinterpret_cast<char*>(codePtr) + codeSize2);
-  code = code2;
+  HIPRTC_SAFE_CALL(hiprtcGetCodeSize(prog, &codeSize));
+  GpuProg code(codeSize);
+  HIPRTC_SAFE_CALL(hiprtcGetCode(prog, code.data()));
 
   HIPRTC_SAFE_CALL(hiprtcDestroyProgram(&prog));
 
