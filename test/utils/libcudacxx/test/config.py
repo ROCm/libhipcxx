@@ -219,19 +219,17 @@ class Configuration(object):
             )
             return []
 
-        cmd = (
-            f"{self.cxx.path} --help | grep -oE 'compute_[0-9]+' | "
-            "sed -E 's/compute_//g' | sort -ug"
-        )
+        # Ask nvcc which architectures it knows. Parse the help text in
+        # process instead of piping through a shell: the compiler path is
+        # interpolated, and shell=True is a Bandit B602 finding.
         result = subprocess.run(
-            cmd,
-            shell=True,
+            [self.cxx.path, "--help"],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        archs = result.stdout.strip().splitlines()
+        archs = [match for match in re.findall(r"compute_([0-9]+)", result.stdout)]
 
         if not archs:
             self.lit_config.fatal(
