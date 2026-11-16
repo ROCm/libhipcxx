@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef TEST_CMATH_COMPARISON_H
 #define TEST_CMATH_COMPARISON_H
 
@@ -38,7 +60,7 @@ TEST_FUNC bool eq(__half lhs, __half rhs) noexcept
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-TEST_FUNC bool eq(__nv_bfloat16 lhs, __nv_bfloat16 rhs) noexcept
+TEST_FUNC bool eq(__hip_bfloat16 lhs, __hip_bfloat16 rhs) noexcept
 {
 #  if _CCCL_CTK_AT_LEAST(12, 2)
   return ::__heq(lhs, rhs);
@@ -79,9 +101,9 @@ TEST_FUNC bool is_about(__half x, __half y)
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-TEST_FUNC bool is_about(__nv_bfloat16 x, __nv_bfloat16 y)
+TEST_FUNC bool is_about(__hip_bfloat16 x, __hip_bfloat16 y)
 {
-  return (cuda::std::fabs((x - y) / (x + y)) <= __nv_bfloat16(5e-3));
+  return (cuda::std::fabs((x - y) / (x + y)) <= __hip_bfloat16(5e-3));
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 

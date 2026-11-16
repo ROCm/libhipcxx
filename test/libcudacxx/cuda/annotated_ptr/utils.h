@@ -51,16 +51,16 @@ TEST_DIAG_SUPPRESS_MSVC(4505)
     } while (false)
 #endif
 
-TEST_FUNC void assert_rt_wrap(cudaError_t code, const char* file, int line)
+TEST_FUNC void assert_rt_wrap(hipError_t code, const char* file, int line)
 {
-  if (code != cudaSuccess)
+  if (code != hipSuccess)
   {
 #if !TEST_COMPILER(NVRTC)
     NV_IF_ELSE_TARGET(NV_IS_HOST,
-                      (printf("assert: %s %s %d\n", cudaGetErrorString(code), file, line);),
+                      (printf("assert: %s %s %d\n", hipGetErrorString(code), file, line);),
                       (printf("assert: error=%d %s %d\n", code, file, line);))
 #endif // !TEST_COMPILER(NVRTC)
-    assert(code == cudaSuccess);
+    assert(code == hipSuccess);
   }
 }
 #define assert_rt(ret)                         \
@@ -74,7 +74,7 @@ TEST_FUNC __noinline__ T* global_alloc()
   T* arr = nullptr;
 
   NV_IF_ELSE_TARGET(
-    NV_IS_DEVICE, (arr = (T*) malloc(N * sizeof(T));), (assert_rt(cudaMallocManaged((void**) &arr, N * sizeof(T)));))
+    NV_IS_DEVICE, (arr = (T*) malloc(N * sizeof(T));), (assert_rt(hipMallocManaged((void**) &arr, N * sizeof(T)));))
 
   for (int i = 0; i < N; ++i)
   {
@@ -98,5 +98,5 @@ TEST_DEVICE_FUNC __noinline__ T* shared_alloc()
 template <typename T>
 TEST_FUNC __noinline__ void dealloc(T* arr)
 {
-  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (free(arr);), assert_rt(cudaFree(arr));)
+  NV_IF_ELSE_TARGET(NV_IS_DEVICE, (free(arr);), assert_rt(hipFree(arr));)
 }

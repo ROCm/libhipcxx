@@ -77,7 +77,7 @@ TEST_FUNC void test_edges()
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-    if constexpr (cuda::std::is_same_v<T, __nv_bfloat16>)
+    if constexpr (cuda::std::is_same_v<T, __hip_bfloat16>)
     {
       z = log(cuda::std::complex<float>(testcases[i])) * 0.434294481903251827651128918916605082294397f;
     }
@@ -115,14 +115,14 @@ int main(int, char**)
   test<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test<__nv_bfloat16>();
+  test<__hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
   test_edges<double>();
 #if _LIBCUDACXX_HAS_NVFP16()
   test_edges<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test_edges<__nv_bfloat16>();
+  test_edges<__hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
   return 0;

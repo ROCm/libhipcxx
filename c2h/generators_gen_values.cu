@@ -1,6 +1,28 @@
 // SPDX-FileCopyrightText: Copyright (c) 2011-2025, NVIDIA CORPORATION. All rights reserved.
 // SPDX-License-Identifier: BSD-3-Clause
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <thrust/tabulate.h>
 #include <thrust/transform.h>
 
@@ -58,8 +80,8 @@ INSTANTIATE(std::int32_t);
 INSTANTIATE(std::int64_t);
 
 #if _CCCL_HAS_NVFP8()
-INSTANTIATE(__nv_fp8_e5m2);
-INSTANTIATE(__nv_fp8_e4m3);
+INSTANTIATE(__hip_fp8_e5m2);
+INSTANTIATE(__hip_fp8_e4m3);
 #endif // _CCCL_HAS_NVFP8()
 INSTANTIATE(float);
 INSTANTIATE(double);
@@ -79,9 +101,9 @@ INSTANTIATE(cuda::std::complex<__half>);
 
 #if TEST_BF_T()
 INSTANTIATE(bfloat16_t);
-INSTANTIATE(__nv_bfloat16);
+INSTANTIATE(__hip_bfloat16);
 #  if _CCCL_CTK_AT_LEAST(12, 2)
-INSTANTIATE(cuda::std::complex<__nv_bfloat16>);
+INSTANTIATE(cuda::std::complex<__hip_bfloat16>);
 #  endif // _CCCL_CTK_AT_LEAST(12, 2)
 #endif // TEST_BF_T()
 

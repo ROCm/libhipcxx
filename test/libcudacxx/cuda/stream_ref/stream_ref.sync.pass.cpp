@@ -41,7 +41,7 @@
 
 #include "test_macros.h"
 
-void CUDART_CB callback(cudaStream_t, cudaError_t, void* flag)
+void HIPRT_CB callback(hipStream_t, hipError_t, void* flag)
 {
   std::chrono::milliseconds sleep_duration{1000};
   std::this_thread::sleep_for(sleep_duration);
@@ -66,14 +66,14 @@ void test_sync(cuda::stream_ref& ref)
 
 bool test()
 {
-  cudaStream_t stream;
-  assert(cudaStreamCreate(&stream) == cudaSuccess);
+  hipStream_t stream;
+  assert(hipStreamCreate(&stream) == hipSuccess);
   std::atomic_flag flag = ATOMIC_FLAG_INIT;
-  assert(cudaStreamAddCallback(stream, callback, &flag, 0) == cudaSuccess);
+  assert(hipStreamAddCallback(stream, callback, &flag, 0) == hipSuccess);
   cuda::stream_ref ref{stream};
   test_sync(ref);
   assert(flag.test_and_set());
-  assert(cudaStreamDestroy(stream) == cudaSuccess);
+  assert(hipStreamDestroy(stream) == hipSuccess);
   return true;
 }
 

@@ -134,7 +134,7 @@ export CUDAHOSTCXX="${HOST_COMPILER}"
 export CXX_STANDARD
 
 # Set LLVM_PATH so COMGR finds the correct clang binary for GCC detection
-export LLVM_PATH=/opt/rocm/lib/llvm
+export LLVM_PATH="${ROCM_PATH:-/opt/rocm}/lib/llvm"
 
 source ./pretty_printing.sh
 
@@ -160,7 +160,7 @@ print_environment_details() {
   git log -1 || echo "Not a repository"
 
   if command -v amd-smi &> /dev/null; then
-    amd-smi
+    amd-smi || echo "amd-smi failed (no GPU driver loaded on this node?)"
   else
     echo "amd-smi not found"
   fi

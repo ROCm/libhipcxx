@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___PSTL_CUDA_UNIQUE_H
 #define _CUDA_STD___PSTL_CUDA_UNIQUE_H
 
@@ -104,7 +126,7 @@ struct __pstl_dispatch<__pstl_algorithm::__unique, __execution_backend::__cuda>
       __count,
       nullptr);
 
-    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStream_t{}}, __policy);
+    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStream_t{}}, __policy);
 
     { // Create temporary storage for the return value as well as a copy of the input sequence as Unique is not inplace
       __temporary_storage<_OffsetType> __storage{__policy, __num_bytes, 1};
@@ -124,12 +146,12 @@ struct __pstl_dispatch<__pstl_algorithm::__unique, __execution_backend::__cuda>
         __stream.get());
 
       _CCCL_TRY_CUDA_API(
-        ::cudaMemcpyAsync,
+        ::hipMemcpyAsync,
         "__pstl_cuda_unique: copy of num_selected from device to host failed",
         ::cuda::std::addressof(__num_selected),
         __storage.template __get_ptr<0>(),
         sizeof(_OffsetType),
-        cudaMemcpyDefault,
+        hipMemcpyDefault,
         __stream.get());
     }
 
@@ -154,7 +176,7 @@ struct __pstl_dispatch<__pstl_algorithm::__unique, __execution_backend::__cuda>
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == ::cudaErrorMemoryAllocation)
+        if (__err.status() == ::hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }
@@ -196,7 +218,7 @@ struct __pstl_dispatch<__pstl_algorithm::__unique, __execution_backend::__cuda>
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == ::cudaErrorMemoryAllocation)
+        if (__err.status() == ::hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }

@@ -87,28 +87,28 @@ int main(int, char**)
   test<long double>(LDBL_MIN);
 #endif // _CCCL_HAS_LONG_DOUBLE()
 #if _CCCL_HAS_NVFP16()
-  test<__half>(__double2half(6.103515625e-05));
+  test<__half>(::__libhipcxx::__double2half(6.103515625e-05));
 #endif // _CCCL_HAS_NVFP16
 #if _CCCL_HAS_NVBF16()
-  test<__nv_bfloat16>(__double2bfloat16(1.17549435082228750796873653722e-38));
+  test<__hip_bfloat16>(__double2bfloat16(1.17549435082228750796873653722e-38));
 #endif // _CCCL_HAS_NVBF16
 #if _CCCL_HAS_NVFP8_E4M3()
-  test<__nv_fp8_e4m3>(make_fp8_e4m3(0.015625));
+  test<__hip_fp8_e4m3>(make_fp8_e4m3(0.015625));
 #endif // _CCCL_HAS_NVFP8_E4M3()
 #if _CCCL_HAS_NVFP8_E5M2()
-  test<__nv_fp8_e5m2>(make_fp8_e5m2(0.000061035));
+  test<__hip_fp8_e5m2>(make_fp8_e5m2(0.000061035));
 #endif // _CCCL_HAS_NVFP8_E5M2()
 #if _CCCL_HAS_NVFP8_E8M0()
   test<__nv_fp8_e8m0>(make_fp8_e8m0(5.8774717541114375398436826861112283890933277838604376075437585313920e-39));
 #endif // _CCCL_HAS_NVFP8_E8M0()
 #if _CCCL_HAS_NVFP6_E2M3()
-  test<__nv_fp6_e2m3>(make_fp6_e2m3(1.0));
+  test<__hip_fp6_e2m3>(make_fp6_e2m3(1.0));
 #endif // _CCCL_HAS_NVFP6_E2M3()
 #if _CCCL_HAS_NVFP6_E3M2()
-  test<__nv_fp6_e3m2>(make_fp6_e3m2(0.25));
+  test<__hip_fp6_e3m2>(make_fp6_e3m2(0.25));
 #endif // _CCCL_HAS_NVFP6_E3M2()
 #if _CCCL_HAS_NVFP4_E2M1()
-  test<__nv_fp4_e2m1>(make_fp4_e2m1(1.0));
+  test<__hip_fp4_e2m1>(make_fp4_e2m1(1.0));
 #endif // _CCCL_HAS_NVFP4_E2M1()
 #if _CCCL_HAS_FLOAT128()
   test<__float128>(cuda::std::bit_cast<__float128>(__uint128_t{0x0001'0000'0000'0000} << 64));

@@ -160,7 +160,7 @@ bool test_mdspan_to_dlpack_device()
 {
   using extents_t = cuda::std::extents<size_t, 2, 3>;
   float* data     = nullptr;
-  assert(cudaMalloc(&data, 6 * sizeof(float)) == cudaSuccess);
+  assert(hipMalloc(&data, 6 * sizeof(float)) == hipSuccess);
   cuda::device_mdspan<float, extents_t> md{data, extents_t{}};
   auto dlpack_wrapper = cuda::to_dlpack_tensor(md);
   auto dltensor       = dlpack_wrapper.get();
@@ -182,7 +182,7 @@ bool test_mdspan_to_dlpack_managed()
 {
   using extents_t = cuda::std::extents<size_t, 2, 3>;
   float* data     = nullptr;
-  assert(cudaMallocManaged(&data, 6 * sizeof(float)) == cudaSuccess);
+  assert(hipMallocManaged(&data, 6 * sizeof(float)) == hipSuccess);
   cuda::managed_mdspan<float, extents_t> md{data, extents_t{}};
   auto dlpack_wrapper = cuda::to_dlpack_tensor(md);
   auto dltensor       = dlpack_wrapper.get();
@@ -296,29 +296,29 @@ bool test_mdspan_to_dlpack_extended_fp_and_complex_types()
     ::__half,
 #endif
 #if _CCCL_HAS_NVBF16()
-    ::__nv_bfloat16,
+    ::__hip_bfloat16,
 #endif
 #if _CCCL_HAS_FLOAT128()
     __float128,
 #endif
   // Low-precision floating-point types
 #if _CCCL_HAS_NVFP8_E4M3()
-    ::__nv_fp8_e4m3,
+    ::__hip_fp8_e4m3,
 #endif
 #if _CCCL_HAS_NVFP8_E5M2()
-    ::__nv_fp8_e5m2,
+    ::__hip_fp8_e5m2,
 #endif
 #if _CCCL_HAS_NVFP8_E8M0()
     ::__nv_fp8_e8m0,
 #endif
 #if _CCCL_HAS_NVFP6_E2M3()
-    ::__nv_fp6_e2m3,
+    ::__hip_fp6_e2m3,
 #endif
 #if _CCCL_HAS_NVFP6_E3M2()
-    ::__nv_fp6_e3m2,
+    ::__hip_fp6_e3m2,
 #endif
 #if _CCCL_HAS_NVFP4_E2M1()
-    ::__nv_fp4_e2m1,
+    ::__hip_fp4_e2m1,
 #endif
   // Complex types
 #if _CCCL_HAS_NVFP16()
@@ -466,31 +466,31 @@ bool test_mdspan_to_dlpack_extended_fp_vector_types()
     ::__half2,
 #endif
 #if _CCCL_HAS_NVBF16()
-    ::__nv_bfloat162,
+    ::__hip_bfloat162,
 #endif
 #if _CCCL_HAS_NVFP8_E4M3()
-    ::__nv_fp8x2_e4m3,
-    ::__nv_fp8x4_e4m3,
+    ::__hip_fp8x2_e4m3,
+    ::__hip_fp8x4_e4m3,
 #endif
 #if _CCCL_HAS_NVFP8_E5M2()
-    ::__nv_fp8x2_e5m2,
-    ::__nv_fp8x4_e5m2,
+    ::__hip_fp8x2_e5m2,
+    ::__hip_fp8x4_e5m2,
 #endif
 #if _CCCL_HAS_NVFP8_E8M0()
     ::__nv_fp8x2_e8m0,
     ::__nv_fp8x4_e8m0,
 #endif
 #if _CCCL_HAS_NVFP6_E2M3()
-    ::__nv_fp6x2_e2m3,
-    ::__nv_fp6x4_e2m3,
+    ::__hip_fp6x2_e2m3,
+    ::__hip_fp6x4_e2m3,
 #endif
 #if _CCCL_HAS_NVFP6_E3M2()
-    ::__nv_fp6x2_e3m2,
-    ::__nv_fp6x4_e3m2,
+    ::__hip_fp6x2_e3m2,
+    ::__hip_fp6x4_e3m2,
 #endif
 #if _CCCL_HAS_NVFP4_E2M1()
-    ::__nv_fp4x2_e2m1,
-    ::__nv_fp4x4_e2m1,
+    ::__hip_fp4x2_e2m1,
+    ::__hip_fp4x4_e2m1,
 #endif
     void* /* dummy to allow trailing commas */>;
   cuda::std::array<DLDataType, list_t::__size> expected_types = {

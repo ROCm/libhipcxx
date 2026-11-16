@@ -59,25 +59,25 @@
 namespace __cccl_internal
 {
 template <>
-struct __is_non_narrowing_convertible<__nv_bfloat16, float>
+struct __is_non_narrowing_convertible<__hip_bfloat16, float>
 {
   static constexpr bool value = true;
 };
 
 template <>
-struct __is_non_narrowing_convertible<__nv_bfloat16, double>
+struct __is_non_narrowing_convertible<__hip_bfloat16, double>
 {
   static constexpr bool value = true;
 };
 
 template <>
-struct __is_non_narrowing_convertible<float, __nv_bfloat16>
+struct __is_non_narrowing_convertible<float, __hip_bfloat16>
 {
   static constexpr bool value = true;
 };
 
 template <>
-struct __is_non_narrowing_convertible<double, __nv_bfloat16>
+struct __is_non_narrowing_convertible<double, __hip_bfloat16>
 {
   static constexpr bool value = true;
 };
@@ -86,25 +86,25 @@ struct __is_non_narrowing_convertible<double, __nv_bfloat16>
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 
 template <>
-inline constexpr size_t __complex_alignment_v<__nv_bfloat16> = alignof(__nv_bfloat162);
+inline constexpr size_t __complex_alignment_v<__hip_bfloat16> = alignof(__hip_bfloat162);
 
 template <>
-struct __type_to_vector<__nv_bfloat16>
+struct __type_to_vector<__hip_bfloat16>
 {
-  using __type = __nv_bfloat162;
+  using __type = __hip_bfloat162;
 };
 
 template <>
-struct __cccl_complex_overload_traits<__nv_bfloat16, false, false>
+struct __cccl_complex_overload_traits<__hip_bfloat16, false, false>
 {
-  using _ValueType   = __nv_bfloat16;
-  using _ComplexType = complex<__nv_bfloat16>;
+  using _ValueType   = __hip_bfloat16;
+  using _ComplexType = complex<__hip_bfloat16>;
 };
 
 template <>
-class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) complex<__nv_bfloat16>
+class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__hip_bfloat162)) complex<__hip_bfloat16>
 {
-  __nv_bfloat162 __repr_;
+  __hip_bfloat162 __repr_;
 
   template <class _Up>
   friend class complex;
@@ -113,23 +113,23 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__nv_bfloat162)) compl
   friend struct __get_complex_impl;
 
   template <class _Tp>
-  [[nodiscard]] _CCCL_API inline static __nv_bfloat16 __convert_to_bfloat16(const _Tp& __value) noexcept
+  [[nodiscard]] _CCCL_API inline static __hip_bfloat16 __convert_to_bfloat16(const _Tp& __value) noexcept
   {
     return __value;
   }
 
-  [[nodiscard]] _CCCL_API inline static __nv_bfloat16 __convert_to_bfloat16(const float& __value) noexcept
+  [[nodiscard]] _CCCL_API inline static __hip_bfloat16 __convert_to_bfloat16(const float& __value) noexcept
   {
     return ::__float2bfloat16(__value);
   }
 
-  [[nodiscard]] _CCCL_API inline static __nv_bfloat16 __convert_to_bfloat16(const double& __value) noexcept
+  [[nodiscard]] _CCCL_API inline static __hip_bfloat16 __convert_to_bfloat16(const double& __value) noexcept
   {
     return ::__double2bfloat16(__value);
   }
 
 public:
-  using value_type = __nv_bfloat16;
+  using value_type = __hip_bfloat16;
 
   _CCCL_API inline complex(const value_type& __re = value_type(), const value_type& __im = value_type()) noexcept
       : __repr_(__re, __im)
@@ -262,21 +262,21 @@ public:
 
 template <> // complex<float>
 template <> // complex<__half>
-_CCCL_API inline complex<float>::complex(const complex<__nv_bfloat16>& __c)
+_CCCL_API inline complex<float>::complex(const complex<__hip_bfloat16>& __c)
     : __re_(::__bfloat162float(__c.real()))
     , __im_(::__bfloat162float(__c.imag()))
 {}
 
 template <> // complex<double>
 template <> // complex<__half>
-_CCCL_API inline complex<double>::complex(const complex<__nv_bfloat16>& __c)
+_CCCL_API inline complex<double>::complex(const complex<__hip_bfloat16>& __c)
     : __re_(::__bfloat162float(__c.real()))
     , __im_(::__bfloat162float(__c.imag()))
 {}
 
 template <> // complex<float>
 template <> // complex<__nv_bfloat16>
-_CCCL_API inline complex<float>& complex<float>::operator=(const complex<__nv_bfloat16>& __c)
+_CCCL_API inline complex<float>& complex<float>::operator=(const complex<__hip_bfloat16>& __c)
 {
   __re_ = ::__bfloat162float(__c.real());
   __im_ = ::__bfloat162float(__c.imag());
@@ -285,7 +285,7 @@ _CCCL_API inline complex<float>& complex<float>::operator=(const complex<__nv_bf
 
 template <> // complex<double>
 template <> // complex<__nv_bfloat16>
-_CCCL_API inline complex<double>& complex<double>::operator=(const complex<__nv_bfloat16>& __c)
+_CCCL_API inline complex<double>& complex<double>::operator=(const complex<__hip_bfloat16>& __c)
 {
   __re_ = ::__bfloat162float(__c.real());
   __im_ = ::__bfloat162float(__c.imag());
@@ -293,28 +293,28 @@ _CCCL_API inline complex<double>& complex<double>::operator=(const complex<__nv_
 }
 
 template <>
-struct __get_complex_impl<__nv_bfloat16>
+struct __get_complex_impl<__hip_bfloat16>
 {
   template <size_t _Index>
-  [[nodiscard]] static _CCCL_API constexpr __nv_bfloat16& get(complex<__nv_bfloat16>& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr __hip_bfloat16& get(complex<__hip_bfloat16>& __z) noexcept
   {
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
   }
 
   template <size_t _Index>
-  [[nodiscard]] static _CCCL_API constexpr __nv_bfloat16&& get(complex<__nv_bfloat16>&& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr __hip_bfloat16&& get(complex<__hip_bfloat16>&& __z) noexcept
   {
     return ::cuda::std::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
   }
 
   template <size_t _Index>
-  [[nodiscard]] static _CCCL_API constexpr const __nv_bfloat16& get(const complex<__nv_bfloat16>& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr const __hip_bfloat16& get(const complex<__hip_bfloat16>& __z) noexcept
   {
     return (_Index == 0) ? __z.__repr_.x : __z.__repr_.y;
   }
 
   template <size_t _Index>
-  [[nodiscard]] static _CCCL_API constexpr const __nv_bfloat16&& get(const complex<__nv_bfloat16>&& __z) noexcept
+  [[nodiscard]] static _CCCL_API constexpr const __hip_bfloat16&& get(const complex<__hip_bfloat16>&& __z) noexcept
   {
     return ::cuda::std::move((_Index == 0) ? __z.__repr_.x : __z.__repr_.y);
   }
@@ -323,7 +323,7 @@ struct __get_complex_impl<__nv_bfloat16>
 #  if _CCCL_HOSTED()
 template <class _CharT, class _Traits>
 ::std::basic_istream<_CharT, _Traits>&
-operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<__nv_bfloat16>& __x)
+operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<__hip_bfloat16>& __x)
 {
   ::std::complex<float> __temp;
   __is >> __temp;
@@ -333,7 +333,7 @@ operator>>(::std::basic_istream<_CharT, _Traits>& __is, complex<__nv_bfloat16>& 
 
 template <class _CharT, class _Traits>
 ::std::basic_ostream<_CharT, _Traits>&
-operator<<(::std::basic_ostream<_CharT, _Traits>& __os, const complex<__nv_bfloat16>& __x)
+operator<<(::std::basic_ostream<_CharT, _Traits>& __os, const complex<__hip_bfloat16>& __x)
 {
   return __os << complex<float>{__x};
 }

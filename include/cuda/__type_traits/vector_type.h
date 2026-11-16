@@ -378,35 +378,35 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__half, 2>
 
 #  if _CCCL_HAS_NVBF16()
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_bfloat16, 2>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_bfloat16, 2>
 {
-  using type = ::__nv_bfloat162;
+  using type = ::__hip_bfloat162;
 };
 #  endif // _CCCL_HAS_NVBF16()
 
 #  if _CCCL_HAS_NVFP8_E4M3()
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp8_e4m3, 2>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp8_e4m3, 2>
 {
-  using type = ::__nv_fp8x2_e4m3;
+  using type = ::__hip_fp8x2_e4m3;
 };
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp8_e4m3, 4>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp8_e4m3, 4>
 {
-  using type = ::__nv_fp8x4_e4m3;
+  using type = ::__hip_fp8x4_e4m3;
 };
 #  endif // _CCCL_HAS_NVFP8_E4M3()
 
 #  if _CCCL_HAS_NVFP8_E5M2()
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp8_e5m2, 2>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp8_e5m2, 2>
 {
-  using type = ::__nv_fp8x2_e5m2;
+  using type = ::__hip_fp8x2_e5m2;
 };
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp8_e5m2, 4>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp8_e5m2, 4>
 {
-  using type = ::__nv_fp8x4_e5m2;
+  using type = ::__hip_fp8x4_e5m2;
 };
 #  endif // _CCCL_HAS_NVFP8_E5M2()
 
@@ -425,40 +425,40 @@ struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp8_e8m0, 4>
 
 #  if _CCCL_HAS_NVFP6_E2M3()
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp6_e2m3, 2>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp6_e2m3, 2>
 {
-  using type = ::__nv_fp6x2_e2m3;
+  using type = ::__hip_fp6x2_e2m3;
 };
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp6_e2m3, 4>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp6_e2m3, 4>
 {
-  using type = ::__nv_fp6x4_e2m3;
+  using type = ::__hip_fp6x4_e2m3;
 };
 #  endif // _CCCL_HAS_NVFP6_E2M3()
 
 #  if _CCCL_HAS_NVFP6_E3M2()
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp6_e3m2, 2>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp6_e3m2, 2>
 {
-  using type = ::__nv_fp6x2_e3m2;
+  using type = ::__hip_fp6x2_e3m2;
 };
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp6_e3m2, 4>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp6_e3m2, 4>
 {
-  using type = ::__nv_fp6x4_e3m2;
+  using type = ::__hip_fp6x4_e3m2;
 };
 #  endif // _CCCL_HAS_NVFP6_E3M2()
 
 #  if _CCCL_HAS_NVFP4_E2M1()
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp4_e2m1, 2>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp4_e2m1, 2>
 {
-  using type = ::__nv_fp4x2_e2m1;
+  using type = ::__hip_fp4x2_e2m1;
 };
 template <>
-struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__nv_fp4_e2m1, 4>
+struct _CCCL_TYPE_VISIBILITY_DEFAULT vector_type<::__hip_fp4_e2m1, 4>
 {
-  using type = ::__nv_fp4x4_e2m1;
+  using type = ::__hip_fp4x4_e2m1;
 };
 #  endif // _CCCL_HAS_NVFP4_E2M1()
 

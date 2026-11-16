@@ -200,7 +200,7 @@ _CCCL_SUPPRESS_DEPRECATED_POP
 
 #if TEST_BF_T()
 
-[[nodiscard]] constexpr bool isnan(__nv_bfloat162 value) noexcept
+[[nodiscard]] constexpr bool isnan(__hip_bfloat162 value) noexcept
 {
   return cuda::std::isnan(value.x) || cuda::std::isnan(value.y);
 }
@@ -582,11 +582,11 @@ template <typename... T>
 _CCCL_END_NAMESPACE_CUDA_STD
 
 template <>
-struct Catch::StringMaker<cudaError>
+struct Catch::StringMaker<hipError_t>
 {
-  static auto convert(cudaError e) -> std::string
+  static auto convert(hipError_t e) -> std::string
   {
-    return std::to_string(cuda::std::to_underlying(e)) + " (" + cudaGetErrorString(e) + ")";
+    return std::to_string(cuda::std::to_underlying(e)) + " (" + hipGetErrorString(e) + ")";
   }
 };
 

@@ -64,13 +64,12 @@ auto array_size_powers = std::vector<std::int64_t>{25, 31};
 // allocator/runtime overhead). This yields a clean "Skip:" instead of nvbench's
 // "Fail: Unexpected error: ...out of memory" (which is what an uncaught bad_alloc
 // produces), so every size that DOES run is measured identically across devices.
-// cudaMemGetInfo resolves to hipMemGetInfo on HIP.
 template <typename T>
 static bool skip_if_insufficient_memory(nvbench::state& state, std::size_t n, int num_buffers)
 {
   std::size_t free_bytes  = 0;
   std::size_t total_bytes = 0;
-  if (cudaMemGetInfo(&free_bytes, &total_bytes) == cudaSuccess && free_bytes > 0)
+  if (hipMemGetInfo(&free_bytes, &total_bytes) == hipSuccess && free_bytes > 0)
   {
     const std::size_t budget   = static_cast<std::size_t>(static_cast<double>(free_bytes) * 0.9);
     const std::size_t required = sizeof(T) * static_cast<std::size_t>(num_buffers) * n;

@@ -43,9 +43,8 @@
 #  pragma system_header
 #endif // no system header
 
-// NOTE(HIP/AMD): event_ref wraps cudaEvent_t which is shimmed to
-// hipEvent_t via include/libhipcxx/__amd/cuda_runtime.h. The cuda::__driver event
-// helpers used here are provided for HIP by include/libhipcxx/__amd/driver_api.h.
+// NOTE(HIP/AMD): the cuda::__driver event helpers used here are provided for
+// HIP by include/libhipcxx/__amd/driver_api.h.
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !_CCCL_COMPILER(NVRTC) && !defined(_CCCL_COMPILER_HIPRTC)
 
 #  include <cuda/__driver/driver_api.h>
@@ -69,10 +68,10 @@ private:
   friend class event;
   friend class timed_event;
 
-  ::cudaEvent_t __event_{};
+  ::hipEvent_t __event_{};
 
 public:
-  using value_type = ::cudaEvent_t;
+  using value_type = ::hipEvent_t;
 
   //! @brief Construct a new `event_ref` object from a `cudaEvent_t`
   //!
@@ -82,7 +81,7 @@ public:
   //!
   //! @note: It is the callers responsibility to ensure the `event_ref` does not
   //! outlive the event denoted by the `cudaEvent_t` handle.
-  _CCCL_HOST_API constexpr event_ref(::cudaEvent_t __evnt) noexcept
+  _CCCL_HOST_API constexpr event_ref(::hipEvent_t __evnt) noexcept
       : __event_(__evnt)
   {}
 
@@ -116,12 +115,12 @@ public:
   [[nodiscard]] _CCCL_HOST_API bool is_done() const
   {
     _CCCL_ASSERT(__event_ != nullptr, "cuda::event_ref::sync no event set");
-    ::cudaError_t __status = ::cuda::__driver::__eventQueryNoThrow(__event_);
-    if (__status == ::cudaSuccess)
+    ::hipError_t __status = ::cuda::__driver::__eventQueryNoThrow(__event_);
+    if (__status == ::hipSuccess)
     {
       return true;
     }
-    else if (__status == ::cudaErrorNotReady)
+    else if (__status == ::hipErrorNotReady)
     {
       return false;
     }
@@ -134,7 +133,7 @@ public:
   //! @brief Retrieve the native `cudaEvent_t` handle.
   //!
   //! @return cudaEvent_t The native handle being held by the event_ref object.
-  [[nodiscard]] _CCCL_HOST_API constexpr ::cudaEvent_t get() const noexcept
+  [[nodiscard]] _CCCL_HOST_API constexpr ::hipEvent_t get() const noexcept
   {
     return __event_;
   }

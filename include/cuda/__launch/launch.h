@@ -405,15 +405,15 @@ template <class _Kernel, class _Config, class... _Args>
 
 #  endif // _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 
-[[nodiscard]] _CCCL_HOST_API inline ::CUfunction __get_cufunction_of(const void* __kernel)
+[[nodiscard]] _CCCL_HOST_API inline ::hipFunction_t __get_cufunction_of(const void* __kernel)
 {
-  ::cudaFunction_t __kernel_cufunction{};
-  _CCCL_TRY_CUDA_API(::cudaGetFuncBySymbol, "Failed to get function from symbol", &__kernel_cufunction, __kernel);
-  return (::CUfunction) __kernel_cufunction;
+  ::hipFunction_t __kernel_cufunction{};
+  _CCCL_TRY_CUDA_API(::hipGetFuncBySymbol, "Failed to get function from symbol", &__kernel_cufunction, __kernel);
+  return (::hipFunction_t) __kernel_cufunction;
 }
 
 _CCCL_HOST_API void inline __do_launch(
-  ::cuda::stream_ref __stream, ::CUlaunchConfig& __config, ::CUfunction __kernel, void** __args_ptrs)
+  ::cuda::stream_ref __stream, ::__libhipcxx::__launch_config& __config, ::hipFunction_t __kernel, void** __args_ptrs)
 {
   __config.hStream = __stream.get();
 #  if defined(_CCCLRT_LAUNCH_CONFIG_TEST)
@@ -424,22 +424,22 @@ _CCCL_HOST_API void inline __do_launch(
 }
 
 template <typename... _ExpTypes, typename _Dst, typename _Config>
-_CCCL_HOST_API auto __launch_impl(_Dst&& __dst, _Config __conf, ::CUfunction __kernel, _ExpTypes... __args)
+_CCCL_HOST_API auto __launch_impl(_Dst&& __dst, _Config __conf, ::hipFunction_t __kernel, _ExpTypes... __args)
 {
   static_assert(!::cuda::std::is_same_v<decltype(__conf.hierarchy()), no_init_t>,
                 "Can't launch a configuration without hierarchy dimensions");
 
   using _Hierarchy = typename _Config::hierarchy_type;
 
-  ::CUlaunchConfig __config{};
+  ::__libhipcxx::__launch_config __config{};
   constexpr bool __has_cluster_level        = _Hierarchy::has_level(cluster);
   constexpr unsigned int __num_attrs_needed = __detail::kernel_config_count_attr_space(__conf) + __has_cluster_level;
-  ::CUlaunchAttribute __attrs[__num_attrs_needed == 0 ? 1 : __num_attrs_needed];
+  ::__libhipcxx::__launch_attribute __attrs[__num_attrs_needed == 0 ? 1 : __num_attrs_needed];
   __config.attrs    = &__attrs[0];
   __config.numAttrs = 0;
 
-  ::cudaError_t __status = __detail::apply_kernel_config(__conf, __config, __kernel);
-  if (__status != ::cudaSuccess)
+  ::hipError_t __status = __detail::apply_kernel_config(__conf, __config, __kernel);
+  if (__status != ::hipSuccess)
   {
     _CCCL_THROW(::cuda::cuda_error, __status, "Failed to prepare a launch configuration");
   }
@@ -453,8 +453,8 @@ _CCCL_HOST_API auto __launch_impl(_Dst&& __dst, _Config __conf, ::CUfunction __k
 
   if constexpr (__has_cluster_level)
   {
-    ::CUlaunchAttribute __cluster_dims_attr{};
-    __cluster_dims_attr.id                 = ::CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION;
+    ::__libhipcxx::__launch_attribute __cluster_dims_attr{};
+    __cluster_dims_attr.id                 = ::__libhipcxx::__launch_attribute_cluster_dimension;
     __cluster_dims_attr.value.clusterDim.x = block.dims(cluster, __conf).x;
     __cluster_dims_attr.value.clusterDim.y = block.dims(cluster, __conf).y;
     __cluster_dims_attr.value.clusterDim.z = block.dims(cluster, __conf).z;

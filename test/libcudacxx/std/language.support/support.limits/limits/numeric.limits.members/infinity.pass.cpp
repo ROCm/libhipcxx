@@ -90,28 +90,28 @@ int main(int, char**)
   test<long double>(inf);
 #endif // _CCCL_HAS_LONG_DOUBLE()
 #if _CCCL_HAS_NVFP16()
-  test<__half>(__double2half(inf));
+  test<__half>(::__libhipcxx::__double2half(inf));
 #endif // _CCCL_HAS_NVFP16
 #if _CCCL_HAS_NVBF16()
-  test<__nv_bfloat16>(__double2bfloat16(inf));
+  test<__hip_bfloat16>(__double2bfloat16(inf));
 #endif // _CCCL_HAS_NVBF16
 #if _CCCL_HAS_NVFP8_E4M3()
-  test<__nv_fp8_e4m3>(__nv_fp8_e4m3{});
+  test<__hip_fp8_e4m3>(__hip_fp8_e4m3{});
 #endif // _CCCL_HAS_NVFP8_E4M3()
 #if _CCCL_HAS_NVFP8_E5M2()
-  test<__nv_fp8_e5m2>(make_fp8_e5m2(inf));
+  test<__hip_fp8_e5m2>(make_fp8_e5m2(inf));
 #endif // _CCCL_HAS_NVFP8_E5M2()
 #if _CCCL_HAS_NVFP8_E8M0()
   test<__nv_fp8_e8m0>(__nv_fp8_e8m0{});
 #endif // _CCCL_HAS_NVFP8_E8M0()
 #if _CCCL_HAS_NVFP6_E2M3()
-  test<__nv_fp6_e2m3>(__nv_fp6_e2m3{});
+  test<__hip_fp6_e2m3>(__hip_fp6_e2m3{});
 #endif // _CCCL_HAS_NVFP6_E2M3()
 #if _CCCL_HAS_NVFP6_E3M2()
-  test<__nv_fp6_e3m2>(__nv_fp6_e3m2{});
+  test<__hip_fp6_e3m2>(__hip_fp6_e3m2{});
 #endif // _CCCL_HAS_NVFP6_E3M2()
 #if _CCCL_HAS_NVFP4_E2M1()
-  test<__nv_fp4_e2m1>(__nv_fp4_e2m1{});
+  test<__hip_fp4_e2m1>(__hip_fp4_e2m1{});
 #endif // _CCCL_HAS_NVFP4_E2M1()
 #if _CCCL_HAS_FLOAT128()
   test<__float128>(inf);

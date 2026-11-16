@@ -112,7 +112,7 @@ struct __pstl_dispatch<__pstl_algorithm::__shift_left, __execution_backend::__cu
     auto __flag_iter    = ::cuda::transform_iterator{
       ::cuda::counting_iterator<size_t>{0}, __shift_left_predicate{static_cast<size_t>(__num_shifted)}};
 
-    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStreamPerThread}, __policy);
+    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStreamPerThread}, __policy);
 
     // Determine temporary device storage requirements for DeviceSelect::Flagged
     size_t __num_bytes = 0;
@@ -163,7 +163,7 @@ struct __pstl_dispatch<__pstl_algorithm::__shift_left, __execution_backend::__cu
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == cudaErrorMemoryAllocation)
+        if (__err.status() == hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }

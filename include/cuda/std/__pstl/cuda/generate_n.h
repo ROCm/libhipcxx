@@ -80,7 +80,7 @@ _CCCL_DIAG_POP
 #  include <cuda/std/__utility/move.h>
 #  include <cuda/std/tuple>
 
-#  if !_CCCL_HIP_COMPILATION() // on HIP cuda* comes from <libhipcxx/__amd/cuda_runtime.h>
+#  if !_CCCL_HIP_COMPILATION() // on HIP the runtime API comes from <hip/hip_runtime.h>
 #    include <cuda_runtime.h>
 #  endif
 
@@ -107,7 +107,7 @@ struct __pstl_dispatch<__pstl_algorithm::__generate_n, __execution_backend::__cu
       __policy);
 
     // Get the stream for synchronization after the algorithm is run
-    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStream_t{}}, __policy);
+    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStream_t{}}, __policy);
     __stream.sync();
 
     return __result + __count;
@@ -126,7 +126,7 @@ struct __pstl_dispatch<__pstl_algorithm::__generate_n, __execution_backend::__cu
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == cudaErrorMemoryAllocation)
+        if (__err.status() == hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }

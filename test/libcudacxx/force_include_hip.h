@@ -26,7 +26,7 @@
 #ifndef LIBCUDACXX_FORCE_INCLUDE_HIP
 #define LIBCUDACXX_FORCE_INCLUDE_HIP
 
-#include <libhipcxx/__amd/cuda_runtime.h>
+#include <libhipcxx/__amd/hip_runtime.h>
 // TODO(HIP/AMD): this is a temporary WAR to create leass file modifications.
 // This should be only in the test_macros.h. Unfortunately many tests do not
 // include this header.
@@ -94,25 +94,41 @@ __device__ void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t
 #  pragma clang diagnostic pop
 #endif // defined(__HIP_PLATFORM_AMD__)
 
-// NOTE(HIP/AMD): single switch for the ROCm 7.14 HIP teardown-spin workaround, so
-// its two halves cannot be removed independently: the _Exit(0) destructor in
+// NOTE(HIP/AMD): single switch for the libamdhip64 DSO-destructor busy-spin, so
+// its two halves cannot be removed independently: the _Exit destructor in
 // heterogeneous/helpers.h, and the abort() here that stops that destructor turning
-// a failed HIP call into a pass. Not reproducible on ROCm 10; drop with 7.x.
-#if LIBHIPCXX_ROCM_VERSION_EQ(7, 14)
+// a failed HIP call into a pass.
+//
+// Seen on ROCm 7.14 and again on ROCm 10. The heterogeneous tests time out, and
+// the lit durations quantize at multiples of the per-test timeout (one spin per
+// retry). A retry that misses the exit storm finishes in tens of seconds. Gate
+// on 7.14 and on every ROCm 10+ until the runtime defect is gone.
+//
+// The destructor ends the process with libhipcxx_teardown_exit_code(), which
+// stays 0 unless a return path below records another code. abort() does not run
+// the destructor, so assertion failures and HIP_CALL failures keep their status.
+#if (LIBHIPCXX_ROCM_VERSION_EQ(7, 14)) || (ROCM_VERSION_MAJOR >= 10)
 #  define LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR 1
 #  define LIBHIPCXX_TEST_FAIL_EXIT()      abort()
+inline int& libhipcxx_teardown_exit_code()
+{
+    static int code = 0;
+    return code;
+}
+#  define LIBHIPCXX_NOTE_EXIT_CODE(code) (libhipcxx_teardown_exit_code() = (code))
 #else
 #  define LIBHIPCXX_HIP_TEARDOWN_SPIN_WAR 0
 #  define LIBHIPCXX_TEST_FAIL_EXIT()      exit(1)
+#  define LIBHIPCXX_NOTE_EXIT_CODE(code)  ((void) (code))
 #endif
 
 #define HIP_CALL(err, ...) \
     do { \
         err = __VA_ARGS__; \
-        if (err != cudaSuccess) \
+        if (err != hipSuccess) \
         { \
             printf("HIP ERROR, line %d: %s: %s\n", __LINE__,\
-                   cudaGetErrorName(err), cudaGetErrorString(err)); \
+                   hipGetErrorName(err), hipGetErrorString(err)); \
             fflush(nullptr); \
             LIBHIPCXX_TEST_FAIL_EXIT(); \
         } \
@@ -122,18 +138,18 @@ __device__ void operator delete[](void* __ptr, __SIZE_TYPE__, ::std::align_val_t
 
 void list_devices()
 {
-    cudaError_t err;
+    hipError_t err;
     int device_count;
-    HIP_CALL(err, cudaGetDeviceCount(&device_count));
+    HIP_CALL(err, hipGetDeviceCount(&device_count));
     printf("HIP devices found: %d\n", device_count);
 
     int selected_device;
-    HIP_CALL(err, cudaGetDevice(&selected_device));
+    HIP_CALL(err, hipGetDevice(&selected_device));
 
     for (int dev = 0; dev < device_count; ++dev)
     {
-        cudaDeviceProp device_prop;
-        HIP_CALL(err, cudaGetDeviceProperties(&device_prop, dev));
+        hipDeviceProp_t device_prop;
+        HIP_CALL(err, hipGetDeviceProperties(&device_prop, dev));
 
         printf("Device %d: \"%s\", ", dev, device_prop.name);
         if(dev == selected_device)
@@ -163,27 +179,29 @@ void fake_main_kernel(int * ret)
 int main(int argc, char** argv)
 {
     // Check if the HIP driver/runtime are installed and working for sanity.
-    cudaError_t err;
-    HIP_CALL(err, cudaDeviceSynchronize());
+    hipError_t err;
+    HIP_CALL(err, hipDeviceSynchronize());
 
     list_devices();
 
     int ret = fake_main(argc, argv);
     if (ret != 0)
     {
+        LIBHIPCXX_NOTE_EXIT_CODE(ret);
         return ret;
     }
 
     int * hip_ret = 0;
-    HIP_CALL(err, cudaMalloc(&hip_ret, sizeof(int)));
+    HIP_CALL(err, hipMalloc(&hip_ret, sizeof(int)));
 
     fake_main_kernel<<<1, cuda_thread_count>>>(hip_ret);
      
-    HIP_CALL(err, cudaGetLastError());
-    HIP_CALL(err, cudaDeviceSynchronize());
-    HIP_CALL(err, cudaMemcpy(&ret, hip_ret, sizeof(int), cudaMemcpyDeviceToHost));
-    HIP_CALL(err, cudaFree(hip_ret));
+    HIP_CALL(err, hipGetLastError());
+    HIP_CALL(err, hipDeviceSynchronize());
+    HIP_CALL(err, hipMemcpy(&ret, hip_ret, sizeof(int), hipMemcpyDeviceToHost));
+    HIP_CALL(err, hipFree(hip_ret));
 
+    LIBHIPCXX_NOTE_EXIT_CODE(ret);
     return ret;
 }
 

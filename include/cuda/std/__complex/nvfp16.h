@@ -131,7 +131,7 @@ class _CCCL_TYPE_VISIBILITY_DEFAULT _CCCL_ALIGNAS(alignof(__half2)) complex<__ha
     // corresponding ticket SWDEV-529927
     return ::__float2half(static_cast<float>(__value));
 #  else
-    return ::__double2half(__value);
+    return ::__libhipcxx::__double2half(__value);
 #  endif
   }
 

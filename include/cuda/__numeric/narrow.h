@@ -87,7 +87,7 @@ struct narrowing_error : ::std::runtime_error
 template <class _To, class _From>
 inline constexpr bool __narrow_needs_double_pivot_v =
   !::cuda::std::is_constructible_v<_To, _From>
-  && (::cuda::std::is_same_v<_To, __nv_bfloat16> || ::cuda::std::is_same_v<_To, __half>);
+  && (::cuda::std::is_same_v<_To, __hip_bfloat16> || ::cuda::std::is_same_v<_To, __half>);
 
 template <class _To, class _From>
 inline constexpr bool __narrow_is_constructible_v =

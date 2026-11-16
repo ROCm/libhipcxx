@@ -39,12 +39,12 @@
 C2H_TEST("Call each driver api", "[utility]")
 {
   namespace driver = ::cuda::__driver;
-  cudaStream_t stream;
+  hipStream_t stream;
   // Assumes the ctx stack was empty or had one ctx, should be the case unless some other
   // test leaves 2+ ctxs on the stack
 
   // Pushes the primary context if the stack is empty
-  CUDART(cudaStreamCreate(&stream));
+  CUDART(hipStreamCreate(&stream));
 
   auto ctx = driver::__ctxGetCurrent();
   CCCLRT_REQUIRE(ctx != nullptr);
@@ -67,7 +67,7 @@ C2H_TEST("Call each driver api", "[utility]")
   auto stream_ctx = driver::__streamGetCtx(stream);
   CCCLRT_REQUIRE(ctx == stream_ctx);
 
-  CUDART(cudaStreamDestroy(stream));
+  CUDART(hipStreamDestroy(stream));
 
   CCCLRT_REQUIRE(driver::__deviceGet(0) == 0);
 
@@ -80,19 +80,19 @@ C2H_TEST("Call each driver api", "[utility]")
 
   CCCLRT_REQUIRE(driver::__isPrimaryCtxActive(0));
   // Confirm we can reset the primary context with double release
-  CCCLRT_REQUIRE(driver::__primaryCtxReleaseNoThrow(0) == cudaSuccess);
-  CCCLRT_REQUIRE(driver::__primaryCtxReleaseNoThrow(0) == cudaSuccess);
+  CCCLRT_REQUIRE(driver::__primaryCtxReleaseNoThrow(0) == hipSuccess);
+  CCCLRT_REQUIRE(driver::__primaryCtxReleaseNoThrow(0) == hipSuccess);
 
   // Try a third release in case curand retained the primary ctx as well
   if (driver::__isPrimaryCtxActive(0))
   {
-    CCCLRT_REQUIRE(driver::__primaryCtxReleaseNoThrow(0) == cudaSuccess);
+    CCCLRT_REQUIRE(driver::__primaryCtxReleaseNoThrow(0) == hipSuccess);
   }
 
   CCCLRT_REQUIRE(!driver::__isPrimaryCtxActive(0));
 
   // Confirm cudart can recover
-  CUDART(cudaStreamCreate(&stream));
+  CUDART(hipStreamCreate(&stream));
   CCCLRT_REQUIRE(driver::__ctxGetCurrent() == ctx);
 
   CUDART(driver::__streamDestroyNoThrow(stream));
@@ -114,8 +114,8 @@ C2H_TEST("Call each driver api (HIP subset)", "[utility]")
   CCCLRT_REQUIRE(driver::__getVersion() > 0);
 
   // Stream lifecycle round-trips.
-  cudaStream_t stream{};
-  CUDART(cudaStreamCreate(&stream));
+  hipStream_t stream{};
+  CUDART(hipStreamCreate(&stream));
   CUDART(driver::__streamDestroyNoThrow(stream));
 }
 #endif // __HIP_PLATFORM_AMD__

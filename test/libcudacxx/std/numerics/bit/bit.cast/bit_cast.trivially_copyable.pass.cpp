@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // XFAIL: enable-tile
 // nvbug6077498: ICE when validating tile MLIR
 
@@ -102,11 +124,11 @@ TEST_FUNC bool tests()
 
 #if _LIBCUDACXX_HAS_NVBF16()
   // cuda::std::complex<__nv_bfloat16>
-  for (const cuda::std::complex<__nv_bfloat16>& i :
-       {cuda::std::complex<__nv_bfloat16>{__float2bfloat16(0.0f), __float2bfloat16(1.0f)},
-        cuda::std::complex<__nv_bfloat16>{__float2bfloat16(1.0f), __float2bfloat16(-1.0f)},
-        cuda::std::complex<__nv_bfloat16>{__float2bfloat16(-1.0f), __float2bfloat16(0.0f)},
-        cuda::std::complex<__nv_bfloat16>{__float2bfloat16(10.0f), __float2bfloat16(-10.0f)}})
+  for (const cuda::std::complex<__hip_bfloat16>& i :
+       {cuda::std::complex<__hip_bfloat16>{__float2bfloat16(0.0f), __float2bfloat16(1.0f)},
+        cuda::std::complex<__hip_bfloat16>{__float2bfloat16(1.0f), __float2bfloat16(-1.0f)},
+        cuda::std::complex<__hip_bfloat16>{__float2bfloat16(-1.0f), __float2bfloat16(0.0f)},
+        cuda::std::complex<__hip_bfloat16>{__float2bfloat16(10.0f), __float2bfloat16(-10.0f)}})
   {
     test_roundtrip_through_nested_T(i);
     test_roundtrip_through_buffer(i);
@@ -127,11 +149,11 @@ TEST_FUNC bool tests()
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-  for (const __nv_bfloat162& i :
-       {__nv_bfloat162{__float2bfloat16(0.0f), __float2bfloat16(1.0f)},
-        __nv_bfloat162{__float2bfloat16(-1.0f), __float2bfloat16(2.0f)},
-        __nv_bfloat162{__float2bfloat16(10.0f), __float2bfloat16(-10.0f)},
-        __nv_bfloat162{__float2bfloat16(2.5f), __float2bfloat16(3.5f)}})
+  for (const __hip_bfloat162& i :
+       {__hip_bfloat162{__float2bfloat16(0.0f), __float2bfloat16(1.0f)},
+        __hip_bfloat162{__float2bfloat16(-1.0f), __float2bfloat16(2.0f)},
+        __hip_bfloat162{__float2bfloat16(10.0f), __float2bfloat16(-10.0f)},
+        __hip_bfloat162{__float2bfloat16(2.5f), __float2bfloat16(3.5f)}})
   {
     test_roundtrip_through_nested_T(i);
     test_roundtrip_through_buffer(i);
@@ -167,12 +189,12 @@ TEST_FUNC bool tests()
 
 #if _LIBCUDACXX_HAS_NVBF16()
   {
-    const auto arr = cuda::std::array<__nv_bfloat16, 2>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)};
+    const auto arr = cuda::std::array<__hip_bfloat16, 2>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)};
     test_roundtrip_through_nested_T(arr);
     test_roundtrip_through_buffer(arr);
   }
   {
-    const auto p = cuda::std::pair<__nv_bfloat16, __nv_bfloat16>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)};
+    const auto p = cuda::std::pair<__hip_bfloat16, __hip_bfloat16>{__float2bfloat16(1.0f), __float2bfloat16(2.0f)};
     test_roundtrip_through_nested_T(p);
     test_roundtrip_through_buffer(p);
   }
@@ -180,7 +202,7 @@ TEST_FUNC bool tests()
 
 #if _LIBCUDACXX_HAS_NVFP16() && _LIBCUDACXX_HAS_NVBF16()
   {
-    const auto t = cuda::std::tuple<__half, __nv_bfloat16>{__float2half(1.0f), __float2bfloat16(2.0f)};
+    const auto t = cuda::std::tuple<__half, __hip_bfloat16>{__float2half(1.0f), __float2bfloat16(2.0f)};
     test_roundtrip_through_nested_T(t);
     test_roundtrip_through_buffer(t);
   }
@@ -202,7 +224,7 @@ TEST_FUNC bool tests()
 
 #if _LIBCUDACXX_HAS_NVBF16()
   {
-    const auto p = cuda::std::pair<__nv_bfloat16, int>{__float2bfloat16(1.0f), 42};
+    const auto p = cuda::std::pair<__hip_bfloat16, int>{__float2bfloat16(1.0f), 42};
     test_roundtrip_through_nested_T<false>(p);
     test_roundtrip_through_buffer<false>(p);
   }

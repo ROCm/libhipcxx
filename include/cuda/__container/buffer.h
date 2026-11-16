@@ -851,16 +851,16 @@ _CCCL_HOST_API void __fill_n(cuda::stream_ref __stream, _Tp* __first, ::cuda::st
   // we need to check the attributes
   if constexpr (_Accessability == mr::__memory_accessibility ::__host_device)
   {
-    __driver::__pointer_attribute_value_type_t<CU_POINTER_ATTRIBUTE_MEMORY_TYPE> __type;
+    __driver::__pointer_attribute_value_type_t<HIP_POINTER_ATTRIBUTE_MEMORY_TYPE> __type;
     bool __is_managed{};
-    auto __status1 = ::cuda::__driver::__pointerGetAttributeNoThrow<CU_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __first);
+    auto __status1 = ::cuda::__driver::__pointerGetAttributeNoThrow<HIP_POINTER_ATTRIBUTE_MEMORY_TYPE>(__type, __first);
     auto __status2 =
-      ::cuda::__driver::__pointerGetAttributeNoThrow<CU_POINTER_ATTRIBUTE_IS_MANAGED>(__is_managed, __first);
-    if (__status1 != ::cudaSuccess || __status2 != ::cudaSuccess)
+      ::cuda::__driver::__pointerGetAttributeNoThrow<HIP_POINTER_ATTRIBUTE_IS_MANAGED>(__is_managed, __first);
+    if (__status1 != ::hipSuccess || __status2 != ::hipSuccess)
     {
       _CCCL_THROW(::cuda::cuda_error, __status1, "Failed to get buffer memory attributes");
     }
-    if (__type == ::CU_MEMORYTYPE_HOST && !__is_managed)
+    if (__type == ::hipMemoryTypeHost && !__is_managed)
     {
       __fill_n<_Tp, mr::__memory_accessibility ::__host>(__stream, __first, __count, __value);
     }

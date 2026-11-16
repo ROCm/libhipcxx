@@ -401,13 +401,14 @@ else() # NOT LIBCUDACXX_TEST_WITH_NVRTC
       "-include ${libcudacxx_SOURCE_DIR}/test/libcudacxx/force_include_hip.h"
     )
     # Select compiler based on HIP_PLATFORM env var HIP_PLATFORM
-    # if HIP_PLAFORM=nvidia use nvcc; else use amdclang++.
+    # if HIP_PLAFORM=nvidia use nvcc; else use the HIP compiler (amdclang++).
+    # Not CMAKE_CXX_COMPILER: CI builds may use g++ as the host compiler.
     if("$ENV{HIP_PLATFORM}" STREQUAL "nvidia" OR "$ENV{HIP_PLATFORM}" STREQUAL "nvcc")
       find_program(NVCC_EXECUTABLE nvcc REQUIRED)
       set(LIBCUDACXX_CUDA_COMPILER "${NVCC_EXECUTABLE}")
       set(CMAKE_CUDA_COMPILER_ID "NVIDIA")
     else()
-      set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_CXX_COMPILER}")
+      set(LIBCUDACXX_CUDA_COMPILER "${CMAKE_HIP_COMPILER}")
       set(CMAKE_CUDA_COMPILER_ID "AMDCLANG")
     endif()
     set(CMAKE_CUDA_HOST_COMPILER ${CMAKE_CXX_COMPILER})

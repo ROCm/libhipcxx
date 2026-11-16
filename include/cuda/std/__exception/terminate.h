@@ -45,7 +45,7 @@
 #endif // _CCCL_TILE_COMPILATION()
 
 // NOTE(HIP/AMD): Under hipRTC __cccl_terminate() takes the device branch
-// (libhipcxx::__trap()), so host <stdlib.h> (for ::exit) is unused. Including it
+// (::__libhipcxx::__trap()), so host <stdlib.h> (for ::exit) is unused. Including it
 // here would pull in host <stddef.h>/<bits/stdint-intn.h> on the JIT include
 // path and cause max_align_t / byte / int64_t redefinition conflicts. Skip it
 // under hipRTC, like NVRTC.
@@ -66,7 +66,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD_NOVERSION // purposefully not using versioning na
   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (assert(false);))
 #else // ^^^ _CCCL_TILE_COMPILATION() ^^^ / vvv !_CCCL_TILE_COMPILATION()
 #  if _CCCL_HIP_COMPILATION()
-  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (libhipcxx::__trap();))
+  NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (::__libhipcxx::__trap();))
 #  else // ^^^ _CCCL_HIP_COMPILATION() ^^^ / vvv !_CCCL_HIP_COMPILATION() vvv
   NV_IF_ELSE_TARGET(NV_IS_HOST, (::exit(-1);), (::__trap();))
 #  endif // !_CCCL_HIP_COMPILATION()

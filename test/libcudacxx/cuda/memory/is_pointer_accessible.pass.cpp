@@ -41,9 +41,8 @@
 #include <cuda/std/cassert>
 
 // NOTE(HIP/AMD): the upstream-named <cuda_runtime_api.h> does not exist
-// on a HIP-only system; the libhipcxx detail/__config transitively pulls
-// <libhipcxx/__amd/cuda_runtime.h> which provides the cuda* runtime API shim, so the
-// include here is unnecessary on HIP. Gate on __HIP_PLATFORM_AMD__
+// on a HIP-only system; the test uses the hip* runtime API from the
+// force-included <hip/hip_runtime.h>, so the include here is unnecessary on HIP. Gate on __HIP_PLATFORM_AMD__
 // rather than _CCCL_HIP_COMPILATION() because the latter is defined
 // only after <cuda/std/...> headers establish it, which may not have
 // happened yet at this point in some configurations -- the clang-hip
@@ -102,21 +101,21 @@ bool test_basic()
   [[maybe_unused]] int host_ptr2[] = {1, 2, 3, 4};
   [[maybe_unused]] auto host_ptr3  = new int[2];
   [[maybe_unused]] int* host_ptr4  = nullptr;
-  assert(cudaMallocHost(&host_ptr4, sizeof(int) * 2) == cudaSuccess);
+  assert(hipHostMalloc(&host_ptr4, sizeof(int) * 2) == hipSuccess);
 
   int* host_ptr5 = nullptr;
-  assert(cudaHostAlloc(&host_ptr5, sizeof(int) * 2, cudaHostAllocMapped) == cudaSuccess);
+  assert(hipHostAlloc(&host_ptr5, sizeof(int) * 2, hipHostAllocMapped) == hipSuccess);
 
   int* device_ptr2 = nullptr;
-  assert(cudaMalloc(&device_ptr2, sizeof(int) * 2) == cudaSuccess);
+  assert(hipMalloc(&device_ptr2, sizeof(int) * 2) == hipSuccess);
 
   int* device_ptr3    = nullptr;
-  cudaStream_t stream = nullptr;
-  assert(cudaStreamCreate(&stream) == cudaSuccess);
-  assert(cudaMallocAsync(&device_ptr3, sizeof(int) * 2, stream) == cudaSuccess);
+  hipStream_t stream = nullptr;
+  assert(hipStreamCreate(&stream) == hipSuccess);
+  assert(hipMallocAsync(&device_ptr3, sizeof(int) * 2, stream) == hipSuccess);
 
   int* managed_ptr2 = nullptr;
-  assert(cudaMallocManaged(&managed_ptr2, sizeof(int) * 2) == cudaSuccess);
+  assert(hipMallocManaged(&managed_ptr2, sizeof(int) * 2) == hipSuccess);
 
   test_accessible_pointer((void*) nullptr, false, false, false, dev);
 
@@ -130,7 +129,7 @@ bool test_basic()
   test_accessible_pointer(device_ptr3, false, true, false, dev); // cudaMallocAsync device pointer
 
   void* device_ptr4 = nullptr;
-  assert(cudaGetSymbolAddress(&device_ptr4, device_ptr1) == cudaSuccess);
+  assert(hipGetSymbolAddress(&device_ptr4, device_ptr1) == hipSuccess);
   test_accessible_pointer(device_ptr4, false, true, false, dev); // cudaGetSymbolAddress device pointer
 
   const int* const_device_ptr2 = device_ptr2;
@@ -149,32 +148,32 @@ bool test_basic()
 }
 
 void* allocate_memory_from_pool(
-  cudaMemAllocationType alloc_type, cudaMemLocationType location_type, cuda::device_ref dev)
+  hipMemAllocationType alloc_type, hipMemLocationType location_type, cuda::device_ref dev)
 {
-  cudaMemPoolProps pool_prop = {};
+  hipMemPoolProps pool_prop = {};
   pool_prop.allocType        = alloc_type;
   pool_prop.location.id      = dev.get();
   pool_prop.location.type    = location_type;
-  cudaMemPool_t mem_pool     = nullptr;
-  assert(cudaMemPoolCreate(&mem_pool, &pool_prop) == cudaSuccess);
+  hipMemPool_t mem_pool     = nullptr;
+  assert(hipMemPoolCreate(&mem_pool, &pool_prop) == hipSuccess);
 
   int* ptr            = nullptr;
-  cudaStream_t stream = nullptr;
-  assert(cudaStreamCreate(&stream) == cudaSuccess);
-  assert(cudaMallocFromPoolAsync(&ptr, sizeof(int) * 2, mem_pool, stream) == cudaSuccess);
-  assert(cudaDeviceSynchronize() == cudaSuccess);
+  hipStream_t stream = nullptr;
+  assert(hipStreamCreate(&stream) == hipSuccess);
+  assert(hipMallocFromPoolAsync(&ptr, sizeof(int) * 2, mem_pool, stream) == hipSuccess);
+  assert(hipDeviceSynchronize() == hipSuccess);
 
-  cudaMemAccessDesc access_desc = {};
-  access_desc.flags             = cudaMemAccessFlagsProtReadWrite;
+  hipMemAccessDesc access_desc = {};
+  access_desc.flags             = hipMemAccessFlagsProtReadWrite;
   access_desc.location.type     = location_type;
   access_desc.location.id       = dev.get();
-  assert(cudaMemPoolSetAccess(mem_pool, &access_desc, 1) == cudaSuccess);
+  assert(hipMemPoolSetAccess(mem_pool, &access_desc, 1) == hipSuccess);
   return ptr;
 }
 
 void test_memory_pool_impl(
-  cudaMemAllocationType alloc_type,
-  cudaMemLocationType location_type,
+  hipMemAllocationType alloc_type,
+  hipMemLocationType location_type,
   bool is_host_accessible,
   bool is_device_accessible,
   bool is_managed_accessible)
@@ -187,14 +186,14 @@ void test_memory_pool_impl(
 
 bool test_memory_pool()
 {
-  if (cuda::__driver::__deviceGetAttribute(::CU_DEVICE_ATTRIBUTE_MEMORY_POOLS_SUPPORTED, 0))
+  if (cuda::__driver::__deviceGetAttribute(::hipDeviceAttributeMemoryPoolsSupported, 0))
   {
-    test_memory_pool_impl(cudaMemAllocationTypePinned, cudaMemLocationTypeDevice, false, true, false);
+    test_memory_pool_impl(hipMemAllocationTypePinned, hipMemLocationTypeDevice, false, true, false);
 
 #if _CCCL_CTK_AT_LEAST(12, 2)
     if (cuda::__is_host_memory_pool_supported())
     {
-      test_memory_pool_impl(cudaMemAllocationTypePinned, cudaMemLocationTypeHost, true, false, false);
+      test_memory_pool_impl(hipMemAllocationTypePinned, hipMemLocationTypeHost, true, false, false);
     }
 #endif // _CCCL_CTK_AT_LEAST(12, 2)
 #if _CCCL_CTK_AT_LEAST(13, 0)
@@ -202,8 +201,8 @@ bool test_memory_pool()
     if (cuda::__driver::__deviceGetAttribute(::CU_DEVICE_ATTRIBUTE_CONCURRENT_MANAGED_ACCESS, 0))
     {
       // TODO(fbusato): check if this can be improved in future releases
-      test_memory_pool_impl(cudaMemAllocationTypeManaged, cudaMemLocationTypeHost, true, false, true);
-      test_memory_pool_impl(cudaMemAllocationTypeManaged, cudaMemLocationTypeDevice, false, true, true);
+      test_memory_pool_impl(cudaMemAllocationTypeManaged, hipMemLocationTypeHost, true, false, true);
+      test_memory_pool_impl(cudaMemAllocationTypeManaged, hipMemLocationTypeDevice, false, true, true);
     }
 #endif // _CCCL_CTK_AT_LEAST(13, 0)
   }
@@ -221,7 +220,7 @@ bool test_multiple_devices()
 
   /// DEVICE 0 CONTEXT
   int* device_ptr0 = nullptr;
-  assert(cudaMalloc(&device_ptr0, sizeof(int) * 2) == cudaSuccess);
+  assert(hipMalloc(&device_ptr0, sizeof(int) * 2) == hipSuccess);
 
   /// DEVICE 1 CONTEXT
   cuda::__ensure_current_context ctx1(dev1);
@@ -248,7 +247,7 @@ bool test_multiple_devices()
   assert(cuda::__is_device_accessible_nothrow(device_ptr0, dev0) == true);
 
   int can_access_peer = 0;
-  assert(cudaDeviceCanAccessPeer(&can_access_peer, dev0.get(), dev1.get()) == cudaSuccess);
+  assert(hipDeviceCanAccessPeer(&can_access_peer, dev0.get(), dev1.get()) == hipSuccess);
   if (!can_access_peer)
   {
     return true;
@@ -275,7 +274,7 @@ bool test_multiple_devices()
   // is_pointer_accessible.h). Avoiding the call also means no
   // peer-access state leaks into test_multiple_devices_from_pool().
 #if !defined(__HIP_PLATFORM_AMD__)
-  assert(cudaDeviceEnablePeerAccess(dev1.get(), 0) == cudaSuccess);
+  assert(hipDeviceEnablePeerAccess(dev1.get(), 0) == hipSuccess);
 #endif // !__HIP_PLATFORM_AMD__
   assert(cuda::is_device_accessible(device_ptr0, dev0) == true);
   assert(cuda::__is_device_accessible_nothrow(device_ptr0, dev0) == true);
@@ -293,12 +292,12 @@ bool test_multiple_devices_from_pool()
   cuda::device_ref dev0{0};
   cuda::device_ref dev1{1};
 
-  void* ptr = allocate_memory_from_pool(cudaMemAllocationTypePinned, cudaMemLocationTypeDevice, dev0);
+  void* ptr = allocate_memory_from_pool(hipMemAllocationTypePinned, hipMemLocationTypeDevice, dev0);
 
   /// DEVICE 1 CONTEXT
   cuda::__ensure_current_context ctx1(dev1);
   int can_access_peer = 0;
-  assert(cudaDeviceCanAccessPeer(&can_access_peer, dev0.get(), dev1.get()) == cudaSuccess);
+  assert(hipDeviceCanAccessPeer(&can_access_peer, dev0.get(), dev1.get()) == hipSuccess);
   if (!can_access_peer)
   {
     return true;
@@ -318,7 +317,7 @@ bool test_multiple_devices_from_pool()
   // pass on HIP via the capability-based fallback in
   // cuda::is_device_accessible.
 #if !defined(__HIP_PLATFORM_AMD__)
-  assert(cudaDeviceEnablePeerAccess(dev1.get(), 0) == cudaSuccess);
+  assert(hipDeviceEnablePeerAccess(dev1.get(), 0) == hipSuccess);
 #endif // !__HIP_PLATFORM_AMD__
   assert(cuda::is_device_accessible(ptr, dev0) == true);
   assert(cuda::__is_device_accessible_nothrow(ptr, dev0) == true);

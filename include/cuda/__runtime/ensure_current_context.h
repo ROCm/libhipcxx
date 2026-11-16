@@ -90,7 +90,7 @@ struct [[maybe_unused]] __ensure_current_context
   //! @param ctx The context to switch to
   //!
   //! @throws cuda_error if the context switch fails
-  _CCCL_HOST_API explicit __ensure_current_context(::CUcontext __ctx)
+  _CCCL_HOST_API explicit __ensure_current_context(::hipCtx_t __ctx)
   {
     ::cuda::__driver::__ctxPush(__ctx);
   }

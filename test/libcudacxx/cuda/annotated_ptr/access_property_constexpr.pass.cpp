@@ -53,9 +53,9 @@ TEST_FUNC constexpr bool test_constexpr()
   access_property d2{access_property::normal{}};
   access_property d3{access_property::streaming{}};
   access_property d4{access_property::persisting{}};
-  auto p1 = static_cast<cudaAccessProperty>(access_property::normal{});
-  auto p2 = static_cast<cudaAccessProperty>(access_property::streaming{});
-  auto p3 = static_cast<cudaAccessProperty>(access_property::persisting{});
+  auto p1 = static_cast<hipAccessProperty>(access_property::normal{});
+  auto p2 = static_cast<hipAccessProperty>(access_property::streaming{});
+  auto p3 = static_cast<hipAccessProperty>(access_property::persisting{});
   // fraction ctor
   access_property e1{access_property::normal{}, 1.0f};
   access_property e2{access_property::streaming{}, 1.0f};

@@ -125,7 +125,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 fmod(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 fmod(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
 {
   return ::__float2bfloat16(::cuda::std::fmod(::__bfloat162float(__x), ::__bfloat162float(__y)));
 }
@@ -213,9 +213,9 @@ template <class _A1, class _A2, enable_if_t<is_arithmetic_v<_A1> && is_arithmeti
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 modf(__nv_bfloat16 __x, __nv_bfloat16* __y) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 modf(__hip_bfloat16 __x, __hip_bfloat16* __y) noexcept
 {
-  const __nv_bfloat16 __integral_part = ::cuda::std::trunc(__x);
+  const __hip_bfloat16 __integral_part = ::cuda::std::trunc(__x);
   *__y                                = __integral_part;
   return ::__heq(__integral_part, __x)
          ? ::cuda::std::copysign(::__float2bfloat16(0.0f), __x)

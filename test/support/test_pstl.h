@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef SUPPORT_TEST_PSTL_H
 #define SUPPORT_TEST_PSTL_H
 
@@ -162,7 +184,7 @@ using all_types =
                  __half,
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-                 __nv_bfloat16,
+                 __hip_bfloat16,
 #endif // _LIBCUDACXX_HAS_NVBF16()
                  nontrivial_type>;
 
@@ -180,7 +202,7 @@ using arithmetic_types =
                  __half,
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-                 __nv_bfloat16
+                 __hip_bfloat16
 #endif // _LIBCUDACXX_HAS_NVBF16()
                  >;
 
@@ -222,7 +244,7 @@ TEST_FUNC __half operator*(const __half lhs, const size_t rhs) noexcept
 }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-TEST_FUNC __nv_bfloat16 operator*(const __nv_bfloat16 lhs, const size_t rhs) noexcept
+TEST_FUNC __hip_bfloat16 operator*(const __hip_bfloat16 lhs, const size_t rhs) noexcept
 {
   return ::__float2bfloat16(::__bfloat162float(lhs) * rhs);
 }

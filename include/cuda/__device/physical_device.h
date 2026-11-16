@@ -73,7 +73,7 @@ class __physical_device
   friend _CCCL_HOST_API inline ::cuda::std::unique_ptr<__physical_device[]>
   __make_physical_devices(::cuda::std::size_t __device_count);
 
-  ::CUdevice __device_{};
+  ::hipDevice_t __device_{};
 
   // NOTE(HIP/AMD): the cuDevicePrimaryCtx* API has no faithful HIP
   // equivalent (the HIP runtime owns per-device state implicitly via
@@ -84,7 +84,7 @@ class __physical_device
   ::std::once_flag __primary_ctx_once_flag_{};
 #  endif // _CCCL_HOSTED() && !_CCCL_HIP_COMPILATION()
 #  if !_CCCL_HIP_COMPILATION()
-  ::CUcontext __primary_ctx_{};
+  ::hipCtx_t __primary_ctx_{};
 #  endif // !_CCCL_HIP_COMPILATION()
 
   static constexpr ::cuda::std::size_t __max_name_length{256};
@@ -159,7 +159,7 @@ public:
   //! the __primary_ctx_ note above for why HIP has no equivalent.
   //!
   //! @return A reference to the primary context for this device.
-  [[nodiscard]] _CCCL_HOST_API ::CUcontext __primary_context()
+  [[nodiscard]] _CCCL_HOST_API ::hipCtx_t __primary_context()
   {
 #  if _CCCL_HOSTED()
     ::std::call_once(__primary_ctx_once_flag_, [this]() {
@@ -242,7 +242,7 @@ _CCCL_HOST_API inline void device_ref::init() const
 #if !_CCCL_HIP_COMPILATION()
 // NV-only: the __physical_device::__primary_context() member is HIP-excluded
 // (see the __primary_ctx_ note above), so this accessor is NV-only as well.
-[[nodiscard]] _CCCL_HOST_API inline ::CUcontext device_ref::__primary_context() const
+[[nodiscard]] _CCCL_HOST_API inline ::hipCtx_t device_ref::__primary_context() const
 {
   return ::cuda::__physical_devices()[__id_].__primary_context();
 }

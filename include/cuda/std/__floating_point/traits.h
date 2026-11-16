@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___FLOATING_POINT_TRAITS_H
 #define _CUDA_STD___FLOATING_POINT_TRAITS_H
 
@@ -72,17 +94,17 @@ inline constexpr bool __is_ext_nv_fp_v<__half> = true;
 
 #if _CCCL_HAS_NVBF16()
 template <>
-inline constexpr bool __is_ext_nv_fp_v<__nv_bfloat16> = true;
+inline constexpr bool __is_ext_nv_fp_v<__hip_bfloat16> = true;
 #endif // _CCCL_HAS_NVBF16()
 
 #if _CCCL_HAS_NVFP8_E4M3()
 template <>
-inline constexpr bool __is_ext_nv_fp_v<__nv_fp8_e4m3> = true;
+inline constexpr bool __is_ext_nv_fp_v<__hip_fp8_e4m3> = true;
 #endif // _CCCL_HAS_NVFP8_E4M3()
 
 #if _CCCL_HAS_NVFP8_E5M2()
 template <>
-inline constexpr bool __is_ext_nv_fp_v<__nv_fp8_e5m2> = true;
+inline constexpr bool __is_ext_nv_fp_v<__hip_fp8_e5m2> = true;
 #endif // _CCCL_HAS_NVFP8_E5M2()
 
 #if _CCCL_HAS_NVFP8_E8M0()
@@ -92,17 +114,17 @@ inline constexpr bool __is_ext_nv_fp_v<__nv_fp8_e8m0> = true;
 
 #if _CCCL_HAS_NVFP6_E2M3()
 template <>
-inline constexpr bool __is_ext_nv_fp_v<__nv_fp6_e2m3> = true;
+inline constexpr bool __is_ext_nv_fp_v<__hip_fp6_e2m3> = true;
 #endif // _CCCL_HAS_NVFP6_E2M3()
 
 #if _CCCL_HAS_NVFP6_E3M2()
 template <>
-inline constexpr bool __is_ext_nv_fp_v<__nv_fp6_e3m2> = true;
+inline constexpr bool __is_ext_nv_fp_v<__hip_fp6_e3m2> = true;
 #endif // _CCCL_HAS_NVFP6_E3M2()
 
 #if _CCCL_HAS_NVFP4_E2M1()
 template <>
-inline constexpr bool __is_ext_nv_fp_v<__nv_fp4_e2m1> = true;
+inline constexpr bool __is_ext_nv_fp_v<__hip_fp4_e2m1> = true;
 #endif // _CCCL_HAS_NVFP4_E2M1()
 
 // __is_ext_compiler_fp_v

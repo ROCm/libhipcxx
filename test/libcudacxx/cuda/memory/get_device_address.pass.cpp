@@ -66,9 +66,9 @@ void test_host(T& object)
   {
     T* host_address = cuda::std::addressof(object);
 
-    cudaPointerAttributes attributes;
-    cudaError_t status = cudaPointerGetAttributes(&attributes, host_address);
-    assert(status == cudaSuccess);
+    hipPointerAttribute_t attributes;
+    hipError_t status = hipPointerGetAttributes(&attributes, host_address);
+    assert(status == hipSuccess);
 
     if (attributes.devicePointer)
     {
@@ -79,18 +79,18 @@ void test_host(T& object)
   {
     T* device_address = cuda::get_device_address(object);
 
-    cudaPointerAttributes attributes;
-    cudaError_t status = cudaPointerGetAttributes(&attributes, device_address);
-    assert(status == cudaSuccess);
+    hipPointerAttribute_t attributes;
+    hipError_t status = hipPointerGetAttributes(&attributes, device_address);
+    assert(status == hipSuccess);
     assert(attributes.devicePointer == device_address);
   }
 
   {
     T* device_address = cuda::get_device_address(object, cuda::device_ref{0});
 
-    cudaPointerAttributes attributes;
-    cudaError_t status = cudaPointerGetAttributes(&attributes, device_address);
-    assert(status == cudaSuccess);
+    hipPointerAttribute_t attributes;
+    hipError_t status = hipPointerGetAttributes(&attributes, device_address);
+    assert(status == hipSuccess);
     assert(attributes.devicePointer == device_address);
   }
 }

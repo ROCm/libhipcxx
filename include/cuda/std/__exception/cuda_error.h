@@ -54,7 +54,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 // NOTE(HIP/AMD): under HIPRTC the COMGR sandbox has no hipError_t, so fall back
 // to the int alias (as NVRTC does via !_CCCL_HAS_CTK()).
 #if (_CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()) && !defined(_CCCL_COMPILER_HIPRTC)
-using __cuda_error_t = ::cudaError_t;
+using __cuda_error_t = ::hipError_t;
 #else
 using __cuda_error_t = int;
 #endif
@@ -78,9 +78,9 @@ static char* __format_cuda_error(
     __api ? __api : "",
     __api ? " " : "",
 #  if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
-    ::cudaGetErrorString(::cudaError_t(__status)),
+    ::hipGetErrorString(::hipError_t(__status)),
 #  else // ^^^ has CTK or HIP ^^^ / vvv neither CTK nor HIP vvv
-    "cudaError",
+    "hipError",
 #  endif // ^^^ neither CTK nor HIP ^^^
     __status,
     __msg);

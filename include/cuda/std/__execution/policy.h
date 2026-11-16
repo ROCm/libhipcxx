@@ -121,7 +121,7 @@ struct __execution_policy_base : env<__unwrap_reference_t<_Envs>...>
   [[nodiscard]] _CCCL_HOST_API constexpr auto with(_Env&& __env) const
   {
     if constexpr (__convertible_to_stream_ref<_Env>
-                  && (is_lvalue_reference_v<_Env> || is_same_v<remove_cvref_t<_Env>, ::cudaStream_t>) )
+                  && (is_lvalue_reference_v<_Env> || is_same_v<remove_cvref_t<_Env>, ::hipStream_t>) )
     { // streams are special in that they are their own environment, but we always want to store a stream_ref
       // We must reject prvalue cuda::stream because they are not copyable
       static_assert(!is_same_v<remove_cvref_t<_Env>, ::cuda::stream> || is_lvalue_reference_v<_Env>,

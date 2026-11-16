@@ -44,9 +44,7 @@
 #endif // no system header
 
 // NOTE(HIP/AMD): invalid_stream_t / invalid_stream / __invalid_stream()
-// only need a valid cudaStream_t typedef. The amd shim aliases
-// ::cudaStream_t to ::hipStream_t via include/libhipcxx/__amd/cuda_runtime.h so the
-// definitions below work unchanged under HIP.
+// only need the stream type, so they are available on HIP as well.
 #if _CCCL_HAS_CTK() || _CCCL_HIP_COMPILATION()
 
 #  include <cuda/std/__cccl/prologue.h>
@@ -59,9 +57,9 @@ enum class invalid_stream_t : unsigned char
 
 _CCCL_GLOBAL_CONSTANT invalid_stream_t invalid_stream{};
 
-[[nodiscard]] _CCCL_API _CCCL_FORCEINLINE ::cudaStream_t __invalid_stream() noexcept
+[[nodiscard]] _CCCL_API _CCCL_FORCEINLINE ::hipStream_t __invalid_stream() noexcept
 {
-  return reinterpret_cast<::cudaStream_t>(~0ull); // NOLINT(performance-no-int-to-ptr)
+  return reinterpret_cast<::hipStream_t>(~0ull); // NOLINT(performance-no-int-to-ptr)
 }
 
 _CCCL_END_NAMESPACE_CUDA

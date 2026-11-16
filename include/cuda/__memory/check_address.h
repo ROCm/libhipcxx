@@ -47,9 +47,8 @@
 #include <cuda/std/cstdint>
 // NOTE(HIP/AMD): cuda::device::__is_smem_valid_address_range and the
 // cuda::device::__internal_is_address_from helpers it uses are also
-// available under HIP via the libhipcxx::__isShared / __isGlobal /
-// __isLocal / __isConstant family in <libhipcxx/__amd/amd_utils.h> (exposed at
-// global namespace as ::__isShared etc. on HIP-device pass).
+// available under HIP via the ::__libhipcxx::__isShared / __isGlobal /
+// __isLocal / __isConstant family in <libhipcxx/__amd/amd_utils.h>.
 #if _CCCL_CUDA_COMPILATION() || _CCCL_HIP_COMPILATION()
 #  include <cuda/__memory/address_space.h>
 #  include <cuda/__ptx/instructions/get_sreg.h>

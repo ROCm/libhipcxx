@@ -43,8 +43,8 @@
 
 TEST_FUNC void test()
 {
-  ::cudaStream_t invalid_stream = reinterpret_cast<::cudaStream_t>(1337);
-  ::cudaStream_t stream         = reinterpret_cast<::cudaStream_t>(42);
+  ::hipStream_t invalid_stream = reinterpret_cast<::hipStream_t>(1337);
+  ::hipStream_t stream         = reinterpret_cast<::hipStream_t>(42);
   { // Can call get_stream on a cudaStream_t
     auto ref = ::cuda::get_stream(stream);
     assert(stream == ref);
@@ -56,8 +56,8 @@ TEST_FUNC void test()
   { // Can call get_stream on a type convertible to cudaStream_t
     struct convertible_to_cuda_stream_t
     {
-      ::cudaStream_t stream_;
-      TEST_FUNC operator ::cudaStream_t() const noexcept
+      ::hipStream_t stream_;
+      TEST_FUNC operator ::hipStream_t() const noexcept
       {
         return stream_;
       }
@@ -70,7 +70,7 @@ TEST_FUNC void test()
   { // Can call get_stream on a type convertible to stream_ref
     struct convertible_to_stream_ref
     {
-      ::cudaStream_t stream_;
+      ::hipStream_t stream_;
       TEST_FUNC operator ::cuda::stream_ref() const noexcept
       {
         return ::cuda::stream_ref{stream_};
@@ -84,7 +84,7 @@ TEST_FUNC void test()
   { // Can call get_stream on a type with a get_stream method
     struct with_const_get_stream
     {
-      ::cudaStream_t stream_;
+      ::hipStream_t stream_;
 
       TEST_FUNC ::cuda::stream_ref get_stream() const noexcept
       {
@@ -102,7 +102,7 @@ TEST_FUNC void test()
   { // Cannot call get_stream on a type with a non-const get_stream method
     struct with_mutable_get_stream
     {
-      ::cudaStream_t stream_;
+      ::hipStream_t stream_;
 
       TEST_FUNC ::cuda::stream_ref get_stream() noexcept
       {
@@ -119,9 +119,9 @@ TEST_FUNC void test()
   { // The get_stream method can return something convertible to cuda::stream_ref
     struct returns_convertible_to_stream_ref
     {
-      ::cudaStream_t stream_{};
+      ::hipStream_t stream_{};
 
-      TEST_FUNC ::cudaStream_t get_stream() const noexcept
+      TEST_FUNC ::hipStream_t get_stream() const noexcept
       {
         return stream_;
       }
@@ -152,7 +152,7 @@ TEST_FUNC void test()
   { // The get_stream method works with queries
     struct with_query
     {
-      ::cudaStream_t stream_{};
+      ::hipStream_t stream_{};
 
       TEST_FUNC ::cuda::stream_ref query(::cuda::get_stream_t) const noexcept
       {
@@ -170,9 +170,9 @@ TEST_FUNC void test()
   { // The get_stream method works with queries that return something convertible to stream_ref
     struct with_query_convertible_to_stream_ref
     {
-      ::cudaStream_t stream_{};
+      ::hipStream_t stream_{};
 
-      TEST_FUNC ::cudaStream_t query(::cuda::get_stream_t) const noexcept
+      TEST_FUNC ::hipStream_t query(::cuda::get_stream_t) const noexcept
       {
         return stream_;
       }
@@ -188,9 +188,9 @@ TEST_FUNC void test()
   { // The get_stream method works with types that have a stream member function
     struct with_stream
     {
-      ::cudaStream_t stream_{};
+      ::hipStream_t stream_{};
 
-      TEST_FUNC ::cudaStream_t stream() const noexcept
+      TEST_FUNC ::hipStream_t stream() const noexcept
       {
         return stream_;
       }

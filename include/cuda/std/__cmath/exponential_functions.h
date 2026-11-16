@@ -149,7 +149,7 @@ _CCCL_BEGIN_NAMESPACE_CUDA_STD
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 exp(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 exp(__hip_bfloat16 __x) noexcept
 {
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE, (return ::hexp(__x);), (return __float2bfloat16(::cuda::std::expf(__bfloat162float(__x)));))
@@ -232,7 +232,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 frexp(__nv_bfloat16 __x, int* __e) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 frexp(__hip_bfloat16 __x, int* __e) noexcept
 {
   return __float2bfloat16(::cuda::std::frexpf(__bfloat162float(__x), __e));
 }
@@ -314,7 +314,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 ldexp(__nv_bfloat16 __x, int __e) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 ldexp(__hip_bfloat16 __x, int __e) noexcept
 {
   return __float2bfloat16(::cuda::std::ldexpf(__bfloat162float(__x), __e));
 }
@@ -396,7 +396,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 exp2(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 exp2(__hip_bfloat16 __x) noexcept
 {
   NV_IF_ELSE_TARGET(
     NV_IS_DEVICE, (return ::hexp2(__x);), (return __float2bfloat16(::cuda::std::exp2f(__bfloat162float(__x)));))
@@ -479,7 +479,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 expm1(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 expm1(__hip_bfloat16 __x) noexcept
 {
   return __float2bfloat16(::cuda::std::expm1f(__bfloat162float(__x)));
 }
@@ -561,7 +561,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 scalbln(__nv_bfloat16 __x, long __y) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 scalbln(__hip_bfloat16 __x, long __y) noexcept
 {
   return __float2bfloat16(::cuda::std::scalblnf(__bfloat162float(__x), __y));
 }
@@ -643,7 +643,7 @@ template <class _Integer, enable_if_t<is_integral_v<_Integer>, int> = 0>
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 scalbn(__nv_bfloat16 __x, int __y) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 scalbn(__hip_bfloat16 __x, int __y) noexcept
 {
   return __float2bfloat16(::cuda::std::scalbnf(__bfloat162float(__x), __y));
 }
@@ -792,7 +792,7 @@ _CCCL_API inline constexpr _Tp __constexpr_scalbn(_Tp __x, int __exp)
 #endif // _LIBCUDACXX_HAS_NVFP16()
 
 #if _LIBCUDACXX_HAS_NVBF16()
-[[nodiscard]] _CCCL_API inline __nv_bfloat16 pow(__nv_bfloat16 __x, __nv_bfloat16 __y) noexcept
+[[nodiscard]] _CCCL_API inline __hip_bfloat16 pow(__hip_bfloat16 __x, __hip_bfloat16 __y) noexcept
 {
   return __float2bfloat16(::cuda::std::powf(__bfloat162float(__x), __bfloat162float(__y)));
 }

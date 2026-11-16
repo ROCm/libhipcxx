@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA___MEMORY_RESOURCE_MANAGED_MEMORY_POOL_H
 #define _CUDA___MEMORY_RESOURCE_MANAGED_MEMORY_POOL_H
 
@@ -67,7 +89,7 @@ class managed_memory_pool_ref
 public:
   //! @brief  Constructs the managed_memory_pool_ref from a \c cudaMemPool_t.
   //! @param __pool The \c cudaMemPool_t used to allocate memory.
-  _CCCL_HOST_API explicit managed_memory_pool_ref(::cudaMemPool_t __pool) noexcept
+  _CCCL_HOST_API explicit managed_memory_pool_ref(::hipMemPool_t __pool) noexcept
       : __memory_pool_base(__pool)
   {}
 
@@ -88,7 +110,7 @@ public:
 [[nodiscard]] inline managed_memory_pool_ref& managed_default_memory_pool()
 {
   static managed_memory_pool_ref __pool{::cuda::__get_default_memory_pool(
-    ::CUmemLocation{::CU_MEM_LOCATION_TYPE_NONE, 0}, ::CU_MEM_ALLOCATION_TYPE_MANAGED)};
+    ::hipMemLocation{::CU_MEM_LOCATION_TYPE_NONE, 0}, ::hipMemAllocationTypeMax)};
   return __pool;
 }
 
@@ -112,7 +134,7 @@ struct managed_memory_pool : managed_memory_pool_ref
 
   //! @brief Constructs an empty \c managed_memory_pool without an underlying pool.
   _CCCL_HOST_API explicit managed_memory_pool(no_init_t) noexcept
-      : managed_memory_pool_ref(::cudaMemPool_t{})
+      : managed_memory_pool_ref(::hipMemPool_t{})
   {}
 
   //! @brief Constructs a \c managed_memory_pool with optional properties.
@@ -123,7 +145,7 @@ struct managed_memory_pool : managed_memory_pool_ref
   //! created.
   _CCCL_HOST_API managed_memory_pool(memory_pool_properties __properties = {})
       : managed_memory_pool_ref(__create_cuda_mempool(
-          __properties, ::CUmemLocation{::CU_MEM_LOCATION_TYPE_NONE, 0}, ::CU_MEM_ALLOCATION_TYPE_MANAGED))
+          __properties, ::hipMemLocation{::CU_MEM_LOCATION_TYPE_NONE, 0}, ::hipMemAllocationTypeMax))
   {}
 
   // TODO add a constructor that accepts memory location one a type for it is
@@ -137,7 +159,7 @@ struct managed_memory_pool : managed_memory_pool_ref
     }
   }
 
-  _CCCL_HOST_API static managed_memory_pool from_native_handle(::cudaMemPool_t __pool) noexcept
+  _CCCL_HOST_API static managed_memory_pool from_native_handle(::hipMemPool_t __pool) noexcept
   {
     return managed_memory_pool(__pool);
   }
@@ -147,7 +169,7 @@ struct managed_memory_pool : managed_memory_pool_ref
   //! @return cudaMemPool_t The native handle being held by this object.
   //!
   //! @post The memory pool object is in a moved-from state.
-  _CCCL_HOST_API constexpr ::cudaMemPool_t release() noexcept
+  _CCCL_HOST_API constexpr ::hipMemPool_t release() noexcept
   {
     return ::cuda::std::exchange(__pool_, nullptr);
   }
@@ -163,7 +185,7 @@ struct managed_memory_pool : managed_memory_pool_ref
   managed_memory_pool& operator=(const managed_memory_pool&) = delete;
 
 private:
-  managed_memory_pool(::cudaMemPool_t __pool) noexcept
+  managed_memory_pool(::hipMemPool_t __pool) noexcept
       : managed_memory_pool_ref(__pool)
   {}
 };

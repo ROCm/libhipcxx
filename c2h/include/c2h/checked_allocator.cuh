@@ -29,7 +29,7 @@
 
 // NOTE(HIP/AMD): the thrust-backed templates at the bottom of this file
 // aren't HIP-portable in this tree (no rocThrust dep). Gate them off on HIP;
-// the pure-C++ c2h::detail::* helpers stay visible via the cudaRT shim.
+// the pure-C++ c2h::detail::* helpers stay available.
 #if !_CCCL_HIP_COMPILATION()
 #  include <thrust/device_allocator.h>
 #  include <thrust/mr/new.h>
@@ -45,7 +45,7 @@
 #include <string>
 
 #if _CCCL_HIP_COMPILATION()
-#  include <libhipcxx/__amd/cuda_runtime.h>
+#  include <hip/hip_runtime.h>
 #else
 #  include <cuda_runtime_api.h>
 #endif
@@ -98,12 +98,12 @@ inline bool get_debug_checked_allocs()
   return result;
 }
 
-inline cudaError_t get_device_memory(memory_info& info)
+inline hipError_t get_device_memory(memory_info& info)
 {
   static std::size_t device_memory_limit = get_device_memory_limit();
 
-  cudaError_t status = cudaMemGetInfo(&info.free, &info.total);
-  if (status != cudaSuccess)
+  hipError_t status = hipMemGetInfo(&info.free, &info.total);
+  if (status != hipSuccess)
   {
     return status;
   }
@@ -115,14 +115,14 @@ inline cudaError_t get_device_memory(memory_info& info)
     info.override = true;
   }
 
-  return cudaSuccess;
+  return hipSuccess;
 }
 
-inline cudaError_t check_free_device_memory(std::size_t bytes)
+inline hipError_t check_free_device_memory(std::size_t bytes)
 {
   memory_info info;
-  cudaError_t status = get_device_memory(info);
-  if (status != cudaSuccess)
+  hipError_t status = get_device_memory(info);
+  if (status != hipSuccess)
   {
     return status;
   }
@@ -154,24 +154,24 @@ inline cudaError_t check_free_device_memory(std::size_t bytes)
         << "Padded device mem:    " << padded_GiB << " GiB\n";
     }
 
-    return cudaErrorMemoryAllocation;
+    return hipErrorMemoryAllocation;
   }
 
-  return cudaSuccess;
+  return hipSuccess;
 }
 
 // Check available memory prior to calling cudaMalloc.
 // This avoids hangups and slowdowns from allocating swap / non-device memory
 // on some platforms, namely tegra.
-inline cudaError_t checked_cuda_malloc(void** ptr, std::size_t bytes)
+inline hipError_t checked_cuda_malloc(void** ptr, std::size_t bytes)
 {
   auto status = check_free_device_memory(bytes);
-  if (status != cudaSuccess)
+  if (status != hipSuccess)
   {
     return status;
   }
 
-  return cudaMalloc(ptr, bytes);
+  return hipMalloc(ptr, bytes);
 }
 } // namespace detail
 
@@ -182,7 +182,7 @@ inline cudaError_t checked_cuda_malloc(void** ptr, std::size_t bytes)
 // need these allocator types remain CUDA-only.
 #if !_CCCL_HIP_COMPILATION()
 using checked_cuda_memory_resource = THRUST_NS_QUALIFIER::system::cuda::detail::
-  cuda_memory_resource<detail::checked_cuda_malloc, cudaFree, THRUST_NS_QUALIFIER::cuda::pointer<void>>;
+  cuda_memory_resource<detail::checked_cuda_malloc, hipFree, THRUST_NS_QUALIFIER::cuda::pointer<void>>;
 
 template <typename T>
 class checked_cuda_allocator
@@ -223,13 +223,13 @@ struct checked_host_memory_resource final : public THRUST_NS_QUALIFIER::mr::new_
     // than is available. Check the amount of free memory before attempting to allocate on
     // integrated systems.
     int device = 0;
-    CubDebugExit(cudaGetDevice(&device));
-    cudaDeviceProp prop;
-    CubDebugExit(cudaGetDeviceProperties(&prop, device));
+    CubDebugExit(hipGetDevice(&device));
+    hipDeviceProp_t prop;
+    CubDebugExit(hipGetDeviceProperties(&prop, device));
     if (prop.integrated)
     {
       auto status = detail::check_free_device_memory(bytes + alignment + sizeof(std::size_t));
-      if (status != cudaSuccess)
+      if (status != hipSuccess)
       {
         throw std::bad_alloc{};
       }

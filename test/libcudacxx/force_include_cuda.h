@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // We use <stdio.h> instead of <iostream> to avoid relying on the host system's
 // C++ standard library.
 #ifndef _LIBCUDACXX_FORCE_INCLUDE_H
@@ -20,16 +42,16 @@
 void list_devices()
 {
   int device_count;
-  cudaGetDeviceCount(&device_count);
+  hipGetDeviceCount(&device_count);
   printf("CUDA devices found: %d\n", device_count);
 
   int selected_device;
-  cudaGetDevice(&selected_device);
+  hipGetDevice(&selected_device);
 
   for (int dev = 0; dev < device_count; ++dev)
   {
-    cudaDeviceProp device_prop;
-    cudaGetDeviceProperties(&device_prop, dev);
+    hipDeviceProp_t device_prop;
+    hipGetDeviceProperties(&device_prop, dev);
 
     printf("Device %d: \"%s\", ", dev, device_prop.name);
     if (dev == selected_device)
@@ -70,9 +92,9 @@ __global__
   do                                                                                                     \
   {                                                                                                      \
     err = __VA_ARGS__;                                                                                   \
-    if (err != cudaSuccess)                                                                              \
+    if (err != hipSuccess)                                                                              \
     {                                                                                                    \
-      printf("CUDA ERROR, line %d: %s: %s\n", __LINE__, cudaGetErrorName(err), cudaGetErrorString(err)); \
+      printf("CUDA ERROR, line %d: %s: %s\n", __LINE__, hipGetErrorName(err), hipGetErrorString(err)); \
       exit(1);                                                                                           \
     }                                                                                                    \
   } while (false)
@@ -80,8 +102,8 @@ __global__
 int main(int argc, char** argv)
 {
   // Check if the CUDA driver/runtime are installed and working for sanity.
-  cudaError_t err;
-  CUDA_CALL(err, cudaDeviceSynchronize());
+  hipError_t err;
+  CUDA_CALL(err, hipDeviceSynchronize());
 
   printf("Testing on host:\n");
   fflush(stdout);
@@ -96,17 +118,17 @@ int main(int argc, char** argv)
   fflush(stdout);
   list_devices();
   int* cuda_ret = 0;
-  CUDA_CALL(err, cudaMalloc(&cuda_ret, sizeof(int)));
+  CUDA_CALL(err, hipMalloc(&cuda_ret, sizeof(int)));
 
   if (cuda_cluster_size > 1)
   {
-    cudaLaunchAttribute attribute[1];
+    hipLaunchAttribute attribute[1];
     attribute[0].id               = cudaLaunchAttributeClusterDimension;
     attribute[0].val.clusterDim.x = cuda_cluster_size; // Cluster size in X-dimension
     attribute[0].val.clusterDim.y = 1;
     attribute[0].val.clusterDim.z = 1;
 
-    cudaLaunchConfig_t config = {
+    hipLaunchConfig_t config = {
       dim3(cuda_cluster_size), // grid dim
       dim3(cuda_thread_count), // block dim
       0, // dynamic smem bytes
@@ -114,17 +136,17 @@ int main(int argc, char** argv)
       attribute, // attributes
       1, // number of attributes
     };
-    CUDA_CALL(err, cudaLaunchKernelEx(&config, fake_main_kernel, cuda_ret));
+    CUDA_CALL(err, hipLaunchKernelEx(&config, fake_main_kernel, cuda_ret));
   }
   else
   {
     fake_main_kernel<<<1, cuda_thread_count>>>(cuda_ret);
   }
 
-  CUDA_CALL(err, cudaGetLastError());
-  CUDA_CALL(err, cudaDeviceSynchronize());
-  CUDA_CALL(err, cudaMemcpy(&ret, cuda_ret, sizeof(int), cudaMemcpyDeviceToHost));
-  CUDA_CALL(err, cudaFree(cuda_ret));
+  CUDA_CALL(err, hipGetLastError());
+  CUDA_CALL(err, hipDeviceSynchronize());
+  CUDA_CALL(err, hipMemcpy(&ret, cuda_ret, sizeof(int), hipMemcpyDeviceToHost));
+  CUDA_CALL(err, hipFree(cuda_ret));
   fflush(stdout);
 
   if (ret != 0)

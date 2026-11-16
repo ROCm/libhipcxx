@@ -70,10 +70,10 @@ enum class stream_id : unsigned long long
 class stream_ref
 {
 protected:
-  ::cudaStream_t __stream{nullptr};
+  ::hipStream_t __stream{nullptr};
 
 public:
-  using value_type = ::cudaStream_t;
+  using value_type = ::hipStream_t;
 
   //! @brief Constructs a `stream_ref` of the "default" CUDA stream.
   //!
@@ -81,7 +81,7 @@ public:
   //! @see //! https://docs.nvidia.com/cuda/cuda-runtime-api/stream-sync-behavior.html
   CCCL_DEPRECATED_BECAUSE("Using the default/null stream is generally discouraged. If you need to use it, please "
                           "construct a "
-                          "stream_ref from cudaStream_t{nullptr}") _CCCL_HIDE_FROM_ABI
+                          "stream_ref from hipStream_t{nullptr}") _CCCL_HIDE_FROM_ABI
   stream_ref() = default;
 
   //! @brief Constructs a `stream_ref` from a `cudaStream_t` handle.
@@ -243,9 +243,9 @@ public:
     const auto __result = ::cuda::__driver::__streamQueryNoThrow(__stream);
     switch (__result)
     {
-      case ::cudaErrorNotReady:
+      case ::hipErrorNotReady:
         return false;
-      case ::cudaSuccess:
+      case ::hipSuccess:
         return true;
       default:
         _CCCL_THROW(::cuda::cuda_error, __result, "Failed to query stream.");
@@ -312,7 +312,7 @@ public:
   //! @throws cuda_error if device check fails
   [[nodiscard]] _CCCL_HOST_API device_ref device() const
   {
-    ::CUdevice __device{};
+    ::hipDevice_t __device{};
     // NOTE(HIP/AMD): hipStreamGetCtx is not in the HIP runtime API and
     // <libhipcxx/__amd/driver_api.h> intentionally does not provide __streamGetCtx.
     // Take the CTK 13+ codepath (uses __streamGetDevice directly) under
@@ -321,7 +321,7 @@ public:
     __device = ::cuda::__driver::__streamGetDevice(__stream);
 #  else // ^^^ _CCCL_CTK_AT_LEAST(13, 0) ^^^ / vvv _CCCL_CTK_BELOW(13, 0) vvv
     {
-      ::CUcontext __stream_ctx = ::cuda::__driver::__streamGetCtx(__stream);
+      ::hipCtx_t __stream_ctx = ::cuda::__driver::__streamGetCtx(__stream);
       __ensure_current_context __setter(__stream_ctx);
       __device = ::cuda::__driver::__ctxGetDevice();
     }
@@ -346,13 +346,13 @@ _CCCL_HOST_API inline void event_ref::record(stream_ref __stream) const
 }
 
 _CCCL_HOST_API inline event::event(stream_ref __stream, event_flags __flags)
-    : event(__stream, ::cuda::std::to_underlying(__flags) | cudaEventDisableTiming)
+    : event(__stream, ::cuda::std::to_underlying(__flags) | hipEventDisableTiming)
 {
   record(__stream);
 }
 
 _CCCL_HOST_API inline event::event(stream_ref __stream, unsigned __flags)
-    : event_ref(::cudaEvent_t{})
+    : event_ref(::hipEvent_t{})
 {
   [[maybe_unused]] __ensure_current_context __ctx_setter(__stream);
   __event_ = ::cuda::__driver::__eventCreate(static_cast<unsigned>(__flags));

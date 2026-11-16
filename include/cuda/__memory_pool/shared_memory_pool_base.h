@@ -62,9 +62,9 @@ _CCCL_BEGIN_NAMESPACE_CUDA
 //! to the shared reference count.
 struct __pool_destroyer
 {
-  ::cudaMemPool_t __pool;
+  ::hipMemPool_t __pool;
 
-  _CCCL_HOST_API explicit __pool_destroyer(::cudaMemPool_t __p) noexcept
+  _CCCL_HOST_API explicit __pool_destroyer(::hipMemPool_t __p) noexcept
       : __pool(__p)
   {}
 
@@ -104,10 +104,10 @@ class __shared_memory_pool_base
 
 protected:
   _CCCL_HOST_API explicit __shared_memory_pool_base(no_init_t) noexcept
-      : __memory_pool_base(::cudaMemPool_t{})
+      : __memory_pool_base(::hipMemPool_t{})
   {}
 
-  _CCCL_HOST_API explicit __shared_memory_pool_base(::cudaMemPool_t __pool)
+  _CCCL_HOST_API explicit __shared_memory_pool_base(::hipMemPool_t __pool)
       : __memory_pool_base(__pool)
       , __ref_(__pool)
   {}
@@ -129,7 +129,7 @@ public:
   __shared_memory_pool_base& operator=(__shared_memory_pool_base&&)      = default;
 
   //! @brief ``release()`` is deleted because ownership is shared.
-  ::cudaMemPool_t release() = delete;
+  ::hipMemPool_t release() = delete;
 };
 
 _CCCL_END_NAMESPACE_CUDA

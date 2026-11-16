@@ -39,7 +39,7 @@
 
 namespace
 {
-template <const auto& Attr, ::cudaDeviceAttr ExpectedAttr, class ExpectedResult>
+template <const auto& Attr, ::hipDeviceAttribute_t ExpectedAttr, class ExpectedResult>
 [[maybe_unused]] auto test_device_attribute()
 {
   cuda::device_ref dev0(0);
@@ -66,7 +66,7 @@ C2H_CCCLRT_TEST("init", "[device]")
   // retain) and the closest observable on-device-runtime-touched
   // signal is "the current device equals 0", which holds by default.
   int __current{};
-  CUDART(cudaGetDevice(&__current));
+  CUDART(hipGetDevice(&__current));
   CCCLRT_REQUIRE(__current == 0);
 #else
   CCCLRT_REQUIRE(cuda::__driver::__isPrimaryCtxActive(cuda::__driver::__deviceGet(0)));
@@ -93,24 +93,24 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 
   SECTION("Attributes")
   {
-    ::test_device_attribute<attributes::max_threads_per_block, ::cudaDevAttrMaxThreadsPerBlock, int>();
-    ::test_device_attribute<attributes::max_block_dim_x, ::cudaDevAttrMaxBlockDimX, int>();
-    ::test_device_attribute<attributes::max_block_dim_y, ::cudaDevAttrMaxBlockDimY, int>();
-    ::test_device_attribute<attributes::max_block_dim_z, ::cudaDevAttrMaxBlockDimZ, int>();
-    ::test_device_attribute<attributes::max_grid_dim_x, ::cudaDevAttrMaxGridDimX, int>();
-    ::test_device_attribute<attributes::max_grid_dim_y, ::cudaDevAttrMaxGridDimY, int>();
-    ::test_device_attribute<attributes::max_grid_dim_z, ::cudaDevAttrMaxGridDimZ, int>();
+    ::test_device_attribute<attributes::max_threads_per_block, ::hipDeviceAttributeMaxThreadsPerBlock, int>();
+    ::test_device_attribute<attributes::max_block_dim_x, ::hipDeviceAttributeMaxBlockDimX, int>();
+    ::test_device_attribute<attributes::max_block_dim_y, ::hipDeviceAttributeMaxBlockDimY, int>();
+    ::test_device_attribute<attributes::max_block_dim_z, ::hipDeviceAttributeMaxBlockDimZ, int>();
+    ::test_device_attribute<attributes::max_grid_dim_x, ::hipDeviceAttributeMaxGridDimX, int>();
+    ::test_device_attribute<attributes::max_grid_dim_y, ::hipDeviceAttributeMaxGridDimY, int>();
+    ::test_device_attribute<attributes::max_grid_dim_z, ::hipDeviceAttributeMaxGridDimZ, int>();
     ::test_device_attribute<attributes::max_shared_memory_per_block,
-                            ::cudaDevAttrMaxSharedMemoryPerBlock,
+                            ::hipDeviceAttributeMaxSharedMemoryPerBlock,
                             cuda::std::size_t>();
-    ::test_device_attribute<attributes::total_constant_memory, ::cudaDevAttrTotalConstantMemory, cuda::std::size_t>();
-    ::test_device_attribute<attributes::warp_size, ::cudaDevAttrWarpSize, int>();
-    ::test_device_attribute<attributes::max_pitch, ::cudaDevAttrMaxPitch, cuda::std::size_t>();
-    ::test_device_attribute<attributes::max_texture_1d_width, ::cudaDevAttrMaxTexture1DWidth, int>();
-    ::test_device_attribute<attributes::max_texture_1d_linear_width, ::cudaDevAttrMaxTexture1DLinearWidth, int>();
-    ::test_device_attribute<attributes::max_texture_1d_mipmapped_width, ::cudaDevAttrMaxTexture1DMipmappedWidth, int>();
-    ::test_device_attribute<attributes::max_texture_2d_width, ::cudaDevAttrMaxTexture2DWidth, int>();
-    ::test_device_attribute<attributes::max_texture_2d_height, ::cudaDevAttrMaxTexture2DHeight, int>();
+    ::test_device_attribute<attributes::total_constant_memory, ::hipDeviceAttributeTotalConstantMemory, cuda::std::size_t>();
+    ::test_device_attribute<attributes::warp_size, ::hipDeviceAttributeWarpSize, int>();
+    ::test_device_attribute<attributes::max_pitch, ::hipDeviceAttributeMaxPitch, cuda::std::size_t>();
+    ::test_device_attribute<attributes::max_texture_1d_width, ::hipDeviceAttributeMaxTexture1DWidth, int>();
+    ::test_device_attribute<attributes::max_texture_1d_linear_width, ::hipDeviceAttributeMaxTexture1DLinear, int>();
+    ::test_device_attribute<attributes::max_texture_1d_mipmapped_width, ::hipDeviceAttributeMaxTexture1DMipmap, int>();
+    ::test_device_attribute<attributes::max_texture_2d_width, ::hipDeviceAttributeMaxTexture2DWidth, int>();
+    ::test_device_attribute<attributes::max_texture_2d_height, ::hipDeviceAttributeMaxTexture2DHeight, int>();
 // NOTE(HIP/AMD): on HIP all three of MaxTexture2DLinearWidth /
 // LinearHeight / LinearPitch are aliased to a single
 // 'hipDeviceAttributeMaxTexture2DLinear' enumerator (HIP returns
@@ -122,8 +122,8 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 // sub-checks on HIP; the Pitch check still runs and exercises the
 // shared HIP enumerator.
 #if !defined(__HIP_PLATFORM_AMD__)
-    ::test_device_attribute<attributes::max_texture_2d_linear_width, ::cudaDevAttrMaxTexture2DLinearWidth, int>();
-    ::test_device_attribute<attributes::max_texture_2d_linear_height, ::cudaDevAttrMaxTexture2DLinearHeight, int>();
+    ::test_device_attribute<attributes::max_texture_2d_linear_width, ::hipDeviceAttributeMaxTexture2DLinear, int>();
+    ::test_device_attribute<attributes::max_texture_2d_linear_height, ::hipDeviceAttributeMaxTexture2DLinear, int>();
 #endif // !__HIP_PLATFORM_AMD__
 // NOTE(HIP/AMD): all texture-pitch / mipmapped / layered / 3D-alt
 // query enumerators are present in the HIP enum but ROCm 7.2's
@@ -134,26 +134,26 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 // this section) are implemented and continue to run.
 #if !defined(__HIP_PLATFORM_AMD__)
     ::test_device_attribute<attributes::max_texture_2d_linear_pitch,
-                            ::cudaDevAttrMaxTexture2DLinearPitch,
+                            ::hipDeviceAttributeMaxTexture2DLinear,
                             cuda::std::size_t>();
-    ::test_device_attribute<attributes::max_texture_2d_mipmapped_width, ::cudaDevAttrMaxTexture2DMipmappedWidth, int>();
-    ::test_device_attribute<attributes::max_texture_2d_mipmapped_height, ::cudaDevAttrMaxTexture2DMipmappedHeight, int>();
+    ::test_device_attribute<attributes::max_texture_2d_mipmapped_width, ::hipDeviceAttributeMaxTexture2DMipmap, int>();
+    ::test_device_attribute<attributes::max_texture_2d_mipmapped_height, ::hipDeviceAttributeMaxTexture2DMipmap, int>();
 #endif // !__HIP_PLATFORM_AMD__
-    ::test_device_attribute<attributes::max_texture_3d_width, ::cudaDevAttrMaxTexture3DWidth, int>();
-    ::test_device_attribute<attributes::max_texture_3d_height, ::cudaDevAttrMaxTexture3DHeight, int>();
-    ::test_device_attribute<attributes::max_texture_3d_depth, ::cudaDevAttrMaxTexture3DDepth, int>();
+    ::test_device_attribute<attributes::max_texture_3d_width, ::hipDeviceAttributeMaxTexture3DWidth, int>();
+    ::test_device_attribute<attributes::max_texture_3d_height, ::hipDeviceAttributeMaxTexture3DHeight, int>();
+    ::test_device_attribute<attributes::max_texture_3d_depth, ::hipDeviceAttributeMaxTexture3DDepth, int>();
 #if !defined(__HIP_PLATFORM_AMD__)
-    ::test_device_attribute<attributes::max_texture_3d_width_alt, ::cudaDevAttrMaxTexture3DWidthAlt, int>();
-    ::test_device_attribute<attributes::max_texture_3d_height_alt, ::cudaDevAttrMaxTexture3DHeightAlt, int>();
-    ::test_device_attribute<attributes::max_texture_3d_depth_alt, ::cudaDevAttrMaxTexture3DDepthAlt, int>();
+    ::test_device_attribute<attributes::max_texture_3d_width_alt, ::hipDeviceAttributeMaxTexture3DAlt, int>();
+    ::test_device_attribute<attributes::max_texture_3d_height_alt, ::hipDeviceAttributeMaxTexture3DAlt, int>();
+    ::test_device_attribute<attributes::max_texture_3d_depth_alt, ::hipDeviceAttributeMaxTexture3DAlt, int>();
 #endif // !__HIP_PLATFORM_AMD__
-    ::test_device_attribute<attributes::max_texture_cubemap_width, ::cudaDevAttrMaxTextureCubemapWidth, int>();
+    ::test_device_attribute<attributes::max_texture_cubemap_width, ::hipDeviceAttributeMaxTextureCubemap, int>();
 #if !defined(__HIP_PLATFORM_AMD__)
-    ::test_device_attribute<attributes::max_texture_1d_layered_width, ::cudaDevAttrMaxTexture1DLayeredWidth, int>();
-    ::test_device_attribute<attributes::max_texture_1d_layered_layers, ::cudaDevAttrMaxTexture1DLayeredLayers, int>();
-    ::test_device_attribute<attributes::max_texture_2d_layered_width, ::cudaDevAttrMaxTexture2DLayeredWidth, int>();
-    ::test_device_attribute<attributes::max_texture_2d_layered_height, ::cudaDevAttrMaxTexture2DLayeredHeight, int>();
-    ::test_device_attribute<attributes::max_texture_2d_layered_layers, ::cudaDevAttrMaxTexture2DLayeredLayers, int>();
+    ::test_device_attribute<attributes::max_texture_1d_layered_width, ::hipDeviceAttributeMaxTexture1DLayered, int>();
+    ::test_device_attribute<attributes::max_texture_1d_layered_layers, ::hipDeviceAttributeMaxTexture1DLayered, int>();
+    ::test_device_attribute<attributes::max_texture_2d_layered_width, ::hipDeviceAttributeMaxTexture2DLayered, int>();
+    ::test_device_attribute<attributes::max_texture_2d_layered_height, ::hipDeviceAttributeMaxTexture2DLayered, int>();
+    ::test_device_attribute<attributes::max_texture_2d_layered_layers, ::hipDeviceAttributeMaxTexture2DLayered, int>();
 #endif // !__HIP_PLATFORM_AMD__
 // NOTE(HIP/AMD): hipDeviceAttributeMaxTextureCubemapLayered does
 // exist in the HIP enum but ROCm 7.2's hipDeviceGetAttribute returns
@@ -161,129 +161,134 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 // query. Skip on HIP until ROCm fills it in.
 #if !defined(__HIP_PLATFORM_AMD__)
     ::test_device_attribute<attributes::max_texture_cubemap_layered_width,
-                            ::cudaDevAttrMaxTextureCubemapLayeredWidth,
+                            ::hipDeviceAttributeMaxTextureCubemapLayered,
                             int>();
     ::test_device_attribute<attributes::max_texture_cubemap_layered_layers,
-                            ::cudaDevAttrMaxTextureCubemapLayeredLayers,
+                            ::hipDeviceAttributeMaxTextureCubemapLayered,
                             int>();
 #endif // !__HIP_PLATFORM_AMD__
-    ::test_device_attribute<attributes::max_surface_1d_width, ::cudaDevAttrMaxSurface1DWidth, int>();
+    ::test_device_attribute<attributes::max_surface_1d_width, ::hipDeviceAttributeMaxSurface1D, int>();
 // NOTE(HIP/AMD): every other Surface attribute query returns
 // hipErrorInvalidValue on ROCm 7.2 (only 1D surface width is
 // implemented). Skip on HIP.
 #if !defined(__HIP_PLATFORM_AMD__)
-    ::test_device_attribute<attributes::max_surface_2d_width, ::cudaDevAttrMaxSurface2DWidth, int>();
-    ::test_device_attribute<attributes::max_surface_2d_height, ::cudaDevAttrMaxSurface2DHeight, int>();
-    ::test_device_attribute<attributes::max_surface_3d_width, ::cudaDevAttrMaxSurface3DWidth, int>();
-    ::test_device_attribute<attributes::max_surface_3d_height, ::cudaDevAttrMaxSurface3DHeight, int>();
-    ::test_device_attribute<attributes::max_surface_3d_depth, ::cudaDevAttrMaxSurface3DDepth, int>();
-    ::test_device_attribute<attributes::max_surface_1d_layered_width, ::cudaDevAttrMaxSurface1DLayeredWidth, int>();
-    ::test_device_attribute<attributes::max_surface_1d_layered_layers, ::cudaDevAttrMaxSurface1DLayeredLayers, int>();
-    ::test_device_attribute<attributes::max_surface_2d_layered_width, ::cudaDevAttrMaxSurface2DLayeredWidth, int>();
-    ::test_device_attribute<attributes::max_surface_2d_layered_height, ::cudaDevAttrMaxSurface2DLayeredHeight, int>();
-    ::test_device_attribute<attributes::max_surface_2d_layered_layers, ::cudaDevAttrMaxSurface2DLayeredLayers, int>();
-    ::test_device_attribute<attributes::max_surface_cubemap_width, ::cudaDevAttrMaxSurfaceCubemapWidth, int>();
+    ::test_device_attribute<attributes::max_surface_2d_width, ::hipDeviceAttributeMaxSurface2D, int>();
+    ::test_device_attribute<attributes::max_surface_2d_height, ::hipDeviceAttributeMaxSurface2D, int>();
+    ::test_device_attribute<attributes::max_surface_3d_width, ::hipDeviceAttributeMaxSurface3D, int>();
+    ::test_device_attribute<attributes::max_surface_3d_height, ::hipDeviceAttributeMaxSurface3D, int>();
+    ::test_device_attribute<attributes::max_surface_3d_depth, ::hipDeviceAttributeMaxSurface3D, int>();
+    ::test_device_attribute<attributes::max_surface_1d_layered_width, ::hipDeviceAttributeMaxSurface1DLayered, int>();
+    ::test_device_attribute<attributes::max_surface_1d_layered_layers, ::hipDeviceAttributeMaxSurface1DLayered, int>();
+    ::test_device_attribute<attributes::max_surface_2d_layered_width, ::hipDeviceAttributeMaxSurface2DLayered, int>();
+    ::test_device_attribute<attributes::max_surface_2d_layered_height, ::hipDeviceAttributeMaxSurface2DLayered, int>();
+    ::test_device_attribute<attributes::max_surface_2d_layered_layers, ::hipDeviceAttributeMaxSurface2DLayered, int>();
+    ::test_device_attribute<attributes::max_surface_cubemap_width, ::hipDeviceAttributeMaxSurfaceCubemap, int>();
     ::test_device_attribute<attributes::max_surface_cubemap_layered_width,
-                            ::cudaDevAttrMaxSurfaceCubemapLayeredWidth,
+                            ::hipDeviceAttributeMaxSurfaceCubemapLayered,
                             int>();
     ::test_device_attribute<attributes::max_surface_cubemap_layered_layers,
-                            ::cudaDevAttrMaxSurfaceCubemapLayeredLayers,
+                            ::hipDeviceAttributeMaxSurfaceCubemapLayered,
                             int>();
 #endif // !__HIP_PLATFORM_AMD__
-    ::test_device_attribute<attributes::max_registers_per_block, ::cudaDevAttrMaxRegistersPerBlock, int>();
-    ::test_device_attribute<attributes::clock_rate, ::cudaDevAttrClockRate, int>();
-    ::test_device_attribute<attributes::texture_alignment, ::cudaDevAttrTextureAlignment, cuda::std::size_t>();
-    ::test_device_attribute<attributes::texture_pitch_alignment, ::cudaDevAttrTexturePitchAlignment, cuda::std::size_t>();
-    ::test_device_attribute<attributes::gpu_overlap, ::cudaDevAttrGpuOverlap, bool>();
-    ::test_device_attribute<attributes::multiprocessor_count, ::cudaDevAttrMultiProcessorCount, int>();
-    ::test_device_attribute<attributes::kernel_exec_timeout, ::cudaDevAttrKernelExecTimeout, bool>();
-    ::test_device_attribute<attributes::integrated, ::cudaDevAttrIntegrated, bool>();
-    ::test_device_attribute<attributes::can_map_host_memory, ::cudaDevAttrCanMapHostMemory, bool>();
-    ::test_device_attribute<attributes::compute_mode, ::cudaDevAttrComputeMode, ::cudaComputeMode>();
-    ::test_device_attribute<attributes::concurrent_kernels, ::cudaDevAttrConcurrentKernels, bool>();
-    ::test_device_attribute<attributes::ecc_enabled, ::cudaDevAttrEccEnabled, bool>();
-    ::test_device_attribute<attributes::pci_bus_id, ::cudaDevAttrPciBusId, int>();
-    ::test_device_attribute<attributes::pci_device_id, ::cudaDevAttrPciDeviceId, int>();
+    ::test_device_attribute<attributes::max_registers_per_block, ::hipDeviceAttributeMaxRegistersPerBlock, int>();
+    ::test_device_attribute<attributes::clock_rate, ::hipDeviceAttributeClockRate, int>();
+    ::test_device_attribute<attributes::texture_alignment, ::hipDeviceAttributeTextureAlignment, cuda::std::size_t>();
+    ::test_device_attribute<attributes::texture_pitch_alignment, ::hipDeviceAttributeTexturePitchAlignment, cuda::std::size_t>();
+    ::test_device_attribute<attributes::gpu_overlap, ::hipDeviceAttributeAsyncEngineCount, bool>();
+    ::test_device_attribute<attributes::multiprocessor_count, ::hipDeviceAttributeMultiprocessorCount, int>();
+    ::test_device_attribute<attributes::kernel_exec_timeout, ::hipDeviceAttributeKernelExecTimeout, bool>();
+    ::test_device_attribute<attributes::integrated, ::hipDeviceAttributeIntegrated, bool>();
+    ::test_device_attribute<attributes::can_map_host_memory, ::hipDeviceAttributeCanMapHostMemory, bool>();
+    ::test_device_attribute<attributes::compute_mode, ::hipDeviceAttributeComputeMode, ::hipComputeMode>();
+    ::test_device_attribute<attributes::concurrent_kernels, ::hipDeviceAttributeConcurrentKernels, bool>();
+    ::test_device_attribute<attributes::ecc_enabled, ::hipDeviceAttributeEccEnabled, bool>();
+    ::test_device_attribute<attributes::pci_bus_id, ::hipDeviceAttributePciBusId, int>();
+    ::test_device_attribute<attributes::pci_device_id, ::hipDeviceAttributePciDeviceId, int>();
 // NOTE(HIP/AMD): cudaDevAttrTccDriver maps to a Windows-only NVIDIA
 // driver-mode flag (TCC vs WDDM). HIP exposes the enumerator for
 // source compatibility but ROCm 7.2's hipDeviceGetAttribute returns
 // hipErrorInvalidValue (the concept does not apply to AMDGPU on
 // Linux). Skip on HIP.
 #if !defined(__HIP_PLATFORM_AMD__)
-    ::test_device_attribute<attributes::tcc_driver, ::cudaDevAttrTccDriver, bool>();
+    ::test_device_attribute<attributes::tcc_driver, ::hipDeviceAttributeTccDriver, bool>();
 #endif // !__HIP_PLATFORM_AMD__
-    ::test_device_attribute<attributes::l2_cache_size, ::cudaDevAttrL2CacheSize, cuda::std::size_t>();
-    ::test_device_attribute<attributes::max_threads_per_multiprocessor, ::cudaDevAttrMaxThreadsPerMultiProcessor, int>();
-    ::test_device_attribute<attributes::unified_addressing, ::cudaDevAttrUnifiedAddressing, bool>();
-    ::test_device_attribute<attributes::compute_capability_major, ::cudaDevAttrComputeCapabilityMajor, int>();
-    ::test_device_attribute<attributes::compute_capability_minor, ::cudaDevAttrComputeCapabilityMinor, int>();
-    ::test_device_attribute<attributes::stream_priorities_supported, ::cudaDevAttrStreamPrioritiesSupported, bool>();
-    ::test_device_attribute<attributes::global_l1_cache_supported, ::cudaDevAttrGlobalL1CacheSupported, bool>();
-    ::test_device_attribute<attributes::local_l1_cache_supported, ::cudaDevAttrLocalL1CacheSupported, bool>();
+    ::test_device_attribute<attributes::l2_cache_size, ::hipDeviceAttributeL2CacheSize, cuda::std::size_t>();
+    ::test_device_attribute<attributes::max_threads_per_multiprocessor, ::hipDeviceAttributeMaxThreadsPerMultiProcessor, int>();
+    ::test_device_attribute<attributes::unified_addressing, ::hipDeviceAttributeUnifiedAddressing, bool>();
+    ::test_device_attribute<attributes::compute_capability_major, ::hipDeviceAttributeComputeCapabilityMajor, int>();
+    ::test_device_attribute<attributes::compute_capability_minor, ::hipDeviceAttributeComputeCapabilityMinor, int>();
+    ::test_device_attribute<attributes::stream_priorities_supported, ::hipDeviceAttributeStreamPrioritiesSupported, bool>();
+    ::test_device_attribute<attributes::global_l1_cache_supported, ::hipDeviceAttributeGlobalL1CacheSupported, bool>();
+    ::test_device_attribute<attributes::local_l1_cache_supported, ::hipDeviceAttributeLocalL1CacheSupported, bool>();
     ::test_device_attribute<attributes::max_shared_memory_per_multiprocessor,
-                            ::cudaDevAttrMaxSharedMemoryPerMultiprocessor,
+                            ::hipDeviceAttributeMaxSharedMemoryPerMultiprocessor,
                             cuda::std::size_t>();
     ::test_device_attribute<attributes::max_registers_per_multiprocessor,
-                            ::cudaDevAttrMaxRegistersPerMultiprocessor,
+                            ::hipDeviceAttributeMaxRegistersPerMultiprocessor,
                             int>();
-    ::test_device_attribute<attributes::is_multi_gpu_board, ::cudaDevAttrIsMultiGpuBoard, bool>();
-    ::test_device_attribute<attributes::multi_gpu_board_group_id, ::cudaDevAttrMultiGpuBoardGroupID, int>();
-    ::test_device_attribute<attributes::host_native_atomic_supported, ::cudaDevAttrHostNativeAtomicSupported, bool>();
+    ::test_device_attribute<attributes::is_multi_gpu_board, ::hipDeviceAttributeIsMultiGpuBoard, bool>();
+    ::test_device_attribute<attributes::multi_gpu_board_group_id, ::hipDeviceAttributeMultiGpuBoardGroupID, int>();
+    ::test_device_attribute<attributes::host_native_atomic_supported, ::hipDeviceAttributeHostNativeAtomicSupported, bool>();
 // NOTE(HIP/AMD): hipDeviceAttributeSingleToDoublePrecisionPerfRatio
 // is defined in the HIP enum but ROCm 7.2's hipDeviceGetAttribute
 // returns hipErrorInvalidValue -- not implemented yet. Skip on HIP.
 #if !defined(__HIP_PLATFORM_AMD__)
     ::test_device_attribute<attributes::single_to_double_precision_perf_ratio,
-                            ::cudaDevAttrSingleToDoublePrecisionPerfRatio,
+                            ::hipDeviceAttributeSingleToDoublePrecisionPerfRatio,
                             int>();
 #endif // !__HIP_PLATFORM_AMD__
-    ::test_device_attribute<attributes::pageable_memory_access, ::cudaDevAttrPageableMemoryAccess, bool>();
-    ::test_device_attribute<attributes::concurrent_managed_access, ::cudaDevAttrConcurrentManagedAccess, bool>();
-    ::test_device_attribute<attributes::compute_preemption_supported, ::cudaDevAttrComputePreemptionSupported, bool>();
+    ::test_device_attribute<attributes::pageable_memory_access, ::hipDeviceAttributePageableMemoryAccess, bool>();
+    ::test_device_attribute<attributes::concurrent_managed_access, ::hipDeviceAttributeConcurrentManagedAccess, bool>();
+    ::test_device_attribute<attributes::compute_preemption_supported, ::hipDeviceAttributeComputePreemptionSupported, bool>();
     ::test_device_attribute<attributes::can_use_host_pointer_for_registered_mem,
-                            ::cudaDevAttrCanUseHostPointerForRegisteredMem,
+                            ::hipDeviceAttributeCanUseHostPointerForRegisteredMem,
                             bool>();
-    ::test_device_attribute<attributes::cooperative_launch, ::cudaDevAttrCooperativeLaunch, bool>();
-    ::test_device_attribute<attributes::can_flush_remote_writes, ::cudaDevAttrCanFlushRemoteWrites, bool>();
-    ::test_device_attribute<attributes::host_register_supported, ::cudaDevAttrHostRegisterSupported, bool>();
+    ::test_device_attribute<attributes::cooperative_launch, ::hipDeviceAttributeCooperativeLaunch, bool>();
+    ::test_device_attribute<attributes::can_flush_remote_writes, ::hipDeviceAttributeHdpMemFlushCntl, bool>();
+    ::test_device_attribute<attributes::host_register_supported, ::hipDeviceAttributeHostRegisterSupported, bool>();
     ::test_device_attribute<attributes::pageable_memory_access_uses_host_page_tables,
-                            ::cudaDevAttrPageableMemoryAccessUsesHostPageTables,
+                            ::hipDeviceAttributePageableMemoryAccessUsesHostPageTables,
                             bool>();
     ::test_device_attribute<attributes::direct_managed_mem_access_from_host,
-                            ::cudaDevAttrDirectManagedMemAccessFromHost,
+                            ::hipDeviceAttributeDirectManagedMemAccessFromHost,
                             bool>();
     ::test_device_attribute<attributes::max_shared_memory_per_block_optin,
-                            ::cudaDevAttrMaxSharedMemoryPerBlockOptin,
+                            ::hipDeviceAttributeSharedMemPerBlockOptin,
                             cuda::std::size_t>();
-    ::test_device_attribute<attributes::max_blocks_per_multiprocessor, ::cudaDevAttrMaxBlocksPerMultiprocessor, int>();
+    ::test_device_attribute<attributes::max_blocks_per_multiprocessor, ::hipDeviceAttributeMaxBlocksPerMultiProcessor, int>();
     ::test_device_attribute<attributes::max_persisting_l2_cache_size,
-                            ::cudaDevAttrMaxPersistingL2CacheSize,
+                            ::hipDeviceAttributePersistingL2CacheMaxSize,
                             cuda::std::size_t>();
     ::test_device_attribute<attributes::max_access_policy_window_size,
-                            ::cudaDevAttrMaxAccessPolicyWindowSize,
+                            ::hipDeviceAttributeAccessPolicyMaxWindowSize,
                             cuda::std::size_t>();
     ::test_device_attribute<attributes::reserved_shared_memory_per_block,
-                            ::cudaDevAttrReservedSharedMemoryPerBlock,
+                            ::hipDeviceAttributeReservedSharedMemPerBlock,
                             cuda::std::size_t>();
-    ::test_device_attribute<attributes::sparse_cuda_array_supported, ::cudaDevAttrSparseCudaArraySupported, bool>();
+    ::test_device_attribute<attributes::sparse_cuda_array_supported, ::hipDeviceAttributeVirtualMemoryManagementSupported, bool>();
     ::test_device_attribute<attributes::host_register_read_only_supported,
-                            ::cudaDevAttrHostRegisterReadOnlySupported,
+                            ::hipDeviceAttributeAsicRevision,
                             bool>();
-    ::test_device_attribute<attributes::memory_pools_supported, ::cudaDevAttrMemoryPoolsSupported, bool>();
-    ::test_device_attribute<attributes::gpu_direct_rdma_supported, ::cudaDevAttrGPUDirectRDMASupported, bool>();
+    ::test_device_attribute<attributes::memory_pools_supported, ::hipDeviceAttributeMemoryPoolsSupported, bool>();
+    ::test_device_attribute<attributes::gpu_direct_rdma_supported, ::hipDeviceAttributeIsLargeBar, bool>();
     ::test_device_attribute<attributes::gpu_direct_rdma_flush_writes_options,
-                            ::cudaDevAttrGPUDirectRDMAFlushWritesOptions,
-                            ::cudaFlushGPUDirectRDMAWritesOptions>();
+                            ::hipDeviceAttributeCooperativeMultiDeviceUnmatchedFunc,
+                            ::hipFlushGPUDirectRDMAWritesOptions>();
     ::test_device_attribute<attributes::gpu_direct_rdma_writes_ordering,
-                            ::cudaDevAttrGPUDirectRDMAWritesOrdering,
-                            ::cudaGPUDirectRDMAWritesOrdering>();
+                            ::hipDeviceAttributeHdpRegFlushCntl,
+                            ::hipGPUDirectRDMAWritesOrdering>();
+#if defined(__HIP_PLATFORM_AMD__)
+    CCCLRT_REQUIRE(!attributes::can_flush_remote_writes(device_ref(0)));
+    CCCLRT_REQUIRE(attributes::gpu_direct_rdma_writes_ordering(device_ref(0))
+                   == attributes::gpu_direct_rdma_writes_ordering.none);
+#endif // __HIP_PLATFORM_AMD__
     ::test_device_attribute<attributes::memory_pool_supported_handle_types,
-                            ::cudaDevAttrMemoryPoolSupportedHandleTypes,
-                            ::cudaMemAllocationHandleType>();
+                            ::hipDeviceAttributeMemoryPoolSupportedHandleTypes,
+                            ::hipMemAllocationHandleType>();
     ::test_device_attribute<attributes::deferred_mapping_cuda_array_supported,
-                            ::cudaDevAttrDeferredMappingCudaArraySupported,
+                            ::hipDeviceAttributeImageSupport,
                             bool>();
-    ::test_device_attribute<attributes::ipc_event_support, ::cudaDevAttrIpcEventSupport, bool>();
+    ::test_device_attribute<attributes::ipc_event_support, ::hipDeviceAttributeFineGrainSupport, bool>();
 
 #if _CCCL_CTK_AT_LEAST(12, 2)
     ::test_device_attribute<attributes::numa_config, ::cudaDevAttrNumaConfig, ::cudaDeviceNumaConfig>();
@@ -292,9 +297,9 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 
     SECTION("compute_mode")
     {
-      STATIC_REQUIRE(::cudaComputeModeDefault == attributes::compute_mode.default_mode);
-      STATIC_REQUIRE(::cudaComputeModeProhibited == attributes::compute_mode.prohibited_mode);
-      STATIC_REQUIRE(::cudaComputeModeExclusiveProcess == attributes::compute_mode.exclusive_process_mode);
+      STATIC_REQUIRE(::hipComputeModeDefault == attributes::compute_mode.default_mode);
+      STATIC_REQUIRE(::hipComputeModeProhibited == attributes::compute_mode.prohibited_mode);
+      STATIC_REQUIRE(::hipComputeModeExclusiveProcess == attributes::compute_mode.exclusive_process_mode);
 
       auto mode = device_ref(0).attribute(attributes::compute_mode);
       CCCLRT_REQUIRE((mode == attributes::compute_mode.default_mode || //
@@ -304,9 +309,9 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 
     SECTION("gpu_direct_rdma_flush_writes_options")
     {
-      STATIC_REQUIRE(::cudaFlushGPUDirectRDMAWritesOptionHost == attributes::gpu_direct_rdma_flush_writes_options.host);
+      STATIC_REQUIRE(::hipFlushGPUDirectRDMAWritesOptionHost == attributes::gpu_direct_rdma_flush_writes_options.host);
       STATIC_REQUIRE(
-        ::cudaFlushGPUDirectRDMAWritesOptionMemOps == attributes::gpu_direct_rdma_flush_writes_options.mem_ops);
+        ::hipFlushGPUDirectRDMAWritesOptionMemOps == attributes::gpu_direct_rdma_flush_writes_options.mem_ops);
 
       [[maybe_unused]] auto options = device_ref(0).attribute(attributes::gpu_direct_rdma_flush_writes_options);
 #if !_CCCL_COMPILER(MSVC) && !_CCCL_OS(WINDOWS)
@@ -317,33 +322,24 @@ C2H_CCCLRT_TEST("Smoke", "[device]")
 
     SECTION("gpu_direct_rdma_writes_ordering")
     {
-      STATIC_REQUIRE(::cudaGPUDirectRDMAWritesOrderingNone == attributes::gpu_direct_rdma_writes_ordering.none);
-      STATIC_REQUIRE(::cudaGPUDirectRDMAWritesOrderingOwner == attributes::gpu_direct_rdma_writes_ordering.owner);
+      STATIC_REQUIRE(::hipGPUDirectRDMAWritesOrderingNone == attributes::gpu_direct_rdma_writes_ordering.none);
+      STATIC_REQUIRE(::hipGPUDirectRDMAWritesOrderingOwner == attributes::gpu_direct_rdma_writes_ordering.owner);
       STATIC_REQUIRE(
-        ::cudaGPUDirectRDMAWritesOrderingAllDevices == attributes::gpu_direct_rdma_writes_ordering.all_devices);
+        ::hipGPUDirectRDMAWritesOrderingAllDevices == attributes::gpu_direct_rdma_writes_ordering.all_devices);
 
-// NOTE(HIP/AMD): there is no hipDeviceAttributeGPUDirectRDMAWritesOrdering;
-// the libhipcxx shim aliases it to 'hipDeviceAttributeHdpRegFlushCntl',
-// which queries a completely unrelated HDP-register-flush-control
-// value that is not in {None=0, Owner=100, AllDevices=200}. The
-// STATIC_REQUIRE blocks above still pass (they only compare the
-// libhipcxx-side enumerator constants); skip the runtime-value
-// membership check on HIP.
-#if !defined(__HIP_PLATFORM_AMD__)
       auto ordering = device_ref(0).attribute(attributes::gpu_direct_rdma_writes_ordering);
       CCCLRT_REQUIRE((ordering == attributes::gpu_direct_rdma_writes_ordering.none || //
                       ordering == attributes::gpu_direct_rdma_writes_ordering.owner || //
                       ordering == attributes::gpu_direct_rdma_writes_ordering.all_devices));
-#endif // !__HIP_PLATFORM_AMD__
     }
 
     SECTION("memory_pool_supported_handle_types")
     {
-      STATIC_REQUIRE(::cudaMemHandleTypeNone == attributes::memory_pool_supported_handle_types.none);
+      STATIC_REQUIRE(::hipMemHandleTypeNone == attributes::memory_pool_supported_handle_types.none);
       STATIC_REQUIRE(
-        ::cudaMemHandleTypePosixFileDescriptor == attributes::memory_pool_supported_handle_types.posix_file_descriptor);
-      STATIC_REQUIRE(::cudaMemHandleTypeWin32 == attributes::memory_pool_supported_handle_types.win32);
-      STATIC_REQUIRE(::cudaMemHandleTypeWin32Kmt == attributes::memory_pool_supported_handle_types.win32_kmt);
+        ::hipMemHandleTypePosixFileDescriptor == attributes::memory_pool_supported_handle_types.posix_file_descriptor);
+      STATIC_REQUIRE(::hipMemHandleTypeWin32 == attributes::memory_pool_supported_handle_types.win32);
+      STATIC_REQUIRE(::hipMemHandleTypeWin32Kmt == attributes::memory_pool_supported_handle_types.win32_kmt);
 #if _CCCL_CTK_AT_LEAST(12, 4)
       STATIC_REQUIRE(::cudaMemHandleTypeFabric == 0x8);
       STATIC_REQUIRE(::cudaMemHandleTypeFabric == attributes::memory_pool_supported_handle_types.fabric);
@@ -458,13 +454,13 @@ C2H_CCCLRT_TEST("global devices vector", "[device]")
 C2H_CCCLRT_TEST("memory location", "[device]")
 {
   cuda::memory_location loc = cuda::devices[0];
-  CCCLRT_REQUIRE(loc.type == ::cudaMemLocationTypeDevice);
+  CCCLRT_REQUIRE(loc.type == ::hipMemLocationTypeDevice);
   CCCLRT_REQUIRE(loc.id == 0);
 
   if (cuda::devices.size() > 1)
   {
     loc = cuda::device_ref{1};
-    CCCLRT_REQUIRE(loc.type == ::cudaMemLocationTypeDevice);
+    CCCLRT_REQUIRE(loc.type == ::hipMemLocationTypeDevice);
     CCCLRT_REQUIRE(loc.id == 1);
   }
 }

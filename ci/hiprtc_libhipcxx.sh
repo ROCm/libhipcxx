@@ -23,7 +23,7 @@ source "./build_common.sh"
 # On RHEL/CentOS-based containers, set LLVM_PATH to help COMGR find the correct clang binary
 # This prevents COMGR from defaulting to /bin/clang which causes incorrect GCC detection
 if [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]; then
-  export LLVM_PATH=/opt/rocm/lib/llvm
+  export LLVM_PATH="${ROCM_PATH:-/opt/rocm}/lib/llvm"
 fi
 
 print_environment_details

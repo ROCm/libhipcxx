@@ -95,7 +95,7 @@ TEST_FUNC constexpr bool test()
   test_type<__half>();
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test_type<__nv_bfloat16>();
+  test_type<__hip_bfloat16>();
 #endif // _LIBCUDACXX_HAS_NVBF16()
 #if _CCCL_HAS_FLOAT128()
   test_type<__float128>();

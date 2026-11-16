@@ -121,6 +121,16 @@ inline void FormatHipHeader(std::ostream& out)
 
 #include <cuda/std/__cccl/prologue.h>
 
+// NOTE(HIP/AMD): newer amd-llvm deprecates the __hip_atomic_* builtins used
+// below (-Whip-deprecated-builtins), which fails builds that see this header
+// as a non-system header under -Werror.
+_CCCL_DIAG_PUSH
+#if defined(__has_warning)
+#  if __has_warning("-Whip-deprecated-builtins")
+_CCCL_DIAG_SUPPRESS_CLANG("-Whip-deprecated-builtins")
+#  endif
+#endif
+
 _CCCL_BEGIN_NAMESPACE_CUDA_STD
 )XXX",
              generator_rel);
@@ -130,6 +140,8 @@ inline void FormatHipFooter(std::ostream& out)
 {
   out << R"XXX(
 _CCCL_END_NAMESPACE_CUDA_STD
+
+_CCCL_DIAG_POP
 
 #include <cuda/std/__cccl/epilogue.h>
 )XXX";

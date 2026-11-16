@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #include <cuda/std/cstddef>
 #include <cuda/type_traits>
 
@@ -107,17 +129,17 @@ TEST_FUNC void test()
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-  test<__nv_bfloat16, 2, __nv_bfloat162>();
+  test<__hip_bfloat16, 2, __hip_bfloat162>();
 #endif // _CCCL_HAS_NVBF16()
 
 #if _CCCL_HAS_NVFP8_E4M3()
-  test<__nv_fp8_e4m3, 2, __nv_fp8x2_e4m3>();
-  test<__nv_fp8_e4m3, 4, __nv_fp8x4_e4m3>();
+  test<__hip_fp8_e4m3, 2, __hip_fp8x2_e4m3>();
+  test<__hip_fp8_e4m3, 4, __hip_fp8x4_e4m3>();
 #endif // _CCCL_HAS_NVFP8_E4M3()
 
 #if _CCCL_HAS_NVFP8_E5M2()
-  test<__nv_fp8_e5m2, 2, __nv_fp8x2_e5m2>();
-  test<__nv_fp8_e5m2, 4, __nv_fp8x4_e5m2>();
+  test<__hip_fp8_e5m2, 2, __hip_fp8x2_e5m2>();
+  test<__hip_fp8_e5m2, 4, __hip_fp8x4_e5m2>();
 #endif // _CCCL_HAS_NVFP8_E5M2()
 
 #if _CCCL_HAS_NVFP8_E8M0()
@@ -126,18 +148,18 @@ TEST_FUNC void test()
 #endif // _CCCL_HAS_NVFP8_E8M0()
 
 #if _CCCL_HAS_NVFP6_E2M3()
-  test<__nv_fp6_e2m3, 2, __nv_fp6x2_e2m3>();
-  test<__nv_fp6_e2m3, 4, __nv_fp6x4_e2m3>();
+  test<__hip_fp6_e2m3, 2, __hip_fp6x2_e2m3>();
+  test<__hip_fp6_e2m3, 4, __hip_fp6x4_e2m3>();
 #endif // _CCCL_HAS_NVFP6_E2M3()
 
 #if _CCCL_HAS_NVFP6_E3M2()
-  test<__nv_fp6_e3m2, 2, __nv_fp6x2_e3m2>();
-  test<__nv_fp6_e3m2, 4, __nv_fp6x4_e3m2>();
+  test<__hip_fp6_e3m2, 2, __hip_fp6x2_e3m2>();
+  test<__hip_fp6_e3m2, 4, __hip_fp6x4_e3m2>();
 #endif // _CCCL_HAS_NVFP6_E3M2()
 
 #if _CCCL_HAS_NVFP4_E2M1()
-  test<__nv_fp4_e2m1, 2, __nv_fp4x2_e2m1>();
-  test<__nv_fp4_e2m1, 4, __nv_fp4x4_e2m1>();
+  test<__hip_fp4_e2m1, 2, __hip_fp4x2_e2m1>();
+  test<__hip_fp4_e2m1, 4, __hip_fp4x4_e2m1>();
 #endif // _CCCL_HAS_NVFP4_E2M1()
 
   test<float, 0, void>();

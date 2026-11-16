@@ -116,7 +116,7 @@ _CCCL_REQUIRES(__is_extended_arithmetic_v<_Tp>)
     }
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-    if constexpr (is_same_v<_Tp, __nv_bfloat16>)
+    if constexpr (is_same_v<_Tp, __hip_bfloat16>)
     {
       _CCCL_IF_NOT_CONSTEVAL_DEFAULT
       {

@@ -62,7 +62,7 @@
 _CCCL_BEGIN_NAMESPACE_CUDA
 
 template <class _Callable>
-_CCCL_HOST_API inline void CUDA_CB __host_func_launcher(void* __callable_ptr)
+_CCCL_HOST_API inline void HIPRT_CB __host_func_launcher(void* __callable_ptr)
 {
   (*(_Callable*) __callable_ptr)();
 }
@@ -75,10 +75,10 @@ struct __stream_callback_data
 };
 
 template <class _CallbackData>
-_CCCL_HOST_API inline void CUDA_CB __stream_callback_launcher(::CUstream, ::CUresult __status, void* __data_ptr)
+_CCCL_HOST_API inline void HIPRT_CB __stream_callback_launcher(::hipStream_t, ::hipError_t __status, void* __data_ptr)
 {
   auto* __casted_data_ptr = static_cast<_CallbackData*>(__data_ptr);
-  if (__status == ::CUDA_SUCCESS)
+  if (__status == ::hipSuccess)
   {
     (void) ::cuda::std::apply(__casted_data_ptr->__callable_, ::cuda::std::move(__casted_data_ptr->__args_));
   }

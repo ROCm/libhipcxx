@@ -134,9 +134,9 @@ bool test(int N, F&& f)
   for (int tidx : {0, 33, 63, 94})
   {
     int *a, *b, *c;
-    cudaMallocManaged(&a, N * sizeof(int));
-    cudaMallocManaged(&b, N * sizeof(int));
-    cudaMallocManaged(&c, N * sizeof(int));
+    hipMallocManaged(&a, N * sizeof(int));
+    hipMallocManaged(&b, N * sizeof(int));
+    hipMallocManaged(&c, N * sizeof(int));
     for (int i = 0; i < N; ++i)
     {
       a[i] = i;
@@ -145,16 +145,16 @@ bool test(int N, F&& f)
     }
 
     f(a, b, c, N, tidx);
-    assert(cudaDeviceSynchronize() == cudaSuccess);
+    assert(hipDeviceSynchronize() == hipSuccess);
 
     for (int i = 0; i < N; ++i)
     {
       assert(c[i] == (1 + i));
     }
 
-    cudaFree(a);
-    cudaFree(b);
-    cudaFree(c);
+    hipFree(a);
+    hipFree(b);
+    hipFree(c);
   }
   return true;
 }

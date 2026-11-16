@@ -247,7 +247,7 @@ TEST_FUNC void test(const float val)
   test<__half>(val);
 #endif // _LIBCUDACXX_HAS_NVFP16()
 #if _LIBCUDACXX_HAS_NVBF16()
-  test<__nv_bfloat16>(val);
+  test<__hip_bfloat16>(val);
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
   test<unsigned short>(static_cast<unsigned short>(val));

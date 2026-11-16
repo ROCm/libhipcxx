@@ -34,9 +34,8 @@
 #define __COMMON_UTILITY_H__
 
 // NOTE(HIP/AMD): the upstream-named <cuda_runtime_api.h> does not
-// exist on a HIP-only system; the libhipcxx detail/__config
-// transitively pulls <libhipcxx/__amd/cuda_runtime.h> which provides the cuda*
-// runtime API shim, so this include is unnecessary on HIP. Gate on
+// exist on a HIP-only system; the test uses the hip* runtime API from the
+// force-included <hip/hip_runtime.h>, so this include is unnecessary on HIP. Gate on
 // __HIP_PLATFORM_AMD__ rather than _CCCL_HIP_COMPILATION() because
 // the latter is only defined after some <cuda/std/...> headers have
 // established it -- the clang-hip preprocessor sets the former
@@ -105,13 +104,13 @@ public:
   explicit _malloc_pinned(std::size_t size)
   {
     cuda::__ensure_current_context guard(cuda::device_ref{0});
-    _CCCL_TRY_CUDA_API(::cudaMallocHost, "failed to allocate pinned memory", &pv, size);
+    _CCCL_TRY_CUDA_API(::hipHostMalloc, "failed to allocate pinned memory", &pv, size);
   }
 
   ~_malloc_pinned()
   {
     cuda::__ensure_current_context guard(cuda::device_ref{0});
-    [[maybe_unused]] auto status = ::cudaFreeHost(pv);
+    [[maybe_unused]] auto status = ::hipHostFree(pv);
   }
 
   template <class T>
@@ -225,7 +224,7 @@ void launch_kernel_single_thread(cuda::stream_ref stream, Fn fn, Args... args)
 {
   cuda::__ensure_current_context guard(stream);
   kernel_launcher<<<1, 1, 0, stream.get()>>>(fn, args...);
-  assert(cudaGetLastError() == cudaSuccess);
+  assert(hipGetLastError() == hipSuccess);
 }
 } // namespace test
 } // namespace

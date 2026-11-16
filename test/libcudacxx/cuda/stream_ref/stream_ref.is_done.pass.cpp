@@ -59,11 +59,11 @@ void test_is_done(cuda::stream_ref& ref)
 
 bool test()
 {
-  cudaStream_t stream;
-  assert(cudaStreamCreate(&stream) == cudaSuccess);
+  hipStream_t stream;
+  assert(hipStreamCreate(&stream) == hipSuccess);
   cuda::stream_ref ref{stream};
   test_is_done(ref);
-  assert(cudaStreamDestroy(stream) == cudaSuccess);
+  assert(hipStreamDestroy(stream) == hipSuccess);
 
   return true;
 }

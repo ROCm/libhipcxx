@@ -65,9 +65,9 @@ class timed_event;
 //! @brief Flags to use when creating the event.
 enum class event_flags : unsigned
 {
-  none          = cudaEventDefault,
-  blocking_sync = cudaEventBlockingSync,
-  interprocess  = cudaEventInterprocess,
+  none          = hipEventDefault,
+  blocking_sync = hipEventBlockingSync,
+  interprocess  = hipEventInterprocess,
 };
 
 [[nodiscard]] _CCCL_HOST_API constexpr event_flags operator|(event_flags __lhs, event_flags __rhs) noexcept
@@ -92,14 +92,14 @@ public:
   //!
   //! @throws cuda_error if the event creation fails.
   _CCCL_HOST_API explicit event(device_ref __device, event_flags __flags = event_flags::none)
-      : event(__device, ::cuda::std::to_underlying(__flags) | cudaEventDisableTiming)
+      : event(__device, ::cuda::std::to_underlying(__flags) | hipEventDisableTiming)
   {}
 
   //! @brief Construct a new `event` object into the moved-from state.
   //!
   //! @post `get()` returns `cudaEvent_t()`.
   _CCCL_HOST_API explicit constexpr event(no_init_t) noexcept
-      : event_ref(::cudaEvent_t{})
+      : event_ref(::hipEvent_t{})
   {}
 
   //! @brief Move-construct a new `event` object
@@ -149,7 +149,7 @@ public:
   //! @return event The constructed `event` object
   //!
   //! @note The constructed `event` object takes ownership of the native handle.
-  [[nodiscard]] static _CCCL_HOST_API event from_native_handle(::cudaEvent_t __evnt) noexcept
+  [[nodiscard]] static _CCCL_HOST_API event from_native_handle(::hipEvent_t __evnt) noexcept
   {
     return event(__evnt);
   }
@@ -165,7 +165,7 @@ public:
   //! @return cudaEvent_t The native handle being held by the `event` object.
   //!
   //! @post The event object is in a moved-from state.
-  [[nodiscard]] _CCCL_HOST_API constexpr ::cudaEvent_t release() noexcept
+  [[nodiscard]] _CCCL_HOST_API constexpr ::hipEvent_t release() noexcept
   {
     return ::cuda::std::exchange(__event_, {});
   }
@@ -173,14 +173,14 @@ public:
 private:
   // Use `event::from_native_handle(e)` to construct an owning `event`
   // object from a `cudaEvent_t` handle.
-  _CCCL_HOST_API explicit constexpr event(::cudaEvent_t __evnt) noexcept
+  _CCCL_HOST_API explicit constexpr event(::hipEvent_t __evnt) noexcept
       : event_ref(__evnt)
   {}
 
   _CCCL_HOST_API explicit event(stream_ref __stream, unsigned __flags);
 
   _CCCL_HOST_API explicit event(device_ref __device, unsigned __flags)
-      : event_ref(::cudaEvent_t{})
+      : event_ref(::hipEvent_t{})
   {
     [[maybe_unused]] __ensure_current_context __ctx_setter(__device);
     __event_ = ::cuda::__driver::__eventCreate(static_cast<unsigned>(__flags));

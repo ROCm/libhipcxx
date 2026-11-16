@@ -163,7 +163,7 @@ int main(int, char**)
   assert(s == N);
 
 #if _CCCL_CUDA_COMPILATION()
-  NV_IF_TARGET(NV_IS_HOST, (test_kernel<<<1, 1>>>(MyStruct{}); assert(cudaDeviceSynchronize() == cudaSuccess);))
+  NV_IF_TARGET(NV_IS_HOST, (test_kernel<<<1, 1>>>(MyStruct{}); assert(hipDeviceSynchronize() == hipSuccess);))
 #endif // _CCCL_CUDA_COMPILATION()
 
   return 0;

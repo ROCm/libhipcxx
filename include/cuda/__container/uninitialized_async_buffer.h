@@ -106,7 +106,7 @@ private:
   using __async_resource = ::cuda::mr::any_resource<_Properties...>;
 
   __async_resource __mr_;
-  ::cuda::stream_ref __stream_ = {::cudaStream_t{}};
+  ::cuda::stream_ref __stream_ = {::hipStream_t{}};
   size_t __count_              = 0;
   size_t __alignment_          = alignof(_Tp);
   void* __buf_                 = nullptr;
@@ -250,7 +250,7 @@ public:
   //! Takes ownership of the allocation in \p __other and resets it
   _CCCL_HOST_API __uninitialized_async_buffer(__uninitialized_async_buffer&& __other) noexcept
       : __mr_(::cuda::std::move(__other.__mr_))
-      , __stream_(::cuda::std::exchange(__other.__stream_, ::cuda::stream_ref{::cudaStream_t{}}))
+      , __stream_(::cuda::std::exchange(__other.__stream_, ::cuda::stream_ref{::hipStream_t{}}))
       , __count_(::cuda::std::exchange(__other.__count_, 0))
       , __alignment_(::cuda::std::exchange(__other.__alignment_, alignof(_Tp)))
       , __buf_(::cuda::std::exchange(__other.__buf_, nullptr))
@@ -263,7 +263,7 @@ public:
   _CCCL_REQUIRES(__properties_match<_OtherProperties...>)
   _CCCL_HOST_API __uninitialized_async_buffer(__uninitialized_async_buffer<_Tp, _OtherProperties...>&& __other) noexcept
       : __mr_(::cuda::std::move(__other.__mr_))
-      , __stream_(::cuda::std::exchange(__other.__stream_, ::cuda::stream_ref{::cudaStream_t{}}))
+      , __stream_(::cuda::std::exchange(__other.__stream_, ::cuda::stream_ref{::hipStream_t{}}))
       , __count_(::cuda::std::exchange(__other.__count_, 0))
       , __alignment_(::cuda::std::exchange(__other.__alignment_, alignof(_Tp)))
       , __buf_(::cuda::std::exchange(__other.__buf_, nullptr))
@@ -285,7 +285,7 @@ public:
       __mr_.deallocate(__stream_, __buf_, __get_allocation_size(__count_), __alignment_);
     }
     __mr_        = ::cuda::std::move(__other.__mr_);
-    __stream_    = ::cuda::std::exchange(__other.__stream_, ::cuda::stream_ref{::cudaStream_t{}});
+    __stream_    = ::cuda::std::exchange(__other.__stream_, ::cuda::stream_ref{::hipStream_t{}});
     __count_     = ::cuda::std::exchange(__other.__count_, 0);
     __alignment_ = ::cuda::std::exchange(__other.__alignment_, alignof(_Tp));
     __buf_       = ::cuda::std::exchange(__other.__buf_, nullptr);

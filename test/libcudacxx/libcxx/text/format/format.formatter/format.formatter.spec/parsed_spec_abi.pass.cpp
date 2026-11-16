@@ -133,7 +133,7 @@ void test_host_device_abi_compatiblity()
   value.__fill_      = ref.fill;
 
   test_host_device_abi_compatiblity_kernel<CharT><<<1, 1>>>(value);
-  assert(cudaDeviceSynchronize() == cudaSuccess);
+  assert(hipDeviceSynchronize() == hipSuccess);
 }
 
 void test_host_device_abi_compatiblity()

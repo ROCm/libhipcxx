@@ -94,7 +94,7 @@ struct __pstl_dispatch<__pstl_algorithm::__sort, __execution_backend::__cuda>
 {
   template <class _Tp>
   using _DeviceRadixSort =
-    cudaError_t (*)(void*, size_t&, CUB_NS_QUALIFIER::DoubleBuffer<_Tp>&, size_t, int, int, cudaStream_t);
+    hipError_t (*)(void*, size_t&, CUB_NS_QUALIFIER::DoubleBuffer<_Tp>&, size_t, int, int, hipStream_t);
 
   template <class _Tp, class _BinaryPredicate>
   [[nodiscard]] static _CCCL_CONSTEVAL _DeviceRadixSort<_Tp> __select_radix_impl() noexcept
@@ -113,7 +113,7 @@ struct __pstl_dispatch<__pstl_algorithm::__sort, __execution_backend::__cuda>
   _CCCL_HOST_API static void __radix_sort_impl(const _Policy& __policy, _Tp* __first, _Tp* __last, _BinaryPredicate)
   {
     const auto __count = static_cast<size_t>(::cuda::std::distance(__first, __last));
-    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStreamPerThread}, __policy);
+    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStreamPerThread}, __policy);
 
     CUB_NS_QUALIFIER::DoubleBuffer<_Tp> __buffer{__first, nullptr};
 
@@ -171,7 +171,7 @@ struct __pstl_dispatch<__pstl_algorithm::__sort, __execution_backend::__cuda>
   __merge_sort_impl(const _Policy& __policy, _InputIterator __first, _InputIterator __last, _BinaryPredicate __pred)
   {
     const auto __count = ::cuda::std::distance(__first, __last);
-    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStreamPerThread}, __policy);
+    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStreamPerThread}, __policy);
 
     // Run the kernel
     _CCCL_TRY_CUDA_API(
@@ -210,7 +210,7 @@ struct __pstl_dispatch<__pstl_algorithm::__sort, __execution_backend::__cuda>
       }
       catch (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == cudaErrorMemoryAllocation)
+        if (__err.status() == hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }

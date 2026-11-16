@@ -99,58 +99,58 @@ PoolType construct_pool(cuda::memory_pool_properties props = {})
 #endif // _CCCL_CTK_AT_LEAST(13, 0)
 }
 
-static bool ensure_release_threshold(::cudaMemPool_t pool, const size_t expected_threshold)
+static bool ensure_release_threshold(::hipMemPool_t pool, const size_t expected_threshold)
 {
   size_t release_threshold = expected_threshold + 1337; // use something different than the expected threshold
   _CCCL_TRY_CUDA_API(
-    ::cudaMemPoolGetAttribute,
-    "Failed to call cudaMemPoolGetAttribute",
+    ::hipMemPoolGetAttribute,
+    "Failed to call hipMemPoolGetAttribute",
     pool,
-    ::cudaMemPoolAttrReleaseThreshold,
+    ::hipMemPoolAttrReleaseThreshold,
     &release_threshold);
   return release_threshold == expected_threshold;
 }
 
-static bool ensure_disable_reuse(::cudaMemPool_t pool)
+static bool ensure_disable_reuse(::hipMemPool_t pool)
 {
   int disable_reuse = 0;
   _CCCL_TRY_CUDA_API(
-    ::cudaMemPoolGetAttribute,
-    "Failed to call cudaMemPoolGetAttribute",
+    ::hipMemPoolGetAttribute,
+    "Failed to call hipMemPoolGetAttribute",
     pool,
-    ::cudaMemPoolReuseAllowOpportunistic,
+    ::hipMemPoolReuseAllowOpportunistic,
     &disable_reuse);
 
   return disable_reuse != 0;
 }
 
-static bool ensure_export_handle(::cudaMemPool_t pool, const ::cudaMemAllocationHandleType allocation_handle)
+static bool ensure_export_handle(::hipMemPool_t pool, const ::hipMemAllocationHandleType allocation_handle)
 {
   size_t handle              = 0;
-  const ::cudaError_t status = ::cudaMemPoolExportToShareableHandle(&handle, pool, allocation_handle, 0);
+  const ::hipError_t status = ::hipMemPoolExportToShareableHandle(&handle, pool, allocation_handle, 0);
   // Clear CUDA error state; the return is intentionally discarded.
-  (void) ::cudaGetLastError();
+  (void) ::hipGetLastError();
 
   // If no export was defined we need to query cudaErrorInvalidValue
-  return allocation_handle == ::cudaMemHandleTypeNone ? status == ::cudaErrorInvalidValue : status == ::cudaSuccess;
+  return allocation_handle == ::hipMemHandleTypeNone ? status == ::hipErrorInvalidValue : status == ::hipSuccess;
 }
 
 C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TEST_TYPES)
 {
   int current_device{};
   {
-    _CCCL_TRY_CUDA_API(::cudaGetDevice, "Failed to query current device with with cudaGetDevice.", &current_device);
+    _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query current device with with hipGetDevice.", &current_device);
   }
 
   int driver_version = 0;
   {
-    _CCCL_TRY_CUDA_API(::cudaDriverGetVersion, "Failed to call cudaDriverGetVersion", &driver_version);
+    _CCCL_TRY_CUDA_API(::hipDriverGetVersion, "Failed to call hipDriverGetVersion", &driver_version);
   }
 
-  ::cudaMemPool_t current_default_pool{};
+  ::hipMemPool_t current_default_pool{};
   {
-    _CCCL_TRY_CUDA_API(::cudaDeviceGetDefaultMemPool,
-                       "Failed to call cudaDeviceGetDefaultMemPool",
+    _CCCL_TRY_CUDA_API(::hipDeviceGetDefaultMemPool,
+                       "Failed to call hipDeviceGetDefaultMemPool",
                        &current_default_pool,
                        current_device);
   }
@@ -160,7 +160,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
   {
     memory_pool from_device = construct_pool<memory_pool>();
 
-    ::cudaMemPool_t get = from_device.get();
+    ::hipMemPool_t get = from_device.get();
     CHECK(get != current_default_pool);
 
     // Ensure we use the right release threshold
@@ -170,7 +170,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
     CHECK(ensure_disable_reuse(get));
 
     // Ensure that we disable export
-    CHECK(ensure_export_handle(get, ::cudaMemHandleTypeNone));
+    CHECK(ensure_export_handle(get, ::hipMemHandleTypeNone));
   }
 
   SECTION("Construct with empty properties")
@@ -178,7 +178,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
     cuda::memory_pool_properties props{};
     memory_pool from_defaulted_properties = construct_pool<memory_pool>(props);
 
-    ::cudaMemPool_t get = from_defaulted_properties.get();
+    ::hipMemPool_t get = from_defaulted_properties.get();
     CHECK(get != current_default_pool);
 
     // Ensure we use the right release threshold
@@ -188,7 +188,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
     CHECK(ensure_disable_reuse(get));
 
     // Ensure that we disable export
-    CHECK(ensure_export_handle(get, ::cudaMemHandleTypeNone));
+    CHECK(ensure_export_handle(get, ::hipMemHandleTypeNone));
   }
 
   SECTION("Construct with initial pool size")
@@ -196,7 +196,7 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
     cuda::memory_pool_properties props = {20, 42};
     memory_pool with_threshold         = construct_pool<memory_pool>(props);
 
-    ::cudaMemPool_t get = with_threshold.get();
+    ::hipMemPool_t get = with_threshold.get();
     CHECK(get != current_default_pool);
 
     // Ensure we use the right release threshold
@@ -206,23 +206,23 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
     CHECK(ensure_disable_reuse(get));
 
     // Ensure that we disable export
-    CHECK(ensure_export_handle(get, ::cudaMemHandleTypeNone));
+    CHECK(ensure_export_handle(get, ::hipMemHandleTypeNone));
   }
 
   SECTION("Take ownership of native handle")
   {
-    ::cudaMemPoolProps pool_properties{};
-    pool_properties.handleTypes = ::cudaMemAllocationHandleType(cudaMemAllocationHandleType::cudaMemHandleTypeNone);
+    ::hipMemPoolProps pool_properties{};
+    pool_properties.handleTypes = ::hipMemAllocationHandleType(hipMemAllocationHandleType::hipMemHandleTypeNone);
     if (cuda::std::is_same_v<memory_pool, cuda::device_memory_pool>)
     {
-      pool_properties.allocType     = ::cudaMemAllocationTypePinned;
-      pool_properties.location.type = ::cudaMemLocationTypeDevice;
+      pool_properties.allocType     = ::hipMemAllocationTypePinned;
+      pool_properties.location.type = ::hipMemLocationTypeDevice;
       pool_properties.location.id   = current_device;
     }
 #if _CCCL_CTK_AT_LEAST(12, 9)
     else if (cuda::std::is_same_v<memory_pool, cuda::pinned_memory_pool>)
     {
-      pool_properties.allocType     = ::cudaMemAllocationTypePinned;
+      pool_properties.allocType     = ::hipMemAllocationTypePinned;
       pool_properties.location.type = cudaMemLocationTypeHostNuma;
       pool_properties.location.id   = 0;
     }
@@ -239,8 +239,8 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool construction", "[memory_resource]", TES
     {
       REQUIRE(false);
     }
-    ::cudaMemPool_t new_pool{};
-    _CCCL_TRY_CUDA_API(::cudaMemPoolCreate, "Failed to call cudaMemPoolCreate", &new_pool, &pool_properties);
+    ::hipMemPool_t new_pool{};
+    _CCCL_TRY_CUDA_API(::hipMemPoolCreate, "Failed to call hipMemPoolCreate", &new_pool, &pool_properties);
 
     memory_pool from_handle = memory_pool::from_native_handle(new_pool);
     CHECK(from_handle.get() == new_pool);
@@ -254,13 +254,13 @@ C2H_CCCLRT_TEST_LIST("base_memory_pool construction", "[memory_resource]", TEST_
 
   int driver_version = 0;
   {
-    _CCCL_TRY_CUDA_API(::cudaDriverGetVersion, "Failed to call cudaDriverGetVersion", &driver_version);
+    _CCCL_TRY_CUDA_API(::hipDriverGetVersion, "Failed to call hipDriverGetVersion", &driver_version);
   }
 
-  ::cudaMemPool_t current_default_pool{};
+  ::hipMemPool_t current_default_pool{};
   {
-    _CCCL_TRY_CUDA_API(::cudaDeviceGetDefaultMemPool,
-                       "Failed to call cudaDeviceGetDefaultMemPool",
+    _CCCL_TRY_CUDA_API(::hipDeviceGetDefaultMemPool,
+                       "Failed to call hipDeviceGetDefaultMemPool",
                        &current_default_pool,
                        current_device);
   }
@@ -283,7 +283,7 @@ C2H_CCCLRT_TEST_LIST("base_memory_pool construction", "[memory_resource]", TEST_
     {
       memory_pool with_max_pool_size = construct_pool<memory_pool>(props);
 
-      ::cudaMemPool_t get = with_max_pool_size.get();
+      ::hipMemPool_t get = with_max_pool_size.get();
       CHECK(get != current_default_pool);
 
       // Ensure we use the right release threshold
@@ -293,14 +293,14 @@ C2H_CCCLRT_TEST_LIST("base_memory_pool construction", "[memory_resource]", TEST_
       CHECK(ensure_disable_reuse(get));
 
       // Ensure that we disable export
-      CHECK(ensure_export_handle(get, ::cudaMemHandleTypeNone));
+      CHECK(ensure_export_handle(get, ::hipMemHandleTypeNone));
 
       void* ptr{nullptr};
 
-      ::cudaStream_t stream{nullptr};
+      ::hipStream_t stream{nullptr};
       // make an allocation smaller than the max pool size
       _CCCL_TRY_CUDA_API(
-        ::cudaMallocAsync,
+        ::hipMallocAsync,
         "Failed to allocate with pool passed to cuda::device_memory_pool_ref",
         &ptr,
         42,
@@ -309,11 +309,11 @@ C2H_CCCLRT_TEST_LIST("base_memory_pool construction", "[memory_resource]", TEST_
       CHECK(ptr != nullptr);
 
       _CCCL_ASSERT_CUDA_API(
-        ::cudaFreeAsync, "Failed to deallocate with pool passed to cuda::device_memory_pool_ref", ptr, stream);
+        ::hipFreeAsync, "Failed to deallocate with pool passed to cuda::device_memory_pool_ref", ptr, stream);
       // make an allocation larger than the max pool size
       // NOTE: currently cuda driver rounds up max size to 32MB. So we need to allocate 32MB + 1 byte.
-      cudaError_t status = ::cudaMallocAsync(&ptr, 33 << 20, get, stream);
-      CHECK(status == cudaErrorMemoryAllocation);
+      hipError_t status = ::hipMallocAsync(&ptr, 33 << 20, get, stream);
+      CHECK(status == hipErrorMemoryAllocation);
       CHECK(ptr == nullptr);
     }
 #else
@@ -336,18 +336,18 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool comparison", "[memory_resource]", TEST_
 {
   int current_device{};
   {
-    _CCCL_TRY_CUDA_API(::cudaGetDevice, "Failed to query current device with with cudaGetDevice.", &current_device);
+    _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query current device with with hipGetDevice.", &current_device);
   }
 
   int driver_version = 0;
   {
-    _CCCL_TRY_CUDA_API(::cudaDriverGetVersion, "Failed to call cudaDriverGetVersion", &driver_version);
+    _CCCL_TRY_CUDA_API(::hipDriverGetVersion, "Failed to call hipDriverGetVersion", &driver_version);
   }
 
-  ::cudaMemPool_t current_default_pool{};
+  ::hipMemPool_t current_default_pool{};
   {
-    _CCCL_TRY_CUDA_API(::cudaDeviceGetDefaultMemPool,
-                       "Failed to call cudaDeviceGetDefaultMemPool",
+    _CCCL_TRY_CUDA_API(::hipDeviceGetDefaultMemPool,
+                       "Failed to call hipDeviceGetDefaultMemPool",
                        &current_default_pool,
                        current_device);
   }
@@ -365,12 +365,12 @@ C2H_CCCLRT_TEST_LIST("device_memory_pool accessors", "[memory_resource]", TEST_T
 {
   int current_device{};
   {
-    _CCCL_TRY_CUDA_API(::cudaGetDevice, "Failed to query current device with with cudaGetDevice.", &current_device);
+    _CCCL_TRY_CUDA_API(::hipGetDevice, "Failed to query current device with with hipGetDevice.", &current_device);
   }
 
   int driver_version = 0;
   {
-    _CCCL_TRY_CUDA_API(::cudaDriverGetVersion, "Failed to call cudaDriverGetVersion", &driver_version);
+    _CCCL_TRY_CUDA_API(::hipDriverGetVersion, "Failed to call hipDriverGetVersion", &driver_version);
   }
 
   using memory_pool     = TestType;
@@ -697,20 +697,20 @@ C2H_CCCLRT_TEST("pinned_memory_pool::enable_access", "[memory_resource]")
 C2H_CCCLRT_TEST("device_memory_pool with allocation handle", "[memory_resource]")
 {
   if (!(cuda::device_attributes::memory_pool_supported_handle_types(cuda::devices[0])
-        & cudaMemHandleTypePosixFileDescriptor))
+        & hipMemHandleTypePosixFileDescriptor))
   {
     return;
   }
-  cuda::memory_pool_properties props              = {20, 42, ::cudaMemHandleTypePosixFileDescriptor};
+  cuda::memory_pool_properties props              = {20, 42, ::hipMemHandleTypePosixFileDescriptor};
   cuda::device_memory_pool with_allocation_handle = cuda::device_memory_pool(cuda::device_ref{0}, props);
 
-  ::cudaMemPool_t current_default_pool{};
+  ::hipMemPool_t current_default_pool{};
   {
     _CCCL_TRY_CUDA_API(
-      ::cudaDeviceGetDefaultMemPool, "Failed to call cudaDeviceGetDefaultMemPool", &current_default_pool, 0);
+      ::hipDeviceGetDefaultMemPool, "Failed to call hipDeviceGetDefaultMemPool", &current_default_pool, 0);
   }
 
-  ::cudaMemPool_t get = with_allocation_handle.get();
+  ::hipMemPool_t get = with_allocation_handle.get();
   CHECK(get != current_default_pool);
 
   // Ensure we use the right release threshold
@@ -720,21 +720,21 @@ C2H_CCCLRT_TEST("device_memory_pool with allocation handle", "[memory_resource]"
   CHECK(ensure_disable_reuse(get));
 
   // Ensure that we disable export
-  CHECK(ensure_export_handle(get, static_cast<cudaMemAllocationHandleType>(props.allocation_handle_type)));
+  CHECK(ensure_export_handle(get, static_cast<hipMemAllocationHandleType>(props.allocation_handle_type)));
 }
 
 #  if _CCCL_CTK_AT_LEAST(12, 9)
 C2H_CCCLRT_TEST("pinned_memory_pool with allocation handle", "[memory_resource]")
 {
   if (!(cuda::device_attributes::memory_pool_supported_handle_types(cuda::devices[0])
-        & cudaMemHandleTypePosixFileDescriptor))
+        & hipMemHandleTypePosixFileDescriptor))
   {
     return;
   }
-  cuda::memory_pool_properties props              = {20, 42, ::cudaMemHandleTypePosixFileDescriptor};
+  cuda::memory_pool_properties props              = {20, 42, ::hipMemHandleTypePosixFileDescriptor};
   cuda::pinned_memory_pool with_allocation_handle = cuda::pinned_memory_pool(0, props);
 
-  ::cudaMemPool_t get = with_allocation_handle.get();
+  ::hipMemPool_t get = with_allocation_handle.get();
   CHECK(get != cuda::pinned_default_memory_pool().get());
 
   // Ensure we use the right release threshold
@@ -744,7 +744,7 @@ C2H_CCCLRT_TEST("pinned_memory_pool with allocation handle", "[memory_resource]"
   CHECK(ensure_disable_reuse(get));
 
   // Ensure that we disable export
-  CHECK(ensure_export_handle(get, static_cast<cudaMemAllocationHandleType>(props.allocation_handle_type)));
+  CHECK(ensure_export_handle(get, static_cast<hipMemAllocationHandleType>(props.allocation_handle_type)));
 }
 #  endif // _CCCL_CTK_AT_LEAST(12, 9)
 

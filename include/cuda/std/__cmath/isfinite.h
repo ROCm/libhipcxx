@@ -140,23 +140,23 @@ template <class _Tp>
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-[[nodiscard]] _CCCL_API constexpr bool isfinite(__nv_bfloat16 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isfinite(__hip_bfloat16 __x) noexcept
 {
-  return (::cuda::std::__fp_get_storage(__x) & __fp_exp_mask_of_v<__nv_bfloat16>) != __fp_exp_mask_of_v<__nv_bfloat16>;
+  return (::cuda::std::__fp_get_storage(__x) & __fp_exp_mask_of_v<__hip_bfloat16>) != __fp_exp_mask_of_v<__hip_bfloat16>;
 }
 #endif // _CCCL_HAS_NVBF16()
 
 #if _CCCL_HAS_NVFP8_E4M3()
-[[nodiscard]] _CCCL_API constexpr bool isfinite(__nv_fp8_e4m3 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isfinite(__hip_fp8_e4m3 __x) noexcept
 {
-  return (__x.__x & __fp_exp_mant_mask_of_v<__nv_fp8_e4m3>) != __fp_exp_mant_mask_of_v<__nv_fp8_e4m3>;
+  return (__x.__x & __fp_exp_mant_mask_of_v<__hip_fp8_e4m3>) != __fp_exp_mant_mask_of_v<__hip_fp8_e4m3>;
 }
 #endif // _CCCL_HAS_NVFP8_E4M3()
 
 #if _CCCL_HAS_NVFP8_E5M2()
-[[nodiscard]] _CCCL_API constexpr bool isfinite(__nv_fp8_e5m2 __x) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isfinite(__hip_fp8_e5m2 __x) noexcept
 {
-  return (__x.__x & __fp_exp_mask_of_v<__nv_fp8_e5m2>) != __fp_exp_mask_of_v<__nv_fp8_e5m2>;
+  return (__x.__x & __fp_exp_mask_of_v<__hip_fp8_e5m2>) != __fp_exp_mask_of_v<__hip_fp8_e5m2>;
 }
 #endif // _CCCL_HAS_NVFP8_E5M2()
 
@@ -168,21 +168,21 @@ template <class _Tp>
 #endif // _CCCL_HAS_NVFP8_E8M0()
 
 #if _CCCL_HAS_NVFP6_E2M3()
-[[nodiscard]] _CCCL_API constexpr bool isfinite(__nv_fp6_e2m3) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isfinite(__hip_fp6_e2m3) noexcept
 {
   return true;
 }
 #endif // _CCCL_HAS_NVFP6_E2M3()
 
 #if _CCCL_HAS_NVFP6_E3M2()
-[[nodiscard]] _CCCL_API constexpr bool isfinite(__nv_fp6_e3m2) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isfinite(__hip_fp6_e3m2) noexcept
 {
   return true;
 }
 #endif // _CCCL_HAS_NVFP6_E3M2()
 
 #if _CCCL_HAS_NVFP4_E2M1()
-[[nodiscard]] _CCCL_API constexpr bool isfinite(__nv_fp4_e2m1) noexcept
+[[nodiscard]] _CCCL_API constexpr bool isfinite(__hip_fp4_e2m1) noexcept
 {
   return true;
 }

@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 // XFAIL: enable-tile && !c++17
 // nvbug6077402: error: "call to non-tile function not supported!"
 
@@ -72,10 +94,10 @@ TEST_FUNC bool runtime_test()
 #  endif
 #endif
 #if _LIBCUDACXX_HAS_NVBF16()
-  test<__nv_bfloat16, __nv_bfloat16, __nv_bfloat16>(__nv_bfloat16(1.0f), __nv_bfloat16(2.0f), __nv_bfloat16(2.0f));
-  test<__nv_bfloat16, float, float>(__nv_bfloat16(1.0f), 2.0f, 2.0f);
+  test<__hip_bfloat16, __hip_bfloat16, __hip_bfloat16>(__hip_bfloat16(1.0f), __hip_bfloat16(2.0f), __hip_bfloat16(2.0f));
+  test<__hip_bfloat16, float, float>(__hip_bfloat16(1.0f), 2.0f, 2.0f);
 #  if _LIBCUDACXX_HAS_NVFP16() && !(_CCCL_COMPILER(MSVC) && _CCCL_STD_VER == 2017)
-  test<__nv_bfloat16, double, double>(__nv_bfloat16(1.0f), 2.0, 2.0);
+  test<__hip_bfloat16, double, double>(__hip_bfloat16(1.0f), 2.0, 2.0);
 #  endif
 #endif
   return true;

@@ -63,8 +63,8 @@ TEST_FUNC constexpr bool test()
   test<::std::complex<__half>, 1, __half>();
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  test<::std::complex<__nv_bfloat16>, 0, __nv_bfloat16>();
-  test<::std::complex<__nv_bfloat16>, 1, __nv_bfloat16>();
+  test<::std::complex<__hip_bfloat16>, 0, __hip_bfloat16>();
+  test<::std::complex<__hip_bfloat16>, 1, __hip_bfloat16>();
 #endif // _CCCL_HAS_NVBF16()
 
   test<::std::pair<int, float>, 0, int>();

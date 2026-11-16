@@ -41,9 +41,6 @@
 //   * cub::DeviceTransform::Generate  (hipCUB's DeviceTransform has Transform only)
 //   * cub::detail::transform::{requires_stable_address, always_true_predicate,
 //     dispatch}  (CUB-internal; not part of hipCUB's public API)
-// The cuda* runtime symbols (cudaStream_t, cudaError_t, cudaStreamPerThread,
-// cudaMemcpy*) are already hip-aliased globally via <cuda/std/detail/__config> ->
-// <libhipcxx/__amd/cuda_runtime.h>, and _CCCL_TRY_CUDA_API works on HIP.
 //
 // dispatch()/Generate() are implemented directly over rocprim::transform with a
 // counting+discard iterator and an explicit index op (the same reliable pattern

@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___PSTL_CUDA_STABLE_PARTITION_H
 #define _CUDA_STD___PSTL_CUDA_STABLE_PARTITION_H
 
@@ -71,7 +93,7 @@ struct __pstl_dispatch<__pstl_algorithm::__stable_partition, __execution_backend
 
     _OffsetType __num_selected;
     const auto __count = static_cast<_OffsetType>(::cuda::std::distance(__first, __last));
-    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStreamPerThread}, __policy);
+    auto __stream      = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStreamPerThread}, __policy);
 
     // Determine temporary device storage requirements for device_stable_partition
     size_t __num_bytes = 0;
@@ -116,12 +138,12 @@ struct __pstl_dispatch<__pstl_algorithm::__stable_partition, __execution_backend
 
       // Copy the result back from storage
       _CCCL_TRY_CUDA_API(
-        ::cudaMemcpyAsync,
+        ::hipMemcpyAsync,
         "__pstl_cuda_stable_partition: copy of result from device to host failed",
         ::cuda::std::addressof(__num_selected),
         __storage.template __get_ptr<0>(),
         sizeof(_OffsetType),
-        ::cudaMemcpyDefault,
+        ::hipMemcpyDefault,
         __stream.get());
     }
 
@@ -146,7 +168,7 @@ struct __pstl_dispatch<__pstl_algorithm::__stable_partition, __execution_backend
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == cudaErrorMemoryAllocation)
+        if (__err.status() == hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }

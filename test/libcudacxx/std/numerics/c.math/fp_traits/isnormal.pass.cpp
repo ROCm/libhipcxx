@@ -130,25 +130,25 @@ TEST_FUNC constexpr bool test()
   test_type<__half>();
 #endif // _CCCL_HAS_NVFP16()
 #if _CCCL_HAS_NVBF16()
-  test_type<__nv_bfloat16>();
+  test_type<__hip_bfloat16>();
 #endif // _CCCL_HAS_NVBF16()
 #if _CCCL_HAS_NVFP8_E4M3()
-  test_type<__nv_fp8_e4m3>();
+  test_type<__hip_fp8_e4m3>();
 #endif // _CCCL_HAS_NVFP8_E4M3
 #if _CCCL_HAS_NVFP8_E5M2()
-  test_type<__nv_fp8_e5m2>();
+  test_type<__hip_fp8_e5m2>();
 #endif // _CCCL_HAS_NVFP8_E5M2
 #if _CCCL_HAS_NVFP8_E8M0()
   test_type<__nv_fp8_e8m0>();
 #endif // _CCCL_HAS_NVFP8_E8M0
 #if _CCCL_HAS_NVFP6_E2M3()
-  test_type<__nv_fp6_e2m3>();
+  test_type<__hip_fp6_e2m3>();
 #endif // _CCCL_HAS_NVFP6_E2M3
 #if _CCCL_HAS_NVFP6_E3M2()
-  test_type<__nv_fp6_e3m2>();
+  test_type<__hip_fp6_e3m2>();
 #endif // _CCCL_HAS_NVFP6_E3M2
 #if _CCCL_HAS_NVFP4_E2M1()
-  test_type<__nv_fp4_e2m1>();
+  test_type<__hip_fp4_e2m1>();
 #endif // _CCCL_HAS_NVFP4_E2M1
 
   test_type<signed char>();

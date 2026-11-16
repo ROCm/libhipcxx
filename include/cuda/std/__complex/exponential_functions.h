@@ -8,6 +8,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___COMPLEX_EXPONENTIAL_FUNCTIONS_H
 #define _CUDA_STD___COMPLEX_EXPONENTIAL_FUNCTIONS_H
 
@@ -322,9 +344,9 @@ _CCCL_API inline complex<__half> exp(const complex<__half>& __x)
 
 #if _LIBCUDACXX_HAS_NVBF16()
 template <>
-_CCCL_API inline complex<__nv_bfloat16> exp(const complex<__nv_bfloat16>& __x)
+_CCCL_API inline complex<__hip_bfloat16> exp(const complex<__hip_bfloat16>& __x)
 {
-  return complex<__nv_bfloat16>{::cuda::std::exp(complex<float>{__x})};
+  return complex<__hip_bfloat16>{::cuda::std::exp(complex<float>{__x})};
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 
@@ -350,13 +372,13 @@ _CCCL_API inline complex<__half> pow(const complex<__half>& __x, const complex<_
 
 #if _LIBCUDACXX_HAS_NVBF16()
 template <>
-_CCCL_API inline complex<__nv_bfloat16> pow(const complex<__nv_bfloat16>& __x, const complex<__nv_bfloat16>& __y)
+_CCCL_API inline complex<__hip_bfloat16> pow(const complex<__hip_bfloat16>& __x, const complex<__hip_bfloat16>& __y)
 {
   // complex<__nv_bfloat16>exp and complex<__nv_bfloat16>log both call the fp32 version, as they are both
   // faster and more accurate.
   // With this in mind it also makes sense for complex<__nv_bfloat16>pow to call the fp32 version,
   // avoiding the intermediate narrowing conversion and losing accuracy.
-  return complex<__nv_bfloat16>{::cuda::std::pow(complex<float>{__x}, complex<float>{__y})};
+  return complex<__hip_bfloat16>{::cuda::std::pow(complex<float>{__x}, complex<float>{__y})};
 }
 #endif // _LIBCUDACXX_HAS_NVBF16()
 

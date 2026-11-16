@@ -8,7 +8,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-// Modifications Copyright (c) 2025 Advanced Micro Devices, Inc.
+// Modifications Copyright (c) 2025-2026 Advanced Micro Devices, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -52,11 +52,11 @@ void test_ready(cuda::stream_ref& ref)
 
 bool test()
 {
-  cudaStream_t stream;
-  assert(cudaStreamCreate(&stream) == cudaSuccess);
+  hipStream_t stream;
+  assert(hipStreamCreate(&stream) == hipSuccess);
   cuda::stream_ref ref{stream};
   test_ready(ref);
-  assert(cudaStreamDestroy(stream) == cudaSuccess);
+  assert(hipStreamDestroy(stream) == hipSuccess);
 
   return true;
 }

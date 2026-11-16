@@ -105,8 +105,8 @@ TEST_FUNC void test_extended_fp_types()
 #endif // _CCCL_HAS_NVFP16()
 
 #if _CCCL_HAS_NVBF16()
-  test_is_trivially_copyable_compositions<__nv_bfloat16>();
-  test_is_trivially_copyable_compositions<__nv_bfloat162>();
+  test_is_trivially_copyable_compositions<__hip_bfloat16>();
+  test_is_trivially_copyable_compositions<__hip_bfloat162>();
 #endif // _CCCL_HAS_NVBF16()
 }
 

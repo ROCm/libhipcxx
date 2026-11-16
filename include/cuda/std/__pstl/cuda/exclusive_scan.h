@@ -110,7 +110,7 @@ struct __pstl_dispatch<__pstl_algorithm::__exclusive_scan, __execution_backend::
       __policy);
 
     // Get the stream for synchronization after the algorithm is run
-    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{cudaStream_t{}}, __policy);
+    auto __stream = ::cuda::__call_or(::cuda::get_stream, ::cuda::stream_ref{hipStream_t{}}, __policy);
     __stream.sync();
 
     return __result + iter_difference_t<_OutputIterator>(__count);
@@ -141,7 +141,7 @@ struct __pstl_dispatch<__pstl_algorithm::__exclusive_scan, __execution_backend::
       }
       _CCCL_CATCH (const ::cuda::cuda_error& __err)
       {
-        if (__err.status() == cudaErrorMemoryAllocation)
+        if (__err.status() == hipErrorMemoryAllocation)
         {
           _CCCL_THROW(::std::bad_alloc);
         }
