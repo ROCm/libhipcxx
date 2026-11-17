@@ -21,5 +21,14 @@
 #
 # More details are in the discussion at
 # https://github.com/NVIDIA/libcudacxx/pull/242#discussion_r794003857
-include(${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config-version.cmake)
-include(${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config.cmake)
+#
+# Called outside find_package(), from add_subdirectory and from the top-level
+# build. The version file writes PACKAGE_VERSION and the other find_package
+# result variables; a function scope drops those on return so they do not
+# replace the caller's packaging version. The INTERFACE target and the
+# include-dir cache entries stay visible.
+function(_libhipcxx_define_from_source)
+  include(${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config-version.cmake)
+  include(${libcudacxx_SOURCE_DIR}/lib/cmake/libhipcxx/libhipcxx-config.cmake)
+endfunction()
+_libhipcxx_define_from_source()
