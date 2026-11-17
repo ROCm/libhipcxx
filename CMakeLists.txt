@@ -63,8 +63,27 @@ if (libhipcxx_ENABLE_INSTALL_RULES)
   include(cmake/libhipcxxInstallRules.cmake)
 endif()
 
+# Define libhipcxx::libhipcxx from this source tree on every configure.
+# add_subdirectory consumers stop below. The top-level build must define the
+# same target: installed rocThrust links libhipcxx::libhipcxx, and
+# find_package(libhipcxx) would select the headers installed under
+# include/hipccl. The source config returns immediately when the target
+# already exists. libhipcxx-config-version.cmake overwrites PACKAGE_VERSION,
+# so keep the packaging version established above.
+set(_libhipcxx_saved_package_version "${PACKAGE_VERSION}")
+set(_libhipcxx_saved_package_version_compatible "${PACKAGE_VERSION_COMPATIBLE}")
+set(_libhipcxx_saved_package_version_exact "${PACKAGE_VERSION_EXACT}")
+set(_libhipcxx_saved_package_version_unsuitable "${PACKAGE_VERSION_UNSUITABLE}")
+include(cmake/libhipcxxAddSubdir.cmake)
+set(PACKAGE_VERSION "${_libhipcxx_saved_package_version}")
+set(PACKAGE_VERSION_COMPATIBLE "${_libhipcxx_saved_package_version_compatible}")
+set(PACKAGE_VERSION_EXACT "${_libhipcxx_saved_package_version_exact}")
+set(PACKAGE_VERSION_UNSUITABLE "${_libhipcxx_saved_package_version_unsuitable}")
+unset(_libhipcxx_saved_package_version)
+unset(_libhipcxx_saved_package_version_compatible)
+unset(_libhipcxx_saved_package_version_exact)
+unset(_libhipcxx_saved_package_version_unsuitable)
 if (NOT LIBCUDACXX_TOPLEVEL_PROJECT)
-  include(cmake/libhipcxxAddSubdir.cmake)
   return()
 endif()
 
