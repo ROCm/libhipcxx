@@ -30,6 +30,7 @@
 
 import copy
 import errno
+import glob
 import os
 import time
 
@@ -318,11 +319,13 @@ class LibcxxTestFormat(object):
         object_path = tmpBase + ".o"
         # Create the output directory if it does not already exist.
         libcudacxx.util.mkdir_p(os.path.dirname(tmpBase))
-        compile_cmd_path = self._compile_cmd_path(tmpBase)
         if self.prebuilt_mode == "build":
-            for path in self._prebuilt_outputs(tmpBase, exec_path) + [compile_cmd_path]:
+            stale = self._prebuilt_outputs(tmpBase, exec_path) + self._recorded_compile_cmd_paths(tmpBase)
+            for path in stale:
                 libcudacxx.util.cleanFile(path)
-        keep_compile_cmd = self.prebuilt_mode == "build" or os.path.exists(compile_cmd_path)
+        keep_compile_cmd = self.prebuilt_mode == "build" or bool(
+            self._recorded_compile_cmd_paths(tmpBase)
+        )
         # A combined run over a prebuilt tree refreshes the prebuilt executable
         # instead of deleting it, so a later prebuilt_mode=run still finds it.
         keep_exec = self.prebuilt_mode == "build" or os.path.exists(exec_path)
@@ -343,8 +346,9 @@ class LibcxxTestFormat(object):
             compiled = True
             compile_cmd = " ".join(cmd)
             if keep_compile_cmd:
-                with open(compile_cmd_path, "w") as f:
-                    f.write(compile_cmd)
+                for path in self._compile_cmd_paths(tmpBase, test_cxx, cmd):
+                    with open(path, "w") as f:
+                        f.write(compile_cmd)
             if self.prebuilt_mode == "build":
                 if test.isExpectedToFail():
                     # Not yet known whether it fails; prebuilt_mode=run decides.
@@ -432,10 +436,33 @@ class LibcxxTestFormat(object):
         return [exec_path, tmpBase + ".build.yml"]
 
     @staticmethod
-    def _compile_cmd_path(tmpBase):
-        # prebuilt_mode=build records the compile command here so that
-        # prebuilt_mode=run can report it.
-        return tmpBase + ".compile_cmd"
+    def _compile_cmd_paths(tmpBase, test_cxx, cmd):
+        # prebuilt_mode=build records the compile command so that
+        # prebuilt_mode=run can report it. hiprtcc writes one device build per
+        # --offload-arch, and the kpack splitter sends each build to the
+        # artifact of its arch. The command is recorded per arch the same way,
+        # so each artifact carries the command that produced its build.
+        if test_cxx.type == "hiprtcc":
+            archs = sorted(
+                {a[len("--offload-arch="):] for a in cmd if a.startswith("--offload-arch=")}
+            )
+            if archs:
+                return ["%s.%s.compile_cmd" % (tmpBase, arch) for arch in archs]
+        return [tmpBase + ".compile_cmd"]
+
+    @staticmethod
+    def _recorded_compile_cmd_paths(tmpBase):
+        # Every file recorded for this test: the per-arch files and, when the
+        # command had no --offload-arch, the plain '<tmpBase>.compile_cmd'.
+        paths = []
+        for path in sorted(glob.glob(glob.escape(tmpBase) + ".*.compile_cmd")):
+            arch = path[len(tmpBase) + 1 : -len(".compile_cmd")]
+            if arch and "." not in arch and os.sep not in arch:
+                paths.append(path)
+        plain = tmpBase + ".compile_cmd"
+        if os.path.exists(plain):
+            paths.append(plain)
+        return paths
 
     def _run_prebuilt_test(self, test, tmpBase, exec_path, run_should_pass):
         if not any(os.path.exists(p) for p in self._prebuilt_outputs(tmpBase, exec_path)):
@@ -444,12 +471,16 @@ class LibcxxTestFormat(object):
                 "No prebuilt test found at '%s'. Build the tests with "
                 "prebuilt_mode=build first.\n" % exec_path,
             )
-        compile_cmd = None
-        try:
-            with open(self._compile_cmd_path(tmpBase)) as f:
-                compile_cmd = f.read()
-        except OSError:
-            pass
+        # A device only holds the artifact of its own arch, so this usually
+        # reads one file. Identical commands from several archs are shown once.
+        compile_cmds = []
+        for path in self._recorded_compile_cmd_paths(tmpBase):
+            try:
+                with open(path) as f:
+                    compile_cmds.append(f.read())
+            except OSError:
+                pass
+        compile_cmd = "\n".join(dict.fromkeys(compile_cmds)) or None
         return self._retry(
             lambda retry_count: self._run_test_exe(
                 test, exec_path, compile_cmd, run_should_pass, retry_count
