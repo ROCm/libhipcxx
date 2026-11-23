@@ -414,11 +414,12 @@ elseif (LIBHIPCXX_TEST_WITH_HIPRTC)
   )
   # NOTE(HIP/AMD): the hiprtcc test driver does NOT produce a host
   # '.exe' -- it writes per-arch '.gpu' device-code files plus a
-  # '<test>.build.yml' index next to where the executable would
-  # normally land. The lit harness therefore cannot exec the .exe
-  # directly. Wrap the executable invocation with hiprtcc itself
-  # (PrefixExecutor) so 'hiprtcc <test>.exe ...' detects the .exe
-  # extension, loads the matching .build.yml, and launches the
+  # '<test>.<arch>.build.yml' run description for each of them next to
+  # where the executable would normally land. The lit harness therefore
+  # cannot exec the .exe directly. Wrap the executable invocation with
+  # hiprtcc itself (PrefixExecutor) so 'hiprtcc <test>.exe ...' detects
+  # the .exe extension, loads the .build.yml of the current device's
+  # arch, and launches the
   # pre-built device kernel via hipModuleLaunchKernel. Mirrors the
   # NVRTC branch above and the 3.1.4 setup that was lost during the
   # 3.2 port. Without this, every '.compile.pass.cpp' / '.pass.cpp'

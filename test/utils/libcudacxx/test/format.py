@@ -37,6 +37,7 @@ import time
 import lit.Test  # pylint: disable=import-error
 import lit.TestRunner  # pylint: disable=import-error
 import lit.util
+from lit.BooleanExpression import BooleanExpression
 from lit.TestRunner import IntegratedTestKeywordParser, ParserKind
 
 import libcudacxx.util
@@ -85,6 +86,7 @@ class LibcxxTestFormat(object):
         executor,
         exec_env,
         prebuilt_mode="",
+        arch_features=None,
     ):
         assert prebuilt_mode in self.PREBUILT_MODES
         self.cxx = copy.deepcopy(cxx)
@@ -93,6 +95,9 @@ class LibcxxTestFormat(object):
         self.executor = executor
         self.exec_env = dict(exec_env)
         self.prebuilt_mode = prebuilt_mode
+        # NOTE(HIP/AMD): arch -> features of that arch alone. hiprtcc builds
+        # each arch separately, so a test is built for the archs it supports.
+        self.arch_features = dict(arch_features or {})
 
     @staticmethod
     def _make_custom_parsers():
@@ -283,6 +288,13 @@ class LibcxxTestFormat(object):
                 if flag.startswith("-gencode=") or flag.startswith("--generate-code=")
             ]
 
+        if self.arch_features and test_cxx.type == "hiprtcc" and not is_sh_test:
+            result = self._select_supported_archs(
+                test, tmpBase, test_cxx, write_markers=not is_fail_test
+            )
+            if result is not None:
+                return result
+
         # Dispatch the test based on its suffix.
         if is_sh_test:
             if not isinstance(self.executor, LocalExecutor):
@@ -320,7 +332,8 @@ class LibcxxTestFormat(object):
         # Create the output directory if it does not already exist.
         libcudacxx.util.mkdir_p(os.path.dirname(tmpBase))
         if self.prebuilt_mode == "build":
-            stale = self._prebuilt_outputs(tmpBase, exec_path) + self._recorded_compile_cmd_paths(tmpBase)
+            stale = self._prebuilt_outputs(tmpBase, exec_path)
+            stale += self._recorded_compile_cmd_paths(tmpBase)
             for path in stale:
                 libcudacxx.util.cleanFile(path)
         keep_compile_cmd = self.prebuilt_mode == "build" or bool(
@@ -412,6 +425,10 @@ class LibcxxTestFormat(object):
             report += self._timeout_report(e)
         else:
             report += libcudacxx.util.makeReport(cmd, out, err, rc)
+            if rc != 0 and "HIPRTCC_NO_BUILD_FOR_DEVICE" in out + err:
+                # hiprtcc found no build for this device: the test was not
+                # built for its arch.
+                return lit.Test.UNSUPPORTED, report
             if (rc == 0) == run_should_pass:
                 return "pass", report
             # Rarely devices are unavailable, so just restart the test to avoid false negatives.
@@ -430,10 +447,66 @@ class LibcxxTestFormat(object):
         return libcudacxx.util.makeReport(cmd, getattr(e, "out", ""), err, -42)
 
     @staticmethod
-    def _prebuilt_outputs(tmpBase, exec_path):
+    def _arch_files(tmpBase, suffix):
+        # Files hiprtc tests record per arch: '<tmpBase>.<arch>.<suffix>'. The
+        # arch in the name is what lets the kpack splitter send each file to
+        # the artifact of its arch.
+        paths = []
+        for path in sorted(glob.glob(glob.escape(tmpBase) + ".*." + suffix)):
+            arch = path[len(tmpBase) + 1 : -len(suffix) - 1]
+            if arch and "." not in arch and os.sep not in arch:
+                paths.append(path)
+        return paths
+
+    @classmethod
+    def _prebuilt_outputs(cls, tmpBase, exec_path):
         # Offline builds produce exec_path. hiprtcc writes no executable but a
-        # '<tmpBase>.build.yml' index that 'hiprtcc <exec_path>' loads to run.
-        return [exec_path, tmpBase + ".build.yml"]
+        # '<tmpBase>.<arch>.build.yml' per arch that 'hiprtcc <exec_path>'
+        # loads to run the build for the current device.
+        return [exec_path] + cls._arch_files(tmpBase, "build.yml")
+
+    def _select_supported_archs(self, test, tmpBase, test_cxx, write_markers):
+        """Limit the hiprtc build of a test to the archs that support it.
+
+        The pre-gfx* features of a job cover all of its archs, so a test for
+        one arch would be dropped from every arch of a mixed job. Each arch is
+        checked on its own instead. An arch that is ruled out is not compiled
+        and, when building ahead of time, leaves '<tmpBase>.<arch>.unsupported'
+        so that its artifact can report the test as unsupported.
+
+        Returns a result when no arch supports the test, else None.
+        """
+        prefix = "--offload-arch="
+        archs = [f[len(prefix) :] for f in test_cxx.compile_flags if f.startswith(prefix)]
+        ruled_out = {}
+        for arch in archs:
+            features = set(test.config.available_features)
+            features |= self.arch_features.get(arch, set())
+            missing = [r for r in test.requires if not BooleanExpression.evaluate(r, features)]
+            hit = [u for u in test.unsupported if BooleanExpression.evaluate(u, features)]
+            if missing:
+                ruled_out[arch] = "REQUIRES: " + ", ".join(missing)
+            elif hit:
+                ruled_out[arch] = "UNSUPPORTED: " + ", ".join(hit)
+
+        if write_markers and self.prebuilt_mode == "build":
+            for path in self._arch_files(tmpBase, "unsupported"):
+                libcudacxx.util.cleanFile(path)
+            for arch, reason in ruled_out.items():
+                with open("%s.%s.unsupported" % (tmpBase, arch), "w") as f:
+                    f.write(reason + "\n")
+
+        if not ruled_out:
+            return None
+        if len(ruled_out) == len(archs):
+            reasons = "".join("%s: %s\n" % item for item in sorted(ruled_out.items()))
+            return lit.Test.Result(lit.Test.UNSUPPORTED, reasons)
+        test_cxx.compile_flags = [
+            f
+            for f in test_cxx.compile_flags
+            if not (f.startswith(prefix) and f[len(prefix) :] in ruled_out)
+        ]
+        return None
 
     @staticmethod
     def _compile_cmd_paths(tmpBase, test_cxx, cmd):
@@ -450,15 +523,11 @@ class LibcxxTestFormat(object):
                 return ["%s.%s.compile_cmd" % (tmpBase, arch) for arch in archs]
         return [tmpBase + ".compile_cmd"]
 
-    @staticmethod
-    def _recorded_compile_cmd_paths(tmpBase):
+    @classmethod
+    def _recorded_compile_cmd_paths(cls, tmpBase):
         # Every file recorded for this test: the per-arch files and, when the
         # command had no --offload-arch, the plain '<tmpBase>.compile_cmd'.
-        paths = []
-        for path in sorted(glob.glob(glob.escape(tmpBase) + ".*.compile_cmd")):
-            arch = path[len(tmpBase) + 1 : -len(".compile_cmd")]
-            if arch and "." not in arch and os.sep not in arch:
-                paths.append(path)
+        paths = cls._arch_files(tmpBase, "compile_cmd")
         plain = tmpBase + ".compile_cmd"
         if os.path.exists(plain):
             paths.append(plain)
@@ -466,6 +535,15 @@ class LibcxxTestFormat(object):
 
     def _run_prebuilt_test(self, test, tmpBase, exec_path, run_should_pass):
         if not any(os.path.exists(p) for p in self._prebuilt_outputs(tmpBase, exec_path)):
+            # A test that was not built for any arch of this artifact left only
+            # the reasons why.
+            reasons = []
+            for path in self._arch_files(tmpBase, "unsupported"):
+                with open(path) as f:
+                    arch = os.path.basename(path)[len(os.path.basename(tmpBase)) + 1 : -len(".unsupported")]
+                    reasons.append("%s: %s" % (arch, f.read()))
+            if reasons:
+                return lit.Test.Result(lit.Test.UNSUPPORTED, "".join(reasons))
             return lit.Test.Result(
                 lit.Test.FAIL,
                 "No prebuilt test found at '%s'. Build the tests with "

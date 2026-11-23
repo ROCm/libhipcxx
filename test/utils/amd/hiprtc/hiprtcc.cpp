@@ -245,11 +245,22 @@ ArgPair argHandlers[] = {
 
      return NORMAL;
    }},
-  {// If an input is a .exe file, search for other builds and run those
+  {// If an input is a .exe file, run the build for the current device. Every arch has its own
+   // "<template>.<arch>.build.yml" next to its "<template>.<arch>.gpu", so an artifact that only
+   // holds one arch is complete, and a test that was not built for this device has no file.
    std::regex("^([^-].*).exe$"),
    [](const std::smatch& match) {
-     execute         = true;
-     executionConfig = load_execution_config_from_file(match[1].str() + ".build.yml");
+     execute = true;
+     const std::string arch           = current_device_arch();
+     const std::string runDescription = match[1].str() + "." + arch + ".build.yml";
+     if (!std::filesystem::exists(runDescription))
+     {
+       // The lit format reports this marker as an unsupported test.
+       std::cerr << "HIPRTCC_NO_BUILD_FOR_DEVICE: no build for current device " << arch << " ('" << runDescription
+                 << "' not found)" << std::endl;
+       std::exit(1);
+     }
+     executionConfig = load_execution_config_from_file(runDescription);
      assert(executionConfig.builds.size());
      return NORMAL;
    }},
@@ -368,22 +379,22 @@ int main(int argc, char** argv)
   hiprtcArguments.emplace_back("-DCCCL_ENABLE_ASSERTIONS");
   if (!skipOutput)
   {
-    std::ofstream ostr(outputTemplate + ".build.yml");
-    ostr << "cuda_thread_count: " << runConfig.threadCount << '\n';
-    ostr << "cuda_block_shmem_size: " << runConfig.shmemSize << '\n';
-    
-    // Do a build for each arch and add it to the build list
-    ostr << "builds:\n";
+    // Do a build for each arch. Each gets its own run description, so a test tree can be split
+    // by arch and every part still describes exactly the builds it holds.
     for (const auto& build : buildList)
     {
       auto gpuCode            = hiprtc_build_prog(testCu, build, hiprtcArguments);
       std::string gpuCodeFile = outputTemplate + "." + archString(build) + ".gpu";
       write_output_file(gpuCode.data(), gpuCode.size(), gpuCodeFile);
+
+      std::ofstream ostr(outputTemplate + "." + archString(build) + ".build.yml");
+      ostr << "cuda_thread_count: " << runConfig.threadCount << '\n';
+      ostr << "cuda_block_shmem_size: " << runConfig.shmemSize << '\n';
+      ostr << "builds:\n";
       ostr << "  - ";
       ostr << '\'' << std::filesystem::path(gpuCodeFile).filename().string() << '\'';
       ostr << '\n';
     }
-    ostr.close();
   }
   else
   {
