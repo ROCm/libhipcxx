@@ -45,6 +45,12 @@ import libcudacxx.util
 # pylint: disable=import-error
 from libcudacxx.test.executor import LocalExecutor as LocalExecutor
 
+# NOTE(HIP/AMD): environment variable naming the arch of the device that
+# prebuilt_mode=run runs on, e.g. 'gfx1100'. With it, prebuilt_mode=run reports
+# a test that was not built for that arch as unsupported and shows the compile
+# command of that arch.
+DEVICE_ARCH_ENV = "LIBHIPCXX_DEVICE_ARCH"
+
 _TIMEOUT_EXCEPTIONS = (
     libcudacxx.util.ExecuteCommandTimeoutException,
     lit.util.ExecuteCommandTimeoutException,
@@ -95,8 +101,8 @@ class LibcxxTestFormat(object):
         self.executor = executor
         self.exec_env = dict(exec_env)
         self.prebuilt_mode = prebuilt_mode
-        # NOTE(HIP/AMD): arch -> features of that arch alone. hiprtcc builds
-        # each arch separately, so a test is built for the archs it supports.
+        # NOTE(HIP/AMD): arch -> features of that arch alone, so that a test is
+        # built only for the archs it supports.
         self.arch_features = dict(arch_features or {})
 
     @staticmethod
@@ -288,7 +294,7 @@ class LibcxxTestFormat(object):
                 if flag.startswith("-gencode=") or flag.startswith("--generate-code=")
             ]
 
-        if self.arch_features and test_cxx.type == "hiprtcc" and not is_sh_test:
+        if self.arch_features and test_cxx.type in ("hiprtcc", "hipcc") and not is_sh_test:
             result = self._select_supported_archs(
                 test, tmpBase, test_cxx, write_markers=not is_fail_test
             )
@@ -438,6 +444,13 @@ class LibcxxTestFormat(object):
         return outcome, report
 
     @staticmethod
+    def _device_arch():
+        # The arch of the device the prebuilt tests run on, set by whoever runs
+        # them (e.g. 'gfx1100'). hiprtcc finds it out itself, an amdclang++
+        # executable cannot be asked without running it.
+        return os.environ.get(DEVICE_ARCH_ENV) or None
+
+    @staticmethod
     def _timeout_report(e):
         # libcudacxx's timeout exception carries the command that timed out.
         cmd = getattr(e, "command", None) or ["None"]
@@ -466,7 +479,7 @@ class LibcxxTestFormat(object):
         return [exec_path] + cls._arch_files(tmpBase, "build.yml")
 
     def _select_supported_archs(self, test, tmpBase, test_cxx, write_markers):
-        """Limit the hiprtc build of a test to the archs that support it.
+        """Limit the build of a test to the archs that support it.
 
         The pre-gfx* features of a job cover all of its archs, so a test for
         one arch would be dropped from every arch of a mixed job. Each arch is
@@ -511,16 +524,16 @@ class LibcxxTestFormat(object):
     @staticmethod
     def _compile_cmd_paths(tmpBase, test_cxx, cmd):
         # prebuilt_mode=build records the compile command so that
-        # prebuilt_mode=run can report it. hiprtcc writes one device build per
-        # --offload-arch, and the kpack splitter sends each build to the
-        # artifact of its arch. The command is recorded per arch the same way,
-        # so each artifact carries the command that produced its build.
-        if test_cxx.type == "hiprtcc":
-            archs = sorted(
-                {a[len("--offload-arch="):] for a in cmd if a.startswith("--offload-arch=")}
-            )
-            if archs:
-                return ["%s.%s.compile_cmd" % (tmpBase, arch) for arch in archs]
+        # prebuilt_mode=run can report it. A compile covers the archs of the
+        # --offload-arch flags: hiprtcc writes one device build per arch and
+        # amdclang++ one executable with the device code of all of them. The
+        # kpack splitter sends every file named after an arch to the artifact
+        # of that arch, so the command is recorded under the name of each arch
+        # and each artifact carries the command that built its device code.
+        prefix = "--offload-arch="
+        archs = sorted({a[len(prefix) :] for a in cmd if a.startswith(prefix)})
+        if archs:
+            return ["%s.%s.compile_cmd" % (tmpBase, arch) for arch in archs]
         return [tmpBase + ".compile_cmd"]
 
     @classmethod
@@ -549,10 +562,23 @@ class LibcxxTestFormat(object):
                 "No prebuilt test found at '%s'. Build the tests with "
                 "prebuilt_mode=build first.\n" % exec_path,
             )
+        device_arch = self._device_arch()
+        if device_arch:
+            marker = "%s.%s.unsupported" % (tmpBase, device_arch)
+            if os.path.exists(marker):
+                # The test was not built for the arch of this device.
+                with open(marker) as f:
+                    return lit.Test.Result(
+                        lit.Test.UNSUPPORTED, "%s: %s" % (device_arch, f.read())
+                    )
         # A device only holds the artifact of its own arch, so this usually
         # reads one file. Identical commands from several archs are shown once.
         compile_cmds = []
-        for path in self._recorded_compile_cmd_paths(tmpBase):
+        paths = self._recorded_compile_cmd_paths(tmpBase)
+        own = "%s.%s.compile_cmd" % (tmpBase, device_arch) if device_arch else None
+        if own in paths:
+            paths = [own]
+        for path in paths:
             try:
                 with open(path) as f:
                     compile_cmds.append(f.read())

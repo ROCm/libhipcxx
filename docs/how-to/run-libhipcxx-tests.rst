@@ -202,6 +202,15 @@ compiler: lit takes the compiler type, flags and features from ``lit.prebuilt.js
 runs the c2h and amdclang++ lit tests; ``ctest --test-dir <prefix>/bin/libhipcxx/lit-hiprtc`` runs
 the hiprtc lit tests.
 
+A build for several architectures records the files of a test per architecture, so that a
+tool can split them into one package per architecture. ``<test>.<arch>.compile_cmd`` holds the
+compile command and ``<test>.<arch>.unsupported`` marks an architecture whose features rule
+the test out (such a test is not built for that architecture). Both amdclang++ and HIPRTC
+record them; HIPRTC also records ``<test>.<arch>.build.yml``. To make ``prebuilt_mode=run`` report
+a test that was not built for the device as unsupported, and show only the compile command of the
+device, set the environment variable ``LIBHIPCXX_DEVICE_ARCH`` to the architecture of the
+device, for example ``gfx1100``.
+
 To test a different C++ standard, pass ``--param=std=<standard>``, for example:
 
 .. code-block:: shell

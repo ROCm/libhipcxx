@@ -1143,19 +1143,16 @@ class Configuration(object):
             pre_sm_80  = False
             pre_sm_90  = False
             compute_archs = set(sorted(re.split('\s|;|,', compute_archs)))
-            # NOTE(HIP/AMD): the pre-gfx* features of a job are those of all its
-            # archs. hiprtcc builds each arch separately, so a test is checked
-            # against the features of every arch on its own (see
-            # LibcxxTestFormat); only hipcc keeps the job-wide features.
-            job_pre_features = self._hip_pre_features(compute_archs)
-            if self.cxx.type == 'hiprtcc':
-                self.arch_features = {
-                    arch: self._hip_pre_features({arch})
-                    for arch in compute_archs
-                    if arch.startswith("gfx")
-                }
-            else:
-                self.config.available_features.update(job_pre_features)
+            # NOTE(HIP/AMD): a job can cover several archs that differ in the
+            # pre-gfx* features. A job-wide feature would rule a test out for
+            # all of them, so each arch is checked on its own (see
+            # LibcxxTestFormat) and a test is built only for the archs that
+            # support it.
+            self.arch_features = {
+                arch: self._hip_pre_features({arch})
+                for arch in compute_archs
+                if arch.startswith("gfx")
+            }
             for arch in compute_archs:
                 # Add --offload-arch for all valid gfx architectures
                 if arch.startswith("gfx"):
