@@ -67,7 +67,13 @@
 #  include <cuda/std/__type_traits/is_same.h>
 #  if _CCCL_HOSTED()
 #    if _CCCL_OS(WINDOWS)
+// Do not leak the min/max macros defined by windows.h unless NOMINMAX is set
+#      pragma push_macro("NOMINMAX")
+#      ifndef NOMINMAX
+#        define NOMINMAX
+#      endif // !NOMINMAX
 #      include <windows.h>
+#      pragma pop_macro("NOMINMAX")
 #    else
 #      include <dlfcn.h>
 #    endif

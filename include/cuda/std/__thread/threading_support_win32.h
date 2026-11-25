@@ -7,6 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 
+// MIT License
+//
+// Modifications Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef _CUDA_STD___THREAD_THREADING_SUPPORT_WIN32_H
 #define _CUDA_STD___THREAD_THREADING_SUPPORT_WIN32_H
 
@@ -25,7 +47,17 @@
 #  include <cuda/std/__chrono/duration.h>
 
 #  include <process.h>
+
+// NOTE(HIP/AMD): <windows.h> defines the function-like macros min(a, b) and max(a, b) unless NOMINMAX is defined. The
+// prologue below can only protect against macros that are already defined, so it cannot undo a leak from this include.
+// Prevent windows.h from defining them in the first place and restore the includer's NOMINMAX state afterwards, so that
+// including libhipcxx headers does not break user code such as std::min(...) or numeric_limits<T>::max().
+#  pragma push_macro("NOMINMAX")
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif // !NOMINMAX
 #  include <windows.h>
+#  pragma pop_macro("NOMINMAX")
 
 #  include <cuda/std/__cccl/prologue.h>
 
