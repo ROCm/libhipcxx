@@ -52,14 +52,16 @@
 #  error "libhipcxx public headers must not leave NOMINMAX defined"
 #endif
 
-#include <algorithm>
-#include <limits>
+// Use the cuda/std headers, not the host <algorithm>/<limits>: under hiprtc there are no host libc headers, and
+// the host headers clash with libhipcxx's own time_t/int64_t/timespec definitions.
+#include <cuda/std/algorithm>
+#include <cuda/std/limits>
 
 int main(int, char**)
 {
   // These would fail to parse if min/max were function-like macros.
-  const int smaller = std::min(1, 2);
-  const int larger  = std::max(1, 2);
-  static_assert(std::numeric_limits<int>::max() > 0, "");
+  const int smaller = cuda::std::min(1, 2);
+  const int larger  = cuda::std::max(1, 2);
+  static_assert(cuda::std::numeric_limits<int>::max() > 0, "");
   return smaller < larger ? 0 : 1;
 }
