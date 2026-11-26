@@ -36,9 +36,10 @@
 // protect themselves.
 #undef NOMINMAX
 
+// <cuda/std/atomic> reaches <cuda/std/__thread/threading_support.h> (via __atomic/wait/polling.h), which
+// includes <windows.h> on Windows. <cuda/std/latch> and <cuda/std/semaphore> are not supported on AMD
+// hardware (they #error), so they cannot be used here.
 #include <cuda/std/atomic>
-#include <cuda/std/latch>
-#include <cuda/std/semaphore>
 
 #if defined(min)
 #  error "libhipcxx public headers must not leak the min macro from <windows.h>"
