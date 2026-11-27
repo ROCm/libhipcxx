@@ -116,6 +116,13 @@ namespace __libhipcxx
   //===----------------------------------------------------------------------===//
   #ifdef __HIP_DEVICE_COMPILE__
 
+#if defined(__SPIRV__)
+  // AMDGPU address-space builtins take AS0 pointers, which are private in SPIR-V.
+  // Keep generic pointers intact until OCKL is linked for the concrete GPU.
+  extern "C" __device__ __attribute__((const)) bool __ockl_is_local_addr(const void*);
+  extern "C" __device__ __attribute__((const)) bool __ockl_is_private_addr(const void*);
+#endif
+
   /**
    * @brief Check if a pointer points to shared memory (LDS - Local Data Share)
    * @param ptr Pointer to check (can be any type)
@@ -126,7 +133,9 @@ namespace __libhipcxx
    */
   template<typename T>
   __device__ inline bool __isShared(const T* ptr) {
-#if __has_builtin(__builtin_amdgcn_is_shared)
+#if defined(__SPIRV__)
+    return __ockl_is_local_addr((const void*)ptr);
+#elif __has_builtin(__builtin_amdgcn_is_shared)
     // Cast to address space 0 (generic/flat) as required by the builtin
     return __builtin_amdgcn_is_shared(
         (const __attribute__((address_space(0))) void*)ptr);
@@ -148,7 +157,9 @@ namespace __libhipcxx
    */
   template<typename T>
   __device__ inline bool __isGlobal(const T* ptr) {
-#if __has_builtin(__builtin_amdgcn_is_shared) && __has_builtin(__builtin_amdgcn_is_private)
+#if defined(__SPIRV__)
+    return !__ockl_is_local_addr((const void*)ptr) && !__ockl_is_private_addr((const void*)ptr);
+#elif __has_builtin(__builtin_amdgcn_is_shared) && __has_builtin(__builtin_amdgcn_is_private)
     // Cast to address space 0 (generic/flat) as required by the builtin
     const __attribute__((address_space(0))) void* flat_ptr =
         (const __attribute__((address_space(0))) void*)ptr;
@@ -173,7 +184,9 @@ namespace __libhipcxx
    */
   template<typename T>
   __device__ inline bool __isPrivate(const T* ptr) {
-#if __has_builtin(__builtin_amdgcn_is_private)
+#if defined(__SPIRV__)
+    return __ockl_is_private_addr((const void*)ptr);
+#elif __has_builtin(__builtin_amdgcn_is_private)
     return __builtin_amdgcn_is_private(
         (const __attribute__((address_space(0))) void*)ptr);
 #else
